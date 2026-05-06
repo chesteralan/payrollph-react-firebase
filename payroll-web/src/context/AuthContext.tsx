@@ -3,6 +3,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updatePassword,
+  sendPasswordResetEmail,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
 } from 'firebase/auth'
 import type { User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
@@ -19,6 +23,8 @@ interface AuthContextType {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   setCurrentCompanyId: (companyId: string) => void
   hasPermission: (department: Department, section: Section, action: 'view' | 'add' | 'edit' | 'delete') => boolean
 }
@@ -97,6 +103,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth)
   }
 
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    if (!firebaseUser || !firebaseUser.email) throw new Error('No authenticated user')
+    const credential = EmailAuthProvider.credential(firebaseUser.email, currentPassword)
+    await reauthenticateWithCredential(firebaseUser, credential)
+    await updatePassword(firebaseUser, newPassword)
+  }
+
+  const resetPassword = async (email: string) => {
+    await sendPasswordResetEmail(auth, email)
+  }
+
   const setCurrentCompanyId = (companyId: string) => {
     setCurrentCompanyIdState(companyId)
   }
@@ -129,6 +146,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         login,
         logout,
+        changePassword,
+        resetPassword,
         setCurrentCompanyId,
         hasPermission,
       }}

@@ -94,6 +94,15 @@ export function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate('/forgot-password')}
+            className="text-sm text-primary-600 hover:text-primary-700"
+          >
+            Forgot your password?
+          </button>
+        </div>
       </div>
     </div>
   )

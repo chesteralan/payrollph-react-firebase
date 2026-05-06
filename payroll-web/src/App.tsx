@@ -5,6 +5,9 @@ import { ProtectedRoute } from './components/ui/ProtectedRoute'
 import { AppLayout } from './components/layout/AppLayout'
 import { LoginPage } from './pages/auth/LoginPage'
 import { SetupPage } from './pages/auth/SetupPage'
+import { ChangePasswordPage } from './pages/auth/ChangePasswordPage'
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { UserSettingsPage } from './pages/auth/UserSettingsPage'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { EmployeesPage } from './pages/employees/EmployeesPage'
 import { EmployeeProfilePage } from './pages/employees/EmployeeProfilePage'
@@ -31,6 +34,8 @@ function App() {
           <Routes>
             <Route path="/setup" element={<SetupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
             <Route
               path="/"
               element={
@@ -40,6 +45,7 @@ function App() {
               }
             >
               <Route index element={<DashboardPage />} />
+              <Route path="settings" element={<UserSettingsPage />} />
               <Route path="employees" element={<EmployeesPage />} />
               <Route path="employees/:id" element={<EmployeeProfilePage />} />
               <Route path="employees/calendar" element={<EmployeeCalendarPage />} />

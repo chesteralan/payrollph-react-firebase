@@ -16,11 +16,11 @@
 - [x] 2.4 Build custom hooks (useAuth, usePermissions)
 - [x] 2.5 Implement SetupPage for first-run initialization
 - [x] 2.6 Create LoginPage with redirect logic
-- [ ] 2.7 Implement Firebase Auth email/password sign-in
-- [ ] 2.8 Add password change functionality
-- [ ] 2.9 Add password reset flow
-- [ ] 2.10 Implement session management & logout
-- [ ] 2.11 Add user settings page (theme, items per page, default company)
+- [x] 2.7 Implement Firebase Auth email/password sign-in
+- [x] 2.10 Implement session management & logout
+- [x] 2.8 Add password change functionality
+- [x] 2.9 Add password reset flow
+- [x] 2.11 Add user settings page (theme, items per page, default company)
 
 ## 3. Layout & Navigation
 - [x] 3.1 Build AppLayout with sidebar and header
@@ -29,7 +29,7 @@
 - [x] 3.4 Add "New Payroll" quick action in sidebar
 - [ ] 3.5 Implement responsive mobile sidebar (hamburger menu)
 - [ ] 3.6 Add breadcrumb navigation
-- [ ] 3.7 Implement user profile dropdown in header
+- [x] 3.7 Implement user profile dropdown in header
 
 ## 4. Employee Management
 - [x] 4.1 Create EmployeesPage with CRUD operations
@@ -298,7 +298,7 @@
 
 ## Progress Summary
 
-- **Completed:** 76 tasks
-- **Remaining:** 164 tasks
+- **Completed:** 80 tasks
+- **Remaining:** 160 tasks
 - **Total:** 240 tasks
-- **Progress:** 32%
+- **Progress:** 33%
