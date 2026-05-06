@@ -44,6 +44,13 @@ export interface PayrollEmployee {
   positionId?: string
   printGroup?: string
   payslipTemplate?: string
+  daysWorked: number
+  absences: number
+  lateHours: number
+  overtimeHours: number
+  basicSalary: number
+  grossPay: number
+  netPay: number
 }
 
 export interface PayrollEmployeeSalary {

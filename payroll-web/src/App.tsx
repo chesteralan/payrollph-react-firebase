@@ -7,6 +7,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { SetupPage } from './pages/auth/SetupPage'
 import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { EmployeesPage } from './pages/employees/EmployeesPage'
+import { EmployeeProfilePage } from './pages/employees/EmployeeProfilePage'
 import { EmployeeCalendarPage } from './pages/employees/CalendarPage'
 import { EmployeeGroupsPage } from './pages/employees/GroupsPage'
 import { PositionsPage } from './pages/employees/PositionsPage'
@@ -40,6 +41,7 @@ function App() {
             >
               <Route index element={<DashboardPage />} />
               <Route path="employees" element={<EmployeesPage />} />
+              <Route path="employees/:id" element={<EmployeeProfilePage />} />
               <Route path="employees/calendar" element={<EmployeeCalendarPage />} />
               <Route path="employees/groups" element={<EmployeeGroupsPage />} />
               <Route path="employees/positions" element={<PositionsPage />} />

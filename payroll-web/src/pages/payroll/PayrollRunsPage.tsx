@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore'
+import { collection, getDocs, query, where, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -29,7 +29,6 @@ export function PayrollRunsPage() {
   }
 
   const toggleLock = async (payroll: Payroll) => {
-    const { updateDoc } = await import('firebase/firestore')
     await updateDoc(doc(db, 'payroll', payroll.id), { isLocked: !payroll.isLocked })
     fetchPayrolls()
   }

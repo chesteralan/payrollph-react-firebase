@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
@@ -6,12 +7,13 @@ import { usePermissions } from '../../hooks/usePermissions'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import type { Employee } from '../../types'
 
 export function EmployeesPage() {
   const { currentCompanyId } = useAuth()
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
+  const navigate = useNavigate()
   const [employees, setEmployees] = useState<(Employee & { name?: string })[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -189,6 +191,9 @@ export function EmployeesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/employees/${emp.id}`)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
                         {canEdit('employees', 'employees') && (
                           <Button variant="ghost" size="sm" onClick={() => handleEdit(emp)}>
                             <Edit className="w-4 h-4" />
