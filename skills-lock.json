@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "coding-agent": {
+      "source": "steipete/clawdis",
+      "sourceType": "github",
+      "skillPath": "skills/coding-agent/SKILL.md",
+      "computedHash": "ab1be22623ea204040e938a66150cedea97cd612f7376b4c97a6854bd577721b"
+    }
+  }
+}
