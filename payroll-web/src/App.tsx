@@ -14,6 +14,8 @@ import { AreasPage } from './pages/employees/AreasPage'
 import { NamesListPage } from './pages/lists/NamesListPage'
 import { BenefitsPage, EarningsPage, DeductionsPage } from './pages/lists/ListPages'
 import { PayrollRunsPage } from './pages/payroll/PayrollRunsPage'
+import { PayrollWizardPage } from './pages/payroll/PayrollWizardPage'
+import { PayrollDetailPage } from './pages/payroll/PayrollDetailPage'
 import { TemplatesPage } from './pages/payroll/TemplatesPage'
 import { DTRPage } from './pages/dtr/DTRPage'
 import { Report13thMonthPage } from './pages/reports/Report13thMonthPage'
@@ -47,6 +49,9 @@ function App() {
               <Route path="lists/earnings" element={<EarningsPage />} />
               <Route path="lists/deductions" element={<DeductionsPage />} />
               <Route path="payroll" element={<PayrollRunsPage />} />
+              <Route path="payroll/new" element={<PayrollWizardPage />} />
+              <Route path="payroll/:id" element={<PayrollDetailPage />} />
+              <Route path="payroll/:id/wizard" element={<PayrollWizardPage />} />
               <Route path="payroll/templates" element={<TemplatesPage />} />
               <Route path="dtr" element={<DTRPage />} />
               <Route path="reports/13th-month" element={<Report13thMonthPage />} />

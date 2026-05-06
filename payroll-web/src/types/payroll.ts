@@ -3,9 +3,13 @@ export interface Payroll {
   companyId: string
   templateId?: string
   name: string
+  month: number
+  year: number
   status: 'draft' | 'locked' | 'published'
-  periodStart: Date
-  periodEnd: Date
+  isActive: boolean
+  isLocked: boolean
+  printFormat?: string
+  groupBy?: string
   createdAt: Date
   updatedAt: Date
   createdBy: string
@@ -20,76 +24,143 @@ export interface PayrollInclusiveDate {
 export interface PayrollGroup {
   id: string
   payrollId: string
-  name: string
-  employeeIds: string[]
+  groupId?: string
+  areaId?: string
+  positionId?: string
+  statusId?: string
+  order: number
+  page: number
 }
 
 export interface PayrollEmployee {
   id: string
   payrollId: string
-  employeeId: string
-  status: string
+  nameId: string
+  orderId: number
+  isActive: boolean
+  statusId?: string
   groupId?: string
-  positionId?: string
   areaId?: string
+  positionId?: string
   printGroup?: string
   payslipTemplate?: string
-  basicSalary: number
-  grossPay: number
-  netPay: number
 }
 
-export interface PayrollDTR {
+export interface PayrollEmployeeSalary {
   id: string
-  payrollEmployeeId: string
-  date: Date
-  timeIn?: string
-  timeOut?: string
-  hoursWorked: number
-  overtimeHours: number
-  absences: number
-  lateHours: number
-  undertimeHours: number
+  payrollId: string
+  nameId: string
+  salaryId: string
+  amount: number
+  ratePer: string
+  days: number
+  annualDays: number
+  months: number
 }
 
-export interface PayrollEarning {
+export interface PayrollEmployeeEarning {
   id: string
-  payrollEmployeeId: string
+  payrollId: string
+  nameId: string
   earningId: string
-  name: string
+  entryId: string
   amount: number
+  notes?: string
+  isManual: boolean
 }
 
-export interface PayrollDeduction {
+export interface PayrollEmployeeDeduction {
   id: string
-  payrollEmployeeId: string
+  payrollId: string
+  nameId: string
   deductionId: string
-  name: string
+  entryId: string
   amount: number
+  maxAmount?: number
+  notes?: string
+  isManual: boolean
 }
 
-export interface PayrollBenefit {
+export interface PayrollEmployeeBenefit {
   id: string
-  payrollEmployeeId: string
+  payrollId: string
+  nameId: string
   benefitId: string
-  name: string
-  amount: number
+  entryId: string
+  employeeShare: number
+  employerShare: number
+  notes?: string
 }
 
 export interface PayrollPrintColumn {
   id: string
-  companyId?: string
-  payrollId?: string
-  label: string
-  field: string
+  payrollId: string
+  termId: string
+  columnId: string
   order: number
-  isVisible: boolean
 }
 
-export type PayrollTemplate = Omit<Payroll, 'templateId'> & {
-  isTemplate: true
-  earnings: string[]
-  deductions: string[]
-  benefits: string[]
-  columns: PayrollPrintColumn[]
+export interface PayrollMeta {
+  id: string
+  payrollId: string
+  key: string
+  value: string
+}
+
+export interface PayrollEarning {
+  id: string
+  payrollId: string
+  earningId: string
+  order: number
+}
+
+export interface PayrollDeduction {
+  id: string
+  payrollId: string
+  deductionId: string
+  order: number
+}
+
+export interface PayrollBenefit {
+  id: string
+  payrollId: string
+  benefitId: string
+  order: number
+}
+
+export interface PayrollTemplate {
+  id: string
+  companyId: string
+  name: string
+  pages: number
+  checkedBy?: string
+  approvedBy?: string
+  printFormat?: string
+  groupBy?: string
+  isActive: boolean
+}
+
+export interface PayrollTemplateGroup {
+  id: string
+  templateId: string
+  groupId?: string
+  areaId?: string
+  positionId?: string
+  statusId?: string
+  order: number
+  page: number
+}
+
+export interface PayrollTemplateEmployee {
+  id: string
+  templateId: string
+  nameId: string
+  order: number
+  isActive: boolean
+  statusId?: string
+  groupId?: string
+  areaId?: string
+  positionId?: string
+  printGroup?: string
+  payslipTemplate?: string
 }

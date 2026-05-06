@@ -26,6 +26,7 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
+  Plus,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
@@ -131,6 +132,13 @@ const navigation: NavItem[] = [
         label: 'Payroll Runs',
         icon: <CreditCard className="w-4 h-4" />,
         path: '/payroll',
+        department: 'payroll',
+        section: 'payroll',
+      },
+      {
+        label: 'New Payroll',
+        icon: <Plus className="w-4 h-4" />,
+        path: '/payroll/new',
         department: 'payroll',
         section: 'payroll',
       },
