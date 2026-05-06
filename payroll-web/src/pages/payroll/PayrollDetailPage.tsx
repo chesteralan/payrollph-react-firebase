@@ -50,6 +50,8 @@ export function PayrollDetailPage() {
   const [validationErrors, setValidationErrors] = useState<PayrollValidationError[]>([])
   const [defaultWorkdays, setDefaultWorkdays] = useState(22)
   const [company, setCompany] = useState<{ name: string; address?: string; tin?: string; printHeader?: string; printFooter?: string } | null>(null)
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
 
   useEffect(() => {
     if (id) loadPayroll()
@@ -59,12 +61,13 @@ export function PayrollDetailPage() {
     if (!id) return
     setLoading(true)
     try {
-      const [payrollSnap, empSnap, earningsSnap, deductionsSnap, benefitsSnap] = await Promise.all([
+      const [payrollSnap, empSnap, earningsSnap, deductionsSnap, benefitsSnap, inclusiveDatesSnap] = await Promise.all([
         getDoc(doc(db, 'payroll', id)),
         getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', id))),
         getDocs(query(collection(db, 'earnings'))),
         getDocs(query(collection(db, 'deductions'))),
         getDocs(query(collection(db, 'benefits'))),
+        getDocs(query(collection(db, 'payroll_inclusive_dates'), where('payrollId', '==', id))),
       ])
 
       if (payrollSnap.exists()) {
@@ -88,6 +91,28 @@ export function PayrollDetailPage() {
       const payEmps = empSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as PayrollEmployee[]
       setEmployees(payEmps)
 
+      const dateRange = inclusiveDatesSnap.docs.map(d => d.data() as { startDate?: string; endDate?: string }).find(Boolean)
+      const sd = dateRange?.startDate || null
+      const ed = dateRange?.endDate || null
+      setStartDate(sd)
+      setEndDate(ed)
+
+      const dtrData = new Map<string, { daysWorked: number; absences: number; lateHours: number; overtimeHours: number }>()
+      if (sd && ed && payEmps.length > 0) {
+        const dtrSnap = await getDocs(query(collection(db, 'dtr_entries'), where('employeeId', 'in', payEmps.map(e => e.employeeId || e.nameId).slice(0, 10))))
+        const filteredEntries = dtrSnap.docs.map(d => d.data() as { employeeId?: string; date?: string; hoursWorked?: number; overtimeHours?: number; lateHours?: number; absenceType?: string })
+          .filter(e => e.date && e.date >= sd && e.date <= ed)
+        for (const entry of filteredEntries) {
+          const empKey = entry.employeeId || ''
+          if (!dtrData.has(empKey)) dtrData.set(empKey, { daysWorked: 0, absences: 0, lateHours: 0, overtimeHours: 0 })
+          const current = dtrData.get(empKey)!
+          if ((entry.hoursWorked || 0) > 0) current.daysWorked++
+          if (entry.absenceType) current.absences++
+          current.lateHours += entry.lateHours || 0
+          current.overtimeHours += entry.overtimeHours || 0
+        }
+      }
+
       setEarningsList(earningsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as { name: string }) })))
       setDeductionsList(deductionsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as { name: string }) })))
       setBenefitsList(benefitsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as { name: string }) })))
@@ -96,7 +121,12 @@ export function PayrollDetailPage() {
       for (const emp of payEmps) {
         const basicSalary = emp.basicSalary || 0
         const ratePerDay = basicSalary / defaultWorkdays
-        const salaryAmount = ratePerDay * (emp.daysWorked || 0)
+        const empDtr = dtrData.get(emp.employeeId || emp.nameId)
+        const daysWorked = empDtr?.daysWorked ?? emp.daysWorked ?? 0
+        const absences = empDtr?.absences ?? emp.absences ?? 0
+        const lateHours = empDtr?.lateHours ? Math.round(empDtr.lateHours * 100) / 100 : (emp.lateHours ?? 0)
+        const overtimeHours = empDtr?.overtimeHours ? Math.round(empDtr.overtimeHours * 100) / 100 : (emp.overtimeHours ?? 0)
+        const salaryAmount = ratePerDay * daysWorked
 
         rowsData.push({
           nameId: emp.nameId,
@@ -106,10 +136,10 @@ export function PayrollDetailPage() {
           groupId: emp.groupId || '',
           positionId: emp.positionId || '',
           areaId: emp.areaId || '',
-          daysWorked: emp.daysWorked || 0,
-          absences: emp.absences || 0,
-          lateHours: emp.lateHours || 0,
-          overtimeHours: emp.overtimeHours || 0,
+          daysWorked,
+          absences,
+          lateHours,
+          overtimeHours,
           basicSalary,
           ratePerDay,
           salaryAmount,
@@ -460,7 +490,15 @@ export function PayrollDetailPage() {
       {activeStage === 'dtr' && (
         <Card>
           <CardHeader>
-            <CardTitle>Daily Time Record</CardTitle>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Daily Time Record</CardTitle>
+                {startDate && endDate && <p className="text-sm text-gray-500">Auto-populated from DTR entries ({startDate} to {endDate})</p>}
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => navigate('/dtr')}>
+                Manage DTR Entries
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full">

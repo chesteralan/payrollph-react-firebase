@@ -149,12 +149,17 @@ export interface PayrollTemplate {
   id: string
   companyId: string
   name: string
+  description?: string
   pages: number
   checkedBy?: string
   approvedBy?: string
   printFormat?: string
   groupBy?: string
   isActive: boolean
+  earnings: string[]
+  deductions: string[]
+  benefits: string[]
+  printColumns: string[]
 }
 
 export interface PayrollTemplateGroup {

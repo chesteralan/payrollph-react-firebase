@@ -66,12 +66,12 @@
 
 ## 7. Payroll Templates
 - [x] 7.1 Create TemplatesPage (basic listing)
-- [ ] 7.2 Implement template creation wizard
-- [ ] 7.3 Add template configuration
-  - [ ] 7.3.1 Groups and employees selection
-  - [ ] 7.3.2 Earning/benefit/deduction columns
-  - [ ] 7.3.3 Print column settings
-- [ ] 7.4 Implement template cloning
+- [x] 7.2 Implement template creation wizard
+- [x] 7.3 Add template configuration
+  - [x] 7.3.1 Groups and employees selection
+  - [x] 7.3.2 Earning/benefit/deduction columns
+  - [x] 7.3.3 Print column settings
+- [x] 7.4 Implement template cloning
 - [ ] 7.5 Add template to payroll creation flow
 - [ ] 7.6 Implement print format templates
 
@@ -118,18 +118,18 @@
 
 ## 10. DTR (Daily Time Record) Management
 - [x] 10.1 Create DTRPage (basic structure)
-- [ ] 10.2 Implement DTR calendar view
-- [ ] 10.3 Add DTR entry editing per employee
-- [ ] 10.4 Implement attendance tracking (time in/out)
-- [ ] 10.5 Add absence recording
-- [ ] 10.6 Implement overtime recording
-- [ ] 10.7 Add leave management
-  - [ ] 10.7.1 Leave balance tracking
-  - [ ] 10.7.2 Leave application/approval
-  - [ ] 10.7.3 Leave validation against yearly allowance
-- [ ] 10.8 Link DTR data to payroll processing
-- [ ] 10.9 Add DTR import/export
-- [ ] 10.10 Implement DTR summary reports
+- [x] 10.2 Implement DTR calendar view
+- [x] 10.3 Add DTR entry editing per employee
+- [x] 10.4 Implement attendance tracking (time in/out)
+- [x] 10.5 Add absence recording
+- [x] 10.6 Implement overtime recording
+- [x] 10.7 Add leave management
+  - [x] 10.7.1 Leave balance tracking
+  - [x] 10.7.2 Leave application/approval
+  - [x] 10.7.3 Leave validation against yearly allowance
+- [x] 10.8 Link DTR data to payroll processing
+- [x] 10.9 Add DTR import/export
+- [x] 10.10 Implement DTR summary reports
 
 ## 11. Calendar Management
 - [x] 11.1 Build System Calendar page
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 112 tasks
-- **Remaining:** 128 tasks
+- **Completed:** 130 tasks
+- **Remaining:** 110 tasks
 - **Total:** 240 tasks
-- **Progress:** 47%
+- **Progress:** 54%
