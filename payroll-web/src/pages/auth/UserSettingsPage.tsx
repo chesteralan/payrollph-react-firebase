@@ -5,7 +5,8 @@ import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { ArrowLeft, Save, Lock, Palette } from 'lucide-react'
+import { ArrowLeft, Save, Lock, Palette, DollarSign } from 'lucide-react'
+import { getAvailableCurrencies, setDefaultCurrency, getDefaultCurrency } from '../../utils/currency'
 
 export function UserSettingsPage() {
   const { user, userCompanies, settings, changePassword } = useAuth()
@@ -16,6 +17,7 @@ export function UserSettingsPage() {
     theme: 'light' as 'light' | 'dark',
     itemsPerPage: 25,
     defaultCompanyId: '',
+    currency: 'PHP',
   })
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -31,7 +33,9 @@ export function UserSettingsPage() {
         theme: settings.theme || 'light',
         itemsPerPage: settings.itemsPerPage || 25,
         defaultCompanyId: settings.defaultCompanyId || '',
+        currency: settings.currency || 'PHP',
       })
+      setDefaultCurrency(settings.currency || 'PHP')
     }
   }, [settings])
 
@@ -49,6 +53,7 @@ export function UserSettingsPage() {
         theme: formData.theme,
         itemsPerPage: formData.itemsPerPage,
         defaultCompanyId: formData.defaultCompanyId || undefined,
+        currency: formData.currency,
         updatedAt: new Date()
       }
 
@@ -146,6 +151,19 @@ export function UserSettingsPage() {
                 <option value={25}>25</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                value={formData.currency}
+                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+              >
+                {getAvailableCurrencies().map(c => (
+                  <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
               </select>
             </div>
 

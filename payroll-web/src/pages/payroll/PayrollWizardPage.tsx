@@ -19,6 +19,7 @@ export function PayrollWizardPage() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ name: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), templateId: '' })
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [inclusiveDates, setInclusiveDates] = useState<Date[]>([])
   const [groups, setGroups] = useState<PayrollGroup[]>([])
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([])
@@ -82,7 +83,14 @@ export function PayrollWizardPage() {
 
   const handleNext = async () => {
     if (step === 0) {
-      if (!formData.name) return
+      const newErrors: Record<string, string> = {}
+      if (!formData.name.trim()) newErrors.name = 'Payroll name is required'
+      if (formData.year < 2000 || formData.year > 2100) newErrors.year = 'Year must be between 2000 and 2100'
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors)
+        return
+      }
+      setErrors({})
       setLoading(true)
       try {
         let payrollId = id
@@ -97,7 +105,11 @@ export function PayrollWizardPage() {
         setLoading(false)
       }
     } else if (step === 1) {
-      if (inclusiveDates.length === 0) return
+      if (inclusiveDates.length === 0) {
+        setErrors({ dates: 'Add at least one inclusive date' })
+        return
+      }
+      setErrors({})
       setLoading(true)
       try {
         const payrollId = id || (await createPayroll())
@@ -170,7 +182,10 @@ export function PayrollWizardPage() {
         <Card>
           <CardHeader><CardTitle>Payroll Configuration</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <Input id="name" label="Payroll Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g., January 2026 Payroll" required />
+            <div>
+              <Input id="name" label="Payroll Name" value={formData.name} onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setErrors(prev => ({ ...prev, name: '' })) }} placeholder="e.g., January 2026 Payroll" />
+              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
@@ -180,7 +195,10 @@ export function PayrollWizardPage() {
                   ))}
                 </select>
               </div>
-              <Input id="year" label="Year" type="number" value={formData.year} onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })} />
+              <div>
+                <Input id="year" label="Year" type="number" value={formData.year} onChange={(e) => { setFormData({ ...formData, year: parseInt(e.target.value) }); setErrors(prev => ({ ...prev, year: '' })) }} />
+                {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
+              </div>
             </div>
             {templates.length > 0 && (
               <div>
@@ -202,6 +220,7 @@ export function PayrollWizardPage() {
         <Card>
           <CardHeader><CardTitle>Inclusive Dates</CardTitle></CardHeader>
           <CardContent className="space-y-4">
+            {errors.dates && <p className="text-sm text-red-600">{errors.dates}</p>}
             <div className="flex gap-2">
               <Input id="date" type="date" value={dateStr} onChange={(e) => setDateStr(e.target.value)} />
               <Button onClick={addDate} disabled={!dateStr}>Add Date</Button>

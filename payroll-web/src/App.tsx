@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CompanyProvider } from './context/CompanyContext'
@@ -9,23 +10,39 @@ import { SetupPage } from './pages/auth/SetupPage'
 import { ChangePasswordPage } from './pages/auth/ChangePasswordPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
 import { UserSettingsPage } from './pages/auth/UserSettingsPage'
-import { DashboardPage } from './pages/dashboard/DashboardPage'
-import { EmployeesPage } from './pages/employees/EmployeesPage'
-import { EmployeeProfilePage } from './pages/employees/EmployeeProfilePage'
-import { EmployeeCalendarPage } from './pages/employees/CalendarPage'
-import { EmployeeGroupsPage } from './pages/employees/GroupsPage'
-import { PositionsPage } from './pages/employees/PositionsPage'
-import { AreasPage } from './pages/employees/AreasPage'
-import { NamesListPage } from './pages/lists/NamesListPage'
-import { BenefitsPage, EarningsPage, DeductionsPage } from './pages/lists/ListPages'
-import { PayrollRunsPage } from './pages/payroll/PayrollRunsPage'
-import { PayrollWizardPage } from './pages/payroll/PayrollWizardPage'
-import { PayrollDetailPage } from './pages/payroll/PayrollDetailPage'
-import { TemplatesPage } from './pages/payroll/TemplatesPage'
-import { DTRPage } from './pages/dtr/DTRPage'
-import { Report13thMonthPage } from './pages/reports/Report13thMonthPage'
-import { CompaniesPage } from './pages/system/CompaniesPage'
-import { CalendarPage, TermsPage, UsersPage, RestrictionsPage, AuditPage, DatabasePage } from './pages/system/SystemPages'
+
+const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const EmployeesPage = lazy(() => import('./pages/employees/EmployeesPage').then(m => ({ default: m.EmployeesPage })))
+const EmployeeProfilePage = lazy(() => import('./pages/employees/EmployeeProfilePage').then(m => ({ default: m.EmployeeProfilePage })))
+const EmployeeCalendarPage = lazy(() => import('./pages/employees/CalendarPage').then(m => ({ default: m.EmployeeCalendarPage })))
+const EmployeeGroupsPage = lazy(() => import('./pages/employees/GroupsPage').then(m => ({ default: m.EmployeeGroupsPage })))
+const PositionsPage = lazy(() => import('./pages/employees/PositionsPage').then(m => ({ default: m.PositionsPage })))
+const AreasPage = lazy(() => import('./pages/employees/AreasPage').then(m => ({ default: m.AreasPage })))
+const NamesListPage = lazy(() => import('./pages/lists/NamesListPage').then(m => ({ default: m.NamesListPage })))
+const BenefitsPage = lazy(() => import('./pages/lists/ListPages').then(m => ({ default: m.BenefitsPage })))
+const EarningsPage = lazy(() => import('./pages/lists/ListPages').then(m => ({ default: m.EarningsPage })))
+const DeductionsPage = lazy(() => import('./pages/lists/ListPages').then(m => ({ default: m.DeductionsPage })))
+const PayrollRunsPage = lazy(() => import('./pages/payroll/PayrollRunsPage').then(m => ({ default: m.PayrollRunsPage })))
+const PayrollWizardPage = lazy(() => import('./pages/payroll/PayrollWizardPage').then(m => ({ default: m.PayrollWizardPage })))
+const PayrollDetailPage = lazy(() => import('./pages/payroll/PayrollDetailPage').then(m => ({ default: m.PayrollDetailPage })))
+const TemplatesPage = lazy(() => import('./pages/payroll/TemplatesPage').then(m => ({ default: m.TemplatesPage })))
+const DTRPage = lazy(() => import('./pages/dtr/DTRPage').then(m => ({ default: m.DTRPage })))
+const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPage').then(m => ({ default: m.Report13thMonthPage })))
+const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
+const CalendarPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.CalendarPage })))
+const TermsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.TermsPage })))
+const UsersPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.UsersPage })))
+const RestrictionsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.RestrictionsPage })))
+const AuditPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.AuditPage })))
+const DatabasePage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.DatabasePage })))
+
+function LoadingFallback() {
+  return <div className="flex items-center justify-center min-h-[400px]"><div className="text-gray-500">Loading...</div></div>
+}
+
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
+}
 
 function App() {
   return (
@@ -46,32 +63,32 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<DashboardPage />} />
-              <Route path="settings" element={<UserSettingsPage />} />
-              <Route path="employees" element={<EmployeesPage />} />
-              <Route path="employees/:id" element={<EmployeeProfilePage />} />
-              <Route path="employees/calendar" element={<EmployeeCalendarPage />} />
-              <Route path="employees/groups" element={<EmployeeGroupsPage />} />
-              <Route path="employees/positions" element={<PositionsPage />} />
-              <Route path="employees/areas" element={<AreasPage />} />
-              <Route path="lists/names" element={<NamesListPage />} />
-              <Route path="lists/benefits" element={<BenefitsPage />} />
-              <Route path="lists/earnings" element={<EarningsPage />} />
-              <Route path="lists/deductions" element={<DeductionsPage />} />
-              <Route path="payroll" element={<PayrollRunsPage />} />
-              <Route path="payroll/new" element={<PayrollWizardPage />} />
-              <Route path="payroll/:id" element={<PayrollDetailPage />} />
-              <Route path="payroll/:id/wizard" element={<PayrollWizardPage />} />
-              <Route path="payroll/templates" element={<TemplatesPage />} />
-              <Route path="dtr" element={<DTRPage />} />
-              <Route path="reports/13th-month" element={<Report13thMonthPage />} />
-              <Route path="system/companies" element={<CompaniesPage />} />
-              <Route path="system/calendar" element={<CalendarPage />} />
-              <Route path="system/terms" element={<TermsPage />} />
-              <Route path="system/users" element={<UsersPage />} />
-              <Route path="system/restrictions" element={<RestrictionsPage />} />
-              <Route path="system/audit" element={<AuditPage />} />
-              <Route path="system/database" element={<DatabasePage />} />
+              <Route index element={<LazyPage><DashboardPage /></LazyPage>} />
+              <Route path="settings" element={<LazyPage><UserSettingsPage /></LazyPage>} />
+              <Route path="employees" element={<LazyPage><EmployeesPage /></LazyPage>} />
+              <Route path="employees/:id" element={<LazyPage><EmployeeProfilePage /></LazyPage>} />
+              <Route path="employees/calendar" element={<LazyPage><EmployeeCalendarPage /></LazyPage>} />
+              <Route path="employees/groups" element={<LazyPage><EmployeeGroupsPage /></LazyPage>} />
+              <Route path="employees/positions" element={<LazyPage><PositionsPage /></LazyPage>} />
+              <Route path="employees/areas" element={<LazyPage><AreasPage /></LazyPage>} />
+              <Route path="lists/names" element={<LazyPage><NamesListPage /></LazyPage>} />
+              <Route path="lists/benefits" element={<LazyPage><BenefitsPage /></LazyPage>} />
+              <Route path="lists/earnings" element={<LazyPage><EarningsPage /></LazyPage>} />
+              <Route path="lists/deductions" element={<LazyPage><DeductionsPage /></LazyPage>} />
+              <Route path="payroll" element={<LazyPage><PayrollRunsPage /></LazyPage>} />
+              <Route path="payroll/new" element={<LazyPage><PayrollWizardPage /></LazyPage>} />
+              <Route path="payroll/:id" element={<LazyPage><PayrollDetailPage /></LazyPage>} />
+              <Route path="payroll/:id/wizard" element={<LazyPage><PayrollWizardPage /></LazyPage>} />
+              <Route path="payroll/templates" element={<LazyPage><TemplatesPage /></LazyPage>} />
+              <Route path="dtr" element={<LazyPage><DTRPage /></LazyPage>} />
+              <Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
+              <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
+              <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
+              <Route path="system/terms" element={<LazyPage><TermsPage /></LazyPage>} />
+              <Route path="system/users" element={<LazyPage><UsersPage /></LazyPage>} />
+              <Route path="system/restrictions" element={<LazyPage><RestrictionsPage /></LazyPage>} />
+              <Route path="system/audit" element={<LazyPage><AuditPage /></LazyPage>} />
+              <Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

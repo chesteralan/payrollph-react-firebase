@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Users, FileText, Calendar, Plus, TrendingUp, Clock, CheckCircle } from 'lucide-react'
+import { Skeleton, TableSkeleton } from '../../components/ui/Skeleton'
 
 interface DashboardStats {
   totalEmployees: number
@@ -143,13 +144,17 @@ export function DashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 mt-1">Loading...</p>
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-4 w-64 mt-2" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
-            <Card key={i}><CardContent className="pt-6"><div className="animate-pulse h-8 bg-gray-200 rounded w-24"></div></CardContent></Card>
+            <Card key={i}><CardContent className="pt-6"><Skeleton className="h-12 w-24" /></CardContent></Card>
           ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card><CardContent className="p-0"><TableSkeleton rows={5} columns={3} /></Card></Card>
+          <Card><CardContent className="p-0"><TableSkeleton rows={5} columns={3} /></Card></Card>
         </div>
       </div>
     )

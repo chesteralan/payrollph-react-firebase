@@ -5,11 +5,14 @@ import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
+import { useTableSort } from '../../hooks/useTableSort'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Pagination } from '../../components/ui/Pagination'
-import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { TableSkeleton } from '../../components/ui/Skeleton'
 import type { Employee } from '../../types'
 
 export function EmployeesPage() {
@@ -88,12 +91,10 @@ export function EmployeesPage() {
     setShowForm(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Delete this employee?')) {
-      await deleteDoc(doc(db, 'employees', id))
-      addToast({ type: 'success', title: 'Employee deleted' })
-      fetchEmployees()
-    }
+  const handleDelete = async (id: string, code: string) => {
+    await deleteDoc(doc(db, 'employees', id))
+    addToast({ type: 'success', title: 'Employee deleted', message: `${code} has been removed` })
+    fetchEmployees()
   }
 
   const handleToggleStatus = async (employee: Employee) => {
@@ -122,8 +123,13 @@ export function EmployeesPage() {
     })
   }, [employees, searchQuery, statusFilter])
 
-  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage)
-  const paginatedEmployees = filteredEmployees.slice(
+  const { items: sortedEmployees, handleSort, sortConfig } = useTableSort(
+    filteredEmployees.map(emp => ({ ...emp, sortName: emp.name || emp.nameId || '' })),
+    'employeeCode'
+  )
+
+  const totalPages = Math.ceil(sortedEmployees.length / itemsPerPage)
+  const paginatedEmployees = sortedEmployees.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
@@ -218,26 +224,54 @@ export function EmployeesPage() {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-            <span className="text-sm text-gray-500 ml-auto">
-              {filteredEmployees.length} employee{filteredEmployees.length !== 1 ? 's' : ''}
-            </span>
+    <span className="text-sm text-gray-500 ml-auto">
+      {sortedEmployees.length} employee{sortedEmployees.length !== 1 ? 's' : ''}
+    </span>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Code</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Hire Date</th>
+                <th
+                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                  onClick={() => handleSort('employeeCode')}
+                >
+                  <div className="flex items-center gap-1">
+                    Code
+                    {sortConfig?.key === 'employeeCode' ? (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    ) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}
+                  </div>
+                </th>
+                <th
+                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                  onClick={() => handleSort('isActive')}
+                >
+                  <div className="flex items-center gap-1">
+                    Status
+                    {sortConfig?.key === 'isActive' ? (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    ) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}
+                  </div>
+                </th>
+                <th
+                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                  onClick={() => handleSort('hireDate')}
+                >
+                  <div className="flex items-center gap-1">
+                    Hire Date
+                    {sortConfig?.key === 'hireDate' ? (
+                      sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                    ) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}
+                  </div>
+                </th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">Loading...</td>
-                </tr>
+                <tr><td colSpan={4} className="px-0 py-0"><TableSkeleton rows={10} columns={4} /></td></tr>
               ) : paginatedEmployees.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-4 text-center text-gray-500">No employees found</td>
@@ -274,9 +308,18 @@ export function EmployeesPage() {
                           </Button>
                         )}
                         {canDelete('employees', 'employees') && (
-                          <Button variant="ghost" size="sm" onClick={() => handleDelete(emp.id)}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <ConfirmDialog
+                            title="Delete Employee"
+                            message={`Are you sure you want to delete ${emp.employeeCode}? This action cannot be undone.`}
+                            confirmText="Delete"
+                            onConfirm={() => handleDelete(emp.id, emp.employeeCode)}
+                          >
+                            {(open) => (
+                              <Button variant="ghost" size="sm" onClick={open}>
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </ConfirmDialog>
                         )}
                       </div>
                     </td>
@@ -290,7 +333,7 @@ export function EmployeesPage() {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-              totalItems={filteredEmployees.length}
+              totalItems={sortedEmployees.length}
               itemsPerPage={itemsPerPage}
             />
           )}

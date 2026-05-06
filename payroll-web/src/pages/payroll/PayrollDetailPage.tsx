@@ -8,6 +8,7 @@ import { PayrollOutputView } from '../../components/payroll/PayrollOutputView'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { ArrowLeft, Lock, Unlock, Save, AlertCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react'
+import { formatCurrency } from '../../utils/currency'
 import type { Payroll, PayrollEmployee, PayrollValidationError } from '../../types'
 
 const STAGES = ['dtr', 'salaries', 'earnings', 'benefits', 'deductions', 'summary', 'output']
@@ -350,12 +351,6 @@ export function PayrollDetailPage() {
       setSaving(false)
     }
   }
-
-  const formatCurrency = (value: number) => value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-  const getEarningTotal = (earningId: string) => rows.reduce((sum, row) => sum + (earningData.get(row.nameId)?.get(earningId) || 0), 0)
-
-  const getDeductionTotal = (deductionId: string) => rows.reduce((sum, row) => sum + (deductionData.get(row.nameId)?.get(deductionId) || 0), 0)
 
   const getEmployeeGross = (row: ProcessingRow) => {
     const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)

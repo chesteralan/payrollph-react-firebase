@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { usePermissions } from '../../hooks/usePermissions'
-import { Plus, Edit, Trash2, Save, X, Check, Shield } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download } from 'lucide-react'
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry } from '../../types'
 import type { AuditEntry } from '../../services/audit'
+import { useTableSort } from '../../hooks/useTableSort'
 
 interface CalendarEvent extends CalendarEntry {
   isPaid?: boolean
@@ -75,6 +76,26 @@ export function CalendarPage() {
     }
   }
 
+  const handleExport = () => {
+    const headers = ['Date', 'Name', 'Type', 'Paid']
+    const csvRows = [headers.join(',')]
+    for (const event of events) {
+      const date = new Date(event.date).toLocaleDateString()
+      const name = `"${event.name}"`
+      const type = event.type
+      const paid = event.isPaid ? 'Yes' : 'No'
+      csvRows.push([date, name, type, paid].join(','))
+    }
+    const csv = csvRows.join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Calendar_${selectedYear}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const groupedByMonth = events.reduce((acc, event) => {
     const month = new Date(event.date).getMonth()
     if (!acc[month]) acc[month] = []
@@ -107,9 +128,14 @@ export function CalendarPage() {
             ))}
           </select>
         </div>
-        {canAdd('system', 'calendar') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Date</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={handleExport}>
+            <Download className="w-4 h-4 mr-2" />Export CSV
+          </Button>
+          {canAdd('system', 'calendar') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Date</Button>
+          )}
+        </div>
       </div>
 
       {showForm && (
@@ -235,6 +261,8 @@ export function UsersPage() {
     setUsers(usersWithRestrictions)
     setLoading(false)
   }
+
+  const { items: sortedUsers, handleSort, sortConfig } = useTableSort(users, 'username')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -393,19 +421,27 @@ export function UsersPage() {
 
       <Card><CardContent className="p-0">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Username</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Display Name</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('username')}>
+                  <div className="flex items-center gap-1">Username{sortConfig?.key === 'username' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('displayName')}>
+                  <div className="flex items-center gap-1">Display Name{sortConfig?.key === 'displayName' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('email')}>
+                  <div className="flex items-center gap-1">Email{sortConfig?.key === 'email' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('isActive')}>
+                  <div className="flex items-center justify-center gap-1">Status{sortConfig?.key === 'isActive' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : users.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No users found</td></tr>
-              : users.map(user => (
+              : sortedUsers.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No users found</td></tr>
+              : sortedUsers.map(user => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.username}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{user.displayName}</td>
@@ -478,6 +514,8 @@ export function AuditPage() {
     setLoading(false)
   }
 
+  const { items: sortedLogs, handleSort, sortConfig } = useTableSort(logs, 'timestamp')
+
   const actionColors: Record<string, string> = {
     create: 'bg-green-100 text-green-800',
     update: 'bg-blue-100 text-blue-800',
@@ -529,19 +567,27 @@ export function AuditPage() {
 
       <Card><CardContent className="p-0">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Timestamp</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">User</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Action</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Module</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Description</th>
-            </tr>
-          </thead>
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('timestamp')}>
+                  <div className="flex items-center gap-1">Timestamp{sortConfig?.key === 'timestamp' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('userName')}>
+                  <div className="flex items-center gap-1">User{sortConfig?.key === 'userName' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('action')}>
+                  <div className="flex items-center gap-1">Action{sortConfig?.key === 'action' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('module')}>
+                  <div className="flex items-center gap-1">Module{sortConfig?.key === 'module' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Description</th>
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : logs.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No audit logs found</td></tr>
-              : logs.map(log => (
+              : sortedLogs.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No audit logs found</td></tr>
+              : sortedLogs.map(log => (
                 <tr key={log.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {log.timestamp ? new Date(log.timestamp).toLocaleString() : '-'}

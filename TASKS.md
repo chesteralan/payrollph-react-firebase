@@ -54,14 +54,14 @@
   - [x] 5.2.4 Import statistics
 - [ ] 5.3 Add bulk edit for names
 - [x] 5.4 Implement names export to CSV
-- [ ] 5.5 Add duplicate name detection during import
+- [x] 5.5 Add duplicate name detection during import
 
 ## 6. Compensation Lists
 - [x] 6.1 Create EarningsPage (CRUD for earning items)
 - [x] 6.2 Create BenefitsPage (CRUD for benefit items with EE/ER share)
 - [x] 6.3 Create DeductionsPage (CRUD for deduction items)
 - [ ] 6.4 Add earning formula configuration
-- [ ] 6.5 Implement deduction rules (fixed/percentage)
+- [x] 6.5 Implement deduction rules (fixed/percentage)
 - [ ] 6.6 Add benefit allocation rules
 
 ## 7. Payroll Templates
@@ -139,7 +139,7 @@
   - [x] 11.1.4 Paid/unpaid toggle
 - [ ] 11.2 Integrate calendar with payroll calculations
 - [ ] 11.3 Add recurring holiday patterns
-- [ ] 11.4 Export calendar data
+- [x] 11.4 Export calendar data
 
 ## 12. Terms Management
 - [x] 12.1 Create TermsPage (placeholder)
@@ -217,22 +217,22 @@
 - [ ] 19.5 Implement soft-delete with trash/restore
 - [ ] 19.6 Add data archival for old payroll runs
 - [x] 19.7 Implement pagination for all lists
-- [ ] 19.8 Add sorting and filtering to all tables
+- [x] 19.8 Add sorting and filtering to all tables
 
 ## 20. Performance & Optimization
 - [ ] 20.1 Implement Firestore query optimization
 - [ ] 20.2 Add data caching layer
-- [ ] 20.3 Optimize bundle size (code splitting)
-- [ ] 20.4 Add lazy loading for routes
+- [x] 20.3 Optimize bundle size (code splitting)
+- [x] 20.4 Add lazy loading for routes
 - [ ] 20.5 Implement virtual scrolling for large tables
-- [ ] 20.6 Add loading states and skeleton screens
+- [x] 20.6 Add loading states and skeleton screens
 - [ ] 20.7 Optimize re-renders with React.memo/useMemo
 
 ## 21. Error Handling & UX
 - [ ] 21.1 Implement global error boundary
 - [x] 21.2 Add toast notifications for actions
-- [ ] 21.3 Improve form validation with inline errors
-- [ ] 21.4 Add confirmation dialogs for destructive actions
+- [x] 21.3 Improve form validation with inline errors
+- [x] 21.4 Add confirmation dialogs for destructive actions
 - [ ] 21.5 Implement undo functionality for critical operations
 - [ ] 21.6 Add offline mode handling
 - [ ] 21.7 Improve loading states across all pages
@@ -291,13 +291,13 @@
 - [ ] 26.4 Ensure color contrast compliance
 - [ ] 26.5 Add i18n support (if needed)
 - [ ] 26.6 Support multiple date/time formats
-- [ ] 26.7 Add currency formatting options
+- [x] 26.7 Add currency formatting options
 
 ---
 
 ## Progress Summary
 
-- **Completed:** 102 tasks
-- **Remaining:** 138 tasks
+- **Completed:** 112 tasks
+- **Remaining:** 128 tasks
 - **Total:** 240 tasks
-- **Progress:** 43%
+- **Progress:** 47%

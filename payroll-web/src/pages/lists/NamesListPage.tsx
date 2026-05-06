@@ -5,7 +5,9 @@ import { usePermissions } from '../../hooks/usePermissions'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download } from 'lucide-react'
+import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { useTableSort } from '../../hooks/useTableSort'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 
 interface NameRecord {
   id: string
@@ -35,7 +37,7 @@ export function NamesListPage() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewRow[]>([])
   const [csvFileName, setCsvFileName] = useState('')
   const [importing, setImporting] = useState(false)
-  const [importStats, setImportStats] = useState<{ success: number; failed: number } | null>(null)
+  const [importStats, setImportStats] = useState<{ success: number; failed: number; duplicates: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchNames() }, [])
@@ -54,8 +56,9 @@ export function NamesListPage() {
     setShowForm(false); setEditingId(null); setFormData({ firstName: '', middleName: '', lastName: '', suffix: '' }); fetchNames()
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Delete this name record?')) { await deleteDoc(doc(db, 'names', id)); fetchNames() }
+  const handleDelete = async (id: string, name: string) => {
+    await deleteDoc(doc(db, 'names', id))
+    fetchNames()
   }
 
   const handleExportCSV = () => {
@@ -85,15 +88,15 @@ export function NamesListPage() {
       const text = event.target?.result as string
       const lines = text.split('\n').filter(line => line.trim())
 
-      // Skip header row if it looks like headers
       const startIndex = lines[0].toLowerCase().includes('first') || lines[0].toLowerCase().includes('name') ? 1 : 0
+
+      const existingNames = new Set(names.map(n => `${n.firstName.toLowerCase()} ${n.lastName.toLowerCase()}`))
 
       const preview: CsvPreviewRow[] = []
       for (let i = startIndex; i < lines.length; i++) {
         const line = lines[i].trim()
         if (!line) continue
 
-        // Handle both comma and tab separated
         const columns = line.includes('\t') ? line.split('\t') : line.split(',').map(c => c.trim())
 
         let firstName = '', middleName = '', lastName = '', suffix = ''
@@ -109,9 +112,11 @@ export function NamesListPage() {
           if (!firstName || !lastName) {
             isValid = false
             error = 'First and Last name required'
+          } else if (existingNames.has(`${firstName.toLowerCase()} ${lastName.toLowerCase()}`)) {
+            isValid = false
+            error = 'Duplicate name'
           }
         } else {
-          // Try to parse "LastName, FirstName MiddleName" format
           const parts = line.split(',')
           if (parts.length >= 2) {
             lastName = parts[0].trim()
@@ -139,8 +144,16 @@ export function NamesListPage() {
     setImporting(true)
     let success = 0
     let failed = 0
+    let duplicates = 0
+
+    const existingNames = new Set(names.map(n => `${n.firstName.toLowerCase()} ${n.lastName.toLowerCase()}`))
 
     for (const row of validRows) {
+      const key = `${row.firstName.toLowerCase()} ${row.lastName.toLowerCase()}`
+      if (existingNames.has(key)) {
+        duplicates++
+        continue
+      }
       try {
         await addDoc(collection(db, 'names'), {
           firstName: row.firstName,
@@ -150,13 +163,14 @@ export function NamesListPage() {
           createdAt: new Date(),
           updatedAt: new Date()
         })
+        existingNames.add(key)
         success++
       } catch {
         failed++
       }
     }
 
-    setImportStats({ success, failed })
+    setImportStats({ success, failed, duplicates })
     setImporting(false)
     fetchNames()
   }
@@ -168,6 +182,11 @@ export function NamesListPage() {
     setImportStats(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
+
+  const { items: sortedNames, handleSort, sortConfig } = useTableSort(
+    names.map(n => ({ ...n, fullName: `${n.firstName} ${n.middleName || ''} ${n.lastName}` })),
+    'lastName'
+  )
 
   if (!canView('lists', 'names')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
@@ -290,6 +309,9 @@ export function NamesListPage() {
                   {importStats.failed > 0 && (
                     <span>, <span className="font-medium text-red-600">{importStats.failed}</span> failed</span>
                   )}
+                  {importStats.duplicates > 0 && (
+                    <span>, <span className="font-medium text-yellow-600">{importStats.duplicates}</span> duplicates skipped</span>
+                  )}
                 </p>
                 <Button onClick={resetImport}>Done</Button>
               </div>
@@ -319,16 +341,18 @@ export function NamesListPage() {
       )}
       <Card><CardContent className="p-0">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('fullName')}>
+                  <div className="flex items-center gap-1">Name{sortConfig?.key === 'fullName' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? <tr><td colSpan={2} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : names.length === 0 ? <tr><td colSpan={2} className="px-6 py-4 text-center text-gray-500">No names found</td></tr>
-              : names.map((n) => (
+              : sortedNames.length === 0 ? <tr><td colSpan={2} className="px-6 py-4 text-center text-gray-500">No names found</td></tr>
+              : sortedNames.map((n) => (
                 <tr key={n.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {n.firstName} {n.middleName || ''} {n.lastName}{n.suffix ? `, ${n.suffix}` : ''}
@@ -336,7 +360,18 @@ export function NamesListPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       {canEdit('lists', 'names') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(n.id); setFormData({ firstName: n.firstName, middleName: n.middleName || '', lastName: n.lastName, suffix: n.suffix || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
-                      {canDelete('lists', 'names') && <Button variant="ghost" size="sm" onClick={() => handleDelete(n.id)}><Trash2 className="w-4 h-4" /></Button>}
+                      {canDelete('lists', 'names') && (
+                        <ConfirmDialog
+                          title="Delete Name"
+                          message={`Delete ${n.firstName} ${n.lastName}? This action cannot be undone.`}
+                          confirmText="Delete"
+                          onConfirm={() => handleDelete(n.id, `${n.firstName} ${n.lastName}`)}
+                        >
+                          {(open) => (
+                            <Button variant="ghost" size="sm" onClick={open}><Trash2 className="w-4 h-4" /></Button>
+                          )}
+                        </ConfirmDialog>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -3,10 +3,12 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
+import { useTableSort } from '../../hooks/useTableSort'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, RotateCcw, Search } from 'lucide-react'
+import { Plus, Edit, Trash2, RotateCcw, Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import type { Company } from '../../types'
 
 export function CompaniesPage() {
@@ -72,11 +74,9 @@ export function CompaniesPage() {
   }
 
   const handleSoftDelete = async (company: Company) => {
-    if (confirm(`Soft delete ${company.name}? It can be restored later.`)) {
-      await updateDoc(doc(db, 'companies', company.id), { isDeleted: true, isActive: false, deletedAt: new Date() })
-      addToast({ type: 'success', title: 'Company archived', message: `${company.name} has been archived` })
-      fetchCompanies()
-    }
+    await updateDoc(doc(db, 'companies', company.id), { isDeleted: true, isActive: false, deletedAt: new Date() })
+    addToast({ type: 'success', title: 'Company archived', message: `${company.name} has been archived` })
+    fetchCompanies()
   }
 
   const handleRestore = async (company: Company) => {
@@ -86,18 +86,18 @@ export function CompaniesPage() {
   }
 
   const handlePermanentDelete = async (id: string) => {
-    if (confirm('Permanently delete this company? This cannot be undone.')) {
-      await deleteDoc(doc(db, 'companies', id))
-      addToast({ type: 'success', title: 'Company permanently deleted' })
-      fetchCompanies()
-    }
+    await deleteDoc(doc(db, 'companies', id))
+    addToast({ type: 'success', title: 'Company permanently deleted' })
+    fetchCompanies()
   }
 
-  const filteredCompanies = companies.filter(c => {
+  const preFiltered = companies.filter(c => {
     const matchesSearch = searchQuery === '' || c.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesDeleted = showDeleted ? c.isDeleted : !c.isDeleted
     return matchesSearch && matchesDeleted
   })
+
+  const { items: sortedCompanies, handleSort, sortConfig } = useTableSort(preFiltered, 'name')
 
   if (!canView('system', 'companies')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
@@ -154,18 +154,26 @@ export function CompaniesPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Address</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">TIN</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('name')}>
+                  <div className="flex items-center gap-1">Name{sortConfig?.key === 'name' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('address')}>
+                  <div className="flex items-center gap-1">Address{sortConfig?.key === 'address' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('tin')}>
+                  <div className="flex items-center gap-1">TIN{sortConfig?.key === 'tin' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Workdays</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('isActive')}>
+                  <div className="flex items-center gap-1">Status{sortConfig?.key === 'isActive' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+                </th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-                : filteredCompanies.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
-                : filteredCompanies.map((c) => (
+                : sortedCompanies.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
+                : sortedCompanies.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{c.address || '-'}</td>
@@ -182,22 +190,65 @@ export function CompaniesPage() {
                       <div className="flex items-center justify-end gap-2">
                         {c.isDeleted ? (
                           <>
-                            <Button variant="ghost" size="sm" onClick={() => handleRestore(c)} title="Restore">
-                              <RotateCcw className="w-4 h-4" />
-                            </Button>
+                            <ConfirmDialog
+                              title="Restore Company"
+                              message={`Restore ${c.name}? It will be marked as active again.`}
+                              confirmText="Restore"
+                              variant="info"
+                              onConfirm={() => handleRestore(c)}
+                            >
+                              {(open) => (
+                                <Button variant="ghost" size="sm" onClick={open} title="Restore">
+                                  <RotateCcw className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </ConfirmDialog>
                             {canDelete('system', 'companies') && (
-                              <Button variant="ghost" size="sm" onClick={() => handlePermanentDelete(c.id)} title="Permanent delete">
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                              </Button>
+                              <ConfirmDialog
+                                title="Permanently Delete Company"
+                                message={`Permanently delete ${c.name}? This action cannot be undone and all associated data will be lost.`}
+                                confirmText="Delete Permanently"
+                                onConfirm={() => handlePermanentDelete(c.id)}
+                              >
+                                {(open) => (
+                                  <Button variant="ghost" size="sm" onClick={open} title="Permanent delete">
+                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                  </Button>
+                                )}
+                              </ConfirmDialog>
                             )}
                           </>
                         ) : (
                           <>
                             {canEdit('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => handleEdit(c)}><Edit className="w-4 h-4" /></Button>}
-                            <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(c)}>
-                              {c.isActive ? 'Deactivate' : 'Activate'}
-                            </Button>
-                            {canDelete('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => handleSoftDelete(c)} title="Archive"><Trash2 className="w-4 h-4" /></Button>}
+                            <ConfirmDialog
+                              title={c.isActive ? 'Deactivate Company' : 'Activate Company'}
+                              message={`${c.isActive ? 'Deactivate' : 'Activate'} ${c.name}?`}
+                              confirmText={c.isActive ? 'Deactivate' : 'Activate'}
+                              variant={c.isActive ? 'warning' : 'info'}
+                              onConfirm={() => handleToggleStatus(c)}
+                            >
+                              {(open) => (
+                                <Button variant="ghost" size="sm" onClick={open}>
+                                  {c.isActive ? 'Deactivate' : 'Activate'}
+                                </Button>
+                              )}
+                            </ConfirmDialog>
+                            {canDelete('system', 'companies') && (
+                              <ConfirmDialog
+                                title="Archive Company"
+                                message={`Archive ${c.name}? It can be restored later.`}
+                                confirmText="Archive"
+                                variant="warning"
+                                onConfirm={() => handleSoftDelete(c)}
+                              >
+                                {(open) => (
+                                  <Button variant="ghost" size="sm" onClick={open} title="Archive">
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </ConfirmDialog>
+                            )}
                           </>
                         )}
                       </div>
