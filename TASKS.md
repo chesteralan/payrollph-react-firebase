@@ -154,7 +154,7 @@
   - [x] 13.2.2 Action toggles (view/add/edit/delete)
 - [x] 13.3 Add user-to-company assignment
 - [x] 13.4 Implement user activation/deactivation
-- [ ] 13.5 Add bulk user operations
+- [x] 13.5 Add bulk user operations
 - [ ] 13.6 Implement user import from CSV
 - [ ] 13.7 Add user activity monitoring
 
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 143 tasks
-- **Remaining:** 97 tasks
+- **Completed:** 145 tasks
+- **Remaining:** 95 tasks
 - **Total:** 240 tasks
-- **Progress:** 143/240 (59.6%)
+- **Progress:** 145/240 (60.4%)

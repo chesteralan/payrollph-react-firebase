@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, limit } from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, limit, writeBatch } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { usePermissions } from '../../hooks/usePermissions'
-import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download } from 'lucide-react'
+import { useToast } from '../../components/ui/Toast'
+import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square } from 'lucide-react'
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry, Term } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
@@ -368,6 +369,7 @@ export function TermsPage() {
 
 export function UsersPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
+  const { addToast } = useToast()
   const [users, setUsers] = useState<(UserAccount & { restrictions?: UserRestriction[] })[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -375,6 +377,8 @@ export function UsersPage() {
   const [formData, setFormData] = useState({ username: '', email: '', displayName: '', password: '' })
   const [editingRestrictions, setEditingRestrictions] = useState<string | null>(null)
   const [restrictions, setRestrictions] = useState<UserRestriction[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkLoading, setBulkLoading] = useState(false)
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -456,7 +460,53 @@ export function UsersPage() {
     setRestrictions(snap.docs.map(d => ({ id: d.id, ...d.data() })) as UserRestriction[])
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => prev.size === sortedUsers.length ? new Set() : new Set(sortedUsers.map((u) => u.id)))
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const handleBulkStatusUpdate = async (isActive: boolean) => {
+    setBulkLoading(true)
+    try {
+      const batch = writeBatch(db)
+      selectedIds.forEach((id) => {
+        batch.update(doc(db, 'user_accounts', id), { isActive, updatedAt: new Date() })
+      })
+      await batch.commit()
+      addToast({ type: 'success', title: `${isActive ? 'Activated' : 'Deactivated'} ${selectedIds.size} user(s)` })
+      clearSelection()
+      fetchUsers()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk status update failed' })
+    }
+    setBulkLoading(false)
+  }
+
+  const handleBulkDelete = async () => {
+    try {
+      const batch = writeBatch(db)
+      selectedIds.forEach((id) => batch.delete(doc(db, 'user_accounts', id)))
+      await batch.commit()
+      addToast({ type: 'success', title: `Deleted ${selectedIds.size} user(s)` })
+      clearSelection()
+      fetchUsers()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk delete failed' })
+    }
+  }
+
   if (!canView('system', 'users')) return <div className="text-center py-12 text-gray-500">Access denied</div>
+
+  const selectedCount = selectedIds.size
 
   return (
     <div className="space-y-6">
@@ -466,6 +516,32 @@ export function UsersPage() {
           <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add User</Button>
         )}
       </div>
+
+      {selectedCount > 0 && (
+        <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+          <span className="text-sm text-blue-800">{selectedCount} user{selectedCount !== 1 ? 's' : ''} selected</span>
+          <div className="flex gap-2">
+            {canEdit('system', 'users') && (
+              <>
+                <Button size="sm" onClick={() => handleBulkStatusUpdate(true)} disabled={bulkLoading}>Activate</Button>
+                <Button size="sm" variant="warning" onClick={() => handleBulkStatusUpdate(false)} disabled={bulkLoading}>Deactivate</Button>
+              </>
+            )}
+            {canDelete('system', 'users') && (
+              <ConfirmDialog
+                title="Bulk Delete Users"
+                message={`Delete ${selectedCount} selected user${selectedCount !== 1 ? 's' : ''}? This cannot be undone.`}
+                confirmText="Delete All"
+                variant="danger"
+                onConfirm={handleBulkDelete}
+              >
+                {(open) => <Button size="sm" variant="danger" onClick={open} disabled={bulkLoading}>Delete</Button>}
+              </ConfirmDialog>
+            )}
+            <Button size="sm" variant="ghost" onClick={clearSelection}>Clear Selection</Button>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <Card>
@@ -555,6 +631,11 @@ export function UsersPage() {
         <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-4 py-3">
+                  <button onClick={toggleSelectAll} className="text-gray-500 hover:text-gray-700">
+                    {selectedIds.size === sortedUsers.length && sortedUsers.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                </th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('username')}>
                   <div className="flex items-center gap-1">Username{sortConfig?.key === 'username' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
                 </th>
@@ -571,10 +652,15 @@ export function UsersPage() {
               </tr>
             </thead>
           <tbody className="divide-y divide-gray-200">
-            {loading ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : sortedUsers.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No users found</td></tr>
+            {loading ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+              : sortedUsers.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No users found</td></tr>
               : sortedUsers.map(user => (
-                <tr key={user.id} className="hover:bg-gray-50">
+                <tr key={user.id} className={selectedIds.has(user.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}>
+                  <td className="px-4">
+                    <button onClick={() => toggleSelect(user.id)} className="text-gray-500 hover:text-gray-700">
+                      {selectedIds.has(user.id) ? <CheckSquare className="w-4 h-4 text-blue-600" /> : <Square className="w-4 h-4" />}
+                    </button>
+                  </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.username}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{user.displayName}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.email}</td>
