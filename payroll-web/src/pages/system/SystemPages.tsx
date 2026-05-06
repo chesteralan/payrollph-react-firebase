@@ -577,7 +577,17 @@ export function AuditPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={handleExportCSV}>
+            <Download className="w-4 h-4 mr-2" />Export CSV
+          </Button>
+          <Button variant="secondary" onClick={handleExportXLS}>
+            <Download className="w-4 h-4 mr-2" />Export XLS
+          </Button>
+        </div>
+      </div>
 
       <Card>
         <CardHeader><CardTitle>Filter</CardTitle></CardHeader>

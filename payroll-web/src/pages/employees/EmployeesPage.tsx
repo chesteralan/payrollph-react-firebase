@@ -10,7 +10,7 @@ import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Pagination } from '../../components/ui/Pagination'
-import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square, X } from 'lucide-react'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { TableSkeleton } from '../../components/ui/Skeleton'
 import type { Employee } from '../../types'
@@ -112,6 +112,54 @@ export function EmployeesPage() {
     fetchEmployees()
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => prev.size === sortedEmployees.length ? new Set() : new Set(sortedEmployees.map((e) => e.id)))
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const handleBulkStatusUpdate = async () => {
+    setBulkStatusLoading(true)
+    try {
+      const batch = writeBatch(db)
+      selectedIds.forEach((id) => {
+        batch.update(doc(db, 'employees', id), {
+          isActive: bulkStatusValue === 'active',
+          updatedAt: new Date()
+        })
+      })
+      await batch.commit()
+      addToast({ type: 'success', title: `Updated ${selectedIds.size} employee(s) to ${bulkStatusValue}` })
+      setShowBulkStatus(false)
+      clearSelection()
+      fetchEmployees()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk status update failed' })
+    }
+    setBulkStatusLoading(false)
+  }
+
+  const handleBulkDelete = async () => {
+    try {
+      const batch = writeBatch(db)
+      selectedIds.forEach((id) => batch.delete(doc(db, 'employees', id)))
+      await batch.commit()
+      addToast({ type: 'success', title: `Deleted ${selectedIds.size} employee(s)` })
+      clearSelection()
+      fetchEmployees()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk delete failed' })
+    }
+  }
+
   const filteredEmployees = useMemo(() => {
     return employees.filter(emp => {
       const matchesSearch = searchQuery === '' ||
@@ -146,6 +194,8 @@ export function EmployeesPage() {
     return <div className="text-center py-12 text-gray-500">Access denied</div>
   }
 
+  const selectedCount = selectedIds.size
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -157,6 +207,29 @@ export function EmployeesPage() {
           </Button>
         )}
       </div>
+
+      {selectedCount > 0 && (
+        <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+          <span className="text-sm text-blue-800">{selectedCount} employee{selectedCount !== 1 ? 's' : ''} selected</span>
+          <div className="flex gap-2">
+            {canEdit('employees', 'employees') && (
+              <Button size="sm" onClick={() => setShowBulkStatus(true)}>Change Status</Button>
+            )}
+            {canDelete('employees', 'employees') && (
+              <ConfirmDialog
+                title="Bulk Delete"
+                message={`Delete ${selectedCount} selected employee${selectedCount !== 1 ? 's' : ''}? This action cannot be undone.`}
+                confirmText="Delete All"
+                variant="danger"
+                onConfirm={handleBulkDelete}
+              >
+                {(open) => <Button size="sm" variant="danger" onClick={open}>Delete</Button>}
+              </ConfirmDialog>
+            )}
+            <Button size="sm" variant="ghost" onClick={clearSelection}>Clear Selection</Button>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <Card>
@@ -206,6 +279,39 @@ export function EmployeesPage() {
         </Card>
       )}
 
+      {showBulkStatus && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Change Status for {selectedCount} Employee{selectedCount !== 1 ? 's' : ''}</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setShowBulkStatus(false)}><X className="w-4 h-4" /></Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">New Status</label>
+                <select
+                  value={bulkStatusValue}
+                  onChange={(e) => setBulkStatusValue(e.target.value as 'active' | 'inactive' | 'terminated')}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="terminated">Terminated</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setShowBulkStatus(false)}>Cancel</Button>
+                <Button onClick={handleBulkStatusUpdate} disabled={bulkStatusLoading}>
+                  {bulkStatusLoading ? 'Updating...' : 'Apply Changes'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader className="py-3">
           <div className="flex items-center gap-4">
@@ -237,6 +343,11 @@ export function EmployeesPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-4 py-3">
+                  <button onClick={toggleSelectAll} className="text-gray-500 hover:text-gray-700">
+                    {selectedIds.size === sortedEmployees.length && sortedEmployees.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                </th>
                 <th
                   className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
                   onClick={() => handleSort('employeeCode')}
@@ -275,14 +386,19 @@ export function EmployeesPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? (
-                <tr><td colSpan={4} className="px-0 py-0"><TableSkeleton rows={10} columns={4} /></td></tr>
+                <tr><td colSpan={5} className="px-0 py-0"><TableSkeleton rows={10} columns={5} /></td></tr>
               ) : paginatedEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">No employees found</td>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">No employees found</td>
                 </tr>
               ) : (
                 paginatedEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-gray-50">
+                  <tr key={emp.id} className={selectedIds.has(emp.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}>
+                    <td className="px-4">
+                      <button onClick={() => toggleSelect(emp.id)} className="text-gray-500 hover:text-gray-700">
+                        {selectedIds.has(emp.id) ? <CheckSquare className="w-4 h-4 text-blue-600" /> : <Square className="w-4 h-4" />}
+                      </button>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">{emp.employeeCode}</div>
                       {emp.name && <div className="text-xs text-gray-500">{emp.name}</div>}
