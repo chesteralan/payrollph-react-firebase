@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
+import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Pagination } from '../../components/ui/Pagination'
+import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX } from 'lucide-react'
 import type { Employee } from '../../types'
 
 export function EmployeesPage() {
   const { currentCompanyId } = useAuth()
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [employees, setEmployees] = useState<(Employee & { name?: string })[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -27,6 +30,10 @@ export function EmployeesPage() {
     statusId: '',
     hireDate: '',
   })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 25
 
   useEffect(() => {
     if (currentCompanyId) {
@@ -50,12 +57,15 @@ export function EmployeesPage() {
       ...formData,
       companyId: currentCompanyId,
       isActive: true,
+      updatedAt: new Date()
     }
 
     if (editingId) {
       await updateDoc(doc(db, 'employees', editingId), data)
+      addToast({ type: 'success', title: 'Employee updated', message: `${formData.employeeCode} has been updated` })
     } else {
-      await addDoc(collection(db, 'employees'), data)
+      await addDoc(collection(db, 'employees'), { ...data, createdAt: new Date() })
+      addToast({ type: 'success', title: 'Employee created', message: `${formData.employeeCode} has been added` })
     }
 
     setShowForm(false)
@@ -81,9 +91,46 @@ export function EmployeesPage() {
   const handleDelete = async (id: string) => {
     if (confirm('Delete this employee?')) {
       await deleteDoc(doc(db, 'employees', id))
+      addToast({ type: 'success', title: 'Employee deleted' })
       fetchEmployees()
     }
   }
+
+  const handleToggleStatus = async (employee: Employee) => {
+    const newStatus = !employee.isActive
+    await updateDoc(doc(db, 'employees', employee.id), { isActive: newStatus, updatedAt: new Date() })
+    addToast({
+      type: 'info',
+      title: 'Status updated',
+      message: `${employee.employeeCode} is now ${newStatus ? 'active' : 'inactive'}`
+    })
+    fetchEmployees()
+  }
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter(emp => {
+      const matchesSearch = searchQuery === '' ||
+        emp.employeeCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (emp.name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (emp.nameId?.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesStatus = statusFilter === 'all' ||
+        (statusFilter === 'active' && emp.isActive) ||
+        (statusFilter === 'inactive' && !emp.isActive)
+
+      return matchesSearch && matchesStatus
+    })
+  }, [employees, searchQuery, statusFilter])
+
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage)
+  const paginatedEmployees = filteredEmployees.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, statusFilter])
 
   if (!canView('employees', 'employees')) {
     return <div className="text-center py-12 text-gray-500">Access denied</div>
@@ -150,6 +197,32 @@ export function EmployeesPage() {
       )}
 
       <Card>
+        <CardHeader className="py-3">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search employees..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <select
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <span className="text-sm text-gray-500 ml-auto">
+              {filteredEmployees.length} employee{filteredEmployees.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </CardHeader>
         <CardContent className="p-0">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -163,28 +236,29 @@ export function EmployeesPage() {
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                    Loading...
-                  </td>
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">Loading...</td>
                 </tr>
-              ) : employees.length === 0 ? (
+              ) : paginatedEmployees.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                    No employees found
-                  </td>
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">No employees found</td>
                 </tr>
               ) : (
-                employees.map((emp) => (
+                paginatedEmployees.map((emp) => (
                   <tr key={emp.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{emp.employeeCode}</td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          emp.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      <div className="text-sm font-medium text-gray-900">{emp.employeeCode}</div>
+                      {emp.name && <div className="text-xs text-gray-500">{emp.name}</div>}
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleToggleStatus(emp)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                          emp.isActive ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                       >
+                        {emp.isActive ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
                         {emp.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {emp.hireDate ? new Date(emp.hireDate).toLocaleDateString() : '-'}
@@ -211,6 +285,15 @@ export function EmployeesPage() {
               )}
             </tbody>
           </table>
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={filteredEmployees.length}
+              itemsPerPage={itemsPerPage}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
