@@ -26,6 +26,7 @@ const PayrollRunsPage = lazy(() => import('./pages/payroll/PayrollRunsPage').the
 const PayrollWizardPage = lazy(() => import('./pages/payroll/PayrollWizardPage').then(m => ({ default: m.PayrollWizardPage })))
 const PayrollDetailPage = lazy(() => import('./pages/payroll/PayrollDetailPage').then(m => ({ default: m.PayrollDetailPage })))
 const TemplatesPage = lazy(() => import('./pages/payroll/TemplatesPage').then(m => ({ default: m.TemplatesPage })))
+const PrintFormatsPage = lazy(() => import('./pages/payroll/PrintFormatsPage').then(m => ({ default: m.PrintFormatsPage })))
 const DTRPage = lazy(() => import('./pages/dtr/DTRPage').then(m => ({ default: m.DTRPage })))
 const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPage').then(m => ({ default: m.Report13thMonthPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
@@ -80,6 +81,7 @@ function App() {
               <Route path="payroll/:id" element={<LazyPage><PayrollDetailPage /></LazyPage>} />
               <Route path="payroll/:id/wizard" element={<LazyPage><PayrollWizardPage /></LazyPage>} />
               <Route path="payroll/templates" element={<LazyPage><TemplatesPage /></LazyPage>} />
+              <Route path="payroll/print-formats" element={<LazyPage><PrintFormatsPage /></LazyPage>} />
               <Route path="dtr" element={<LazyPage><DTRPage /></LazyPage>} />
               <Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
               <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />

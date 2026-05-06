@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Input } from '../../components/ui/Input'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { Plus, Edit, Trash2, Copy, ChevronRight, ChevronLeft, Check, X } from 'lucide-react'
-import type { PayrollTemplate, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus } from '../../types'
+import type { PayrollTemplate, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus, PrintFormat } from '../../types'
 
 const WIZARD_STEPS = ['Basic Info', 'Groups & Filters', 'Columns', 'Print Settings', 'Review']
 
@@ -38,6 +39,7 @@ export function TemplatesPage() {
   const [earningsList, setEarningsList] = useState<{ id: string; name: string }[]>([])
   const [deductionsList, setDeductionsList] = useState<{ id: string; name: string }[]>([])
   const [benefitsList, setBenefitsList] = useState<{ id: string; name: string }[]>([])
+  const [printFormats, setPrintFormats] = useState<PrintFormat[]>([])
 
   const fetchTemplates = async () => {
     setLoading(true)
@@ -47,14 +49,15 @@ export function TemplatesPage() {
   }
 
   const fetchLookups = async () => {
-    const [gSnap, pSnap, aSnap, sSnap, eSnap, dSnap, bSnap] = await Promise.all([
+    const [gSnap, pSnap, aSnap, sSnap, eSnap, dSnap, bSnap, pfSnap] = await Promise.all([
       getDocs(query(collection(db, 'employee_groups'), where('isActive', '==', true))),
       getDocs(query(collection(db, 'employee_positions'), where('isActive', '==', true))),
       getDocs(query(collection(db, 'employee_areas'), where('isActive', '==', true))),
       getDocs(query(collection(db, 'employee_statuses'), where('isActive', '==', true))),
       getDocs(query(collection(db, 'earnings'))),
       getDocs(query(collection(db, 'deductions'))),
-      getDocs(query(collection(db, 'benefits')))
+      getDocs(query(collection(db, 'benefits'))),
+      getDocs(query(collection(db, 'print_formats')))
     ])
     setGroups(gSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeGroup[])
     setPositions(pSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeePosition[])
@@ -63,6 +66,7 @@ export function TemplatesPage() {
     setEarningsList(eSnap.docs.map(d => ({ id: d.id, name: (d.data() as { name: string }).name })))
     setDeductionsList(dSnap.docs.map(d => ({ id: d.id, name: (d.data() as { name: string }).name })))
     setBenefitsList(bSnap.docs.map(d => ({ id: d.id, name: (d.data() as { name: string }).name })))
+    setPrintFormats(pfSnap.docs.map(d => ({ id: d.id, ...d.data() })) as PrintFormat[])
   }
 
   useEffect(() => { fetchTemplates() }, [])
@@ -205,12 +209,15 @@ export function TemplatesPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Print Format</label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" value={basicForm.printFormat} onChange={(e) => setBasicForm({ ...basicForm, printFormat: e.target.value })}>
-                    <option value="register">Payroll Register</option>
-                    <option value="payslip">Payslip</option>
-                    <option value="transmittal">Bank Transmittal</option>
-                    <option value="journal">Journal Entry</option>
-                    <option value="denomination">Cash Denomination</option>
+                    <option value="register">Default: Payroll Register</option>
+                    <option value="payslip">Default: Payslip</option>
+                    <option value="transmittal">Default: Bank Transmittal</option>
+                    <option value="journal">Default: Journal Entry</option>
+                    <option value="denomination">Default: Cash Denomination</option>
+                    {printFormats.length > 0 && <option disabled>──────────</option>}
+                    {printFormats.filter(f => f.isActive).map(f => <option key={f.id} value={f.id}>{f.name} ({f.outputType})</option>)}
                   </select>
+                  {printFormats.length === 0 && <p className="mt-1 text-xs text-gray-400">Create custom formats in <Link to="/payroll/print-formats" className="text-primary-600 hover:underline">Print Formats</Link></p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Default Group By</label>
@@ -262,7 +269,13 @@ export function TemplatesPage() {
                   <h3 className="font-medium">Template Summary</h3>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <span className="text-gray-500">Name:</span><span className="font-medium">{basicForm.name}</span>
-                    <span className="text-gray-500">Print Format:</span><span className="capitalize">{basicForm.printFormat}</span>
+                    <span className="text-gray-500">Print Format:</span>
+                    <span className="font-medium">
+                      {(() => {
+                        const pf = printFormats.find(f => f.id === basicForm.printFormat)
+                        return pf ? `${pf.name} (${pf.outputType})` : basicForm.printFormat.charAt(0).toUpperCase() + basicForm.printFormat.slice(1)
+                      })()}
+                    </span>
                     <span className="text-gray-500">Group By:</span><span className="capitalize">{basicForm.groupBy}</span>
                     <span className="text-gray-500">Groups:</span><span>{selectedGroups.length > 0 ? `${selectedGroups.length} selected` : 'All'}</span>
                     <span className="text-gray-500">Earnings:</span><span>{selectedEarnings.length} items</span>
@@ -305,7 +318,12 @@ export function TemplatesPage() {
                     <div className="text-sm font-medium text-gray-900">{t.name}</div>
                     {t.description && <div className="text-xs text-gray-500">{t.description}</div>}
                   </td>
-                  <td className="px-6 py-4 text-sm capitalize text-gray-500">{t.printFormat || 'register'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {(() => {
+                      const pf = printFormats.find(f => f.id === t.printFormat)
+                      return pf ? pf.name : (t.printFormat || 'register').charAt(0).toUpperCase() + (t.printFormat || 'register').slice(1)
+                    })()}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {(t.earnings?.length || 0) + (t.deductions?.length || 0) + (t.benefits?.length || 0)} items
                   </td>

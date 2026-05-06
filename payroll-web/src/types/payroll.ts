@@ -186,3 +186,31 @@ export interface PayrollTemplateEmployee {
   printGroup?: string
   payslipTemplate?: string
 }
+
+export interface PrintFormat {
+  id: string
+  companyId?: string
+  name: string
+  description?: string
+  outputType: 'register' | 'payslip' | 'transmittal' | 'journal' | 'denomination'
+  paperSize: 'A4' | 'Letter' | 'Legal'
+  orientation: 'portrait' | 'landscape'
+  showHeader: boolean
+  showFooter: boolean
+  headerHtml?: string
+  footerHtml?: string
+  showCompanyLogo: boolean
+  showCompanyName: boolean
+  showCompanyAddress: boolean
+  showCompanyTIN: boolean
+  showTitle: boolean
+  showPeriod: boolean
+  showSignatureLines: boolean
+  signatureLabels?: string[]
+  columnOrder?: string[]
+  fontSize: 'xs' | 'sm' | 'md' | 'lg'
+  includeTotals: boolean
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}

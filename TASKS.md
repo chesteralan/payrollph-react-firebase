@@ -73,7 +73,7 @@
   - [x] 7.3.3 Print column settings
 - [x] 7.4 Implement template cloning
 - [x] 7.5 Add template to payroll creation flow
-- [ ] 7.6 Implement print format templates
+- [x] 7.6 Implement print format templates
 
 ## 8. Payroll Runs & Processing
 - [x] 8.1 Create PayrollRunsPage (listing with lock/unlock/delete)
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 131 tasks
-- **Remaining:** 109 tasks
+- **Completed:** 132 tasks
+- **Remaining:** 108 tasks
 - **Total:** 240 tasks
 - **Progress:** 55%

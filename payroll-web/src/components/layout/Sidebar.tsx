@@ -149,6 +149,13 @@ const navigation: NavItem[] = [
         department: 'payroll',
         section: 'templates',
       },
+      {
+        label: 'Print Formats',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/payroll/print-formats',
+        department: 'payroll',
+        section: 'templates',
+      },
     ],
   },
   {
