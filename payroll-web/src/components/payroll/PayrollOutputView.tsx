@@ -152,34 +152,75 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
     const ws = XLSX.utils.json_to_sheet(registerData)
     XLSX.utils.book_append_sheet(wb, ws, 'Payroll Register')
 
-  const monthName = new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })
+    // Column widths
+    ws['!cols'] = [
+      { wch: 15 }, // Employee ID
+      { wch: 25 }, // Name
+      { wch: 15 }, // Basic Salary
+      { wch: 15 }, // Earnings
+      { wch: 15 }, // Gross Pay
+      { wch: 15 }, // Deductions
+      { wch: 15 }, // Benefits (EE)
+      { wch: 15 }  // Net Pay
+    ]
 
-  const PrintHeader = () => {
-    if (!company) return null
-    return (
-      <div className="print-header text-center mb-6 pb-4 border-b border-gray-300">
-        {company.printHeader ? (
-          <div dangerouslySetInnerHTML={{ __html: company.printHeader }} />
-        ) : (
-          <>
-            <h2 className="text-xl font-bold text-gray-900">{company.name}</h2>
-            {company.address && <p className="text-sm text-gray-600">{company.address}</p>}
-            {company.tin && <p className="text-sm text-gray-600">TIN: {company.tin}</p>}
-          </>
-        )}
-        <h3 className="text-lg font-semibold text-gray-800 mt-2">{payroll.name} - {monthName} {payroll.year}</h3>
-      </div>
-    )
-  }
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 }
 
-  const PrintFooter = () => {
-    if (!company?.printFooter) return null
-    return (
-      <div className="print-footer text-center mt-6 pt-4 border-t border-gray-300 text-sm text-gray-500">
-        <div dangerouslySetInnerHTML={{ __html: company.printFooter }} />
-      </div>
-    )
-  }
+    // Apply header row styles (row 1, 0-indexed r=0)
+    for (let c = 0; c < 8; c++) {
+      const cellAddr = XLSX.utils.encode_cell({ r: 0, c })
+      const cell = ws[cellAddr]
+      if (cell) {
+        cell.s = {
+          font: { bold: true, color: { rgb: 'FFFFFFFF' } },
+          fill: { fgColor: { rgb: 'FF4472C4' } },
+          border: {
+            top: { style: 'thin', color: { rgb: 'FF000000' } },
+            bottom: { style: 'thin', color: { rgb: 'FF000000' } },
+            left: { style: 'thin', color: { rgb: 'FF000000' } },
+            right: { style: 'thin', color: { rgb: 'FF000000' } }
+          }
+        }
+      }
+    }
+
+    // Apply data and total row styles
+    const totalRowIndex = registerData.length - 1
+    for (let r = 1; r < registerData.length; r++) {
+      const isTotalRow = r === totalRowIndex
+      // Numeric columns: C to H (c=2 to 7)
+      for (let c = 2; c < 8; c++) {
+        const cellAddr = XLSX.utils.encode_cell({ r, c })
+        const cell = ws[cellAddr]
+        if (!cell) continue
+
+        if (isTotalRow) {
+          cell.s = {
+            font: { bold: true },
+            fill: { fgColor: { rgb: 'FFD9E1F2' } },
+            border: {
+              top: { style: 'medium', color: { rgb: 'FF000000' } },
+              bottom: { style: 'thin', color: { rgb: 'FF000000' } },
+              left: { style: 'thin', color: { rgb: 'FF000000' } },
+              right: { style: 'thin', color: { rgb: 'FF000000' } }
+            },
+            numFmt: '₱#,##0.00'
+          }
+        } else {
+          cell.s = { ...cell.s, numFmt: '₱#,##0.00' }
+        }
+      }
+      // Total row label styling
+      if (isTotalRow) {
+        const labelCell = ws[XLSX.utils.encode_cell({ r, c: 0 })]
+        if (labelCell) labelCell.s = { ...labelCell.s, font: { bold: true } }
+        const nameCell = ws[XLSX.utils.encode_cell({ r, c: 1 })]
+        if (nameCell) nameCell.s = { ...nameCell.s, font: { bold: true } }
+      }
+    }
+
+    const monthName = new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })
     XLSX.writeFile(wb, `Payroll_${payroll.name}_${monthName}_${payroll.year}.xlsx`)
   }
 
@@ -208,8 +249,6 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
     a.click()
     URL.revokeObjectURL(url)
   }
-
-  const monthName = new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })
 
   const MODES: { key: OutputMode; label: string }[] = [
     { key: 'register', label: 'Payroll Register' },

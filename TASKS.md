@@ -143,7 +143,7 @@
 
 ## 12. Terms Management
 - [x] 12.1 Create TermsPage (placeholder)
-- [ ] 12.2 Implement terms CRUD
+- [x] 12.2 Implement terms CRUD
 - [ ] 12.3 Link terms to payroll periods
 - [ ] 12.4 Add term validation rules
 
@@ -161,7 +161,7 @@
 ## 14. Company Management
 - [x] 14.1 Create CompaniesPage (basic structure)
 - [x] 14.2 Implement company CRUD with soft-delete
-- [ ] 14.3 Add company payroll period configuration
+- [x] 14.3 Add company payroll period configuration
 - [x] 14.4 Configure company print settings (logo, header, CSS)
 - [ ] 14.5 Add company column-group settings
 - [ ] 14.6 Implement company options/settings
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 136 tasks
-- **Remaining:** 104 tasks
+- **Completed:** 138 tasks
+- **Remaining:** 102 tasks
 - **Total:** 240 tasks
-- **Progress:** 56%
+- **Progress:** 138/240 (57.5%)

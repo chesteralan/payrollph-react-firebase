@@ -4,9 +4,10 @@ import { db } from '../../config/firebase'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { usePermissions } from '../../hooks/usePermissions'
 import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download } from 'lucide-react'
-import type { UserAccount, UserRestriction, Department, Section, CalendarEntry } from '../../types'
+import type { UserAccount, UserRestriction, Department, Section, CalendarEntry, Term } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
 import * as XLSX from 'xlsx'
@@ -230,9 +231,139 @@ export function CalendarPage() {
 }
 
 export function TermsPage() {
-  const { canView } = usePermissions()
+  const { canView, canAdd, canEdit, canDelete } = usePermissions()
+  const [terms, setTerms] = useState<Term[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [formData, setFormData] = useState({ name: '', description: '', type: 'semi-monthly' as Term['type'], frequency: '', daysPerPeriod: 0 })
+
+  useEffect(() => { fetchTerms() }, [])
+
+  const fetchTerms = async () => {
+    setLoading(true)
+    const snap = await getDocs(query(collection(db, 'payroll_terms'), orderBy('name')))
+    setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[])
+    setLoading(false)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const data = { ...formData, isActive: true }
+    if (editingId) {
+      await updateDoc(doc(db, 'payroll_terms', editingId), { ...formData, updatedAt: new Date() })
+    } else {
+      await addDoc(collection(db, 'payroll_terms'), { ...data, createdAt: new Date(), updatedAt: new Date() })
+    }
+    setShowForm(false); setEditingId(null); setFormData({ name: '', description: '', type: 'semi-monthly', frequency: '', daysPerPeriod: 0 }); fetchTerms()
+  }
+
+  const handleDelete = async (id: string) => {
+    await deleteDoc(doc(db, 'payroll_terms', id))
+    setConfirmDelete(null); fetchTerms()
+  }
+
+  const handleToggleStatus = async (term: Term) => {
+    await updateDoc(doc(db, 'payroll_terms', term.id), { isActive: !term.isActive, updatedAt: new Date() })
+    fetchTerms()
+  }
+
+  const { items: sortedTerms, handleSort, sortConfig } = useTableSort(terms, 'name')
+
+  const typeLabels: Record<string, string> = {
+    'semi-monthly': 'Semi-monthly',
+    'monthly': 'Monthly',
+    'bi-weekly': 'Bi-weekly',
+    'weekly': 'Weekly'
+  }
+
   if (!canView('system', 'terms')) return <div className="text-center py-12 text-gray-500">Access denied</div>
-  return (<div className="space-y-6"><h1 className="text-2xl font-bold text-gray-900">Terms</h1><Card><CardContent className="pt-6"><p className="text-gray-500">Manage terms and conditions.</p></CardContent></Card></div>)
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Terms</h1>
+        {canAdd('system', 'terms') && (
+          <Button onClick={() => { setEditingId(null); setFormData({ name: '', description: '', type: 'semi-monthly', frequency: '', daysPerPeriod: 0 }); setShowForm(!showForm) }}><Plus className="w-4 h-4 mr-2" />Add Term</Button>
+        )}
+      </div>
+      {showForm && (
+        <Card>
+          <CardHeader><CardTitle>{editingId ? 'Edit' : 'Add'} Term</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input id="name" label="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value as Term['type'] })}>
+                    <option value="semi-monthly">Semi-monthly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="bi-weekly">Bi-weekly</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </div>
+                <Input id="frequency" label="Frequency" value={formData.frequency} onChange={(e) => setFormData({ ...formData, frequency: e.target.value })} />
+                <Input id="daysPerPeriod" label="Days per Period" type="number" value={String(formData.daysPerPeriod)} onChange={(e) => setFormData({ ...formData, daysPerPeriod: Number(e.target.value) })} />
+                <div className="col-span-2">
+                  <Input id="description" label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
+                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+      <Card><CardContent className="p-0">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('name')}>
+                <div className="flex items-center gap-1">Name{sortConfig?.key === 'name' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
+              </th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Frequency</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Days/Period</th>
+              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loading ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+              : sortedTerms.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No terms found</td></tr>
+              : sortedTerms.map((term) => (
+                <tr key={term.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{term.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{typeLabels[term.type] || term.type}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{term.frequency || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{term.daysPerPeriod || '-'}</td>
+                  <td className="px-6 py-4">
+                    <button onClick={() => handleToggleStatus(term)} className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${term.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {term.isActive ? 'Active' : 'Inactive'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      {canEdit('system', 'terms') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(term.id); setFormData({ name: term.name, description: term.description || '', type: term.type, frequency: term.frequency, daysPerPeriod: term.daysPerPeriod }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
+                      {canDelete('system', 'terms') && <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(term.id)}><Trash2 className="w-4 h-4" /></Button>}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </CardContent></Card>
+      {confirmDelete && (
+        <ConfirmDialog title="Delete Term" message="Delete this term? This cannot be undone." confirmText="Delete" onConfirm={() => handleDelete(confirmDelete)}>
+          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(null)}><Trash2 className="w-4 h-4" /></Button>
+        </ConfirmDialog>
+      )}
+    </div>
+  )
 }
 
 export function UsersPage() {

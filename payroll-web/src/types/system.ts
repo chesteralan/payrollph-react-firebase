@@ -15,3 +15,13 @@ export interface CalendarEntry {
   type: 'holiday' | 'special' | 'workday'
   name: string
 }
+
+export interface Term {
+  id: string
+  name: string
+  description?: string
+  type: 'semi-monthly' | 'monthly' | 'bi-weekly' | 'weekly'
+  frequency: string
+  daysPerPeriod: number
+  isActive: boolean
+}

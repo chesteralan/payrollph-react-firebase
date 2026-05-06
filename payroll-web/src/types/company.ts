@@ -11,6 +11,13 @@ export interface Company {
   printCss?: string
   defaultWorkdays?: number
   currency?: string
+  payrollPeriods?: Array<{
+    type: 'monthly' | 'semi-monthly' | 'bi-weekly' | 'weekly'
+    cutOff1Day?: number
+    cutOff2Day?: number
+    payDay?: number
+    frequency?: string
+  }>
   createdAt: Date
   updatedAt: Date
 }

@@ -7,7 +7,7 @@ import { useTableSort } from '../../hooks/useTableSort'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, RotateCcw, Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { Plus, Edit, Trash2, RotateCcw, Search, ChevronUp, ChevronDown, ChevronsUpDown, X } from 'lucide-react'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import type { Company } from '../../types'
 
@@ -23,7 +23,14 @@ export function CompaniesPage() {
   const [formData, setFormData] = useState({
     name: '', address: '', tin: '',
     printHeader: '', printFooter: '', printCss: '',
-    defaultWorkdays: 22, currency: 'PHP'
+    defaultWorkdays: 22, currency: 'PHP',
+    payrollPeriods: [] as Array<{
+      type: 'monthly' | 'semi-monthly' | 'bi-weekly' | 'weekly'
+      cutOff1Day?: number
+      cutOff2Day?: number
+      payDay?: number
+      frequency?: string
+    }>
   })
 
   useEffect(() => { fetchCompanies() }, [])
@@ -37,14 +44,16 @@ export function CompaniesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const { payrollPeriods, ...rest } = formData
+    const dataToSave = { ...rest, payrollPeriods: payrollPeriods.length > 0 ? payrollPeriods : null }
     if (editingId) {
-      await updateDoc(doc(db, 'companies', editingId), formData)
+      await updateDoc(doc(db, 'companies', editingId), dataToSave)
       addToast({ type: 'success', title: 'Company updated', message: `${formData.name} has been updated` })
     } else {
-      await addDoc(collection(db, 'companies'), { ...formData, isActive: true, createdAt: new Date() })
+      await addDoc(collection(db, 'companies'), { ...dataToSave, isActive: true, createdAt: new Date() })
       addToast({ type: 'success', title: 'Company created', message: `${formData.name} has been added` })
     }
-    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '', printHeader: '', printFooter: '', printCss: '', defaultWorkdays: 22, currency: 'PHP' }); fetchCompanies()
+    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '', printHeader: '', printFooter: '', printCss: '', defaultWorkdays: 22, currency: 'PHP', payrollPeriods: [] }); fetchCompanies()
   }
 
   const handleEdit = (company: Company) => {
@@ -57,9 +66,30 @@ export function CompaniesPage() {
       printFooter: (company as any).printFooter || '',
       printCss: (company as any).printCss || '',
       defaultWorkdays: (company as any).defaultWorkdays || 22,
-      currency: (company as any).currency || 'PHP'
+      currency: (company as any).currency || 'PHP',
+      payrollPeriods: (company as any).payrollPeriods || []
     })
     setShowForm(true)
+  }
+
+  const addPayrollPeriod = () => {
+    setFormData({
+      ...formData,
+      payrollPeriods: [...formData.payrollPeriods, { type: 'monthly' as const, cutOff1Day: 15, payDay: 5 }]
+    })
+  }
+
+  const removePayrollPeriod = (index: number) => {
+    setFormData({
+      ...formData,
+      payrollPeriods: formData.payrollPeriods.filter((_, i) => i !== index)
+    })
+  }
+
+  const updatePayrollPeriod = (index: number, field: string, value: any) => {
+    const updated = [...formData.payrollPeriods]
+    updated[index] = { ...updated[index], [field]: value }
+    setFormData({ ...formData, payrollPeriods: updated })
   }
 
   const handleToggleStatus = async (company: Company) => {
@@ -119,7 +149,7 @@ export function CompaniesPage() {
         <Card>
           <CardHeader><CardTitle>{editingId ? 'Edit' : 'Add'} Company</CardTitle></CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <Input id="name" label="Company Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
                 <Input id="tin" label="TIN" value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} />
@@ -128,6 +158,87 @@ export function CompaniesPage() {
                 <Input id="printHeader" label="Print Header" value={formData.printHeader} onChange={(e) => setFormData({ ...formData, printHeader: e.target.value })} placeholder="Company header for prints" />
                 <Input id="printFooter" label="Print Footer" value={formData.printFooter} onChange={(e) => setFormData({ ...formData, printFooter: e.target.value })} placeholder="Company footer for prints" />
               </div>
+
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-medium text-gray-900">Payroll Periods</h3>
+                  <Button type="button" variant="secondary" size="sm" onClick={addPayrollPeriod}>
+                    <Plus className="w-4 h-4 mr-1" /> Add Period
+                  </Button>
+                </div>
+                {formData.payrollPeriods.length === 0 ? (
+                  <p className="text-sm text-gray-500">No payroll periods configured. Click "Add Period" to configure.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.payrollPeriods.map((period, index) => (
+                      <div key={index} className="border rounded-lg p-4 bg-gray-50 relative">
+                        <button
+                          type="button"
+                          onClick={() => removePayrollPeriod(index)}
+                          className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                            <select
+                              value={period.type}
+                              onChange={(e) => updatePayrollPeriod(index, 'type', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                            >
+                              <option value="monthly">Monthly</option>
+                              <option value="semi-monthly">Semi-Monthly</option>
+                              <option value="bi-weekly">Bi-Weekly</option>
+                              <option value="weekly">Weekly</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Cutoff 1 (Day)</label>
+                            <Input
+                              type="number"
+                              value={String(period.cutOff1Day || '')}
+                              onChange={(e) => updatePayrollPeriod(index, 'cutOff1Day', e.target.value ? Number(e.target.value) : undefined)}
+                              placeholder="e.g., 15"
+                            />
+                          </div>
+                          {period.type === 'semi-monthly' && (
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Cutoff 2 (Day)</label>
+                              <Input
+                                type="number"
+                                value={String(period.cutOff2Day || '')}
+                                onChange={(e) => updatePayrollPeriod(index, 'cutOff2Day', e.target.value ? Number(e.target.value) : undefined)}
+                                placeholder="e.g., 30"
+                              />
+                            </div>
+                          )}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Pay Day</label>
+                            <Input
+                              type="number"
+                              value={String(period.payDay || '')}
+                              onChange={(e) => updatePayrollPeriod(index, 'payDay', e.target.value ? Number(e.target.value) : undefined)}
+                              placeholder="e.g., 5"
+                            />
+                          </div>
+                          {period.type === 'weekly' || period.type === 'bi-weekly' ? (
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Frequency</label>
+                              <Input
+                                value={period.frequency || ''}
+                                onChange={(e) => updatePayrollPeriod(index, 'frequency', e.target.value)}
+                                placeholder="e.g., Every Friday"
+                              />
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="flex gap-2">
                 <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
                 <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
