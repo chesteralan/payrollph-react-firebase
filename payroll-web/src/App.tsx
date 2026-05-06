@@ -4,6 +4,8 @@ import { CompanyProvider } from './context/CompanyContext'
 import { ProtectedRoute } from './components/ui/ProtectedRoute'
 import { AppLayout } from './components/layout/AppLayout'
 import { LoginPage } from './pages/auth/LoginPage'
+import { SetupPage } from './pages/auth/SetupPage'
+import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { EmployeesPage } from './pages/employees/EmployeesPage'
 import { EmployeeCalendarPage } from './pages/employees/CalendarPage'
 import { EmployeeGroupsPage } from './pages/employees/GroupsPage'
@@ -15,7 +17,6 @@ import { PayrollRunsPage } from './pages/payroll/PayrollRunsPage'
 import { TemplatesPage } from './pages/payroll/TemplatesPage'
 import { DTRPage } from './pages/dtr/DTRPage'
 import { Report13thMonthPage } from './pages/reports/Report13thMonthPage'
-import { DashboardPage } from './pages/dashboard/DashboardPage'
 import { CompaniesPage } from './pages/system/CompaniesPage'
 import { CalendarPage, TermsPage, UsersPage, RestrictionsPage, AuditPage, DatabasePage } from './pages/system/SystemPages'
 
@@ -25,6 +26,7 @@ function App() {
       <AuthProvider>
         <CompanyProvider>
           <Routes>
+            <Route path="/setup" element={<SetupPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/"
@@ -35,7 +37,6 @@ function App() {
               }
             >
               <Route index element={<DashboardPage />} />
-              <Route path="employees" element={<EmployeesPage />} />
               <Route path="employees" element={<EmployeesPage />} />
               <Route path="employees/calendar" element={<EmployeeCalendarPage />} />
               <Route path="employees/groups" element={<EmployeeGroupsPage />} />
