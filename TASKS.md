@@ -27,7 +27,7 @@
 - [x] 3.2 Implement RBAC-filtered sidebar navigation
 - [x] 3.3 Create company selector dropdown in header
 - [x] 3.4 Add "New Payroll" quick action in sidebar
-- [ ] 3.5 Implement responsive mobile sidebar (hamburger menu)
+- [x] 3.5 Implement responsive mobile sidebar (hamburger menu)
 - [ ] 3.6 Add breadcrumb navigation
 - [x] 3.7 Implement user profile dropdown in header
 
@@ -60,7 +60,7 @@
 - [x] 6.1 Create EarningsPage (CRUD for earning items)
 - [x] 6.2 Create BenefitsPage (CRUD for benefit items with EE/ER share)
 - [x] 6.3 Create DeductionsPage (CRUD for deduction items)
-- [ ] 6.4 Add earning formula configuration
+- [x] 6.4 Add earning formula configuration
 - [x] 6.5 Implement deduction rules (fixed/percentage)
 - [ ] 6.6 Add benefit allocation rules
 
@@ -163,7 +163,7 @@
 - [x] 14.2 Implement company CRUD with soft-delete
 - [x] 14.3 Add company payroll period configuration
 - [x] 14.4 Configure company print settings (logo, header, CSS)
-- [ ] 14.5 Add company column-group settings
+- [x] 14.5 Add company column-group settings
 - [ ] 14.6 Implement company options/settings
 - [x] 14.7 Add workday configuration (default workdays per month)
 
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 141 tasks
-- **Remaining:** 99 tasks
+- **Completed:** 143 tasks
+- **Remaining:** 97 tasks
 - **Total:** 240 tasks
-- **Progress:** 141/240 (58.8%)
+- **Progress:** 143/240 (59.6%)

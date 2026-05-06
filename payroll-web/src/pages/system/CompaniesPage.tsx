@@ -33,6 +33,14 @@ export function CompaniesPage() {
     }>
   })
 
+  const [columnGroup, setColumnGroup] = useState({
+    dtr: true,
+    salaries: true,
+    earnings: true,
+    benefits: true,
+    deductions: true
+  })
+
   useEffect(() => { fetchCompanies() }, [])
 
   const fetchCompanies = async () => {
@@ -45,7 +53,7 @@ export function CompaniesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const { payrollPeriods, ...rest } = formData
-    const dataToSave = { ...rest, payrollPeriods: payrollPeriods.length > 0 ? payrollPeriods : null }
+    const dataToSave = { ...rest, payrollPeriods: payrollPeriods.length > 0 ? payrollPeriods : null, columnGroup }
     if (editingId) {
       await updateDoc(doc(db, 'companies', editingId), dataToSave)
       addToast({ type: 'success', title: 'Company updated', message: `${formData.name} has been updated` })
@@ -53,7 +61,7 @@ export function CompaniesPage() {
       await addDoc(collection(db, 'companies'), { ...dataToSave, isActive: true, createdAt: new Date() })
       addToast({ type: 'success', title: 'Company created', message: `${formData.name} has been added` })
     }
-    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '', printHeader: '', printFooter: '', printCss: '', defaultWorkdays: 22, currency: 'PHP', payrollPeriods: [] }); fetchCompanies()
+    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '', printHeader: '', printFooter: '', printCss: '', defaultWorkdays: 22, currency: 'PHP', payrollPeriods: [] }); setColumnGroup({ dtr: true, salaries: true, earnings: true, benefits: true, deductions: true }); fetchCompanies()
   }
 
   const handleEdit = (company: Company) => {
@@ -69,6 +77,7 @@ export function CompaniesPage() {
       currency: (company as any).currency || 'PHP',
       payrollPeriods: (company as any).payrollPeriods || []
     })
+    setColumnGroup((company as any).columnGroup || { dtr: true, salaries: true, earnings: true, benefits: true, deductions: true })
     setShowForm(true)
   }
 
@@ -239,11 +248,29 @@ export function CompaniesPage() {
                 )}
               </div>
 
-              <div className="flex gap-2">
-                <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
-                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
-              </div>
-            </form>
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-3">Column Groups</h3>
+            <p className="text-sm text-gray-500 mb-3">Control which column groups are shown by default in payroll processing views.</p>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {Object.entries(columnGroup).map(([key, value]) => (
+                <label key={key} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={value}
+                    onChange={(e) => setColumnGroup({ ...columnGroup, [key]: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 capitalize">{key}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
+            <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
+          </div>
+        </form>
           </CardContent>
         </Card>
       )}
@@ -275,6 +302,7 @@ export function CompaniesPage() {
                   <div className="flex items-center gap-1">TIN{sortConfig?.key === 'tin' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
                 </th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Workdays</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Columns</th>
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('isActive')}>
                   <div className="flex items-center gap-1">Status{sortConfig?.key === 'isActive' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
                 </th>
@@ -282,14 +310,27 @@ export function CompaniesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {loading ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-                : sortedCompanies.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
+              {loading ? <tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+                : sortedCompanies.length === 0 ? <tr><td colSpan={7} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
                 : sortedCompanies.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{c.address || '-'}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{c.tin || '-'}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{(c as any).defaultWorkdays || 22}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {(c as any).columnGroup ? (
+                          Object.entries((c as any).columnGroup).filter(([_, v]) => v).map(([key]) => (
+                            <span key={key} className="inline-flex px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">
+                              {key}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-400">All</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                         c.isDeleted ? 'bg-red-100 text-red-800' : c.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
