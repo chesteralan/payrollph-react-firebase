@@ -8,11 +8,21 @@ export interface Payroll {
   status: 'draft' | 'locked' | 'published'
   isActive: boolean
   isLocked: boolean
+  isPublished?: boolean
+  publishedAt?: Date
   printFormat?: string
   groupBy?: string
   createdAt: Date
   updatedAt: Date
   createdBy: string
+}
+
+export interface PayrollValidationError {
+  field: string
+  nameId?: string
+  employeeName?: string
+  message: string
+  severity: 'error' | 'warning'
 }
 
 export interface PayrollInclusiveDate {

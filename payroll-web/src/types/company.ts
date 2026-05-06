@@ -4,6 +4,13 @@ export interface Company {
   address?: string
   tin?: string
   isActive: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | null
+  printHeader?: string
+  printFooter?: string
+  printCss?: string
+  defaultWorkdays?: number
+  currency?: string
   createdAt: Date
   updatedAt: Date
 }

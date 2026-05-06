@@ -5,7 +5,7 @@ import { usePermissions } from '../../hooks/usePermissions'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download } from 'lucide-react'
 
 interface NameRecord {
   id: string
@@ -56,6 +56,22 @@ export function NamesListPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Delete this name record?')) { await deleteDoc(doc(db, 'names', id)); fetchNames() }
+  }
+
+  const handleExportCSV = () => {
+    const headers = ['First Name', 'Middle Name', 'Last Name', 'Suffix']
+    const csvRows = [headers.join(',')]
+    for (const n of names) {
+      csvRows.push([n.firstName, n.middleName || '', n.lastName, n.suffix || ''].join(','))
+    }
+    const csv = csvRows.join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `NamesList_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +176,9 @@ export function NamesListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Names List</h1>
         <div className="flex gap-2">
+          <Button variant="secondary" onClick={handleExportCSV}>
+            <Download className="w-4 h-4 mr-2" />Export CSV
+          </Button>
           <Button variant="secondary" onClick={() => setShowImport(true)}>
             <Upload className="w-4 h-4 mr-2" />Import CSV
           </Button>

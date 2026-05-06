@@ -21,6 +21,14 @@ interface ProcessingRow {
   salaryAmount: number
 }
 
+interface CompanyInfo {
+  name: string
+  address?: string
+  tin?: string
+  printHeader?: string
+  printFooter?: string
+}
+
 interface OutputViewProps {
   payroll: {
     name: string
@@ -28,6 +36,7 @@ interface OutputViewProps {
     year: number
     isLocked: boolean
   }
+  company?: CompanyInfo
   rows: ProcessingRow[]
   earningData: Map<string, Map<string, number>>
   deductionData: Map<string, Map<string, number>>
@@ -37,9 +46,7 @@ interface OutputViewProps {
   benefitsList: { id: string; name: string }[]
 }
 
-type OutputMode = 'register' | 'payslip' | 'transmittal' | 'journal' | 'denomination'
-
-export function PayrollOutputView({ payroll, rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList }: OutputViewProps) {
+export function PayrollOutputView({ payroll, company, rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList }: OutputViewProps) {
   const [activeMode, setActiveMode] = useState<OutputMode>('register')
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null)
 
@@ -123,7 +130,34 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
     const ws = XLSX.utils.json_to_sheet(registerData)
     XLSX.utils.book_append_sheet(wb, ws, 'Payroll Register')
 
-    const monthName = new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })
+  const monthName = new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })
+
+  const PrintHeader = () => {
+    if (!company) return null
+    return (
+      <div className="print-header text-center mb-6 pb-4 border-b border-gray-300">
+        {company.printHeader ? (
+          <div dangerouslySetInnerHTML={{ __html: company.printHeader }} />
+        ) : (
+          <>
+            <h2 className="text-xl font-bold text-gray-900">{company.name}</h2>
+            {company.address && <p className="text-sm text-gray-600">{company.address}</p>}
+            {company.tin && <p className="text-sm text-gray-600">TIN: {company.tin}</p>}
+          </>
+        )}
+        <h3 className="text-lg font-semibold text-gray-800 mt-2">{payroll.name} - {monthName} {payroll.year}</h3>
+      </div>
+    )
+  }
+
+  const PrintFooter = () => {
+    if (!company?.printFooter) return null
+    return (
+      <div className="print-footer text-center mt-6 pt-4 border-t border-gray-300 text-sm text-gray-500">
+        <div dangerouslySetInnerHTML={{ __html: company.printFooter }} />
+      </div>
+    )
+  }
     XLSX.writeFile(wb, `Payroll_${payroll.name}_${monthName}_${payroll.year}.xlsx`)
   }
 
@@ -205,6 +239,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
             <CardTitle>Payroll Register</CardTitle>
           </CardHeader>
           <CardContent className="p-0 overflow-x-auto">
+            <PrintHeader />
             <table className="w-full print:text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -255,6 +290,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
                 )}
               </tbody>
             </table>
+            <PrintFooter />
           </CardContent>
         </Card>
       )}
@@ -382,6 +418,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
             <p className="text-sm text-gray-500 mt-1">Employee net pay amounts for bank transfer</p>
           </CardHeader>
           <CardContent className="p-0">
+            <PrintHeader />
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -411,6 +448,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
                 )}
               </tbody>
             </table>
+            <PrintFooter />
           </CardContent>
         </Card>
       )}
@@ -422,6 +460,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
             <p className="text-sm text-gray-500 mt-1">{monthName} {payroll.year} - Accounting summary</p>
           </CardHeader>
           <CardContent className="p-0">
+            <PrintHeader />
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -477,6 +516,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
                 </tr>
               </tbody>
             </table>
+            <PrintFooter />
           </CardContent>
         </Card>
       )}
@@ -488,6 +528,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
             <p className="text-sm text-gray-500 mt-1">Cash payout preparation</p>
           </CardHeader>
           <CardContent>
+            <PrintHeader />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">Denomination Count</h3>
@@ -548,6 +589,7 @@ export function PayrollOutputView({ payroll, rows, earningData, deductionData, b
                 </table>
               </div>
             </div>
+            <PrintFooter />
           </CardContent>
         </Card>
       )}

@@ -2,19 +2,27 @@ import { useState, useEffect } from 'react'
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
+import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, RotateCcw, Search } from 'lucide-react'
 import type { Company } from '../../types'
 
 export function CompaniesPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
+  const { addToast } = useToast()
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ name: '', address: '', tin: '' })
+  const [showDeleted, setShowDeleted] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [formData, setFormData] = useState({
+    name: '', address: '', tin: '',
+    printHeader: '', printFooter: '', printCss: '',
+    defaultWorkdays: 22, currency: 'PHP'
+  })
 
   useEffect(() => { fetchCompanies() }, [])
 
@@ -27,14 +35,69 @@ export function CompaniesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (editingId) { await updateDoc(doc(db, 'companies', editingId), formData) }
-    else { await addDoc(collection(db, 'companies'), { ...formData, isActive: true }) }
-    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '' }); fetchCompanies()
+    if (editingId) {
+      await updateDoc(doc(db, 'companies', editingId), formData)
+      addToast({ type: 'success', title: 'Company updated', message: `${formData.name} has been updated` })
+    } else {
+      await addDoc(collection(db, 'companies'), { ...formData, isActive: true, createdAt: new Date() })
+      addToast({ type: 'success', title: 'Company created', message: `${formData.name} has been added` })
+    }
+    setShowForm(false); setEditingId(null); setFormData({ name: '', address: '', tin: '', printHeader: '', printFooter: '', printCss: '', defaultWorkdays: 22, currency: 'PHP' }); fetchCompanies()
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Delete this company?')) { await deleteDoc(doc(db, 'companies', id)); fetchCompanies() }
+  const handleEdit = (company: Company) => {
+    setEditingId(company.id)
+    setFormData({
+      name: company.name,
+      address: company.address || '',
+      tin: company.tin || '',
+      printHeader: (company as any).printHeader || '',
+      printFooter: (company as any).printFooter || '',
+      printCss: (company as any).printCss || '',
+      defaultWorkdays: (company as any).defaultWorkdays || 22,
+      currency: (company as any).currency || 'PHP'
+    })
+    setShowForm(true)
   }
+
+  const handleToggleStatus = async (company: Company) => {
+    const newStatus = !company.isActive
+    await updateDoc(doc(db, 'companies', company.id), { isActive: newStatus })
+    addToast({
+      type: 'info',
+      title: 'Status updated',
+      message: `${company.name} is now ${newStatus ? 'active' : 'inactive'}`
+    })
+    fetchCompanies()
+  }
+
+  const handleSoftDelete = async (company: Company) => {
+    if (confirm(`Soft delete ${company.name}? It can be restored later.`)) {
+      await updateDoc(doc(db, 'companies', company.id), { isDeleted: true, isActive: false, deletedAt: new Date() })
+      addToast({ type: 'success', title: 'Company archived', message: `${company.name} has been archived` })
+      fetchCompanies()
+    }
+  }
+
+  const handleRestore = async (company: Company) => {
+    await updateDoc(doc(db, 'companies', company.id), { isDeleted: false, isActive: true, deletedAt: null })
+    addToast({ type: 'success', title: 'Company restored', message: `${company.name} has been restored` })
+    fetchCompanies()
+  }
+
+  const handlePermanentDelete = async (id: string) => {
+    if (confirm('Permanently delete this company? This cannot be undone.')) {
+      await deleteDoc(doc(db, 'companies', id))
+      addToast({ type: 'success', title: 'Company permanently deleted' })
+      fetchCompanies()
+    }
+  }
+
+  const filteredCompanies = companies.filter(c => {
+    const matchesSearch = searchQuery === '' || c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesDeleted = showDeleted ? c.isDeleted : !c.isDeleted
+    return matchesSearch && matchesDeleted
+  })
 
   if (!canView('system', 'companies')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
@@ -42,18 +105,29 @@ export function CompaniesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Companies</h1>
-        {canAdd('system', 'companies') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Company</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => setShowDeleted(!showDeleted)}>
+            {showDeleted ? 'Show Active' : 'Show Archived'}
+          </Button>
+          {canAdd('system', 'companies') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Company</Button>
+          )}
+        </div>
       </div>
+
       {showForm && (
         <Card>
           <CardHeader><CardTitle>{editingId ? 'Edit' : 'Add'} Company</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input id="name" label="Company Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
-              <Input id="address" label="Address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
-              <Input id="tin" label="TIN" value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} />
+              <div className="grid grid-cols-2 gap-4">
+                <Input id="name" label="Company Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                <Input id="tin" label="TIN" value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} />
+                <Input id="address" label="Address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+                <Input id="defaultWorkdays" label="Default Workdays/Month" type="number" value={String(formData.defaultWorkdays)} onChange={(e) => setFormData({ ...formData, defaultWorkdays: Number(e.target.value) })} />
+                <Input id="printHeader" label="Print Header" value={formData.printHeader} onChange={(e) => setFormData({ ...formData, printHeader: e.target.value })} placeholder="Company header for prints" />
+                <Input id="printFooter" label="Print Footer" value={formData.printFooter} onChange={(e) => setFormData({ ...formData, printFooter: e.target.value })} placeholder="Company footer for prints" />
+              </div>
               <div className="flex gap-2">
                 <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
                 <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
@@ -62,37 +136,78 @@ export function CompaniesPage() {
           </CardContent>
         </Card>
       )}
-      <Card><CardContent className="p-0">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Address</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">TIN</th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {loading ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : companies.length === 0 ? <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
-              : companies.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{c.address || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{c.tin || '-'}</td>
-                  <td className="px-6 py-4"><span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${c.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{c.isActive ? 'Active' : 'Inactive'}</span></td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {canEdit('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(c.id); setFormData({ name: c.name, address: c.address || '', tin: c.tin || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
-                      {canDelete('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => handleDelete(c.id)}><Trash2 className="w-4 h-4" /></Button>}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </CardContent></Card>
+
+      <Card>
+        <CardContent className="pt-4">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search companies..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </CardContent>
+        <CardContent className="p-0">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Address</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">TIN</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Workdays</th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+                : filteredCompanies.length === 0 ? <tr><td colSpan={6} className="px-6 py-4 text-center text-gray-500">No companies found</td></tr>
+                : filteredCompanies.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{c.address || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{c.tin || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{(c as any).defaultWorkdays || 22}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        c.isDeleted ? 'bg-red-100 text-red-800' : c.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {c.isDeleted ? 'Archived' : c.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {c.isDeleted ? (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => handleRestore(c)} title="Restore">
+                              <RotateCcw className="w-4 h-4" />
+                            </Button>
+                            {canDelete('system', 'companies') && (
+                              <Button variant="ghost" size="sm" onClick={() => handlePermanentDelete(c.id)} title="Permanent delete">
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </Button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {canEdit('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => handleEdit(c)}><Edit className="w-4 h-4" /></Button>}
+                            <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(c)}>
+                              {c.isActive ? 'Deactivate' : 'Activate'}
+                            </Button>
+                            {canDelete('system', 'companies') && <Button variant="ghost" size="sm" onClick={() => handleSoftDelete(c)} title="Archive"><Trash2 className="w-4 h-4" /></Button>}
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

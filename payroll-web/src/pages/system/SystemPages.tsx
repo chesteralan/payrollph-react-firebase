@@ -266,6 +266,11 @@ export function UsersPage() {
     }
   }
 
+  const handleToggleStatus = async (user: UserAccount) => {
+    await updateDoc(doc(db, 'user_accounts', user.id), { isActive: !user.isActive })
+    fetchUsers()
+  }
+
   const toggleRestriction = async (userId: string, department: Department, section: Section, action: string) => {
     const existing = restrictions.find(r => r.userId === userId && r.department === department && r.section === section)
     const currentAction = action === 'view' ? 'canView' : action === 'add' ? 'canAdd' : action === 'edit' ? 'canEdit' : 'canDelete'
@@ -414,6 +419,9 @@ export function UsersPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="sm" onClick={() => startEditRestrictions(user.id)} title="Manage Permissions">
                         <Shield className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleToggleStatus(user)}>
+                        {user.isActive ? 'Deactivate' : 'Activate'}
                       </Button>
                       {canEdit('system', 'users') && (
                         <Button variant="ghost" size="sm" onClick={() => { setEditingId(user.id); setFormData({ username: user.username, email: user.email, displayName: user.displayName, password: '' }); setShowForm(true) }}>

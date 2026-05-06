@@ -53,7 +53,7 @@
   - [x] 5.2.3 Validation with error display
   - [x] 5.2.4 Import statistics
 - [ ] 5.3 Add bulk edit for names
-- [ ] 5.4 Implement names export to CSV
+- [x] 5.4 Implement names export to CSV
 - [ ] 5.5 Add duplicate name detection during import
 
 ## 6. Compensation Lists
@@ -95,8 +95,8 @@
 - [x] 8.6 Implement payroll lock/unlock
 - [x] 8.7 Add payroll status workflow (draft → locked → published)
 - [x] 8.8 Implement payroll cloning
-- [ ] 8.9 Add payroll validation before publishing
-- [ ] 8.10 Implement automatic calculation from DTR → Salary → Summary
+- [x] 8.9 Add payroll validation before publishing
+- [x] 8.10 Implement automatic calculation from DTR → Salary → Summary
 
 ## 9. Payroll Output Views
 - [x] 9.1 Create PayrollOutputView component
@@ -112,7 +112,7 @@
 - [x] 9.9 Add print-optimized CSS
 - [ ] 9.10 Implement print group filtering
 - [ ] 9.11 Add configurable print columns
-- [ ] 9.12 Add company print header/footer (logo, address)
+- [x] 9.12 Add company print header/footer (logo, address)
 - [ ] 9.13 Implement batch payslip printing
 - [ ] 9.14 Add XLS export with formatting (borders, headers)
 
@@ -153,19 +153,19 @@
   - [x] 13.2.1 Department/section grid
   - [x] 13.2.2 Action toggles (view/add/edit/delete)
 - [x] 13.3 Add user-to-company assignment
-- [ ] 13.4 Implement user activation/deactivation
+- [x] 13.4 Implement user activation/deactivation
 - [ ] 13.5 Add bulk user operations
 - [ ] 13.6 Implement user import from CSV
 - [ ] 13.7 Add user activity monitoring
 
 ## 14. Company Management
 - [x] 14.1 Create CompaniesPage (basic structure)
-- [ ] 14.2 Implement company CRUD with soft-delete
+- [x] 14.2 Implement company CRUD with soft-delete
 - [ ] 14.3 Add company payroll period configuration
-- [ ] 14.4 Configure company print settings (logo, header, CSS)
+- [x] 14.4 Configure company print settings (logo, header, CSS)
 - [ ] 14.5 Add company column-group settings
 - [ ] 14.6 Implement company options/settings
-- [ ] 14.7 Add workday configuration (default workdays per month)
+- [x] 14.7 Add workday configuration (default workdays per month)
 
 ## 15. System Administration
 - [x] 15.1 Create DatabasePage (placeholder)
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 94 tasks
-- **Remaining:** 146 tasks
+- **Completed:** 102 tasks
+- **Remaining:** 138 tasks
 - **Total:** 240 tasks
-- **Progress:** 39%
+- **Progress:** 43%

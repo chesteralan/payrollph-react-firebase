@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
+import { useToast } from '../../components/ui/Toast'
 import { EditableCell } from '../../components/ui/EditableCell'
 import { PayrollOutputView } from '../../components/payroll/PayrollOutputView'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
-import { ArrowLeft, Lock, Unlock, Save } from 'lucide-react'
-import type { Payroll, PayrollEmployee } from '../../types'
+import { ArrowLeft, Lock, Unlock, Save, AlertCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react'
+import type { Payroll, PayrollEmployee, PayrollValidationError } from '../../types'
 
 const STAGES = ['dtr', 'salaries', 'earnings', 'benefits', 'deductions', 'summary', 'output']
 
@@ -31,6 +32,7 @@ interface ProcessingRow {
 export function PayrollDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [payroll, setPayroll] = useState<Payroll | null>(null)
   const [activeStage, setActiveStage] = useState('dtr')
   const [loading, setLoading] = useState(true)
@@ -43,6 +45,10 @@ export function PayrollDetailPage() {
   const [deductionData, setDeductionData] = useState<Map<string, Map<string, number>>>(new Map())
   const [benefitData, setBenefitData] = useState<Map<string, Map<string, { employeeShare: number; employerShare: number }>>>(new Map())
   const [saving, setSaving] = useState(false)
+  const [showValidation, setShowValidation] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<PayrollValidationError[]>([])
+  const [defaultWorkdays, setDefaultWorkdays] = useState(22)
+  const [company, setCompany] = useState<{ name: string; address?: string; tin?: string; printHeader?: string; printFooter?: string } | null>(null)
 
   useEffect(() => {
     if (id) loadPayroll()
@@ -61,7 +67,21 @@ export function PayrollDetailPage() {
       ])
 
       if (payrollSnap.exists()) {
-        setPayroll({ id: payrollSnap.id, ...payrollSnap.data() } as Payroll)
+        const payrollData = { id: payrollSnap.id, ...payrollSnap.data() } as Payroll
+        setPayroll(payrollData)
+
+        const companySnap = await getDoc(doc(db, 'companies', payrollData.companyId))
+        if (companySnap.exists()) {
+          const companyData = companySnap.data() as any
+          setDefaultWorkdays(companyData.defaultWorkdays || 22)
+          setCompany({
+            name: companyData.name || '',
+            address: companyData.address,
+            tin: companyData.tin,
+            printHeader: companyData.printHeader,
+            printFooter: companyData.printFooter
+          })
+        }
       }
 
       const payEmps = empSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as PayrollEmployee[]
@@ -73,6 +93,10 @@ export function PayrollDetailPage() {
 
       const rowsData: ProcessingRow[] = []
       for (const emp of payEmps) {
+        const basicSalary = emp.basicSalary || 0
+        const ratePerDay = basicSalary / defaultWorkdays
+        const salaryAmount = ratePerDay * (emp.daysWorked || 0)
+
         rowsData.push({
           nameId: emp.nameId,
           employeeCode: emp.nameId.substring(0, 6),
@@ -81,13 +105,13 @@ export function PayrollDetailPage() {
           groupId: emp.groupId || '',
           positionId: emp.positionId || '',
           areaId: emp.areaId || '',
-          daysWorked: 0,
-          absences: 0,
-          lateHours: 0,
-          overtimeHours: 0,
-          basicSalary: 0,
-          ratePerDay: 0,
-          salaryAmount: 0,
+          daysWorked: emp.daysWorked || 0,
+          absences: emp.absences || 0,
+          lateHours: emp.lateHours || 0,
+          overtimeHours: emp.overtimeHours || 0,
+          basicSalary,
+          ratePerDay,
+          salaryAmount,
         })
       }
       setRows(rowsData)
@@ -108,15 +132,124 @@ export function PayrollDetailPage() {
     }
   }
 
+  const recalculateSalaries = useCallback((updatedRows: ProcessingRow[], workdays: number) => {
+    return updatedRows.map(row => {
+      const ratePerDay = row.basicSalary / workdays
+      const salaryAmount = ratePerDay * row.daysWorked
+      return { ...row, ratePerDay, salaryAmount }
+    })
+  }, [])
+
   const toggleLock = async () => {
     if (!payroll || !id) return
-    await updateDoc(doc(db, 'payroll', id), { isLocked: !payroll.isLocked })
-    setPayroll({ ...payroll, isLocked: !payroll.isLocked })
+    const newLocked = !payroll.isLocked
+    await updateDoc(doc(db, 'payroll', id), { isLocked: newLocked })
+    setPayroll({ ...payroll, isLocked: newLocked })
+    addToast({ type: 'info', title: newLocked ? 'Payroll locked' : 'Payroll unlocked', message: payroll.name })
+  }
+
+  const validatePayroll = useCallback((): PayrollValidationError[] => {
+    const errors: PayrollValidationError[] = []
+
+    if (rows.length === 0) {
+      errors.push({ field: 'employees', message: 'No employees in this payroll', severity: 'error' })
+      return errors
+    }
+
+    for (const row of rows) {
+      if (row.daysWorked === 0 && row.absences === 0) {
+        errors.push({ field: 'dtr', nameId: row.nameId, employeeName: row.lastName, message: 'No DTR data entered', severity: 'warning' })
+      }
+
+      if (row.basicSalary <= 0) {
+        errors.push({ field: 'salary', nameId: row.nameId, employeeName: row.lastName, message: 'Basic salary is not set', severity: 'error' })
+      }
+
+      if (row.daysWorked < 0 || row.absences < 0 || row.lateHours < 0 || row.overtimeHours < 0) {
+        errors.push({ field: 'dtr', nameId: row.nameId, employeeName: row.lastName, message: 'Negative values detected in DTR', severity: 'error' })
+      }
+
+      const empEarnings = earningData.get(row.nameId)
+      if (empEarnings) {
+        empEarnings.forEach((amount, earningId) => {
+          if (amount < 0) {
+            const earning = earningsList.find(e => e.id === earningId)
+            errors.push({ field: 'earnings', nameId: row.nameId, employeeName: row.lastName, message: `Negative earning: ${earning?.name || 'Unknown'}`, severity: 'error' })
+          }
+        })
+      }
+
+      const empDeductions = deductionData.get(row.nameId)
+      if (empDeductions) {
+        empDeductions.forEach((amount, deductionId) => {
+          if (amount < 0) {
+            const deduction = deductionsList.find(d => d.id === deductionId)
+            errors.push({ field: 'deductions', nameId: row.nameId, employeeName: row.lastName, message: `Negative deduction: ${deduction?.name || 'Unknown'}`, severity: 'error' })
+          }
+        })
+      }
+
+      const empBenefits = benefitData.get(row.nameId)
+      if (empBenefits) {
+        empBenefits.forEach(({ employeeShare, employerShare }, benefitId) => {
+          if (employeeShare < 0 || employerShare < 0) {
+            const benefit = benefitsList.find(b => b.id === benefitId)
+            errors.push({ field: 'benefits', nameId: row.nameId, employeeName: row.lastName, message: `Negative benefit: ${benefit?.name || 'Unknown'}`, severity: 'error' })
+          }
+        })
+      }
+
+      const netPay = getEmployeeNet(row)
+      if (netPay < 0) {
+        errors.push({ field: 'summary', nameId: row.nameId, employeeName: row.lastName, message: `Negative net pay: ${formatCurrency(netPay)}`, severity: 'error' })
+      }
+    }
+
+    const errorCount = errors.filter(e => e.severity === 'error').length
+    if (errorCount > 0) {
+      errors.unshift({ field: 'general', message: `${errorCount} error(s) must be resolved before publishing`, severity: 'error' })
+    }
+
+    return errors
+  }, [rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList])
+
+  const handlePublish = async () => {
+    if (!id || !payroll) return
+
+    const errors = validatePayroll()
+    setValidationErrors(errors)
+    setShowValidation(true)
+
+    const hasErrors = errors.some(e => e.severity === 'error')
+    if (hasErrors) {
+      addToast({ type: 'error', title: 'Validation failed', message: 'Please fix all errors before publishing' })
+      return
+    }
+
+    if (!confirm('Publish this payroll? This will finalize all calculations and make it read-only.')) {
+      return
+    }
+
+    try {
+      await updateDoc(doc(db, 'payroll', id), {
+        isPublished: true,
+        status: 'published',
+        publishedAt: new Date(),
+        isLocked: true
+      })
+      setPayroll({ ...payroll, isPublished: true, status: 'published', publishedAt: new Date(), isLocked: true })
+      addToast({ type: 'success', title: 'Payroll published', message: `${payroll.name} has been finalized` })
+    } catch (err) {
+      addToast({ type: 'error', title: 'Failed to publish', message: String(err) })
+    }
   }
 
   const updateRow = useCallback((nameId: string, field: keyof ProcessingRow, value: number) => {
-    setRows((prev) => prev.map((r) => (r.nameId === nameId ? { ...r, [field]: value } : r)))
-  }, [])
+    setRows((prev) => {
+      const updated = prev.map((r) => (r.nameId === nameId ? { ...r, [field]: value } : r))
+      return recalculateSalaries(updated, defaultWorkdays)
+    })
+  }, [defaultWorkdays, recalculateSalaries])
 
   const updateEarning = (nameId: string, earningId: string, value: number) => {
     setEarningData((prev) => {
@@ -152,64 +285,67 @@ export function PayrollDetailPage() {
     if (!id || saving) return
     setSaving(true)
     try {
+      const savePromises: Promise<unknown>[] = []
+
       for (const row of rows) {
-        await updateDoc(doc(db, 'payroll_employees', employees.find((e) => e.nameId === row.nameId)?.id || ''), {
-          daysWorked: row.daysWorked,
-          absences: row.absences,
-          lateHours: row.lateHours,
-          overtimeHours: row.overtimeHours,
-        })
+        const emp = employees.find((e) => e.nameId === row.nameId)
+        if (emp) {
+          savePromises.push(updateDoc(doc(db, 'payroll_employees', emp.id), {
+            daysWorked: row.daysWorked,
+            absences: row.absences,
+            lateHours: row.lateHours,
+            overtimeHours: row.overtimeHours,
+            basicSalary: row.basicSalary,
+            ratePerDay: row.ratePerDay,
+            salaryAmount: row.salaryAmount,
+            grossPay: getEmployeeGross(row),
+            netPay: getEmployeeNet(row),
+          }))
+        }
       }
 
-      const savePromises: Promise<unknown>[] = []
+      const existingEarnings = await getDocs(query(collection(db, 'payroll_employees_earnings'), where('payrollId', '==', id)))
+      const existingDeductions = await getDocs(query(collection(db, 'payroll_employees_deductions'), where('payrollId', '==', id)))
+      const existingBenefits = await getDocs(query(collection(db, 'payroll_employees_benefits'), where('payrollId', '==', id)))
+
+      const deletePromises: Promise<unknown>[] = []
+      existingEarnings.docs.forEach(d => deletePromises.push(updateDoc(doc(db, 'payroll_employees_earnings', d.id), { deleted: true })))
+      existingDeductions.docs.forEach(d => deletePromises.push(updateDoc(doc(db, 'payroll_employees_deductions', d.id), { deleted: true })))
+      existingBenefits.docs.forEach(d => deletePromises.push(updateDoc(doc(db, 'payroll_employees_benefits', d.id), { deleted: true })))
+
+      await Promise.all(deletePromises)
+
+      const addPromises: Promise<unknown>[] = []
       earningData.forEach((empMap, nameId) => {
         empMap.forEach((amount, earningId) => {
           if (amount > 0) {
-            savePromises.push(
-              addDoc(collection(db, 'payroll_employees_earnings'), {
-                payrollId: id,
-                nameId,
-                earningId,
-                amount,
-                createdAt: serverTimestamp(),
-              })
-            )
+            addPromises.push(addDoc(collection(db, 'payroll_employees_earnings'), {
+              payrollId: id, nameId, earningId, amount, createdAt: serverTimestamp()
+            }))
           }
         })
       })
       deductionData.forEach((empMap, nameId) => {
         empMap.forEach((amount, deductionId) => {
           if (amount > 0) {
-            savePromises.push(
-              addDoc(collection(db, 'payroll_employees_deductions'), {
-                payrollId: id,
-                nameId,
-                deductionId,
-                amount,
-                createdAt: serverTimestamp(),
-              })
-            )
+            addPromises.push(addDoc(collection(db, 'payroll_employees_deductions'), {
+              payrollId: id, nameId, deductionId, amount, createdAt: serverTimestamp()
+            }))
           }
         })
       })
       benefitData.forEach((empMap, nameId) => {
         empMap.forEach(({ employeeShare, employerShare }, benefitId) => {
           if (employeeShare > 0 || employerShare > 0) {
-            savePromises.push(
-              addDoc(collection(db, 'payroll_employees_benefits'), {
-                payrollId: id,
-                nameId,
-                benefitId,
-                employeeShare,
-                employerShare,
-                createdAt: serverTimestamp(),
-              })
-            )
+            addPromises.push(addDoc(collection(db, 'payroll_employees_benefits'), {
+              payrollId: id, nameId, benefitId, employeeShare, employerShare, createdAt: serverTimestamp()
+            }))
           }
         })
       })
 
-      await Promise.all(savePromises)
+      await Promise.all(addPromises)
+      addToast({ type: 'success', title: 'Saved', message: 'All changes have been saved' })
     } finally {
       setSaving(false)
     }
@@ -232,6 +368,19 @@ export function PayrollDetailPage() {
     return getEmployeeGross(row) - deductions - benefits
   }
 
+  const autoCalculated = useMemo(() => {
+    return rows.map(row => ({
+      nameId: row.nameId,
+      ratePerDay: row.basicSalary / defaultWorkdays,
+      salaryAmount: (row.basicSalary / defaultWorkdays) * row.daysWorked,
+      gross: getEmployeeGross(row),
+      net: getEmployeeNet(row),
+      totalEarnings: Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
+      totalDeductions: Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
+      totalBenefits: Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0),
+    }))
+  }, [rows, earningData, deductionData, benefitData, defaultWorkdays])
+
   if (loading || !payroll) {
     return <div className="text-center py-12 text-gray-500">Loading...</div>
   }
@@ -245,7 +394,8 @@ export function PayrollDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900">{payroll.name}</h1>
             <p className="text-gray-500">
               {new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })} {payroll.year}
-              {payroll.isLocked && ' (Locked)'}
+              {payroll.isPublished && <span className="ml-2 text-green-600 font-medium">Published</span>}
+              {payroll.isLocked && !payroll.isPublished && <span className="ml-2 text-orange-600 font-medium">Locked</span>}
             </p>
           </div>
         </div>
@@ -255,12 +405,46 @@ export function PayrollDetailPage() {
               <Save className="w-4 h-4 mr-2" />{saving ? 'Saving...' : 'Save'}
             </Button>
           )}
-          <Button variant="secondary" onClick={toggleLock}>
-            {payroll.isLocked ? <Unlock className="w-4 h-4 mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
-            {payroll.isLocked ? 'Unlock' : 'Lock'}
-          </Button>
+          {!payroll.isLocked && (
+            <Button variant="secondary" onClick={toggleLock}>
+              {payroll.isLocked ? <Unlock className="w-4 h-4 mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+              {payroll.isLocked ? 'Unlock' : 'Lock'}
+            </Button>
+          )}
+          {!payroll.isPublished && (
+            <Button onClick={handlePublish} disabled={payroll.isLocked}>
+              <Send className="w-4 h-4 mr-2" />Publish
+            </Button>
+          )}
         </div>
       </div>
+
+      {showValidation && validationErrors.length > 0 && (
+        <Card className={validationErrors.some(e => e.severity === 'error') ? 'border-red-200' : 'border-yellow-200'}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {validationErrors.some(e => e.severity === 'error') ? (
+                <><AlertCircle className="w-5 h-5 text-red-500" />Validation Errors</>
+              ) : (
+                <><AlertTriangle className="w-5 h-5 text-yellow-500" />Validation Warnings</>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {validationErrors.map((err, i) => (
+                <div key={i} className={`flex items-start gap-2 p-2 rounded ${err.severity === 'error' ? 'bg-red-50' : 'bg-yellow-50'}`}>
+                  {err.severity === 'error' ? <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" /> : <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />}
+                  <div>
+                    <span className="text-sm font-medium">{err.employeeName ? `${err.employeeName}: ` : ''}{err.message}</span>
+                    {err.nameId && <span className="text-xs text-gray-500 ml-2">({err.nameId})</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
         {STAGES.map((stage) => (
@@ -326,7 +510,10 @@ export function PayrollDetailPage() {
 
       {activeStage === 'salaries' && (
         <Card>
-          <CardHeader><CardTitle>Salaries</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Salaries</CardTitle>
+            <p className="text-sm text-gray-500">Based on {defaultWorkdays} workdays/month. Rate/Day and Salary Amount auto-calculated.</p>
+          </CardHeader>
           <CardContent className="p-0">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -334,6 +521,7 @@ export function PayrollDetailPage() {
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee</th>
                   <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Basic Salary</th>
                   <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Rate/Day</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days</th>
                   <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Salary Amount</th>
                 </tr>
               </thead>
@@ -348,11 +536,12 @@ export function PayrollDetailPage() {
                       <EditableCell value={row.basicSalary} onChange={(v) => updateRow(row.nameId, 'basicSalary', Number(v))} type="number" className="text-right" />
                     </td>
                     <td className="px-4 py-2 text-right text-sm text-gray-700">{formatCurrency(row.ratePerDay)}</td>
+                    <td className="px-4 py-2 text-right text-sm text-gray-500">{row.daysWorked}</td>
                     <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">{formatCurrency(row.salaryAmount)}</td>
                   </tr>
                 ))}
                 {rows.length === 0 && (
-                  <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-500">No employees in this payroll.</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">No employees in this payroll.</td></tr>
                 )}
               </tbody>
             </table>
@@ -499,7 +688,10 @@ export function PayrollDetailPage() {
 
       {activeStage === 'summary' && (
         <Card>
-          <CardHeader><CardTitle>Payroll Summary</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Payroll Summary</CardTitle>
+            <p className="text-sm text-gray-500">Auto-calculated from DTR, Salaries, Earnings, Benefits, and Deductions</p>
+          </CardHeader>
           <CardContent className="p-0 overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -568,6 +760,7 @@ export function PayrollDetailPage() {
       {activeStage === 'output' && (
         <PayrollOutputView
           payroll={payroll}
+          company={company || undefined}
           rows={rows}
           earningData={earningData}
           deductionData={deductionData}
