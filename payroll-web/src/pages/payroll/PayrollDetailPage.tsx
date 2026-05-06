@@ -147,17 +147,17 @@ export function PayrollDetailPage() {
       }
       setRows(rowsData)
 
-      const ed = new Map<string, Map<string, number>>()
-      const dd = new Map<string, Map<string, number>>()
-      const bd = new Map<string, Map<string, { employeeShare: number; employerShare: number }>>()
+      const earningDataMap = new Map<string, Map<string, number>>()
+      const deductionDataMap = new Map<string, Map<string, number>>()
+      const benefitDataMap = new Map<string, Map<string, { employeeShare: number; employerShare: number }>>()
       for (const emp of payEmps) {
-        ed.set(emp.nameId, new Map())
-        dd.set(emp.nameId, new Map())
-        bd.set(emp.nameId, new Map())
+        earningDataMap.set(emp.nameId, new Map())
+        deductionDataMap.set(emp.nameId, new Map())
+        benefitDataMap.set(emp.nameId, new Map())
       }
-      setEarningData(ed)
-      setDeductionData(dd)
-      setBenefitData(bd)
+      setEarningData(earningDataMap)
+      setDeductionData(deductionDataMap)
+      setBenefitData(benefitDataMap)
     } finally {
       setLoading(false)
     }

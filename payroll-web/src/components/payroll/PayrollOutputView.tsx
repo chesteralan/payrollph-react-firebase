@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import * as XLSX from 'xlsx'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { Printer, FileSpreadsheet, Download } from 'lucide-react'
+import { Printer, FileSpreadsheet, Download, Filter, Columns } from 'lucide-react'
 
 interface ProcessingRow {
   nameId: string
@@ -49,6 +49,28 @@ interface OutputViewProps {
 export function PayrollOutputView({ payroll, company, rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList }: OutputViewProps) {
   const [activeMode, setActiveMode] = useState<OutputMode>('register')
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null)
+  const [showFilters, setShowFilters] = useState(false)
+  const [showColumns, setShowColumns] = useState(false)
+  const [filterGroup, setFilterGroup] = useState('')
+  const [filterPosition, setFilterPosition] = useState('')
+  const [filterArea, setFilterArea] = useState('')
+  const [visibleColumns, setVisibleColumns] = useState({ basic: true, earnings: true, gross: true, deductions: true, benefits: true, net: true, daysWorked: false, absences: false, late: false, overtime: false })
+
+  const groups = useMemo(() => [...new Set(rows.map(r => r.groupId).filter(Boolean))], [rows])
+  const positions = useMemo(() => [...new Set(rows.map(r => r.positionId).filter(Boolean))], [rows])
+  const areas = useMemo(() => [...new Set(rows.map(r => r.areaId).filter(Boolean))], [rows])
+
+  const filteredRows = useMemo(() => {
+    return rows.filter(r => {
+      if (filterGroup && r.groupId !== filterGroup) return false
+      if (filterPosition && r.positionId !== filterPosition) return false
+      if (filterArea && r.areaId !== filterArea) return false
+      return true
+    })
+  }, [rows, filterGroup, filterPosition, filterArea])
+
+  const hasActiveFilters = filterGroup || filterPosition || filterArea
+  const activeFilterCount = [filterGroup, filterPosition, filterArea].filter(Boolean).length
 
   const formatCurrency = (value: number) => value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
@@ -88,15 +110,15 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
   }
 
   const totals = useMemo(() => {
-    const totalBasic = rows.reduce((s, r) => s + r.salaryAmount, 0)
-    const totalEarnings = rows.reduce((s, r) => s + Array.from(earningData.get(r.nameId)?.values() || []).reduce((a, v) => a + v, 0), 0)
-    const totalGross = rows.reduce((s, r) => s + getEmployeeGross(r), 0)
-    const totalDeductions = rows.reduce((s, r) => s + Array.from(deductionData.get(r.nameId)?.values() || []).reduce((a, v) => a + v, 0), 0)
-    const totalBenefitsEE = rows.reduce((s, r) => s + Array.from(benefitData.get(r.nameId)?.values() || []).reduce((a, v) => a + v.employeeShare, 0), 0)
-    const totalBenefitsER = rows.reduce((s, r) => s + Array.from(benefitData.get(r.nameId)?.values() || []).reduce((a, v) => a + v.employerShare, 0), 0)
-    const totalNet = rows.reduce((s, r) => s + getEmployeeNet(r), 0)
+    const totalBasic = filteredRows.reduce((s, r) => s + r.salaryAmount, 0)
+    const totalEarnings = filteredRows.reduce((s, r) => s + Array.from(earningData.get(r.nameId)?.values() || []).reduce((a, v) => a + v, 0), 0)
+    const totalGross = filteredRows.reduce((s, r) => s + getEmployeeGross(r), 0)
+    const totalDeductions = filteredRows.reduce((s, r) => s + Array.from(deductionData.get(r.nameId)?.values() || []).reduce((a, v) => a + v, 0), 0)
+    const totalBenefitsEE = filteredRows.reduce((s, r) => s + Array.from(benefitData.get(r.nameId)?.values() || []).reduce((a, v) => a + v.employeeShare, 0), 0)
+    const totalBenefitsER = filteredRows.reduce((s, r) => s + Array.from(benefitData.get(r.nameId)?.values() || []).reduce((a, v) => a + v.employerShare, 0), 0)
+    const totalNet = filteredRows.reduce((s, r) => s + getEmployeeNet(r), 0)
     return { totalBasic, totalEarnings, totalGross, totalDeductions, totalBenefitsEE, totalBenefitsER, totalNet }
-  }, [rows, earningData, deductionData, benefitData])
+  }, [filteredRows, earningData, deductionData, benefitData])
 
   const handlePrint = () => {
     window.print()
@@ -234,7 +256,62 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
       </div>
 
       {activeMode === 'register' && (
-        <Card>
+        <>
+          <div className="flex gap-2">
+            <div className="relative">
+              <Button variant={hasActiveFilters ? 'primary' : 'secondary'} size="sm" onClick={() => setShowFilters(!showFilters)}>
+                <Filter className="w-4 h-4 mr-2" />Filters{activeFilterCount > 0 && <span className="ml-1 bg-white/20 px-1.5 rounded-full text-xs">{activeFilterCount}</span>}
+              </Button>
+              {showFilters && (
+                <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-72">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">Group</label>
+                      <select className="w-full mt-1 px-2 py-1.5 border rounded text-sm" value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)}>
+                        <option value="">All Groups</option>
+                        {groups.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">Position</label>
+                      <select className="w-full mt-1 px-2 py-1.5 border rounded text-sm" value={filterPosition} onChange={(e) => setFilterPosition(e.target.value)}>
+                        <option value="">All Positions</option>
+                        {positions.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">Area</label>
+                      <select className="w-full mt-1 px-2 py-1.5 border rounded text-sm" value={filterArea} onChange={(e) => setFilterArea(e.target.value)}>
+                        <option value="">All Areas</option>
+                        {areas.map(a => <option key={a} value={a}>{a}</option>)}
+                      </select>
+                    </div>
+                    {hasActiveFilters && <Button variant="ghost" size="sm" className="w-full" onClick={() => { setFilterGroup(''); setFilterPosition(''); setFilterArea('') }}>Clear Filters</Button>}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <Button variant="secondary" size="sm" onClick={() => setShowColumns(!showColumns)}>
+                <Columns className="w-4 h-4 mr-2" />Columns
+              </Button>
+              {showColumns && (
+                <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-64">
+                  <div className="space-y-2">
+                    {Object.entries({ basic: 'Basic Salary', earnings: 'Earnings', gross: 'Gross Pay', deductions: 'Deductions', benefits: 'Benefits (EE)', net: 'Net Pay', daysWorked: 'Days Worked', absences: 'Absences', late: 'Late Hours', overtime: 'Overtime Hours' }).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2 text-sm cursor-pointer">
+                        <input type="checkbox" checked={(visibleColumns as Record<string, boolean>)[key]} onChange={() => setVisibleColumns(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))} className="rounded border-gray-300" />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            {hasActiveFilters && <span className="text-sm text-gray-500 self-center">Showing {filteredRows.length} of {rows.length} employees</span>}
+          </div>
+
+          <Card>
           <CardHeader>
             <CardTitle>Payroll Register</CardTitle>
           </CardHeader>
@@ -244,16 +321,20 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">Employee</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Basic</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Earnings</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Gross</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deductions</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Benefits (EE)</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                  {visibleColumns.daysWorked && <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days</th>}
+                  {visibleColumns.absences && <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Absences</th>}
+                  {visibleColumns.late && <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Late</th>}
+                  {visibleColumns.overtime && <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">OT</th>}
+                  {visibleColumns.basic && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Basic</th>}
+                  {visibleColumns.earnings && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Earnings</th>}
+                  {visibleColumns.gross && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Gross</th>}
+                  {visibleColumns.deductions && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deductions</th>}
+                  {visibleColumns.benefits && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Benefits (EE)</th>}
+                  {visibleColumns.net && <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {rows.map(row => {
+                {filteredRows.map(row => {
                   const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
                   const deductions = Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
                   const benefits = Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0)
@@ -265,43 +346,101 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
                         <div className="text-sm font-medium text-gray-900">{row.employeeCode}</div>
                         <div className="text-xs text-gray-500">{row.lastName}{row.firstName ? `, ${row.firstName}` : ''}</div>
                       </td>
-                      <td className="px-4 py-2 text-right text-sm">{formatCurrency(row.salaryAmount)}</td>
-                      <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(earnings)}</td>
-                      <td className="px-4 py-2 text-right text-sm font-medium">{formatCurrency(gross)}</td>
-                      <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(deductions)}</td>
-                      <td className="px-4 py-2 text-right text-sm">{formatCurrency(benefits)}</td>
-                      <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">{formatCurrency(net)}</td>
+                      {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{row.daysWorked}</td>}
+                      {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{row.absences}</td>}
+                      {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{row.lateHours}</td>}
+                      {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{row.overtimeHours}</td>}
+                      {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(row.salaryAmount)}</td>}
+                      {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(earnings)}</td>}
+                      {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm font-medium">{formatCurrency(gross)}</td>}
+                      {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(deductions)}</td>}
+                      {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(benefits)}</td>}
+                      {visibleColumns.net && <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">{formatCurrency(net)}</td>}
                     </tr>
                   )
                 })}
-                {rows.length > 0 && (
+                {filteredRows.length > 0 && (
                   <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                    <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">Total ({rows.length} employees)</td>
-                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBasic)}</td>
-                    <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(totals.totalEarnings)}</td>
-                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalGross)}</td>
-                    <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(totals.totalDeductions)}</td>
-                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>
-                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>
+                    <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">Total ({filteredRows.length} employees)</td>
+                    {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.daysWorked, 0)}</td>}
+                    {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.absences, 0)}</td>}
+                    {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.lateHours, 0)}</td>}
+                    {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.overtimeHours, 0)}</td>}
+                    {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBasic)}</td>}
+                    {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(totals.totalEarnings)}</td>}
+                    {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalGross)}</td>}
+                    {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(totals.totalDeductions)}</td>}
+                    {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>}
+                    {visibleColumns.net && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>}
                   </tr>
                 )}
-                {rows.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No employees in this payroll.</td></tr>
+                {filteredRows.length === 0 && (
+                  <tr><td colSpan={10} className="px-4 py-8 text-center text-gray-500">No employees match the selected filters.</td></tr>
                 )}
               </tbody>
             </table>
             <PrintFooter />
           </CardContent>
         </Card>
+        </>
       )}
 
       {activeMode === 'payslip' && (
         <div className="space-y-4">
-          {selectedEmployee && (
-            <Button variant="secondary" onClick={() => setSelectedEmployee(null)} className="mb-4">
-              ← Back to All Payslips
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {selectedEmployee && (
+              <Button variant="secondary" onClick={() => setSelectedEmployee(null)}>
+                Back to All Payslips
+              </Button>
+            )}
+            {!selectedEmployee && (
+              <>
+                <Button variant="secondary" onClick={() => {
+                  const printWindow = window.open('', '_blank')
+                  if (!printWindow) return
+                  const payslipHtml = filteredRows.map(row => {
+                    const earnings = getEmployeeEarnings(row)
+                    const deductions = getEmployeeDeductions(row)
+                    const benefits = getEmployeeBenefits(row)
+                    const totalEarnings = earnings.reduce((s, e) => s + e.amount, 0)
+                    const totalDeductions = deductions.reduce((s, d) => s + d.amount, 0)
+                    const totalBenefitsEE = benefits.reduce((s, b) => s + b.employeeShare, 0)
+                    const gross = row.salaryAmount + totalEarnings
+                    const net = gross - totalDeductions - totalBenefitsEE
+                    return `
+                      <div class="payslip" style="page-break-after:always;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-bottom:16px;font-family:system-ui;">
+                        <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px;margin-bottom:16px;">
+                          <div><h2 style="margin:0;">Payslip</h2><p style="margin:4px 0 0;color:#6b7280;font-size:14px;">${monthName} ${payroll.year}</p></div>
+                          <div style="text-align:right;font-size:14px;"><div style="font-weight:500;">${row.employeeCode}</div><div>${row.lastName}${row.firstName ? ', ' + row.firstName : ''}</div></div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                          <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Earnings</h3>
+                          <div style="font-size:14px;">
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Basic Salary</span><span style="font-weight:500;">${formatCurrency(row.salaryAmount)}</span></div>
+                            ${earnings.map(e => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${e.name}</span><span>${formatCurrency(e.amount)}</span></div>`).join('')}
+                            <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Earnings</span><span>${formatCurrency(row.salaryAmount + totalEarnings)}</span></div>
+                          </div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                          <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Deductions</h3>
+                          <div style="font-size:14px;">
+                            ${deductions.map(d => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${d.name}</span><span>${formatCurrency(d.amount)}</span></div>`).join('')}
+                            ${benefits.map(b => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${b.name} (EE)</span><span>${formatCurrency(b.employeeShare)}</span></div>`).join('')}
+                            <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Deductions</span><span>${formatCurrency(totalDeductions + totalBenefitsEE)}</span></div>
+                          </div>
+                        </div>
+                        <div style="background:#f9fafb;padding:16px;border-radius:8px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold;"><span>Net Pay</span><span>${formatCurrency(net)}</span></div>
+                      </div>`
+                  }).join('')
+                  printWindow.document.write(`<!DOCTYPE html><html><head><title>Payslips - ${payroll.name}</title><style>@media print{.payslip{page-break-after:always;}}body{margin:0;padding:16px;}</style></head><body><h1>${payroll.name} - ${monthName} ${payroll.year}</h1>${payslipHtml}</body></html>`)
+                  printWindow.document.close()
+                  setTimeout(() => printWindow.print(), 500)
+                }}>
+                  <Printer className="w-4 h-4 mr-2" />Print All ({filteredRows.length})
+                </Button>
+              </>
+            )}
+          </div>
 
           {selectedEmployee ? (
             <div className="max-w-2xl mx-auto">
@@ -406,8 +545,8 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
                   <p className="text-center text-gray-500 py-8">No employees in this payroll.</p>
                 )}
               </CardContent>
-            </Card>
-          )}
+              </Card>
+            )}
         </div>
       )}
 

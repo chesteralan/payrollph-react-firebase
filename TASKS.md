@@ -72,7 +72,7 @@
   - [x] 7.3.2 Earning/benefit/deduction columns
   - [x] 7.3.3 Print column settings
 - [x] 7.4 Implement template cloning
-- [ ] 7.5 Add template to payroll creation flow
+- [x] 7.5 Add template to payroll creation flow
 - [ ] 7.6 Implement print format templates
 
 ## 8. Payroll Runs & Processing
@@ -110,10 +110,10 @@
 - [x] 9.7 Export to XLS (using xlsx library)
 - [x] 9.8 Export to CSV
 - [x] 9.9 Add print-optimized CSS
-- [ ] 9.10 Implement print group filtering
-- [ ] 9.11 Add configurable print columns
+- [x] 9.10 Implement print group filtering
+- [x] 9.11 Add configurable print columns
 - [x] 9.12 Add company print header/footer (logo, address)
-- [ ] 9.13 Implement batch payslip printing
+- [x] 9.13 Implement batch payslip printing
 - [ ] 9.14 Add XLS export with formatting (borders, headers)
 
 ## 10. DTR (Daily Time Record) Management
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 130 tasks
-- **Remaining:** 110 tasks
+- **Completed:** 131 tasks
+- **Remaining:** 109 tasks
 - **Total:** 240 tasks
-- **Progress:** 54%
+- **Progress:** 55%

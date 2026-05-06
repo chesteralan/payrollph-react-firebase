@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { ArrowLeft, ArrowRight, Check, Trash2 } from 'lucide-react'
-import type { PayrollGroup } from '../../types'
+import type { PayrollGroup, PayrollTemplate, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus } from '../../types'
 
 const STEPS = ['Config', 'Inclusive Dates', 'Groups', 'Employees', 'Review & Generate']
 
@@ -23,22 +23,49 @@ export function PayrollWizardPage() {
   const [inclusiveDates, setInclusiveDates] = useState<Date[]>([])
   const [groups, setGroups] = useState<PayrollGroup[]>([])
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([])
-  const [templates, setTemplates] = useState<{ id: string; name: string }[]>([])
+  const [templates, setTemplates] = useState<{ id: string; name: string; data?: PayrollTemplate }[]>([])
   const [employees, setEmployees] = useState<{ id: string; nameId: string; employeeCode: string }[]>([])
   const [dateStr, setDateStr] = useState('')
+  const [lookups, setLookups] = useState({ groups: [] as EmployeeGroup[], positions: [] as EmployeePosition[], areas: [] as EmployeeArea[], statuses: [] as EmployeeStatus[] })
 
   useEffect(() => {
     if (currentCompanyId) {
       fetchTemplates()
+      fetchLookups()
       fetchEmployees()
       if (id) fetchPayroll()
     }
   }, [id, currentCompanyId])
 
+  useEffect(() => {
+    if (!formData.templateId) return
+    const tmpl = templates.find(t => t.id === formData.templateId)?.data
+    if (!tmpl) return
+    if (tmpl.groupBy) setFormData(prev => ({ ...prev, templateId: formData.templateId }))
+    const autoGroups: PayrollGroup[] = []
+    if (tmpl.earnings || tmpl.deductions || tmpl.benefits || tmpl.printColumns) {
+    }
+  }, [formData.templateId, templates])
+
   const fetchTemplates = async () => {
     if (!currentCompanyId) return
     const snap = await getDocs(query(collection(db, 'payroll_templates'), where('companyId', '==', currentCompanyId)))
-    setTemplates(snap.docs.map((d) => ({ id: d.id, name: (d.data() as { name: string }).name })))
+    setTemplates(snap.docs.map((d) => ({ id: d.id, name: (d.data() as { name: string }).name, data: d.data() as PayrollTemplate })))
+  }
+
+  const fetchLookups = async () => {
+    const [gSnap, pSnap, aSnap, sSnap] = await Promise.all([
+      getDocs(query(collection(db, 'employee_groups'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_positions'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_areas'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_statuses'), where('isActive', '==', true)))
+    ])
+    setLookups({
+      groups: gSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
+      positions: pSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeePosition[],
+      areas: aSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeArea[],
+      statuses: sSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeStatus[]
+    })
   }
 
   const fetchEmployees = async () => {
@@ -245,7 +272,7 @@ export function PayrollWizardPage() {
         <Card>
           <CardHeader><CardTitle>Employee Groups</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <GroupForm onAdd={addGroup} />
+            <GroupForm onAdd={addGroup} lookups={lookups} />
             <div className="space-y-2">
               {groups.map((g, i) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
@@ -291,6 +318,7 @@ export function PayrollWizardPage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div><span className="text-gray-500">Name:</span><p className="font-medium">{formData.name}</p></div>
               <div><span className="text-gray-500">Period:</span><p className="font-medium">{new Date(0, formData.month - 1).toLocaleString('default', { month: 'long' })} {formData.year}</p></div>
+              {formData.templateId && <div><span className="text-gray-500">Template:</span><p className="font-medium">{templates.find(t => t.id === formData.templateId)?.name || 'None'}</p></div>}
               <div><span className="text-gray-500">Inclusive Dates:</span><p className="font-medium">{inclusiveDates.length} dates</p></div>
               <div><span className="text-gray-500">Groups:</span><p className="font-medium">{groups.length} filters</p></div>
               <div><span className="text-gray-500">Employees:</span><p className="font-medium">{selectedEmployeeIds.length || employees.length} selected</p></div>
@@ -317,7 +345,7 @@ export function PayrollWizardPage() {
   )
 }
 
-function GroupForm({ onAdd }: { onAdd: (group: PayrollGroup) => void }) {
+function GroupForm({ onAdd, lookups }: { onAdd: (group: PayrollGroup) => void; lookups: { groups: EmployeeGroup[]; positions: EmployeePosition[]; areas: EmployeeArea[]; statuses: EmployeeStatus[] } }) {
   const [groupId, setGroupId] = useState('')
   const [positionId, setPositionId] = useState('')
   const [areaId, setAreaId] = useState('')
@@ -334,15 +362,19 @@ function GroupForm({ onAdd }: { onAdd: (group: PayrollGroup) => void }) {
     <div className="flex gap-2 flex-wrap">
       <select value={groupId} onChange={(e) => setGroupId(e.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
         <option value="">Any Group</option>
+        {lookups.groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
       </select>
       <select value={positionId} onChange={(e) => setPositionId(e.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
         <option value="">Any Position</option>
+        {lookups.positions.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
       </select>
       <select value={areaId} onChange={(e) => setAreaId(e.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
         <option value="">Any Area</option>
+        {lookups.areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
       </select>
       <select value={statusId} onChange={(e) => setStatusId(e.target.value)} className="rounded-md border border-gray-300 px-3 py-2 text-sm">
         <option value="">Any Status</option>
+        {lookups.statuses.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
       </select>
       <Button onClick={handleAdd} disabled={!groupId && !positionId && !areaId && !statusId}>Add Filter</Button>
     </div>
