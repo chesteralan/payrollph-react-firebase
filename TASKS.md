@@ -114,7 +114,7 @@
 - [x] 9.11 Add configurable print columns
 - [x] 9.12 Add company print header/footer (logo, address)
 - [x] 9.13 Implement batch payslip printing
-- [ ] 9.14 Add XLS export with formatting (borders, headers)
+- [x] 9.14 Add XLS export with formatting (borders, headers)
 
 ## 10. DTR (Daily Time Record) Management
 - [x] 10.1 Create DTRPage (basic structure)
@@ -214,7 +214,7 @@
 - [ ] 19.2 Add data import/export for all major entities
 - [ ] 19.3 Implement data validation on all forms
 - [ ] 19.4 Add duplicate detection
-- [ ] 19.5 Implement soft-delete with trash/restore
+- [x] 19.5 Implement soft-delete with trash/restore
 - [ ] 19.6 Add data archival for old payroll runs
 - [x] 19.7 Implement pagination for all lists
 - [x] 19.8 Add sorting and filtering to all tables
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 138 tasks
-- **Remaining:** 102 tasks
+- **Completed:** 141 tasks
+- **Remaining:** 99 tasks
 - **Total:** 240 tasks
-- **Progress:** 138/240 (57.5%)
+- **Progress:** 141/240 (58.8%)

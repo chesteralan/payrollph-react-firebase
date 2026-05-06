@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch } from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
@@ -60,7 +60,8 @@ export function NamesListPage() {
   const fetchNames = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'names'))
-    setNames(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as NameRecord[])
+    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (NameRecord & { deletedAt?: any })[]
+    setNames(all.filter((n) => !n.deletedAt))
     setLoading(false)
   }
 
@@ -130,19 +131,32 @@ export function NamesListPage() {
     setBulkLoading(true)
     try {
       const batch = writeBatch(db)
-      selectedIds.forEach((id) => batch.delete(doc(db, 'names', id)))
+      selectedIds.forEach((id) => batch.update(doc(db, 'names', id), { deletedAt: serverTimestamp() }))
       await batch.commit()
-      addToast({ type: 'success', title: `Deleted ${selectedIds.size} name(s)` })
+      addToast({ type: 'success', title: `Archived ${selectedIds.size} name(s)` })
       clearSelection()
       fetchNames()
     } catch {
-      addToast({ type: 'error', title: 'Bulk delete failed' })
+      addToast({ type: 'error', title: 'Bulk archive failed' })
     }
     setBulkLoading(false)
   }
 
   const handleDelete = async (id: string, name: string) => {
+    await updateDoc(doc(db, 'names', id), { deletedAt: serverTimestamp() })
+    addToast({ type: 'success', title: 'Name archived', message: `${name} has been moved to trash` })
+    fetchNames()
+  }
+
+  const handlePermanentDelete = async (id: string, name: string) => {
     await deleteDoc(doc(db, 'names', id))
+    addToast({ type: 'success', title: 'Name permanently deleted' })
+    fetchNames()
+  }
+
+  const handleRestore = async (id: string, name: string) => {
+    await updateDoc(doc(db, 'names', id), { deletedAt: null })
+    addToast({ type: 'success', title: 'Name restored' })
     fetchNames()
   }
 
@@ -303,13 +317,13 @@ export function NamesListPage() {
             )}
             {canDelete('lists', 'names') && (
               <ConfirmDialog
-                title="Bulk Delete"
-                message={`Delete ${selectedCount} selected name${selectedCount !== 1 ? 's' : ''}? This action cannot be undone.`}
-                confirmText="Delete All"
-                variant="danger"
+                title="Bulk Archive"
+                message={`Archive ${selectedCount} selected name${selectedCount !== 1 ? 's' : ''}? They can be restored from Trash.`}
+                confirmText="Archive All"
+                variant="warning"
                 onConfirm={handleBulkDelete}
               >
-                {(open) => <Button size="sm" variant="danger" onClick={open}>Bulk Delete</Button>}
+                {(open) => <Button size="sm" variant="warning" onClick={open}>Bulk Archive</Button>}
               </ConfirmDialog>
             )}
             <Button size="sm" variant="ghost" onClick={clearSelection}>Clear Selection</Button>
@@ -524,9 +538,10 @@ export function NamesListPage() {
                       {canEdit('lists', 'names') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(n.id); setFormData({ firstName: n.firstName, middleName: n.middleName || '', lastName: n.lastName, suffix: n.suffix || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                       {canDelete('lists', 'names') && (
                         <ConfirmDialog
-                          title="Delete Name"
-                          message={`Delete ${n.firstName} ${n.lastName}? This action cannot be undone.`}
-                          confirmText="Delete"
+                          title="Archive Name"
+                          message={`Archive ${n.firstName} ${n.lastName}? It can be restored from Trash.`}
+                          confirmText="Archive"
+                          variant="warning"
                           onConfirm={() => handleDelete(n.id, `${n.firstName} ${n.lastName}`)}
                         >
                           {(open) => (

@@ -27,6 +27,7 @@ import {
   ChevronDown,
   ChevronRight,
   Plus,
+  Trash2,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
@@ -225,6 +226,13 @@ const navigation: NavItem[] = [
         path: '/system/database',
         department: 'system',
         section: 'database',
+      },
+      {
+        label: 'Trash',
+        icon: <Trash2 className="w-4 h-4" />,
+        path: '/system/trash',
+        department: 'system',
+        section: 'companies',
       },
     ],
   },

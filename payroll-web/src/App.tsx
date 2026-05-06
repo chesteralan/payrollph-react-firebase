@@ -36,6 +36,7 @@ const UsersPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ d
 const RestrictionsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.RestrictionsPage })))
 const AuditPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.AuditPage })))
 const DatabasePage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.DatabasePage })))
+const TrashPage = lazy(() => import('./pages/system/TrashPage').then(m => ({ default: m.TrashPage })))
 
 function LoadingFallback() {
   return <div className="flex items-center justify-center min-h-[400px]"><div className="text-gray-500">Loading...</div></div>
@@ -91,6 +92,7 @@ function App() {
               <Route path="system/restrictions" element={<LazyPage><RestrictionsPage /></LazyPage>} />
               <Route path="system/audit" element={<LazyPage><AuditPage /></LazyPage>} />
               <Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
+              <Route path="system/trash" element={<LazyPage><TrashPage /></LazyPage>} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -52,7 +52,8 @@ export function EmployeesPage() {
     if (!currentCompanyId) return
     setLoading(true)
     const snap = await getDocs(query(collection(db, 'employees'), where('companyId', '==', currentCompanyId)))
-    setEmployees(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (Employee & { name?: string })[])
+    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (Employee & { name?: string; deletedAt?: any })[]
+    setEmployees(all.filter((e) => !e.deletedAt))
     setLoading(false)
   }
 
@@ -96,8 +97,20 @@ export function EmployeesPage() {
   }
 
   const handleDelete = async (id: string, code: string) => {
+    await updateDoc(doc(db, 'employees', id), { deletedAt: serverTimestamp(), isActive: false, updatedAt: new Date() })
+    addToast({ type: 'success', title: 'Employee archived', message: `${code} has been moved to trash` })
+    fetchEmployees()
+  }
+
+  const handlePermanentDelete = async (id: string, code: string) => {
     await deleteDoc(doc(db, 'employees', id))
-    addToast({ type: 'success', title: 'Employee deleted', message: `${code} has been removed` })
+    addToast({ type: 'success', title: 'Employee permanently deleted', message: `${code} has been permanently removed` })
+    fetchEmployees()
+  }
+
+  const handleRestore = async (id: string, code: string) => {
+    await updateDoc(doc(db, 'employees', id), { deletedAt: null, isActive: true, updatedAt: new Date() })
+    addToast({ type: 'success', title: 'Employee restored', message: `${code} has been restored` })
     fetchEmployees()
   }
 
@@ -150,13 +163,13 @@ export function EmployeesPage() {
   const handleBulkDelete = async () => {
     try {
       const batch = writeBatch(db)
-      selectedIds.forEach((id) => batch.delete(doc(db, 'employees', id)))
+      selectedIds.forEach((id) => batch.update(doc(db, 'employees', id), { deletedAt: serverTimestamp(), isActive: false, updatedAt: new Date() }))
       await batch.commit()
-      addToast({ type: 'success', title: `Deleted ${selectedIds.size} employee(s)` })
+      addToast({ type: 'success', title: `Archived ${selectedIds.size} employee(s)` })
       clearSelection()
       fetchEmployees()
     } catch {
-      addToast({ type: 'error', title: 'Bulk delete failed' })
+      addToast({ type: 'error', title: 'Bulk archive failed' })
     }
   }
 
@@ -217,13 +230,13 @@ export function EmployeesPage() {
             )}
             {canDelete('employees', 'employees') && (
               <ConfirmDialog
-                title="Bulk Delete"
-                message={`Delete ${selectedCount} selected employee${selectedCount !== 1 ? 's' : ''}? This action cannot be undone.`}
-                confirmText="Delete All"
-                variant="danger"
+                title="Bulk Archive"
+                message={`Archive ${selectedCount} selected employee${selectedCount !== 1 ? 's' : ''}? They can be restored from Trash.`}
+                confirmText="Archive All"
+                variant="warning"
                 onConfirm={handleBulkDelete}
               >
-                {(open) => <Button size="sm" variant="danger" onClick={open}>Delete</Button>}
+                {(open) => <Button size="sm" variant="warning" onClick={open}>Archive</Button>}
               </ConfirmDialog>
             )}
             <Button size="sm" variant="ghost" onClick={clearSelection}>Clear Selection</Button>
@@ -429,9 +442,10 @@ export function EmployeesPage() {
                         )}
                         {canDelete('employees', 'employees') && (
                           <ConfirmDialog
-                            title="Delete Employee"
-                            message={`Are you sure you want to delete ${emp.employeeCode}? This action cannot be undone.`}
-                            confirmText="Delete"
+                            title="Archive Employee"
+                            message={`Archive ${emp.employeeCode}? It can be restored from Trash.`}
+                            confirmText="Archive"
+                            variant="warning"
                             onConfirm={() => handleDelete(emp.id, emp.employeeCode)}
                           >
                             {(open) => (
