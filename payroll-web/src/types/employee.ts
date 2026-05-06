@@ -72,3 +72,19 @@ export interface EmployeeProfile {
   gender?: 'male' | 'female'
   civilStatus?: 'single' | 'married' | 'widowed' | 'separated'
 }
+
+export type DocumentCategory = 'ID' | 'Contract' | 'Tax Form' | 'Medical' | 'Certificate' | 'Other'
+
+export interface EmployeeDocument {
+  id: string
+  employeeId: string
+  fileName: string
+  fileType: string
+  fileSize: number
+  fileUrl: string
+  storagePath: string
+  uploadedAt: Date
+  uploadedBy?: string
+  category: DocumentCategory
+  notes?: string
+}

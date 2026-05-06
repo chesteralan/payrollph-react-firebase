@@ -40,7 +40,7 @@
   - [x] 4.2.4 DTR History tab (placeholder)
 - [x] 4.3 Add employee search and filtering
 - [x] 4.4 Implement employee status management (active/inactive/terminated)
-- [ ] 4.5 Add employee document upload capability
+- [x] 4.5 Add employee document upload capability
 - [x] 4.6 Build employee groups CRUD (GroupsPage)
 - [x] 4.7 Build positions CRUD (PositionsPage)
 - [x] 4.8 Build areas CRUD (AreasPage)
@@ -52,7 +52,7 @@
   - [x] 5.2.2 CSV parsing (comma, tab, LastFirst formats)
   - [x] 5.2.3 Validation with error display
   - [x] 5.2.4 Import statistics
-- [ ] 5.3 Add bulk edit for names
+- [x] 5.3 Add bulk edit for names
 - [x] 5.4 Implement names export to CSV
 - [x] 5.5 Add duplicate name detection during import
 
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 132 tasks
-- **Remaining:** 108 tasks
+- **Completed:** 134 tasks
+- **Remaining:** 106 tasks
 - **Total:** 240 tasks
-- **Progress:** 55%
+- **Progress:** 56%

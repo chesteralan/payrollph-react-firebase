@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -10,7 +10,7 @@ import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { Pagination } from '../../components/ui/Pagination'
-import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { TableSkeleton } from '../../components/ui/Skeleton'
 import type { Employee } from '../../types'
@@ -37,6 +37,10 @@ export function EmployeesPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 25
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showBulkStatus, setShowBulkStatus] = useState(false)
+  const [bulkStatusLoading, setBulkStatusLoading] = useState(false)
+  const [bulkStatusValue, setBulkStatusValue] = useState<'active' | 'inactive' | 'terminated'>('active')
 
   useEffect(() => {
     if (currentCompanyId) {

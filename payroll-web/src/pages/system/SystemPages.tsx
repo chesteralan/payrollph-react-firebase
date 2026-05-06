@@ -9,6 +9,7 @@ import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, Che
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
+import * as XLSX from 'xlsx'
 
 interface CalendarEvent extends CalendarEntry {
   isPaid?: boolean
@@ -515,6 +516,47 @@ export function AuditPage() {
   }
 
   const { items: sortedLogs, handleSort, sortConfig } = useTableSort(logs, 'timestamp')
+
+  const handleExportCSV = () => {
+    const headers = ['Date/Time', 'User', 'Action', 'Module', 'Description', 'Entity ID', 'Entity Type']
+    const csvRows = [headers.join(',')]
+    for (const log of sortedLogs) {
+      const row = [
+        log.timestamp ? new Date(log.timestamp).toLocaleString() : '',
+        log.userName || log.userId,
+        log.action,
+        log.module,
+        `"${(log.description || '').replace(/"/g, '""')}"`,
+        log.entityId || '',
+        log.entityType || ''
+      ]
+      csvRows.push(row.join(','))
+    }
+    const csv = csvRows.join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `audit_log_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleExportXLS = () => {
+    const data = sortedLogs.map(log => ({
+      'Date/Time': log.timestamp ? new Date(log.timestamp).toLocaleString() : '',
+      'User': log.userName || log.userId,
+      'Action': log.action,
+      'Module': log.module,
+      'Description': log.description || '',
+      'Entity ID': log.entityId || '',
+      'Entity Type': log.entityType || ''
+    }))
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Audit Log')
+    XLSX.writeFile(wb, `audit_log_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
 
   const actionColors: Record<string, string> = {
     create: 'bg-green-100 text-green-800',

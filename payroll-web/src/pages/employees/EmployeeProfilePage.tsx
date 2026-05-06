@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, deleteDoc } from 'firebase/firestore'
-import { db } from '../../config/firebase'
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
+import { db, storage } from '../../config/firebase'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { ArrowLeft, Plus, Trash2, Save, Phone, Mail, MapPin, Briefcase, Users } from 'lucide-react'
-import type { Employee, EmployeeContact, EmployeeProfile, EmployeeSalary } from '../../types'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../components/ui/Toast'
+import { ArrowLeft, Plus, Trash2, Save, Phone, Mail, MapPin, Briefcase, Users, FileText, Upload, Download, File } from 'lucide-react'
+import type { Employee, EmployeeContact, EmployeeProfile, EmployeeSalary, EmployeeDocument, DocumentCategory } from '../../types'
 
-type ProfileTab = 'info' | 'contact' | 'compensation' | 'dtr'
+type ProfileTab = 'info' | 'contact' | 'compensation' | 'dtr' | 'documents'
 
 export function EmployeeProfilePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [activeTab, setActiveTab] = useState<ProfileTab>('info')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -23,6 +27,12 @@ export function EmployeeProfilePage() {
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([])
   const [positions, setPositions] = useState<{ id: string; name: string }[]>([])
   const [areas, setAreas] = useState<{ id: string; name: string }[]>([])
+  const [documents, setDocuments] = useState<EmployeeDocument[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [docCategory, setDocCategory] = useState<DocumentCategory>('Other')
+  const [docNotes, setDocNotes] = useState('')
 
   const [profileForm, setProfileForm] = useState({
     sss: '', tin: '', philhealth: '', hdmf: '', bankName: '', bankAccount: '',
@@ -42,7 +52,7 @@ export function EmployeeProfilePage() {
     if (!id) return
     setLoading(true)
     try {
-      const [empSnap, profileSnap, contactsSnap, salarySnap, groupsSnap, positionsSnap, areasSnap] = await Promise.all([
+      const [empSnap, profileSnap, contactsSnap, salarySnap, groupsSnap, positionsSnap, areasSnap, docsSnap] = await Promise.all([
         getDoc(doc(db, 'employees', id)),
         getDocs(query(collection(db, 'employee_profiles'), where('employeeId', '==', id))),
         getDocs(query(collection(db, 'employee_contacts'), where('employeeId', '==', id))),
@@ -50,6 +60,7 @@ export function EmployeeProfilePage() {
         getDocs(query(collection(db, 'employees_groups'))),
         getDocs(query(collection(db, 'employees_positions'))),
         getDocs(query(collection(db, 'employees_areas'))),
+        getDocs(query(collection(db, 'employee_documents'), where('employeeId', '==', id))),
       ])
 
       if (empSnap.exists()) setEmployee({ id: empSnap.id, ...empSnap.data() } as Employee)
@@ -72,6 +83,7 @@ export function EmployeeProfilePage() {
       setGroups(groupsSnap.docs.map(d => ({ id: d.id, ...(d.data() as { name: string }) })))
       setPositions(positionsSnap.docs.map(d => ({ id: d.id, ...(d.data() as { name: string }) })))
       setAreas(areasSnap.docs.map(d => ({ id: d.id, ...(d.data() as { name: string }) })))
+      setDocuments(docsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeDocument[])
     } finally {
       setLoading(false)
     }
@@ -146,6 +158,77 @@ export function EmployeeProfilePage() {
     setEmployee({ ...employee, [field]: value })
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setSelectedFile(file)
+  }
+
+  const handleUpload = async () => {
+    if (!selectedFile || !id) return
+    setUploading(true)
+    setUploadProgress(0)
+    try {
+      const storagePath = `employees/${id}/${Date.now()}_${selectedFile.name}`
+      const storageRef = ref(storage, storagePath)
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile)
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setUploadProgress(progress)
+        },
+        (error) => {
+          addToast({ type: 'error', title: 'Upload failed', message: error.message })
+          setUploading(false)
+        },
+        async () => {
+          const fileUrl = await getDownloadURL(uploadTask.snapshot.ref)
+          await addDoc(collection(db, 'employee_documents'), {
+            employeeId: id,
+            fileName: selectedFile.name,
+            fileType: selectedFile.type,
+            fileSize: selectedFile.size,
+            fileUrl,
+            storagePath,
+            uploadedAt: new Date(),
+            category: docCategory,
+            notes: docNotes || null,
+          })
+          addToast({ type: 'success', title: 'Document uploaded', message: `${selectedFile.name} uploaded successfully` })
+          setSelectedFile(null)
+          setDocNotes('')
+          setUploadProgress(0)
+          setUploading(false)
+          loadData()
+        }
+      )
+    } catch (error: any) {
+      addToast({ type: 'error', title: 'Upload failed', message: error.message })
+      setUploading(false)
+    }
+  }
+
+  const handleDeleteDocument = async (doc: EmployeeDocument) => {
+    try {
+      if (doc.storagePath) {
+        await deleteObject(ref(storage, doc.storagePath))
+      }
+      await deleteDoc(doc(db, 'employee_documents', doc.id))
+      addToast({ type: 'success', title: 'Document deleted', message: `${doc.fileName} deleted successfully` })
+      loadData()
+    } catch (error: any) {
+      addToast({ type: 'error', title: 'Delete failed', message: error.message })
+    }
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+  }
+
   const formatCurrency = (value: number) => value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   if (loading || !employee) return <div className="text-center py-12 text-gray-500">Loading...</div>
@@ -154,7 +237,8 @@ export function EmployeeProfilePage() {
     { key: 'info', label: 'Personal Info', icon: <Users className="w-4 h-4" /> },
     { key: 'contact', label: 'Contact', icon: <Phone className="w-4 h-4" /> },
     { key: 'compensation', label: 'Compensation', icon: <Briefcase className="w-4 h-4" /> },
-    { key: 'dtr', label: 'DTR History', icon: <MapPin className="w-4 h-4" /> }
+    { key: 'dtr', label: 'DTR History', icon: <MapPin className="w-4 h-4" /> },
+    { key: 'documents', label: 'Documents', icon: <FileText className="w-4 h-4" /> }
   ]
 
   return (
@@ -502,6 +586,156 @@ export function EmployeeProfilePage() {
           <CardHeader><CardTitle>DTR History</CardTitle></CardHeader>
           <CardContent>
             <p className="text-center text-gray-500 py-8">Attendance records will appear here once DTR entries are created.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === 'documents' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4">Upload New Document</h3>
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors">
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
+                  <label htmlFor="fileUpload" className="cursor-pointer">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600">
+                      {selectedFile ? selectedFile.name : 'Click to select a file or drag and drop'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">Any file type supported</p>
+                  </label>
+                </div>
+
+                {selectedFile && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        value={docCategory}
+                        onChange={(e) => setDocCategory(e.target.value as DocumentCategory)}
+                      >
+                        <option value="ID">ID</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Tax Form">Tax Form</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Certificate">Certificate</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        placeholder="Add notes about this document"
+                        value={docNotes}
+                        onChange={(e) => setDocNotes(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {uploading && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>Uploading...</span>
+                      <span>{Math.round(uploadProgress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-primary-600 h-2 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                {selectedFile && (
+                  <div className="flex justify-end">
+                    <Button onClick={handleUpload} disabled={uploading}>
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? 'Uploading...' : 'Upload Document'}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-4">Uploaded Documents</h3>
+              {documents.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">No documents uploaded yet.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 px-3 font-medium text-gray-600">File Name</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-600">Category</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-600">Size</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-600">Upload Date</th>
+                        <th className="text-right py-2 px-3 font-medium text-gray-600">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {documents.map((doc) => (
+                        <tr key={doc.id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="py-3 px-3">
+                            <div className="flex items-center gap-2">
+                              <File className="w-4 h-4 text-gray-400" />
+                              <span className="font-medium text-gray-900">{doc.fileName}</span>
+                            </div>
+                            {doc.notes && (
+                              <p className="text-xs text-gray-500 mt-0.5 ml-6">{doc.notes}</p>
+                            )}
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                              {doc.category}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-gray-500">{formatFileSize(doc.fileSize)}</td>
+                          <td className="py-3 px-3 text-gray-500">
+                            {new Date(doc.uploadedAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <div className="flex justify-end gap-2">
+                              <a
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-600 hover:text-primary-700"
+                              >
+                                <Download className="w-4 h-4" />
+                              </a>
+                              <ConfirmDialog
+                                title="Delete Document"
+                                message={`Delete "${doc.fileName}"? This action cannot be undone.`}
+                                confirmText="Delete"
+                                onConfirm={() => handleDeleteDocument(doc)}
+                              >
+                                {(open) => (
+                                  <button onClick={open} className="text-red-600 hover:text-red-700">
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </ConfirmDialog>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

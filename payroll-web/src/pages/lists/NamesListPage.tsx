@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
+import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import { useTableSort } from '../../hooks/useTableSort'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import type { EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus } from '../../types/employee'
 
 interface NameRecord {
   id: string
@@ -28,6 +30,7 @@ interface CsvPreviewRow {
 
 export function NamesListPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
+  const { addToast } = useToast()
   const [names, setNames] = useState<NameRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -40,7 +43,19 @@ export function NamesListPage() {
   const [importStats, setImportStats] = useState<{ success: number; failed: number; duplicates: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { fetchNames() }, [])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showBulkEdit, setShowBulkEdit] = useState(false)
+  const [bulkLoading, setBulkLoading] = useState(false)
+  const [groups, setGroups] = useState<EmployeeGroup[]>([])
+  const [positions, setPositions] = useState<EmployeePosition[]>([])
+  const [areas, setAreas] = useState<EmployeeArea[]>([])
+  const [statuses, setStatuses] = useState<EmployeeStatus[]>([])
+  const [bulkEditData, setBulkEditData] = useState({ groupId: '', positionId: '', areaId: '', statusId: '' })
+
+  useEffect(() => {
+    fetchNames()
+    fetchLookups()
+  }, [])
 
   const fetchNames = async () => {
     setLoading(true)
@@ -49,11 +64,81 @@ export function NamesListPage() {
     setLoading(false)
   }
 
+  const fetchLookups = async () => {
+    const [groupsSnap, positionsSnap, areasSnap, statusesSnap] = await Promise.all([
+      getDocs(collection(db, 'groups')),
+      getDocs(collection(db, 'positions')),
+      getDocs(collection(db, 'areas')),
+      getDocs(collection(db, 'statuses'))
+    ])
+    setGroups(groupsSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeeGroup)).filter((g) => g.isActive !== false))
+    setPositions(positionsSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeePosition)).filter((p) => p.isActive !== false))
+    setAreas(areasSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeeArea)).filter((a) => a.isActive !== false))
+    setStatuses(statusesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeeStatus)).filter((s) => s.isActive !== false))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (editingId) { await updateDoc(doc(db, 'names', editingId), formData) }
     else { await addDoc(collection(db, 'names'), formData) }
     setShowForm(false); setEditingId(null); setFormData({ firstName: '', middleName: '', lastName: '', suffix: '' }); fetchNames()
+  }
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
+      return next
+    })
+  }, [])
+
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds((prev) => prev.size === sortedNames.length ? new Set() : new Set(sortedNames.map((n) => n.id)))
+  }, [sortedNames])
+
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), [])
+
+  const handleBulkEdit = async () => {
+    const updates = Object.entries(bulkEditData).filter(([, v]) => v)
+    if (updates.length === 0) return
+
+    setBulkLoading(true)
+    try {
+      const nameIds = Array.from(selectedIds)
+      const empSnap = await getDocs(query(collection(db, 'employees'), where('nameId', 'in', nameIds)))
+      const batch = writeBatch(db)
+      empSnap.docs.forEach((d) => {
+        const data: Record<string, string> = {}
+        if (bulkEditData.groupId) data.groupId = bulkEditData.groupId
+        if (bulkEditData.positionId) data.positionId = bulkEditData.positionId
+        if (bulkEditData.areaId) data.areaId = bulkEditData.areaId
+        if (bulkEditData.statusId) data.statusId = bulkEditData.statusId
+        batch.update(doc(db, 'employees', d.id), { ...data, updatedAt: new Date() })
+      })
+      await batch.commit()
+      addToast({ type: 'success', title: `Updated ${empSnap.size} employee(s)` })
+      setShowBulkEdit(false)
+      setBulkEditData({ groupId: '', positionId: '', areaId: '', statusId: '' })
+      clearSelection()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk update failed' })
+    }
+    setBulkLoading(false)
+  }
+
+  const handleBulkDelete = async () => {
+    setBulkLoading(true)
+    try {
+      const batch = writeBatch(db)
+      selectedIds.forEach((id) => batch.delete(doc(db, 'names', id)))
+      await batch.commit()
+      addToast({ type: 'success', title: `Deleted ${selectedIds.size} name(s)` })
+      clearSelection()
+      fetchNames()
+    } catch {
+      addToast({ type: 'error', title: 'Bulk delete failed' })
+    }
+    setBulkLoading(false)
   }
 
   const handleDelete = async (id: string, name: string) => {
@@ -190,6 +275,8 @@ export function NamesListPage() {
 
   if (!canView('lists', 'names')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
+  const selectedCount = selectedIds.size
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -206,6 +293,29 @@ export function NamesListPage() {
           )}
         </div>
       </div>
+
+      {selectedCount > 0 && (
+        <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+          <span className="text-sm text-blue-800">{selectedCount} name{selectedCount !== 1 ? 's' : ''} selected</span>
+          <div className="flex gap-2">
+            {canEdit('lists', 'names') && (
+              <Button size="sm" onClick={() => setShowBulkEdit(true)}>Bulk Edit</Button>
+            )}
+            {canDelete('lists', 'names') && (
+              <ConfirmDialog
+                title="Bulk Delete"
+                message={`Delete ${selectedCount} selected name${selectedCount !== 1 ? 's' : ''}? This action cannot be undone.`}
+                confirmText="Delete All"
+                variant="danger"
+                onConfirm={handleBulkDelete}
+              >
+                {(open) => <Button size="sm" variant="danger" onClick={open}>Bulk Delete</Button>}
+              </ConfirmDialog>
+            )}
+            <Button size="sm" variant="ghost" onClick={clearSelection}>Clear Selection</Button>
+          </div>
+        </div>
+      )}
 
       {showImport && (
         <Card>
@@ -339,22 +449,74 @@ export function NamesListPage() {
           </CardContent>
         </Card>
       )}
+
+      {showBulkEdit && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Bulk Edit {selectedCount} Name{selectedCount !== 1 ? 's' : ''}</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setShowBulkEdit(false)}><X className="w-4 h-4" /></Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Group</label>
+                <select value={bulkEditData.groupId} onChange={(e) => setBulkEditData({ ...bulkEditData, groupId: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  <option value="">-- No Change --</option>
+                  {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                <select value={bulkEditData.positionId} onChange={(e) => setBulkEditData({ ...bulkEditData, positionId: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  <option value="">-- No Change --</option>
+                  {positions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+                <select value={bulkEditData.areaId} onChange={(e) => setBulkEditData({ ...bulkEditData, areaId: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  <option value="">-- No Change --</option>
+                  {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select value={bulkEditData.statusId} onChange={(e) => setBulkEditData({ ...bulkEditData, statusId: e.target.value })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  <option value="">-- No Change --</option>
+                  {statuses.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="ghost" onClick={() => setShowBulkEdit(false)}>Cancel</Button>
+              <Button onClick={handleBulkEdit} disabled={bulkLoading || !Object.values(bulkEditData).some((v) => v)}>
+                {bulkLoading ? 'Updating...' : 'Apply Changes'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card><CardContent className="p-0">
         <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('fullName')}>
+                <th className="px-4 py-3"><button onClick={toggleSelectAll} className="text-gray-500 hover:text-gray-700">{selectedIds.size === sortedNames.length && sortedNames.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}</button></th>
+                <th className="text-left px-2 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none" onClick={() => handleSort('fullName')}>
                   <div className="flex items-center gap-1">Name{sortConfig?.key === 'fullName' ? (sortConfig.direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronsUpDown className="w-3 h-3 opacity-30" />}</div>
                 </th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
           <tbody className="divide-y divide-gray-200">
-            {loading ? <tr><td colSpan={2} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
-              : sortedNames.length === 0 ? <tr><td colSpan={2} className="px-6 py-4 text-center text-gray-500">No names found</td></tr>
+            {loading ? <tr><td colSpan={3} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+              : sortedNames.length === 0 ? <tr><td colSpan={3} className="px-6 py-4 text-center text-gray-500">No names found</td></tr>
               : sortedNames.map((n) => (
-                <tr key={n.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                <tr key={n.id} className={selectedIds.has(n.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}>
+                  <td className="px-4"><button onClick={() => toggleSelect(n.id)} className="text-gray-500 hover:text-gray-700">{selectedIds.has(n.id) ? <CheckSquare className="w-4 h-4 text-blue-600" /> : <Square className="w-4 h-4" />}</button></td>
+                  <td className="px-2 py-4 text-sm text-gray-900">
                     {n.firstName} {n.middleName || ''} {n.lastName}{n.suffix ? `, ${n.suffix}` : ''}
                   </td>
                   <td className="px-6 py-4 text-right">
