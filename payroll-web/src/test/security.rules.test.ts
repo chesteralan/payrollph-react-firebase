@@ -11,8 +11,13 @@ import { resolve } from "path";
 let testEnv: RulesTestEnvironment;
 
 const PROJECT_ID = "payroll-test";
+const HAS_FIRESTORE_EMULATOR = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
 
 beforeAll(async () => {
+  if (!HAS_FIRESTORE_EMULATOR) {
+    return;
+  }
+
   // Load the firestore.rules file
   const rules = readFileSync(
     resolve(__dirname, "../../../firestore.rules"),
@@ -34,7 +39,11 @@ afterAll(async () => {
   }
 });
 
-describe("Firestore Security Rules", () => {
+const describeIfFirestoreEmulator = HAS_FIRESTORE_EMULATOR
+  ? describe
+  : describe.skip;
+
+describeIfFirestoreEmulator("Firestore Security Rules", () => {
   describe("Users Collection", () => {
     it("should allow authenticated user to read own user doc", async () => {
       const user = testEnv.authenticatedContext("user1", {
