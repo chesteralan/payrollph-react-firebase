@@ -1,7 +1,4 @@
-// Offline Mode Handling Service
-// Uses Service Worker + IndexedDB for offline capabilities
-
-import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../config/firebase'
 
 interface QueuedAction {
@@ -17,21 +14,10 @@ interface QueuedAction {
   error?: string
 }
 
-interface OfflineData {
-  [collection: string]: {
-    [id: string]: {
-      data: Record<string, unknown>
-      timestamp: number
-      synced: boolean
-    }
-  }
-}
-
 const DB_NAME = 'payroll-offline'
-const DB_VERSION = 1
+const DB_VERSION = 2
 let dbInstance: IDBDatabase | null = null
 
-// Initialize IndexedDB
 const initDB = (): Promise<IDBDatabase> => {
   if (dbInstance) return Promise.resolve(dbInstance)
 
@@ -40,11 +26,31 @@ const initDB = (): Promise<IDBDatabase> => {
 
     request.onupgradeneeded = (event) => {
       const database = (event.target as IDBOpenDBRequest).result
+
       if (!database.objectStoreNames.contains('offline_data')) {
-        database.createObjectStore('offline_data', { keyPath: 'id' })
+        const store = database.createObjectStore('offline_data', { keyPath: 'id' })
+        store.createIndex('collection', 'collection', { unique: false })
       }
+
       if (!database.objectStoreNames.contains('action_queue')) {
-        database.createObjectStore('action_queue', { keyPath: 'id' })
+        const store = database.createObjectStore('action_queue', { keyPath: 'id' })
+        store.createIndex('status', 'status', { unique: false })
+      }
+
+      if (event.oldVersion < 2) {
+        const transaction = (event.target as IDBOpenDBRequest).transaction!
+        if (database.objectStoreNames.contains('offline_data')) {
+          const store = transaction.objectStore('offline_data')
+          if (!store.indexNames.contains('collection')) {
+            store.createIndex('collection', 'collection', { unique: false })
+          }
+        }
+        if (database.objectStoreNames.contains('action_queue')) {
+          const store = transaction.objectStore('action_queue')
+          if (!store.indexNames.contains('status')) {
+            store.createIndex('status', 'status', { unique: false })
+          }
+        }
       }
     }
 
@@ -175,7 +181,7 @@ export const syncQueuedActions = async (): Promise<{ success: number; failed: nu
 
       resolve({ success, failed })
     }
-    request.onerror = () => resolve({ success: 0, failed: actions.length })
+    request.onerror = () => resolve({ success: 0, failed: 0 })
   })
 }
 
@@ -221,7 +227,18 @@ const updateQueuedActionStatus = async (
   })
 }
 
-// Check if offline
+export const getQueuedActionCount = async (): Promise<number> => {
+  const database = await initDB()
+  const transaction = database.transaction('action_queue', 'readonly')
+  const store = transaction.objectStore('action_queue')
+  const request = store.index('status').getAll('pending')
+
+  return new Promise((resolve) => {
+    request.onsuccess = () => resolve((request.result || []).length)
+    request.onerror = () => resolve(0)
+  })
+}
+
 export const isOffline = (): boolean => {
   return !navigator.onLine
 }
@@ -333,13 +350,4 @@ export const saveServiceWorker = (): void => {
   URL.revokeObjectURL(url)
 }
 
-export default {
-  cacheDataOffline,
-  getOfflineData,
-  queueAction,
-  syncQueuedActions,
-  isOffline,
-  setupOfflineListeners,
-  registerServiceWorker,
-  saveServiceWorker,
-}
+

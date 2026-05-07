@@ -191,8 +191,8 @@
 - [x] 16.5 Create attendance/DTR reports
 - [x] 16.6 Add benefits utilization report
 - [x] 16.7 Implement year-end reports
-- [ ] 16.8 Add custom report builder
-- [ ] 16.9 Add report scheduling
+- [x] 16.8 Add custom report builder
+- [x] 16.9 Add report scheduling
 
 ## 17. Dashboard & Analytics
 - [x] 17.1 Create DashboardPage (placeholder)
@@ -234,7 +234,7 @@
 - [x] 21.3 Improve form validation with inline errors
 - [x] 21.4 Add confirmation dialogs for destructive actions
 - [x] 21.5 Implement undo functionality for critical operations
-- [ ] 21.6 Add offline mode handling
+- [x] 21.6 Add offline mode handling
 - [x] 21.7 Improve loading states across all pages
 - [x] 21.8 Add empty state illustrations
 - [x] 21.9 Implement keyboard shortcuts
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 218 tasks
-- **Remaining:** 22 tasks
+- **Completed:** 219 tasks
+- **Remaining:** 21 tasks
 - **Total:** 240 tasks
-- **Progress:** 218/240 (90.8%)
+- **Progress:** 219/240 (91.3%)
