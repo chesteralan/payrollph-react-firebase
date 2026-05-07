@@ -44,6 +44,7 @@ const UsersPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ d
 const RestrictionsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.RestrictionsPage })))
 const AuditPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.AuditPage })))
 const DatabasePage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.DatabasePage })))
+const UserActivityPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.UserActivityPage })))
 const SystemSettingsPage = lazy(() => import('./pages/system/SystemSettingsPage').then(m => ({ default: m.SystemSettingsPage })))
 const TrashPage = lazy(() => import('./pages/system/TrashPage').then(m => ({ default: m.TrashPage })))
 const HealthCheckPage = lazy(() => import('./pages/system/HealthCheckPage').then(m => ({ default: m.HealthCheckPage })))
@@ -112,7 +113,8 @@ function LazyPage({ children }: { children: React.ReactNode }) {
 <Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
                <Route path="system/settings" element={<LazyPage><SystemSettingsPage /></LazyPage>} />
                <Route path="system/trash" element={<LazyPage><TrashPage /></LazyPage>} />
-              <Route path="system/health" element={<LazyPage><HealthCheckPage /></LazyPage>} />
+               <Route path="system/health" element={<LazyPage><HealthCheckPage /></LazyPage>} />
+               <Route path="system/activity" element={<LazyPage><UserActivityPage /></LazyPage>} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

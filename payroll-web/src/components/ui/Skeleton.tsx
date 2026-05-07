@@ -1,64 +1,109 @@
+import { clsx } from 'clsx'
+
 interface SkeletonProps {
   className?: string
   variant?: 'text' | 'circular' | 'rectangular'
-  width?: string
-  height?: string
-  count?: number
+  width?: string | number
+  height?: string | number
+  lines?: number
+  animation?: 'pulse' | 'wave' | 'none'
 }
 
-export function Skeleton({ className = '', variant = 'text', width, height, count = 1 }: SkeletonProps) {
-  const baseClasses = 'animate-pulse bg-gray-200 rounded'
-  const variantClasses = {
-    text: 'h-4',
-    circular: 'rounded-full',
-    rectangular: 'h-full w-full'
+export function Skeleton({
+  className,
+  variant = 'text',
+  width,
+  height,
+  lines = 1,
+  animation = 'pulse',
+}: SkeletonProps) {
+  const baseStyle = clsx(
+    'bg-gray-200 rounded',
+    {
+      'animate-pulse': animation === 'pulse',
+      'rounded-full': variant === 'circular',
+    },
+    className
+  )
+
+  const style: React.CSSProperties = {
+    width: width || (variant === 'circular' ? '40px' : '100%'),
+    height: height || (variant === 'text' ? '1em' : variant === 'circular' ? '40px' : '100%'),
   }
 
-  const style: React.CSSProperties = {}
-  if (width) style.width = width
-  if (height) style.height = height
-
-  return (
-    <>
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-          style={style}
-        />
-      ))}
-    </>
-  )
-}
-
-export function TableSkeleton({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) {
-  return (
-    <div className="animate-pulse">
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-3 flex gap-4">
-        {Array.from({ length: columns }).map((_, i) => (
-          <Skeleton key={i} className="h-3 flex-1" />
+  if (variant === 'text' && lines > 1) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: lines }).map((_, i) => (
+          <div
+            key={i}
+            className={baseStyle}
+            style={{
+              ...style,
+              width: i === lines - 1 ? '75%' : undefined,
+            }}
+          />
         ))}
       </div>
-      {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="px-6 py-4 border-b border-gray-100 flex gap-4">
-          {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton key={colIndex} className="h-4 flex-1" />
-          ))}
+    )
+  }
+
+  return <div className={baseStyle} style={style} />
+}
+
+export function CardSkeleton({
+  lines = 3,
+  showHeader = true,
+  className,
+}: { lines?: number; showHeader?: boolean; className?: string }) {
+  return (
+    <div className={clsx('bg-white rounded-lg border border-gray-200 p-6 space-y-4', className)}>
+      {showHeader && (
+        <div className="flex items-center justify-between">
+          <Skeleton width="150px" height="24px" />
+          <Skeleton width="100px" height="36px" variant="rectangular" />
         </div>
-      ))}
+      )}
+      <Skeleton lines={lines} />
     </div>
   )
 }
 
-export function CardSkeleton() {
+export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="animate-pulse space-y-4 p-6">
-      <Skeleton className="h-6 w-1/3" />
-      <div className="space-y-3">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
-        <Skeleton className="h-4 w-4/6" />
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="flex gap-4">
+          {Array.from({ length: cols }).map((_, i) => (
+            <Skeleton key={i} width={`${100 / cols}%`} height="16px" />
+          ))}
+        </div>
       </div>
+      <div className="divide-y divide-gray-200">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} className="px-6 py-4">
+            <div className="flex gap-4">
+              {Array.from({ length: cols }).map((_, j) => (
+                <Skeleton key={j} width={`${100 / cols}%`} height="16px" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function PageSkeleton({ sections = 3 }: { sections?: number }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Skeleton width="200px" height="32px" />
+        <Skeleton width="120px" height="40px" variant="rectangular" />
+      </div>
+      {Array.from({ length: sections }).map((_, i) => (
+        <CardSkeleton key={i} lines={2 + i} />
+      ))}
     </div>
   )
 }

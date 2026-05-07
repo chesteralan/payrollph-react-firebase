@@ -298,6 +298,13 @@ const navigation: NavItem[] = [
         department: 'system',
         section: 'database',
       },
+      {
+        label: 'Activity Monitor',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/system/activity',
+        department: 'system',
+        section: 'users',
+      },
     ],
   },
 ]
