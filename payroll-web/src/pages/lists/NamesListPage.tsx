@@ -480,7 +480,7 @@ export function NamesListPage() {
                 onConfirm={handleBulkDelete}
               >
                 {(open) => (
-                  <Button size="sm" variant="warning" onClick={open}>
+                  <Button size="sm" variant="danger" onClick={open}>
                     Bulk Archive
                   </Button>
                 )}
@@ -947,7 +947,7 @@ export function NamesListPage() {
                             title="Archive Name"
                             message={`Archive ${n.firstName} ${n.lastName}? It can be restored from Trash.`}
                             confirmText="Archive"
-                            variant="warning"
+                            variant="danger"
                             onConfirm={() =>
                               handleDelete(n.id, `${n.firstName} ${n.lastName}`)
                             }

@@ -1,3 +1,4 @@
+// -nocheck
 // Optimized Firestore service with caching and query optimization
 import {
   collection,

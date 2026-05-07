@@ -23,7 +23,7 @@ export function UserSettingsPage() {
     theme: (settings?.theme as "light" | "dark") || "light",
     itemsPerPage: settings?.itemsPerPage || 25,
     defaultCompanyId: settings?.defaultCompanyId || "",
-    currency: settings?.currency || "PHP",
+    currency: (settings as { currency?: string } | undefined)?.currency || "PHP",
     locale: settings?.locale || "en-US",
   });
   const [passwordForm, setPasswordForm] = useState({

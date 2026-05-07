@@ -38,6 +38,7 @@ import {
   ChevronsUpDown,
   CheckSquare,
   Square,
+  X,
 } from "lucide-react";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { TableSkeleton } from "../../components/ui/Skeleton";
@@ -350,7 +351,7 @@ export function EmployeesPage() {
                 onConfirm={handleBulkDelete}
               >
                 {(open) => (
-                  <Button size="sm" variant="warning" onClick={open}>
+                  <Button size="sm" variant="danger" onClick={open}>
                     Archive
                   </Button>
                 )}
@@ -577,7 +578,7 @@ export function EmployeesPage() {
               {loading ? (
                 <tr>
                   <td colSpan={5} className="px-0 py-0">
-                    <TableSkeleton rows={10} columns={5} />
+                    <TableSkeleton rows={10} cols={5} />
                   </td>
                 </tr>
               ) : paginatedEmployees.length === 0 ? (
@@ -664,7 +665,7 @@ export function EmployeesPage() {
                             title="Archive Employee"
                             message={`Archive ${emp.employeeCode}? It can be restored from Trash.`}
                             confirmText="Archive"
-                            variant="warning"
+                            variant="danger"
                             onConfirm={() =>
                               handleDelete(emp.id, emp.employeeCode)
                             }

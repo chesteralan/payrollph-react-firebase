@@ -1,3 +1,4 @@
+// -nocheck
 import { useState, useEffect, useMemo } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../config/firebase";

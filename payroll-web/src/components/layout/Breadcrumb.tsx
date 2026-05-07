@@ -7,7 +7,7 @@ interface BreadcrumbItem {
 }
 
 const routeLabels: Record<string, string> = {
-  employees: "Employees",
+  employees: "Employee Master List",
   calendar: "Calendar",
   groups: "Groups",
   positions: "Positions",
@@ -24,14 +24,12 @@ const routeLabels: Record<string, string> = {
   reports: "Reports",
   "13th-month": "13th Month",
   "payroll-summary": "Payroll Summary",
-  employees: "Employee Master List",
   "earnings-deductions": "Earnings/Deductions",
   attendance: "Attendance",
   "benefits-utilization": "Benefits Utilization",
   system: "System",
   companies: "Companies",
   "company-settings": "Company Settings",
-  calendar: "Calendar",
   terms: "Terms",
   users: "Users",
   restrictions: "Restrictions",

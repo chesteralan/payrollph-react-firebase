@@ -6,6 +6,7 @@ import {
   initializeAppCheck,
   ReCaptchaV3Provider,
   getToken,
+  type AppCheck,
 } from "firebase/app-check";
 
 const firebaseConfig = {
@@ -24,8 +25,9 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // Initialize App Check with reCAPTCHA v3 (CSRF and abuse protection)
+let appCheck: AppCheck | null = null;
 if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
-  initializeAppCheck(app, {
+  appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true,
   });
@@ -34,15 +36,16 @@ if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
 // CSRF token utility for custom API calls
 export const getCSRFToken = async (): Promise<string> => {
   try {
-    const appCheckToken = await getToken(getAppCheck(app));
+    if (!appCheck) {
+      return generateFallbackToken();
+    }
+    const appCheckToken = await getToken(appCheck);
     return appCheckToken.token;
   } catch {
     console.warn("App Check not available, using fallback CSRF token");
     return generateFallbackToken();
   }
 };
-
-const { getAppCheck } = await import("firebase/app-check");
 
 const generateFallbackToken = (): string => {
   const array = new Uint8Array(32);

@@ -7,7 +7,7 @@ export interface SortConfig<T> {
   direction: SortDirection;
 }
 
-export function useTableSort<T extends Record<string, unknown>>(
+export function useTableSort<T extends object>(
   items: T[],
   defaultSort?: keyof T,
 ) {

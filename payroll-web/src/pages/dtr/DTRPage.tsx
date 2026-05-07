@@ -322,7 +322,15 @@ export function DTRPage() {
         timeOut: existing.timeOut || "",
         overtimeHours: existing.overtimeHours || 0,
         lateHours: existing.lateHours || 0,
-        absenceType: existing.absenceType || "",
+        absenceType:
+          existing.absenceType ||
+          (undefined as
+            | "absent"
+            | "late"
+            | "undertime"
+            | "sick"
+            | "vacation"
+            | undefined),
         absenceReason: existing.absenceReason || "",
         notes: existing.notes || "",
       });
@@ -332,7 +340,7 @@ export function DTRPage() {
         timeOut: "",
         overtimeHours: 0,
         lateHours: 0,
-        absenceType: "",
+        absenceType: undefined,
         absenceReason: "",
         notes: "",
       });

@@ -220,12 +220,12 @@ export function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardContent className="p-0">
-              <TableSkeleton rows={5} columns={3} />
+              <TableSkeleton rows={5} cols={3} />
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-0">
-              <TableSkeleton rows={5} columns={3} />
+              <TableSkeleton rows={5} cols={3} />
             </CardContent>
           </Card>
         </div>

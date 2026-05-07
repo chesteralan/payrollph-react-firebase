@@ -18,7 +18,7 @@ export const SearchBar = memo(function SearchBar({
   debounceMs = 300,
 }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeRef = useRef(onChange);
 
   useEffect(() => {

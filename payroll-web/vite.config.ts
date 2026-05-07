@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -39,27 +39,7 @@ export default defineConfig({
     target: "es2020",
     outDir: "dist",
     assetsDir: "assets",
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ["react", "react-dom", "react-router-dom"],
-          firebase: [
-            "firebase/app",
-            "firebase/auth",
-            "firebase/firestore",
-            "firebase/storage",
-          ],
-          ui: ["lucide-react", "clsx", "tailwind-merge"],
-        },
-      },
-    },
+    minify: true,
     chunkSizeWarningLimit: 1000,
   },
   server: {

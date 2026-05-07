@@ -1,6 +1,4 @@
 import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
-import { Replay } from "@sentry/replay";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
@@ -13,12 +11,11 @@ export const initSentry = () => {
   Sentry.init({
     dsn: SENTRY_DSN,
     integrations: [
-      new BrowserTracing({
+      Sentry.browserTracingIntegration({
         traceFetch: true,
         traceXHR: true,
-        tracingOrigins: ["localhost", "firebaseio.com", "googleapis.com"],
       }),
-      new Replay({
+      Sentry.replayIntegration({
         maskAllText: true,
         blockAllMedia: true,
       }),
