@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/Input'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
-import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square, AlertTriangle, CheckCircle } from 'lucide-react'
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry, Term } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
@@ -238,7 +238,9 @@ export function TermsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ name: '', description: '', type: 'semi-monthly' as Term['type'], frequency: '', daysPerPeriod: 0 })
+  const [formData, setFormData] = useState({ name: '', description: '', type: 'semi-monthly' as Term['type'], frequency: '', daysPerPeriod: 0, cutOff1: 0, cutOff2: 0 })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [warnings, setWarnings] = useState<string[]>([])
 
   useEffect(() => { fetchTerms() }, [])
 
@@ -249,15 +251,80 @@ export function TermsPage() {
     setLoading(false)
   }
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+    const newWarnings: string[] = []
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required'
+    } else {
+      const duplicate = terms.find(t => t.name.toLowerCase() === formData.name.trim().toLowerCase() && t.id !== editingId)
+      if (duplicate) newErrors.name = 'Term name must be unique'
+    }
+
+    if (formData.daysPerPeriod <= 0 || formData.daysPerPeriod > 31) {
+      newErrors.daysPerPeriod = 'Days per period must be between 1 and 31'
+    }
+
+    if (formData.type === 'monthly' && (formData.daysPerPeriod < 28 || formData.daysPerPeriod > 31)) {
+      newErrors.daysPerPeriod = 'Monthly terms should have 28-31 days'
+    }
+
+    if (formData.type === 'semi-monthly') {
+      if (!formData.cutOff1 || formData.cutOff1 < 1 || formData.cutOff1 > 31) {
+        newErrors.cutOff1 = 'First cutoff day is required (1-31)'
+      }
+      if (!formData.cutOff2 || formData.cutOff2 < 1 || formData.cutOff2 > 31) {
+        newErrors.cutOff2 = 'Second cutoff day is required (1-31)'
+      }
+    }
+
+    if ((formData.type === 'weekly' || formData.type === 'bi-weekly') && !formData.frequency.trim()) {
+      newErrors.frequency = 'Frequency is required for weekly/bi-weekly terms'
+    }
+
+    const sameTypeFreq = terms.find(t =>
+      t.type === formData.type &&
+      t.frequency === formData.frequency &&
+      t.id !== editingId
+    )
+    if (sameTypeFreq) {
+      newWarnings.push(`A term with same type and frequency already exists: ${sameTypeFreq.name}`)
+    }
+
+    setErrors(newErrors)
+    setWarnings(newWarnings)
+    return Object.keys(newErrors).length === 0
+  }
+
+  useEffect(() => {
+    if (showForm) validateForm()
+  }, [formData, showForm])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const data = { ...formData, isActive: true }
+    if (!validateForm()) return
+
+    const data: Record<string, unknown> = {
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      type: formData.type,
+      frequency: formData.frequency.trim(),
+      daysPerPeriod: formData.daysPerPeriod,
+      isActive: true
+    }
+
+    if (formData.type === 'semi-monthly') {
+      data.cutOff1 = formData.cutOff1
+      data.cutOff2 = formData.cutOff2
+    }
+
     if (editingId) {
-      await updateDoc(doc(db, 'payroll_terms', editingId), { ...formData, updatedAt: new Date() })
+      await updateDoc(doc(db, 'payroll_terms', editingId), { ...data, updatedAt: new Date() })
     } else {
       await addDoc(collection(db, 'payroll_terms'), { ...data, createdAt: new Date(), updatedAt: new Date() })
     }
-    setShowForm(false); setEditingId(null); setFormData({ name: '', description: '', type: 'semi-monthly', frequency: '', daysPerPeriod: 0 }); fetchTerms()
+    setShowForm(false); setEditingId(null); setFormData({ name: '', description: '', type: 'semi-monthly', frequency: '', daysPerPeriod: 0, cutOff1: 0, cutOff2: 0 }); setErrors({}); setWarnings([]); fetchTerms()
   }
 
   const handleDelete = async (id: string) => {
@@ -293,9 +360,17 @@ export function TermsPage() {
         <Card>
           <CardHeader><CardTitle>{editingId ? 'Edit' : 'Add'} Term</CardTitle></CardHeader>
           <CardContent>
+            {warnings.length > 0 && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                {warnings.map((w, i) => <p key={i} className="text-sm text-yellow-800">{w}</p>)}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input id="name" label="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                <div>
+                  <Input id="name" label="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value as Term['type'] })}>
@@ -305,15 +380,33 @@ export function TermsPage() {
                     <option value="weekly">Weekly</option>
                   </select>
                 </div>
-                <Input id="frequency" label="Frequency" value={formData.frequency} onChange={(e) => setFormData({ ...formData, frequency: e.target.value })} />
-                <Input id="daysPerPeriod" label="Days per Period" type="number" value={String(formData.daysPerPeriod)} onChange={(e) => setFormData({ ...formData, daysPerPeriod: Number(e.target.value) })} />
+                <div>
+                  <Input id="frequency" label="Frequency" value={formData.frequency} onChange={(e) => setFormData({ ...formData, frequency: e.target.value })} />
+                  {errors.frequency && <p className="text-sm text-red-600 mt-1">{errors.frequency}</p>}
+                </div>
+                <div>
+                  <Input id="daysPerPeriod" label="Days per Period" type="number" value={String(formData.daysPerPeriod)} onChange={(e) => setFormData({ ...formData, daysPerPeriod: Number(e.target.value) })} />
+                  {errors.daysPerPeriod && <p className="text-sm text-red-600 mt-1">{errors.daysPerPeriod}</p>}
+                </div>
+                {formData.type === 'semi-monthly' && (
+                  <>
+                    <div>
+                      <Input id="cutOff1" label="First Cutoff Day" type="number" value={String(formData.cutOff1)} onChange={(e) => setFormData({ ...formData, cutOff1: Number(e.target.value) })} />
+                      {errors.cutOff1 && <p className="text-sm text-red-600 mt-1">{errors.cutOff1}</p>}
+                    </div>
+                    <div>
+                      <Input id="cutOff2" label="Second Cutoff Day" type="number" value={String(formData.cutOff2)} onChange={(e) => setFormData({ ...formData, cutOff2: Number(e.target.value) })} />
+                      {errors.cutOff2 && <p className="text-sm text-red-600 mt-1">{errors.cutOff2}</p>}
+                    </div>
+                  </>
+                )}
                 <div className="col-span-2">
                   <Input id="description" label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
-                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
+                <Button type="submit" disabled={Object.keys(errors).length > 0}>{editingId ? 'Update' : 'Create'}</Button>
+                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null); setErrors({}); setWarnings([]) }}>Cancel</Button>
               </div>
             </form>
           </CardContent>
@@ -349,7 +442,7 @@ export function TermsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {canEdit('system', 'terms') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(term.id); setFormData({ name: term.name, description: term.description || '', type: term.type, frequency: term.frequency, daysPerPeriod: term.daysPerPeriod }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
+                      {canEdit('system', 'terms') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(term.id); setFormData({ name: term.name, description: term.description || '', type: term.type, frequency: term.frequency, daysPerPeriod: term.daysPerPeriod, cutOff1: term.cutOff1 || 0, cutOff2: term.cutOff2 || 0 }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                       {canDelete('system', 'terms') && <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(term.id)}><Trash2 className="w-4 h-4" /></Button>}
                     </div>
                   </td>
@@ -887,6 +980,8 @@ export function DatabasePage() {
   const [backupLoading, setBackupLoading] = useState(false)
   const [exportLoading, setExportLoading] = useState('')
   const [selectedCollection, setSelectedCollection] = useState('')
+  const [verificationResults, setVerificationResults] = useState<Array<{ name: string; status: 'Pass' | 'Fail' | 'Warning'; details: string; issueCount: number }>>([])
+  const [verifying, setVerifying] = useState(false)
 
   const COLLECTIONS = [
     'names', 'employees', 'employee_groups', 'employee_positions', 'employee_areas',
@@ -988,6 +1083,100 @@ export function DatabasePage() {
       addToast({ type: 'error', title: `Backup failed: ${e}` })
     }
     setBackupLoading(false)
+  }
+
+  const runVerification = async () => {
+    setVerifying(true)
+    setVerificationResults([])
+    const results: Array<{ name: string; status: 'Pass' | 'Fail' | 'Warning'; details: string; issueCount: number }> = []
+
+    try {
+      const [employeesSnap, namesSnap, payrollSnap, payrollEmpsSnap, payrollGroupsSnap, salariesSnap] = await Promise.all([
+        getDocs(collection(db, 'employees')),
+        getDocs(collection(db, 'names')),
+        getDocs(collection(db, 'payroll')),
+        getDocs(collection(db, 'payroll_employees')),
+        getDocs(collection(db, 'payroll_groups')),
+        getDocs(collection(db, 'salaries'))
+      ])
+
+      const employees = employeesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{ id: string; nameId?: string; employeeCode?: string; firstName?: string; lastName?: string }>
+      const names = namesSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+      const payroll = payrollSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+      const payrollEmps = payrollEmpsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{ id: string; payrollId?: string }>
+      const payrollGroups = payrollGroupsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{ id: string; payrollId?: string; groupId?: string }>
+      const salaries = salariesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{ id: string; employeeId?: string }>
+
+      const nameIds = new Set(names.map(n => n.id))
+
+      const orphanedEmployees = employees.filter(e => e.nameId && !nameIds.has(e.nameId))
+      results.push({
+        name: 'Orphaned Employees',
+        status: orphanedEmployees.length > 0 ? 'Fail' : 'Pass',
+        details: orphanedEmployees.length > 0 ? `Employees with invalid nameId: ${orphanedEmployees.map(e => e.employeeCode || e.id).join(', ')}` : 'All employees have valid name references',
+        issueCount: orphanedEmployees.length
+      })
+
+      const payrollIds = new Set(payroll.map(p => p.id))
+      const orphanedPayrollEmps = payrollEmps.filter(pe => pe.payrollId && !payrollIds.has(pe.payrollId))
+      results.push({
+        name: 'Orphaned Payroll Employees',
+        status: orphanedPayrollEmps.length > 0 ? 'Fail' : 'Pass',
+        details: orphanedPayrollEmps.length > 0 ? `${orphanedPayrollEmps.length} payroll_employees with invalid payrollId` : 'All payroll_employees have valid payroll references',
+        issueCount: orphanedPayrollEmps.length
+      })
+
+      const groupIds = new Set((await getDocs(collection(db, 'employee_groups'))).docs.map(d => d.id))
+      const invalidGroups = payrollGroups.filter(pg => pg.groupId && !groupIds.has(pg.groupId))
+      results.push({
+        name: 'Invalid Payroll Group References',
+        status: invalidGroups.length > 0 ? 'Warning' : 'Pass',
+        details: invalidGroups.length > 0 ? `${invalidGroups.length} payroll_groups with invalid groupId` : 'All payroll_groups have valid group references',
+        issueCount: invalidGroups.length
+      })
+
+      const employeeCodes = employees.map(e => e.employeeCode).filter(Boolean) as string[]
+      const duplicateCodes = employeeCodes.filter((code, idx) => employeeCodes.indexOf(code) !== idx)
+      const uniqueDuplicates = [...new Set(duplicateCodes)]
+      results.push({
+        name: 'Duplicate Employee Codes',
+        status: uniqueDuplicates.length > 0 ? 'Fail' : 'Pass',
+        details: uniqueDuplicates.length > 0 ? `Duplicate codes: ${uniqueDuplicates.join(', ')}` : 'No duplicate employee codes found',
+        issueCount: uniqueDuplicates.length
+      })
+
+      const fullNames = employees.map(e => `${e.firstName || ''} ${e.lastName || ''}`.trim().toLowerCase()).filter(Boolean)
+      const duplicateNames = fullNames.filter((name, idx) => fullNames.indexOf(name) !== idx)
+      const uniqueNameDuplicates = [...new Set(duplicateNames)]
+      results.push({
+        name: 'Duplicate Employee Names',
+        status: uniqueNameDuplicates.length > 0 ? 'Warning' : 'Pass',
+        details: uniqueNameDuplicates.length > 0 ? `${uniqueNameDuplicates.length} duplicate names found` : 'No duplicate employee names found',
+        issueCount: uniqueNameDuplicates.length
+      })
+
+      const missingFields = employees.filter(e => !e.firstName || !e.lastName || !e.employeeCode)
+      results.push({
+        name: 'Missing Required Fields (Employees)',
+        status: missingFields.length > 0 ? 'Warning' : 'Pass',
+        details: missingFields.length > 0 ? `${missingFields.length} employees missing required fields` : 'All employees have required fields',
+        issueCount: missingFields.length
+      })
+
+      const missingSalaries = employees.filter(e => !salaries.some(s => s.employeeId === e.id))
+      results.push({
+        name: 'Employees Without Salary Records',
+        status: missingSalaries.length > 0 ? 'Warning' : 'Pass',
+        details: missingSalaries.length > 0 ? `${missingSalaries.length} employees without salary records` : 'All employees have salary records',
+        issueCount: missingSalaries.length
+      })
+
+      setVerificationResults(results)
+      addToast({ type: 'success', title: 'Verification complete' })
+    } catch (e) {
+      addToast({ type: 'error', title: `Verification failed: ${e}` })
+    }
+    setVerifying(false)
   }
 
   const totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0)
@@ -1130,6 +1319,54 @@ export function DatabasePage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Database Verification</CardTitle>
+            <Button onClick={runVerification} disabled={verifying}>
+              <CheckCircle className="w-4 h-4 mr-2" />{verifying ? 'Verifying...' : 'Run Verification'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {verificationResults.length === 0 ? (
+            <div className="px-6 py-8 text-center text-gray-500">Click "Run Verification" to check database integrity</div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Check Name</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Details</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Issues</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {verificationResults.map((result, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{result.name}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        result.status === 'Pass' ? 'bg-green-100 text-green-800' :
+                        result.status === 'Fail' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {result.status === 'Pass' && <CheckCircle className="w-3 h-3 mr-1" />}
+                        {result.status === 'Fail' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        {result.status === 'Warning' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        {result.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{result.details}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">{result.issueCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

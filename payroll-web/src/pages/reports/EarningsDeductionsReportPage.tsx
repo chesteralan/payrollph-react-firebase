@@ -296,7 +296,7 @@ export function EarningsDeductionsReportPage() {
       })),
       { 'Type': 'TOTAL DEDUCTIONS', 'Name': '', 'Total Amount': totalDeductions, 'Employee Count': '' },
       { 'Type': '', 'Name': '', 'Total Amount': '', 'Employee Count': '' },
-      { 'Type': 'BENEFITS', 'Name': '', 'Total Amount (EE)', 'Employee Count': '' },
+       { 'Type': 'BENEFITS', 'Name': '', 'Total Amount': '', 'Employee Count': '' },
       ...benefitSummaries.map(b => ({
         'Type': '',
         'Name': b.name,

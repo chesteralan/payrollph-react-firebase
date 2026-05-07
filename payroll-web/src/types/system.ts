@@ -24,4 +24,7 @@ export interface Term {
   frequency: string
   daysPerPeriod: number
   isActive: boolean
+  cutOff1?: number
+  cutOff2?: number
+  validateOnCreate?: boolean
 }

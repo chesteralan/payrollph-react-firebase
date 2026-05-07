@@ -28,6 +28,7 @@ import {
   ChevronRight,
   Plus,
   Trash2,
+  Activity,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
@@ -185,6 +186,13 @@ const navigation: NavItem[] = [
         department: 'reports',
         section: 'employees',
       },
+      {
+        label: 'Earnings/Deductions',
+        icon: <BarChart3 className="w-4 h-4" />,
+        path: '/reports/earnings-deductions',
+        department: 'reports',
+        section: 'payroll',
+      },
     ],
   },
   {
@@ -261,6 +269,13 @@ const navigation: NavItem[] = [
         path: '/system/trash',
         department: 'system',
         section: 'companies',
+      },
+      {
+        label: 'Health Check',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/system/health',
+        department: 'system',
+        section: 'database',
       },
     ],
   },

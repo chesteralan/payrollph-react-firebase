@@ -31,6 +31,7 @@ const DTRPage = lazy(() => import('./pages/dtr/DTRPage').then(m => ({ default: m
 const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPage').then(m => ({ default: m.Report13thMonthPage })))
 const PayrollSummaryPage = lazy(() => import('./pages/reports/PayrollSummaryPage').then(m => ({ default: m.PayrollSummaryPage })))
 const EmployeeReportPage = lazy(() => import('./pages/reports/EmployeeReportPage').then(m => ({ default: m.EmployeeReportPage })))
+const EarningsDeductionsReportPage = lazy(() => import('./pages/reports/EarningsDeductionsReportPage').then(m => ({ default: m.EarningsDeductionsReportPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
 const CompanySettingsPage = lazy(() => import('./pages/system/CompanySettingsPage').then(m => ({ default: m.CompanySettingsPage })))
 const CalendarPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.CalendarPage })))
@@ -41,6 +42,7 @@ const AuditPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ d
 const DatabasePage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.DatabasePage })))
 const SystemSettingsPage = lazy(() => import('./pages/system/SystemSettingsPage').then(m => ({ default: m.SystemSettingsPage })))
 const TrashPage = lazy(() => import('./pages/system/TrashPage').then(m => ({ default: m.TrashPage })))
+const HealthCheckPage = lazy(() => import('./pages/system/HealthCheckPage').then(m => ({ default: m.HealthCheckPage })))
 
 function LoadingFallback() {
   return <div className="flex items-center justify-center min-h-[400px]"><div className="text-gray-500">Loading...</div></div>
@@ -91,6 +93,7 @@ function App() {
 <Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
                <Route path="reports/payroll-summary" element={<LazyPage><PayrollSummaryPage /></LazyPage>} />
                <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
+               <Route path="reports/earnings-deductions" element={<LazyPage><EarningsDeductionsReportPage /></LazyPage>} />
 <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
                <Route path="system/company-settings" element={<LazyPage><CompanySettingsPage /></LazyPage>} />
                <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
@@ -101,6 +104,7 @@ function App() {
 <Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
                <Route path="system/settings" element={<LazyPage><SystemSettingsPage /></LazyPage>} />
                <Route path="system/trash" element={<LazyPage><TrashPage /></LazyPage>} />
+              <Route path="system/health" element={<LazyPage><HealthCheckPage /></LazyPage>} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
