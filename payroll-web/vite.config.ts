@@ -33,4 +33,31 @@ export default defineConfig({
   preview: {
     headers: securityHeaders,
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    exclude: ['node_modules', 'dist', '.idea', 'coverage'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'node_modules/**',
+        'coverage/**',
+        'dist/**',
+        'src/test/**',
+        'src/types/**',
+        '**/*.d.ts',
+        '**/*.config.*',
+      ],
+      reporter: ['text', 'json', 'html'],
+      thresholds: {
+        lines: 80,
+        branches: 80,
+        functions: 80,
+        statements: 80,
+      },
+    },
+  },
 })

@@ -3,7 +3,7 @@ interface RateLimitEntry {
   timestamp: number
 }
 
-class RateLimiter {
+export class RateLimiter {
   private storage: Map<string, RateLimitEntry>
   private maxRequests: number
   private windowMs: number
