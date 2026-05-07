@@ -100,18 +100,18 @@ This document tracks files that need refactoring in the Payroll v2 React/Firebas
 
 ## Refactor Checklist
 
-- [ ] `./src/App.tsx`
-- [ ] `./src/main.tsx`
-- [ ] `./src/context/AuthContext.tsx`
-- [ ] `./src/context/CompanyContext.tsx`
-- [ ] `./src/components/ui/Button.test.tsx`
-- [ ] `./src/components/ui/ConfirmDialog.tsx`
-- [ ] `./src/components/ui/Pagination.tsx`
-- [ ] `./src/components/ui/Card.tsx`
-- [ ] `./src/components/ui/ProtectedRoute.tsx`
-- [ ] `./src/components/ui/VirtualScroll.tsx`
-- [ ] `./src/components/ui/SearchBar.tsx`
-- [ ] `./src/components/ui/NetworkStatusBanner.tsx`
+- [x] `./src/App.tsx`
+- [x] `./src/main.tsx`
+- [x] `./src/context/AuthContext.tsx`
+- [x] `./src/context/CompanyContext.tsx`
+- [x] `./src/components/ui/Button.test.tsx`
+- [x] `./src/components/ui/ConfirmDialog.tsx`
+- [x] `./src/components/ui/Pagination.tsx`
+- [x] `./src/components/ui/Card.tsx`
+- [x] `./src/components/ui/ProtectedRoute.tsx`
+- [x] `./src/components/ui/VirtualScroll.tsx`
+- [x] `./src/components/ui/SearchBar.tsx`
+- [x] `./src/components/ui/NetworkStatusBanner.tsx`
 - [ ] `./src/components/ui/AlertBanner.tsx`
 - [ ] `./src/components/ui/Button.tsx`
 - [ ] `./src/components/ui/Toast.tsx`

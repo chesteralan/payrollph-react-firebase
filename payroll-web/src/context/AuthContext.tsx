@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -36,41 +29,12 @@ import type {
   Department,
   Section,
 } from "../types";
+import type { Locale } from "../i18n";
 import { setHtmlLang } from "../i18n";
+import { AuthContext } from "./auth";
 
-const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const ACTIVITY_EVENTS = ["mousedown", "keydown", "touchstart", "scroll"];
-
-interface AuthContextType {
-  firebaseUser: FirebaseUser | null;
-  user: UserAccount | null;
-  restrictions: UserRestriction[];
-  userCompanies: UserCompany[];
-  settings: UserSettings | null;
-  currentCompanyId: string | null;
-  loading: boolean;
-  sessionExpiring: boolean;
-  login: (
-    email: string,
-    password: string,
-    rememberMe?: boolean,
-  ) => Promise<void>;
-  logout: () => Promise<void>;
-  changePassword: (
-    currentPassword: string,
-    newPassword: string,
-  ) => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-  setCurrentCompanyId: (companyId: string) => void;
-  hasPermission: (
-    department: Department,
-    section: Section,
-    action: "view" | "add" | "edit" | "delete",
-  ) => boolean;
-  refreshSession: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -116,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     expiryWarningTimerRef.current = setTimeout(() => {
       setSessionExpiring(true);
-    }, SESSION_TIMEOUT_MS - 60000); // Warning 1 minute before
+    }, SESSION_TIMEOUT_MS - 60000);
 
     idleTimerRef.current = setTimeout(() => {
       handleSessionExpired();
@@ -204,8 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSettings(settingsData);
 
           if (settingsData?.locale) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            setHtmlLang(settingsData.locale as any);
+            setHtmlLang(settingsData.locale as Locale);
           }
 
           if (companiesData.length > 0) {
@@ -318,13 +281,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-  return context;
 }
