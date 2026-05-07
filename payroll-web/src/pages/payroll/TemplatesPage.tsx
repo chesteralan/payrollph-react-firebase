@@ -69,8 +69,8 @@ export function TemplatesPage() {
     setPrintFormats(pfSnap.docs.map(d => ({ id: d.id, ...d.data() })) as PrintFormat[])
   }
 
-  useEffect(() => { fetchTemplates() }, [])
-  useEffect(() => { fetchLookups() }, [])
+  useEffect(() => { fetchTemplates() }, []) // eslint-disable-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchLookups() }, []) // eslint-disable-line react-hooks/set-state-in-effect
 
   const resetWizard = () => {
     setWizardStep(0)

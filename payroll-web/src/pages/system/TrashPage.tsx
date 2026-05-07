@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
-import { collection, query, where, getDocs, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
+import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { Trash2, RotateCcw, Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import { useTableSort } from '../../hooks/useTableSort'
-import type { Company } from '../../types'
+
 
 interface TrashItem {
   id: string
@@ -16,7 +16,7 @@ interface TrashItem {
   collectionLabel: string
   name: string
   deletedAt: Date | null
-  rawDeletedAt: any
+  rawDeletedAt: unknown
 }
 
 const COLLECTIONS = [
@@ -34,7 +34,48 @@ export function TrashPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchTrash = useCallback(async () => {
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      const allItems: TrashItem[] = []
+
+      for (const col of COLLECTIONS) {
+        try {
+          const q = query(collection(db, col.key), where('deletedAt', '!=', null))
+          const snap = await getDocs(q)
+          snap.docs.forEach((d) => {
+            const data = d.data()
+            let name: string
+            if (col.key === 'names') {
+              name = `${data.firstName || ''} ${data.middleName || ''} ${data.lastName || ''}`.trim()
+            } else {
+              name = data[col.nameField] || data.name || data.employeeCode || 'Unknown'
+            }
+            allItems.push({
+              id: d.id,
+              collection: col.key,
+              collectionLabel: col.label,
+              name,
+              deletedAt: data.deletedAt?.toDate?.() || null,
+              rawDeletedAt: data.deletedAt,
+            })
+          })
+        } catch {
+          // Collection might not exist or have deleted items
+        }
+      }
+
+      if (!cancelled) {
+        setItems(allItems)
+        setLoading(false)
+      }
+    }
+
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  const reload = useCallback(async () => {
     setLoading(true)
     const allItems: TrashItem[] = []
 
@@ -44,7 +85,7 @@ export function TrashPage() {
         const snap = await getDocs(q)
         snap.docs.forEach((d) => {
           const data = d.data()
-          let name = 'Unknown'
+          let name: string
           if (col.key === 'names') {
             name = `${data.firstName || ''} ${data.middleName || ''} ${data.lastName || ''}`.trim()
           } else {
@@ -68,18 +109,16 @@ export function TrashPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchTrash() }, [fetchTrash])
-
   const handleRestore = async (item: TrashItem) => {
     await updateDoc(doc(db, item.collection, item.id), { deletedAt: null, isActive: true })
     addToast({ type: 'success', title: 'Restored', message: `${item.name} has been restored` })
-    fetchTrash()
+    reload()
   }
 
   const handlePermanentDelete = async (item: TrashItem) => {
     await deleteDoc(doc(db, item.collection, item.id))
     addToast({ type: 'success', title: 'Permanently deleted', message: `${item.name} has been permanently deleted` })
-    fetchTrash()
+    reload()
   }
 
   const filtered = items.filter((item) => {

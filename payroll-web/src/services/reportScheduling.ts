@@ -3,7 +3,7 @@
 
 import { collection, addDoc, getDocs, query, where, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import type { UserAccount } from '../types'
+
 import { sendEmail } from './email'
 import { generateReportData } from './reportGenerator'
 
@@ -47,7 +47,6 @@ export interface ReportRun {
 export const createScheduledReport = async (
   data: Omit<ScheduledReport, 'id' | 'createdAt' | 'updatedAt' | 'nextRun'>
 ): Promise<string> => {
-  const now = new Date()
   const nextRun = calculateNextRun(data.frequency, data.dayOfWeek, data.dayOfMonth, data.time)
 
   const docRef = await addDoc(collection(db, 'scheduled_reports'), {
@@ -117,25 +116,28 @@ export const calculateNextRun = (
       next.setDate(next.getDate() + 1)
       break
 
-    case 'weekly':
-      const targetDay = dayOfWeek || 1 // Default to Monday
+    case 'weekly': {
+      const targetDay = dayOfWeek || 1
       const daysUntil = (targetDay + 7 - now.getDay()) % 7 || 7
       next.setDate(next.getDate() + daysUntil)
       break
+    }
 
-    case 'monthly':
+    case 'monthly': {
       const targetDate = dayOfMonth || 1
       next.setMonth(next.getMonth() + 1)
       next.setDate(targetDate)
       break
+    }
 
-    case 'quarterly':
+    case 'quarterly': {
       const currentQuarter = Math.floor(now.getMonth() / 3)
       next = new Date(now.getFullYear(), (currentQuarter + 1) * 3, dayOfMonth || 1)
       if (next <= now) {
         next = new Date(now.getFullYear(), (currentQuarter + 2) * 3, dayOfMonth || 1)
       }
       break
+    }
   }
 
   next.setHours(hours, minutes, 0, 0)

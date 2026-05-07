@@ -13,9 +13,6 @@ import {
   limit,
   serverTimestamp,
   type QueryConstraint,
-  type Query,
-  type DocumentData,
-  type FirestoreError,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import type { CollectionName } from './firestore'

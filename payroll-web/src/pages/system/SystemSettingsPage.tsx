@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
+import { Card, CardContent } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -77,22 +77,22 @@ export function SystemSettingsPage() {
   const [settings, setSettings] = useState<SystemSettings>(DEFAULT_SETTINGS)
 
   useEffect(() => {
-    fetchSettings()
-  }, [])
-
-  const fetchSettings = async () => {
-    setLoading(true)
-    try {
-      const docRef = doc(db, 'system_settings', 'default')
-      const snap = await getDoc(docRef)
-      if (snap.exists()) {
-        setSettings({ ...DEFAULT_SETTINGS, ...snap.data() } as SystemSettings)
-      }
-    } catch {
-      addToast({ type: 'error', title: 'Failed to load settings' })
-    }
-    setLoading(false)
-  }
+    let cancelled = false
+    const docRef = doc(db, 'system_settings', 'default')
+    getDoc(docRef)
+      .then(snap => {
+        if (!cancelled && snap.exists()) {
+          setSettings({ ...DEFAULT_SETTINGS, ...snap.data() } as SystemSettings)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) addToast({ type: 'error', title: 'Failed to load settings' })
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [addToast])
 
   const handleSave = async () => {
     setSaving(true)

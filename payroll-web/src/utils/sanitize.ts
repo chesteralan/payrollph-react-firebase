@@ -46,7 +46,7 @@ export const sanitizeName = (name: string): string => {
  */
 export const sanitizeNumber = (value: string, allowNegative: boolean = false): string => {
   if (typeof value !== 'string') return ''
-  const pattern = allowNegative ? /[^0-9.\-]/g : /[^0-9.]/g
+  const pattern = allowNegative ? /[^0-9.-]/g : /[^0-9.]/g
   return value.replace(pattern, '')
 }
 
@@ -70,7 +70,7 @@ export const sanitizeFilename = (filename: string): string => {
   if (typeof filename !== 'string') return ''
   return filename
     .replace(/\.\./g, '')
-    .replace(/[\/\\:*?"<>|]/g, '_')
+    .replace(/[/\\:*?"<>|]/g, '_')
     .trim()
     .substring(0, 255)
 }

@@ -23,10 +23,6 @@ export function PayrollRunsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 25
 
-  useEffect(() => {
-    if (currentCompanyId) fetchPayrolls()
-  }, [currentCompanyId])
-
   const fetchPayrolls = async () => {
     if (!currentCompanyId) return
     setLoading(true)
@@ -34,6 +30,13 @@ export function PayrollRunsPage() {
     setPayrolls(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Payroll[])
     setLoading(false)
   }
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (currentCompanyId) fetchPayrolls()
+    /* eslint-enable react-hooks/set-state-in-effect */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCompanyId])
 
   const toggleLock = async (payroll: Payroll) => {
     await updateDoc(doc(db, 'payroll', payroll.id), { isLocked: !payroll.isLocked })
@@ -109,6 +112,7 @@ export function PayrollRunsPage() {
   )
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1)
   }, [searchQuery, statusFilter])
 

@@ -35,16 +35,18 @@ export function PayrollSummaryPage() {
   const [hasGenerated, setHasGenerated] = useState(false)
   const [expandedPayrollId, setExpandedPayrollId] = useState<string | null>(null)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false)
       setPayrolls([])
     }
   }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const fetchPayrollDetails = async (payroll: Payroll): Promise<GroupSummary[]> => {
     const empSnap = await getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', payroll.id)))
-    const employees = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+    const employees = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as { id: string; groupId?: string; grossPay?: number; netPay?: number }[]
 
     const groupMap = new Map<string, GroupSummary>()
 
@@ -96,7 +98,7 @@ export function PayrollSummaryPage() {
       const summaries: PayrollSummary[] = []
       for (const payroll of results) {
         const empSnap = await getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', payroll.id)))
-        const employees = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+        const employees = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as { id: string; groupId?: string; grossPay?: number; netPay?: number }[]
 
         const groups = await fetchPayrollDetails(payroll)
 

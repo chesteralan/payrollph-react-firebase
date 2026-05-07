@@ -19,14 +19,15 @@ export function PositionsPage() {
   const [formData, setFormData] = useState({ name: '', department: '' })
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => { fetchPositions() }, [])
-
   const fetchPositions = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'employee_positions'))
     setPositions(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeePosition[])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchPositions() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +36,7 @@ export function PositionsPage() {
     setShowForm(false); setEditingId(null); setFormData({ name: '', department: '' }); fetchPositions()
   }
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, 'employee_positions', id))
     fetchPositions()
   }
@@ -115,7 +116,7 @@ export function PositionsPage() {
                       <div className="flex items-center justify-end gap-2">
                         {canEdit('employees', 'positions') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(p.id); setFormData({ name: p.name, department: p.department || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                         {canDelete('employees', 'positions') && (
-                          <ConfirmDialog title="Delete Position" message={`Delete "${p.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(p.id, p.name)}>
+                          <ConfirmDialog title="Delete Position" message={`Delete "${p.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(p.id)}>
                             {(open) => <Button variant="ghost" size="sm" onClick={open}><Trash2 className="w-4 h-4" /></Button>}
                           </ConfirmDialog>
                         )}

@@ -4,9 +4,8 @@ import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
+import { Card, CardContent, CardHeader } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Select } from '../../components/ui/Select'
 import { Settings, Calculator, Monitor, Bell } from 'lucide-react'
 import type { Company } from '../../types'
 
@@ -59,7 +58,7 @@ const defaultSettings: Omit<CompanySettings, 'companyId'> = {
 }
 
 export function CompanySettingsPage() {
-  const { canView, canEdit } = usePermissions()
+  const { canView } = usePermissions()
   const { addToast } = useToast()
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('')
@@ -68,20 +67,12 @@ export function CompanySettingsPage() {
   const [activeTab, setActiveTab] = useState<'general' | 'payroll' | 'display' | 'notifications'>('general')
   const [settings, setSettings] = useState<CompanySettings>({ companyId: '', ...defaultSettings })
 
-  useEffect(() => { fetchCompanies() }, [])
-
-  useEffect(() => {
-    if (selectedCompanyId) {
-      fetchSettings(selectedCompanyId)
-    }
-  }, [selectedCompanyId])
-
   const fetchCompanies = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'companies'))
-    const list = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((c: any) => c.isActive && !c.isDeleted) as Company[]
+    const list = (snap.docs
+      .map((d) => ({ id: d.id, ...d.data() })) as Company[])
+      .filter((c) => c.isActive && !c.isDeleted)
     setCompanies(list)
     if (list.length > 0 && !selectedCompanyId) {
       setSelectedCompanyId(list[0].id)
@@ -99,6 +90,16 @@ export function CompanySettingsPage() {
     }
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { fetchCompanies() }, [])
+
+  useEffect(() => {
+    if (selectedCompanyId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchSettings(selectedCompanyId)
+    }
+  }, [selectedCompanyId])
+
   const handleSave = async () => {
     if (!selectedCompanyId) return
     setSaving(true)
@@ -106,16 +107,17 @@ export function CompanySettingsPage() {
       const ref = doc(db, 'company_settings', selectedCompanyId)
       await setDoc(ref, { ...settings, companyId: selectedCompanyId }, { merge: true })
       addToast({ type: 'success', title: 'Settings saved', message: 'Company settings have been updated' })
-    } catch (error) {
+    } catch {
       addToast({ type: 'error', title: 'Save failed', message: 'Could not save settings' })
     }
     setSaving(false)
   }
 
-  const updateSettings = (section: keyof CompanySettings, field: string, value: any) => {
+  const updateSettings = (section: keyof CompanySettings, field: string, value: string | number | boolean) => {
     setSettings({
       ...settings,
       [section]: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(settings[section] as any),
         [field]: value
       }

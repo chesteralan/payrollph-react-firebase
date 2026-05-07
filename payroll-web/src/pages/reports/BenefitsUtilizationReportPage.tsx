@@ -39,12 +39,14 @@ export function BenefitsUtilizationReportPage() {
   const [hasGenerated, setHasGenerated] = useState(false)
   const [expandedBenefitId, setExpandedBenefitId] = useState<string | null>(null)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false)
       setBenefits([])
     }
   }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const generateReport = async () => {
     if (!currentCompanyId) return

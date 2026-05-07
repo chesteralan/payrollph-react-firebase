@@ -85,10 +85,11 @@ export function EmployeeProfilePage() {
     }
   }
 
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (id) loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const handleSaveProfile = async () => {
     if (!id || !employee) return

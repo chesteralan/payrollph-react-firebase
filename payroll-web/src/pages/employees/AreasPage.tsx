@@ -26,6 +26,7 @@ export function AreasPage() {
     setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchAreas() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +36,7 @@ export function AreasPage() {
     setShowForm(false); setEditingId(null); setFormData({ name: '', description: '' }); fetchAreas()
   }
 
-  const handleDelete = async (id: string, _name: string) => {
+  const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, 'employee_areas', id))
     fetchAreas()
   }
@@ -113,7 +114,7 @@ export function AreasPage() {
                       <div className="flex items-center justify-end gap-2">
                         {canEdit('employees', 'areas') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(a.id); setFormData({ name: a.name, description: a.description || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                         {canDelete('employees', 'areas') && (
-                          <ConfirmDialog title="Delete Area" message={`Delete "${a.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(a.id, a.name)}>
+                          <ConfirmDialog title="Delete Area" message={`Delete "${a.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(a.id)}>
                             {(open) => <Button variant="ghost" size="sm" onClick={open}><Trash2 className="w-4 h-4" /></Button>}
                           </ConfirmDialog>
                         )}

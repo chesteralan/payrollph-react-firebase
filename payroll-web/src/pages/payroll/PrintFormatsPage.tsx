@@ -63,7 +63,7 @@ export function PrintFormatsPage() {
     setLoading(false)
   }
 
-  useEffect(() => { fetchFormats() }, [currentCompanyId])
+  useEffect(() => { /* eslint-disable react-hooks/set-state-in-effect */ fetchFormats() /* eslint-enable react-hooks/set-state-in-effect */ }, [currentCompanyId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetWizard = () => {
     setWizardStep(0)

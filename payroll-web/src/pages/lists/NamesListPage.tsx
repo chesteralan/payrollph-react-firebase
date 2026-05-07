@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { collection, getDocs, addDoc, updateDoc, doc, query, where, writeBatch, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, doc, query, where, writeBatch, serverTimestamp, Timestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
@@ -54,15 +54,10 @@ export function NamesListPage() {
   const [statuses, setStatuses] = useState<EmployeeStatus[]>([])
   const [bulkEditData, setBulkEditData] = useState({ groupId: '', positionId: '', areaId: '', statusId: '' })
 
-  useEffect(() => {
-    fetchNames()
-    fetchLookups()
-  }, [])
-
   const fetchNames = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'names'))
-    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (NameRecord & { deletedAt?: any })[]
+    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (NameRecord & { deletedAt?: Timestamp })[]
     setNames(all.filter((n) => !n.deletedAt))
     setLoading(false)
   }
@@ -79,6 +74,13 @@ export function NamesListPage() {
     setAreas(areasSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeeArea)).filter((a) => a.isActive !== false))
     setStatuses(statusesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as EmployeeStatus)).filter((s) => s.isActive !== false))
   }
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    fetchNames()
+    fetchLookups()
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

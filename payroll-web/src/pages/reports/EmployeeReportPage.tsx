@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
@@ -42,12 +42,6 @@ export function EmployeeReportPage() {
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    if (currentCompanyId) {
-      fetchLookups()
-    }
-  }, [currentCompanyId])
-
   const fetchLookups = async () => {
     if (!currentCompanyId) return
     const [groupsSnap, positionsSnap, areasSnap, statusesSnap] = await Promise.all([
@@ -62,6 +56,14 @@ export function EmployeeReportPage() {
     setAreas(areasSnap.docs.map(d => ({ id: d.id, ...d.data() } as EmployeeArea)))
     setStatuses(statusesSnap.docs.map(d => ({ id: d.id, ...d.data() } as EmployeeStatus)))
   }
+
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (currentCompanyId) {
+      fetchLookups()
+    }
+  }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const generateReport = async () => {
     if (!currentCompanyId) return
@@ -81,7 +83,6 @@ export function EmployeeReportPage() {
       if (filters.positionId) emps = emps.filter(e => e.positionId === filters.positionId)
       if (filters.areaId) emps = emps.filter(e => e.areaId === filters.areaId)
 
-      const nameIds = [...new Set(emps.map(e => e.nameId))]
       const [namesSnap, profilesSnap, contactsSnap, salariesSnap] = await Promise.all([
         getDocs(query(collection(db, 'names'), where('companyId', '==', currentCompanyId))),
         getDocs(query(collection(db, 'employeeProfiles'), where('companyId', '==', currentCompanyId))),
@@ -89,7 +90,7 @@ export function EmployeeReportPage() {
         getDocs(query(collection(db, 'employeeSalaries'), where('companyId', '==', currentCompanyId))),
       ])
 
-      const names = namesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+      const names = namesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as { id: string; nameId?: string; firstName?: string; middleName?: string; lastName?: string; suffix?: string }[]
       const profiles = profilesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeProfile[]
       const contacts = contactsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeContact[]
       const salaries = salariesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeSalary[]

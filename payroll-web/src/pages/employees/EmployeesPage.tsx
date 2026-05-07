@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, writeBatch, serverTimestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, updateDoc, doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -59,13 +59,14 @@ export function EmployeesPage() {
     setLoading(false)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (currentCompanyId) {
       fetchEmployees()
       fetchGroups()
     }
   }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -198,10 +199,11 @@ export function EmployeesPage() {
     currentPage * itemsPerPage
   )
 
-  // eslint-disable-next-line
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setCurrentPage(1)
   }, [searchQuery, statusFilter])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!canView('employees', 'employees')) {
     return <div className="text-center py-12 text-gray-500">Access denied</div>

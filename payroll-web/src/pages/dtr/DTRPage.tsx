@@ -102,16 +102,17 @@ export function DTRPage() {
     setBenefits(benSnap.docs.map(d => ({ id: d.id, name: (d.data() as { name: string }).name })).filter(b => b.name.toLowerCase().includes('leave')))
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchEmployees() }, [])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (selectedEmployeeId) {
       fetchDTRData()
       fetchLeaveData()
     }
   }, [selectedEmployeeId, selectedMonth, selectedYear])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const fetchAllMonthEntries = async () => {
     const start = dateStr(selectedYear, selectedMonth, 1)
@@ -127,10 +128,11 @@ export function DTRPage() {
     setAllMonthEntries(allEntries)
   }
 
-  // eslint-disable-next-line
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (viewMode === 'summary' && employees.length > 0) fetchAllMonthEntries()
   }, [viewMode, selectedMonth, selectedYear, employees])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const filteredMonthEntries = useMemo(() => {
     if (dtrSearchQuery === '') return allMonthEntries

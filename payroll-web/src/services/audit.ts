@@ -1,4 +1,4 @@
-import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, where } from 'firebase/firestore'
+import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import type { UserAccount } from '../types'
 
@@ -46,8 +46,7 @@ export interface AuditEntry {
 }
 
 export const logAudit = async (
-  data: Omit<AuditEntry, 'id' | 'timestamp'>,
-  user?: UserAccount | null
+  data: Omit<AuditEntry, 'id' | 'timestamp'>
 ): Promise<void> => {
   try {
     const metadata = {
@@ -128,7 +127,7 @@ export const auditCreate = (user: UserAccount | null, module: string, entityId: 
     entityId,
     entityType,
     metadata,
-  }, user)
+  })
 
 export const auditUpdate = (user: UserAccount | null, module: string, entityId: string, entityType: string, previousValue: unknown, newValue: unknown, details?: string, metadata?: Record<string, unknown>) =>
   logAudit({
@@ -144,7 +143,7 @@ export const auditUpdate = (user: UserAccount | null, module: string, entityId: 
       previousValue,
       newValue,
     },
-  }, user)
+  })
 
 export const auditDelete = (user: UserAccount | null, module: string, entityId: string, entityType: string, details?: string, metadata?: Record<string, unknown>) =>
   logAudit({
@@ -156,7 +155,7 @@ export const auditDelete = (user: UserAccount | null, module: string, entityId: 
     entityId,
     entityType,
     metadata,
-  }, user)
+  })
 
 export const auditLogin = (user: UserAccount | null, method: string = 'email/password') =>
   logAudit({
@@ -166,7 +165,7 @@ export const auditLogin = (user: UserAccount | null, method: string = 'email/pas
     module: 'auth',
     description: `User logged in via ${method}`,
     metadata: { method },
-  }, user)
+  })
 
 export const auditLogout = (user: UserAccount | null) =>
   logAudit({
@@ -175,7 +174,7 @@ export const auditLogout = (user: UserAccount | null) =>
     action: 'logout',
     module: 'auth',
     description: 'User logged out',
-  }, user)
+  })
 
 export const auditSessionTimeout = (user: UserAccount | null) =>
   logAudit({
@@ -184,7 +183,7 @@ export const auditSessionTimeout = (user: UserAccount | null) =>
     action: 'session_timeout',
     module: 'auth',
     description: 'Session timed out due to inactivity',
-  }, user)
+  })
 
 export const auditPermissionDenied = (user: UserAccount | null, module: string, action: string) =>
   logAudit({
@@ -194,7 +193,7 @@ export const auditPermissionDenied = (user: UserAccount | null, module: string, 
     module,
     description: `Permission denied for ${action} in ${module}`,
     metadata: { attemptedAction: action },
-  }, user)
+  })
 
 export const auditBulkOperation = (user: UserAccount | null, module: string, action: 'bulk_update' | 'bulk_delete', count: number, entityType: string, metadata?: Record<string, unknown>) =>
   logAudit({
@@ -208,4 +207,4 @@ export const auditBulkOperation = (user: UserAccount | null, module: string, act
       count,
       entityType,
     },
-  }, user)
+  })

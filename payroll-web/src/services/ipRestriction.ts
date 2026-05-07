@@ -2,7 +2,7 @@
 // Note: For production use, IP validation should be done on the backend (Firebase Functions)
 // This provides the client-side configuration and validation structure
 
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { doc, setDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import type { UserAccount } from '../types'
 
