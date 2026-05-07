@@ -18,6 +18,13 @@ export interface Company {
     payDay?: number
     frequency?: string
   }>
+  columnGroup?: {
+    dtr: boolean
+    salaries: boolean
+    earnings: boolean
+    benefits: boolean
+    deductions: boolean
+  }
   createdAt: Date
   updatedAt: Date
 }

@@ -77,10 +77,39 @@ export function useCache<T>(key: string, fetchFn: () => Promise<T>, options?: Ca
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
   const fetchRef = useRef(fetchFn)
+  const { ttl } = options || {}
 
   useEffect(() => {
     fetchRef.current = fetchFn
   }, [fetchFn])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const cached = cache.get<T>(key)
+    if (cached) {
+      Promise.resolve().then(() => {
+        if (!cancelled) {
+          setData(cached)
+          setLoading(false)
+        }
+      })
+    } else {
+      fetchRef.current()
+        .then(result => {
+          cache.set(key, result, ttl)
+          if (!cancelled) setData(result)
+        })
+        .catch(e => {
+          if (!cancelled) setError(e as Error)
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+    }
+
+    return () => { cancelled = true }
+  }, [key, ttl])
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -95,7 +124,7 @@ export function useCache<T>(key: string, fetchFn: () => Promise<T>, options?: Ca
 
     try {
       const result = await fetchRef.current()
-      cache.set(key, result, options?.ttl)
+      cache.set(key, result, ttl)
       setData(result)
       return result
     } catch (e) {
@@ -104,11 +133,7 @@ export function useCache<T>(key: string, fetchFn: () => Promise<T>, options?: Ca
     } finally {
       setLoading(false)
     }
-  }, [key, options?.ttl])
-
-  useEffect(() => {
-    refresh()
-  }, [refresh])
+  }, [key, ttl])
 
   return { data, loading, error, refresh }
 }
@@ -116,35 +141,40 @@ export function useCache<T>(key: string, fetchFn: () => Promise<T>, options?: Ca
 export function useMultiCache<T>(keys: string[], fetchFn: (key: string) => Promise<T>, options?: CacheOptions) {
   const [results, setResults] = useState<Record<string, T | null>>({})
   const [loading, setLoading] = useState(true)
+  const keysStr = keys.join(',')
+  const { ttl } = options || {}
 
   useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true)
-      const newResults: Record<string, T | null> = {}
+    let cancelled = false
 
-      await Promise.all(
-        keys.map(async (key) => {
-          const cached = cache.get<T>(key)
-          if (cached) {
-            newResults[key] = cached
-          } else {
-            try {
-              const result = await fetchFn(key)
-              cache.set(key, result, options?.ttl)
-              newResults[key] = result
-            } catch {
-              newResults[key] = null
-            }
-          }
-        })
-      )
+    Promise.all(
+      keys.map(async (key) => {
+        const cached = cache.get<T>(key)
+        if (cached) {
+          return { key, value: cached }
+        }
+        try {
+          const result = await fetchFn(key)
+          cache.set(key, result, ttl)
+          return { key, value: result }
+        } catch {
+          return { key, value: null }
+        }
+      })
+    ).then(entries => {
+      if (!cancelled) {
+        const newResults: Record<string, T | null> = {}
+        for (const { key, value } of entries) {
+          newResults[key] = value
+        }
+        setResults(newResults)
+        setLoading(false)
+      }
+    })
 
-      setResults(newResults)
-      setLoading(false)
-    }
-
-    fetchAll()
-  }, [keys.join(','), fetchFn, options?.ttl])
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keysStr, fetchFn, ttl])
 
   return { results, loading }
 }

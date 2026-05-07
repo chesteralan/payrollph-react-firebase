@@ -1,8 +1,7 @@
 // Approval Workflow & Notification Service
 import { collection, addDoc, getDocs, query, where, updateDoc, orderBy, limit, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import type { UserAccount } from '../types'
-import { auditCreate } from './audit'
+
 
 export type NotificationType =
   | 'approval_required'
@@ -83,7 +82,7 @@ export const getNotifications = async (
     includeArchived?: boolean
   }
 ): Promise<Notification[]> => {
-  let constraints: Parameters<typeof query>[1][] = [
+  const constraints: Parameters<typeof query>[1][] = [
     where('recipientId', '==', userId),
   ]
 

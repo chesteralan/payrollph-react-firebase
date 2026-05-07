@@ -317,6 +317,7 @@ function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; lev
   const isActive = item.path === location.pathname
   const isChildActive = item.children?.some((child) => child.path === location.pathname)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (item.department && item.section && !canView(item.department as any, item.section as any)) {
     return null
   }
@@ -324,6 +325,7 @@ function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; lev
   if (item.children) {
     const hasVisibleChildren = item.children.some(
       (child) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         !child.department || !child.section || canView(child.department as any, child.section as any)
     )
 

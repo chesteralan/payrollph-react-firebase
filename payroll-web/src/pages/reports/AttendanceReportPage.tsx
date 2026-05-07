@@ -22,6 +22,15 @@ interface NameRecord {
   suffix?: string
 }
 
+interface DtrEntry {
+  date: string
+  employeeId: string
+  hoursWorked: number
+  absenceType?: string
+  lateHours?: number
+  overtimeHours?: number
+}
+
 interface AttendanceData {
   employeeId: string
   employeeCode: string
@@ -90,15 +99,15 @@ export function AttendanceReportPage() {
       const start = `${year}-${String(month + 1).padStart(2, '0')}-01`
       const end = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth(year, month)).padStart(2, '0')}`
 
-      const entries = dtrSnap.docs.map(d => d.data()).filter((e: any) => e.date >= start && e.date <= end)
+      const entries = dtrSnap.docs.map(d => ({ ...d.data() } as DtrEntry)).filter(e => e.date >= start && e.date <= end)
 
       const workingDays = getWorkingDays(year, month)
       const results: AttendanceData[] = empList.map(emp => {
-        const empEntries = entries.filter((e: any) => e.employeeId === emp.id)
-        const daysWorked = empEntries.filter((e: any) => e.hoursWorked > 0).length
-        const absences = empEntries.filter((e: any) => e.absenceType).length
-        const lateHours = empEntries.reduce((sum: number, e: any) => sum + (e.lateHours || 0), 0)
-        const overtimeHours = empEntries.reduce((sum: number, e: any) => sum + (e.overtimeHours || 0), 0)
+        const empEntries = entries.filter(e => e.employeeId === emp.id)
+        const daysWorked = empEntries.filter(e => e.hoursWorked > 0).length
+        const absences = empEntries.filter(e => e.absenceType).length
+        const lateHours = empEntries.reduce((sum, e) => sum + (e.lateHours || 0), 0)
+        const overtimeHours = empEntries.reduce((sum, e) => sum + (e.overtimeHours || 0), 0)
         const attendanceRate = workingDays > 0 ? Math.round((daysWorked / workingDays) * 100) : 0
 
         return {

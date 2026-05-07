@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
@@ -7,7 +7,7 @@ import { EditableCell } from '../../components/ui/EditableCell'
 import { PayrollOutputView } from '../../components/payroll/PayrollOutputView'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
-import { ArrowLeft, Lock, Unlock, Save, AlertCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react'
+import { ArrowLeft, Lock, Unlock, Save, AlertCircle, AlertTriangle, Send } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
 import { calculateWorkingDaysSync } from '../../utils/calendarUtils'
 import type { Payroll, PayrollEmployee, PayrollValidationError, Term } from '../../types'
@@ -56,10 +56,6 @@ export function PayrollDetailPage() {
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (id) loadPayroll()
-  }, [id])
-
   const loadPayroll = async () => {
     if (!id) return
     setLoading(true)
@@ -87,7 +83,7 @@ export function PayrollDetailPage() {
 
         const companySnap = await getDoc(doc(db, 'companies', payrollData.companyId))
         if (companySnap.exists()) {
-          const companyData = companySnap.data() as any
+          const companyData = companySnap.data() as { defaultWorkdays?: number; name?: string; address?: string; tin?: string; printHeader?: string; printFooter?: string }
           setDefaultWorkdays(companyData.defaultWorkdays || 22)
           setCompany({
             name: companyData.name || '',
@@ -101,7 +97,7 @@ export function PayrollDetailPage() {
         const sd = dateRange?.startDate || null
         const ed = dateRange?.endDate || null
         if (sd && ed) {
-          const calendarEntries = calendarSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+          const calendarEntries = calendarSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Record<string, unknown>[]
           const workDaysResult = calculateWorkingDaysSync(sd, ed, calendarEntries)
           setActualWorkdays(workDaysResult.totalWorkingDays)
         }
@@ -183,6 +179,13 @@ export function PayrollDetailPage() {
     }
   }
 
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (id) loadPayroll()
+    /* eslint-enable react-hooks/set-state-in-effect */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
   const recalculateSalaries = useCallback((updatedRows: ProcessingRow[], workdays: number) => {
     return updatedRows.map(row => {
       const effectiveWorkdays = actualWorkdays ?? workdays
@@ -199,6 +202,17 @@ export function PayrollDetailPage() {
     setPayroll({ ...payroll, isLocked: newLocked })
     addToast({ type: 'info', title: newLocked ? 'Payroll locked' : 'Payroll unlocked', message: payroll.name })
   }
+
+  const getEmployeeGross = useCallback((row: ProcessingRow) => {
+    const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
+    return row.salaryAmount + earnings
+  }, [earningData])
+
+  const getEmployeeNet = useCallback((row: ProcessingRow) => {
+    const deductions = Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
+    const benefits = Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0)
+    return getEmployeeGross(row) - deductions - benefits
+  }, [deductionData, benefitData, getEmployeeGross])
 
   const validatePayroll = useCallback((): PayrollValidationError[] => {
     const errors: PayrollValidationError[] = []
@@ -263,7 +277,7 @@ export function PayrollDetailPage() {
     }
 
     return errors
-  }, [rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList])
+  }, [rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList, getEmployeeNet])
 
   const handlePublish = async () => {
     if (!id || !payroll) return
@@ -402,31 +416,6 @@ export function PayrollDetailPage() {
       setSaving(false)
     }
   }
-
-  const getEmployeeGross = (row: ProcessingRow) => {
-    const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
-    return row.salaryAmount + earnings
-  }
-
-  const getEmployeeNet = (row: ProcessingRow) => {
-    const deductions = Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
-    const benefits = Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0)
-    return getEmployeeGross(row) - deductions - benefits
-  }
-
-  const autoCalculated = useMemo(() => {
-    const effectiveWorkdays = actualWorkdays ?? defaultWorkdays
-    return rows.map(row => ({
-      nameId: row.nameId,
-      ratePerDay: row.basicSalary / effectiveWorkdays,
-      salaryAmount: (row.basicSalary / effectiveWorkdays) * row.daysWorked,
-      gross: getEmployeeGross(row),
-      net: getEmployeeNet(row),
-      totalEarnings: Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
-      totalDeductions: Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
-      totalBenefits: Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0),
-    }))
-  }, [rows, earningData, deductionData, benefitData, defaultWorkdays, actualWorkdays])
 
   if (loading || !payroll) {
     return <div className="text-center py-12 text-gray-500">Loading...</div>

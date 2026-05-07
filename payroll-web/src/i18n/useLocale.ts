@@ -17,14 +17,14 @@ function getStoredLocale(): Locale {
     if (stored && ['en-US', 'en-PH', 'fil-PH'].includes(stored)) {
       return stored as Locale
     }
-  } catch {}
+  } catch { /* empty */ }
   return defaultLocale
 }
 
 function storeLocale(locale: Locale): void {
   try {
     localStorage.setItem(localeKey, locale)
-  } catch {}
+  } catch { /* empty */ }
 }
 
 export function useLocale(): UseLocaleReturn {

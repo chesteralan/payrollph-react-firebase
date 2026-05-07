@@ -29,7 +29,56 @@ export function PayrollWizardPage() {
   const [dateStr, setDateStr] = useState('')
   const [lookups, setLookups] = useState({ groups: [] as EmployeeGroup[], positions: [] as EmployeePosition[], areas: [] as EmployeeArea[], statuses: [] as EmployeeStatus[] })
 
+  const fetchTerms = async () => {
+    const snap = await getDocs(query(collection(db, 'payroll_terms'), where('isActive', '==', true)))
+    setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[])
+  }
+
+  const fetchTemplates = async () => {
+    if (!currentCompanyId) return
+    const snap = await getDocs(query(collection(db, 'payroll_templates'), where('companyId', '==', currentCompanyId)))
+    setTemplates(snap.docs.map((d) => ({ id: d.id, name: (d.data() as { name: string }).name, data: d.data() as PayrollTemplate })))
+  }
+
+  const fetchLookups = async () => {
+    const [gSnap, pSnap, aSnap, sSnap] = await Promise.all([
+      getDocs(query(collection(db, 'employee_groups'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_positions'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_areas'), where('isActive', '==', true))),
+      getDocs(query(collection(db, 'employee_statuses'), where('isActive', '==', true)))
+    ])
+    setLookups({
+      groups: gSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
+      positions: pSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeePosition[],
+      areas: aSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeArea[],
+      statuses: sSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeStatus[]
+    })
+  }
+
+  const fetchEmployees = async () => {
+    if (!currentCompanyId) return
+    const snap = await getDocs(query(collection(db, 'employees'), where('companyId', '==', currentCompanyId)))
+    setEmployees(snap.docs.map((d) => ({ id: d.id, ...(d.data() as { nameId: string; employeeCode: string }) })))
+  }
+
+  const fetchPayroll = async () => {
+    if (!id) return
+    const snap = await getDoc(doc(db, 'payroll', id))
+    if (snap.exists()) {
+      const data = snap.data() as { name: string; month: number; year: number; templateId?: string; termId?: string }
+      setFormData({ name: data.name, month: data.month, year: data.year, templateId: data.templateId || '', termId: data.termId || '' })
+
+      const [datesSnap, groupsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'payroll_inclusive_dates'), where('payrollId', '==', id))),
+        getDocs(query(collection(db, 'payroll_groups'), where('payrollId', '==', id))),
+      ])
+      setInclusiveDates(datesSnap.docs.map((d) => (d.data() as { date: { toDate: () => Date } }).date.toDate()))
+      setGroups(groupsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PayrollGroup, 'id'>) })))
+    }
+  }
+
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (currentCompanyId) {
       fetchTemplates()
       fetchTerms()
@@ -37,12 +86,9 @@ export function PayrollWizardPage() {
       fetchEmployees()
       if (id) fetchPayroll()
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, currentCompanyId])
-
-  const fetchTerms = async () => {
-    const snap = await getDocs(query(collection(db, 'payroll_terms'), where('isActive', '==', true)))
-    setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[])
-  }
 
   const generateDatesFromTerm = (term: Term) => {
     const dates: Date[] = []
@@ -88,54 +134,10 @@ export function PayrollWizardPage() {
     if (!formData.templateId) return
     const tmpl = templates.find(t => t.id === formData.templateId)?.data
     if (!tmpl) return
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (tmpl.groupBy) setFormData(prev => ({ ...prev, templateId: formData.templateId }))
-    const autoGroups: PayrollGroup[] = []
-    if (tmpl.earnings || tmpl.deductions || tmpl.benefits || tmpl.printColumns) {
-    }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [formData.templateId, templates])
-
-  const fetchTemplates = async () => {
-    if (!currentCompanyId) return
-    const snap = await getDocs(query(collection(db, 'payroll_templates'), where('companyId', '==', currentCompanyId)))
-    setTemplates(snap.docs.map((d) => ({ id: d.id, name: (d.data() as { name: string }).name, data: d.data() as PayrollTemplate })))
-  }
-
-  const fetchLookups = async () => {
-    const [gSnap, pSnap, aSnap, sSnap] = await Promise.all([
-      getDocs(query(collection(db, 'employee_groups'), where('isActive', '==', true))),
-      getDocs(query(collection(db, 'employee_positions'), where('isActive', '==', true))),
-      getDocs(query(collection(db, 'employee_areas'), where('isActive', '==', true))),
-      getDocs(query(collection(db, 'employee_statuses'), where('isActive', '==', true)))
-    ])
-    setLookups({
-      groups: gSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
-      positions: pSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeePosition[],
-      areas: aSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeArea[],
-      statuses: sSnap.docs.map(d => ({ id: d.id, ...d.data() })) as EmployeeStatus[]
-    })
-  }
-
-  const fetchEmployees = async () => {
-    if (!currentCompanyId) return
-    const snap = await getDocs(query(collection(db, 'employees'), where('companyId', '==', currentCompanyId)))
-    setEmployees(snap.docs.map((d) => ({ id: d.id, ...(d.data() as { nameId: string; employeeCode: string }) })))
-  }
-
-  const fetchPayroll = async () => {
-    if (!id) return
-    const snap = await getDoc(doc(db, 'payroll', id))
-    if (snap.exists()) {
-      const data = snap.data() as { name: string; month: number; year: number; templateId?: string; termId?: string }
-      setFormData({ name: data.name, month: data.month, year: data.year, templateId: data.templateId || '', termId: data.termId || '' })
-
-      const [datesSnap, groupsSnap] = await Promise.all([
-        getDocs(query(collection(db, 'payroll_inclusive_dates'), where('payrollId', '==', id))),
-        getDocs(query(collection(db, 'payroll_groups'), where('payrollId', '==', id))),
-      ])
-      setInclusiveDates(datesSnap.docs.map((d) => (d.data() as { date: { toDate: () => Date } }).date.toDate()))
-      setGroups(groupsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PayrollGroup, 'id'>) })))
-    }
-  }
 
   const createPayroll = async (): Promise<string> => {
     if (!currentCompanyId) throw new Error('No company selected')
@@ -204,7 +206,7 @@ export function PayrollWizardPage() {
         const existing = await getDocs(query(collection(db, 'payroll_groups'), where('payrollId', '==', payrollId)))
         for (const d of existing.docs) await deleteDoc(doc(db, 'payroll_groups', d.id))
         for (let i = 0; i < groups.length; i++) {
-          const { id: _id, ...groupData } = groups[i]
+          const { ...groupData } = groups[i]
           await addDoc(collection(db, 'payroll_groups'), { ...groupData, payrollId, order: i, page: 1 })
         }
         setStep(3)

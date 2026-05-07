@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { usePermissions } from '../../hooks/usePermissions'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { FileSpreadsheet, Download, BarChart3 } from 'lucide-react'
+import { FileSpreadsheet, Download } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import type { Payroll, PayrollEmployeeEarning, PayrollEmployeeDeduction, PayrollEmployeeBenefit } from '../../types'
 
@@ -77,13 +77,6 @@ export function EarningsDeductionsReportPage() {
   const [deductionNames, setDeductionNames] = useState<Map<string, string>>(new Map())
   const [benefitNames, setBenefitNames] = useState<Map<string, string>>(new Map())
 
-  useEffect(() => {
-    if (currentCompanyId) {
-      loadPayrolls()
-      loadLists()
-    }
-  }, [currentCompanyId])
-
   const loadPayrolls = async () => {
     if (!currentCompanyId) return
     const snap = await getDocs(query(collection(db, 'payroll'), where('companyId', '==', currentCompanyId)))
@@ -119,6 +112,15 @@ export function EarningsDeductionsReportPage() {
 
     setGroups(groupsSnap.docs.map(d => ({ id: d.id, name: d.data().name || d.id })))
   }
+
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (currentCompanyId) {
+      loadPayrolls()
+      loadLists()
+    }
+  }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const generateReport = async () => {
     if (!currentCompanyId) return
@@ -159,7 +161,7 @@ export function EarningsDeductionsReportPage() {
       ])
 
       const employees = new Map(employeesSnap.docs.map(d => [d.data().nameId, { id: d.id, ...d.data() }]))
-      const payrollEmps = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+      const payrollEmps = empSnap.docs.map(d => ({ id: d.id, ...d.data() })) as PayrollEmployee[]
 
       let filteredEmps = payrollEmps
       if (groupFilter !== 'all') {

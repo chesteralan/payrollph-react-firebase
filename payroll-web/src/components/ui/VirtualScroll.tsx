@@ -87,6 +87,7 @@ export function VirtualScroll<T>({
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useVirtualScroll(itemCount: number, itemHeight: number, containerHeight: number, overscan = 5) {
   const [scrollTop, setScrollTop] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)

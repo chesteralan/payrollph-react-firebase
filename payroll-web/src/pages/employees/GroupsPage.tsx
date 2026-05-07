@@ -19,14 +19,15 @@ export function EmployeeGroupsPage() {
   const [formData, setFormData] = useState({ name: '', description: '' })
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => { fetchGroups() }, [])
-
   const fetchGroups = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'employee_groups'))
     setGroups(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchGroups() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +36,7 @@ export function EmployeeGroupsPage() {
     setShowForm(false); setEditingId(null); setFormData({ name: '', description: '' }); fetchGroups()
   }
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, 'employee_groups', id))
     fetchGroups()
   }
@@ -117,7 +118,7 @@ export function EmployeeGroupsPage() {
                       <div className="flex items-center justify-end gap-2">
                         {canEdit('employees', 'groups') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(g.id); setFormData({ name: g.name, description: g.description || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                         {canDelete('employees', 'groups') && (
-                          <ConfirmDialog title="Delete Group" message={`Delete "${g.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(g.id, g.name)}>
+                          <ConfirmDialog title="Delete Group" message={`Delete "${g.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(g.id)}>
                             {(open) => <Button variant="ghost" size="sm" onClick={open}><Trash2 className="w-4 h-4" /></Button>}
                           </ConfirmDialog>
                         )}

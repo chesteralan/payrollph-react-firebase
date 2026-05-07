@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore'
 import { db } from '../../config/firebase'
@@ -32,11 +32,7 @@ export function DashboardPage() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (currentCompanyId) loadDashboard()
-  }, [currentCompanyId])
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     if (!currentCompanyId) return
     setLoading(true)
 
@@ -94,7 +90,14 @@ export function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentCompanyId])
+
+  useEffect(() => {
+    if (currentCompanyId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadDashboard()
+    }
+  }, [currentCompanyId, loadDashboard])
 
   const getMonthName = (month: number) => new Date(0, month - 1).toLocaleString('default', { month: 'long' })
 

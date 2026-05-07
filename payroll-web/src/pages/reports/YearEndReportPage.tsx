@@ -42,12 +42,14 @@ export function YearEndReportPage() {
   const [loading, setLoading] = useState(false)
   const [hasGenerated, setHasGenerated] = useState(false)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false)
       setSummaries([])
     }
   }, [currentCompanyId])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const generateReport = async () => {
     if (!currentCompanyId) return

@@ -19,14 +19,15 @@ export function AreasPage() {
   const [formData, setFormData] = useState({ name: '', description: '' })
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => { fetchAreas() }, [])
-
   const fetchAreas = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'employee_areas'))
     setAreas(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeArea[])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchAreas() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +36,7 @@ export function AreasPage() {
     setShowForm(false); setEditingId(null); setFormData({ name: '', description: '' }); fetchAreas()
   }
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, 'employee_areas', id))
     fetchAreas()
   }
@@ -113,7 +114,7 @@ export function AreasPage() {
                       <div className="flex items-center justify-end gap-2">
                         {canEdit('employees', 'areas') && <Button variant="ghost" size="sm" onClick={() => { setEditingId(a.id); setFormData({ name: a.name, description: a.description || '' }); setShowForm(true) }}><Edit className="w-4 h-4" /></Button>}
                         {canDelete('employees', 'areas') && (
-                          <ConfirmDialog title="Delete Area" message={`Delete "${a.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(a.id, a.name)}>
+                          <ConfirmDialog title="Delete Area" message={`Delete "${a.name}"? This cannot be undone.`} confirmText="Delete" onConfirm={() => handleDelete(a.id)}>
                             {(open) => <Button variant="ghost" size="sm" onClick={open}><Trash2 className="w-4 h-4" /></Button>}
                           </ConfirmDialog>
                         )}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 
 export type DateFormat = 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD-MMM-YYYY' | 'MMM DD, YYYY'
 export type TimeFormat = '12h' | '24h'
@@ -16,7 +16,6 @@ const defaultConfig: DateTimeFormatConfig = {
 }
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const monthNamesFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 function padZero(n: number): string {
   return n.toString().padStart(2, '0')
@@ -30,7 +29,6 @@ export function formatDate(date: Date | string | number, format: DateFormat, loc
   const day = d.getDate()
   const year = d.getFullYear()
   const monthName = monthNames[d.getMonth()]
-  const monthNameFull = monthNamesFull[d.getMonth()]
 
   switch (format) {
     case 'MM/DD/YYYY':
@@ -48,7 +46,7 @@ export function formatDate(date: Date | string | number, format: DateFormat, loc
   }
 }
 
-export function formatTime(date: Date | string | number, format: TimeFormat, locale = 'en-US'): string {
+export function formatTime(date: Date | string | number, format: TimeFormat): string {
   const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
   if (isNaN(d.getTime())) return 'Invalid Time'
 
@@ -65,7 +63,7 @@ export function formatTime(date: Date | string | number, format: TimeFormat, loc
 
 export function formatDateTime(date: Date | string | number, config: DateTimeFormatConfig): string {
   const dateStr = formatDate(date, config.dateFormat, config.locale)
-  const timeStr = formatTime(date, config.timeFormat, config.locale)
+  const timeStr = formatTime(date, config.timeFormat)
   return `${dateStr} ${timeStr}`
 }
 
@@ -149,9 +147,9 @@ export function useDateTimeFormat(initialConfig?: Partial<DateTimeFormatConfig>)
   const formatTime = useCallback(
     (date: Date | string | number) => {
       const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
-      return _formatTime(d, config.timeFormat, config.locale)
+      return _formatTime(d, config.timeFormat)
     },
-    [config.timeFormat, config.locale]
+    [config.timeFormat]
   )
 
   const formatDateTime = useCallback(
@@ -175,7 +173,7 @@ export function useDateTimeFormat(initialConfig?: Partial<DateTimeFormatConfig>)
   }
 }
 
-function _formatTime(date: Date, format: TimeFormat, locale = 'en-US'): string {
+function _formatTime(date: Date, format: TimeFormat): string {
   if (format === '24h') {
     return `${padZero(date.getHours())}:${padZero(date.getMinutes())}`
   }
@@ -188,6 +186,6 @@ function _formatTime(date: Date, format: TimeFormat, locale = 'en-US'): string {
 
 function _formatDateTime(date: Date, config: DateTimeFormatConfig): string {
   const dateStr = formatDate(date, config.dateFormat, config.locale)
-  const timeStr = _formatTime(date, config.timeFormat, config.locale)
+  const timeStr = _formatTime(date, config.timeFormat)
   return `${dateStr} ${timeStr}`
 }

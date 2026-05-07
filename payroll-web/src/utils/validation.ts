@@ -131,7 +131,7 @@ export function useValidation<T extends Record<string, unknown>>(initialData: T)
     setTouched(prev => new Set([...prev, field]))
   }, [])
 
-  const validate = useCallback((validationRules: ValidationRule<T>[]) => {
+  const runValidation = useCallback((validationRules: ValidationRule<T>[]) => {
     const result = validate<T>(data, validationRules)
     setErrors(result.errors)
     return result
@@ -153,7 +153,7 @@ export function useValidation<T extends Record<string, unknown>>(initialData: T)
     touched,
     updateField,
     touchField,
-    validate,
+    validate: runValidation,
     getFieldError,
     reset,
     isValid: Object.keys(errors).length === 0,

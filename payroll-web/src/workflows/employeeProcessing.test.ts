@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { sanitizeString, sanitizeEmail, sanitizePhone, sanitizeName, validateInput } from '../utils/sanitize'
+import { sanitizeEmail, sanitizePhone, sanitizeName, validateInput } from '../utils/sanitize'
 import { auditCreate, auditUpdate, auditDelete } from '../services/audit'
-import type { Employee, EmployeeProfile } from '../types'
+import type { EmployeeProfile } from '../types'
 
 // Mock the audit module
 vi.mock('../services/audit', () => ({

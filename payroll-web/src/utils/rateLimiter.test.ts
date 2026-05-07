@@ -1,10 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import {
   RateLimiter,
   authRateLimiter,
   apiRateLimiter,
-  searchRateLimiter,
-  importRateLimiter,
 } from './rateLimiter'
 
 describe('RateLimiter', () => {

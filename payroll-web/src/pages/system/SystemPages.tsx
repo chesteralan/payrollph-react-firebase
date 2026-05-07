@@ -45,8 +45,6 @@ export function CalendarPage() {
     years: 5,
   })
 
-  useEffect(() => { fetchEvents() }, [selectedYear])
-
   const fetchEvents = async () => {
     setLoading(true)
     const snap = await getDocs(query(collection(db, 'calendar')))
@@ -57,6 +55,9 @@ export function CalendarPage() {
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()))
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { fetchEvents() }, [selectedYear])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -363,14 +364,15 @@ export function TermsPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [warnings, setWarnings] = useState<string[]>([])
 
-  useEffect(() => { fetchTerms() }, [])
-
   const fetchTerms = async () => {
     setLoading(true)
     const snap = await getDocs(query(collection(db, 'payroll_terms'), orderBy('name')))
     setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchTerms() }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -419,7 +421,9 @@ export function TermsPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (showForm) validateForm()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, showForm])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -601,19 +605,6 @@ export function UsersPage() {
   const [importStats, setImportStats] = useState<{ success: number; failed: number; duplicates: number } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { fetchUsers() }, [])
-
-  const filteredUsers = useMemo(() => {
-    if (searchQuery === '') return users
-    const q = searchQuery.toLowerCase()
-    return users.filter(u =>
-      u.username.toLowerCase().includes(q) ||
-      (u.displayName || '').toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
-      (u.role || '').toLowerCase().includes(q)
-    )
-  }, [users, searchQuery])
-
   const fetchUsers = async () => {
     setLoading(true)
     const [usersSnap, restrictionsSnap] = await Promise.all([
@@ -629,6 +620,20 @@ export function UsersPage() {
     setUsers(usersWithRestrictions)
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchUsers() }, [])
+
+  const filteredUsers = useMemo(() => {
+    if (searchQuery === '') return users
+    const q = searchQuery.toLowerCase()
+    return users.filter(u =>
+      u.username.toLowerCase().includes(q) ||
+      (u.displayName || '').toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.role || '').toLowerCase().includes(q)
+    )
+  }, [users, searchQuery])
 
   const { items: sortedUsers, handleSort, sortConfig } = useTableSort(filteredUsers, 'username')
 
@@ -1205,8 +1210,6 @@ export function AuditPage() {
   const [filterModule, setFilterModule] = useState<string>('')
   const [filterUser, setFilterUser] = useState<string>('')
 
-  useEffect(() => { fetchLogs() }, [filterModule, filterUser])
-
   const fetchLogs = async () => {
     setLoading(true)
     const q = query(collection(db, 'system_audit'), orderBy('timestamp', 'desc'), limit(200))
@@ -1217,6 +1220,9 @@ export function AuditPage() {
     setLogs(allLogs)
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { fetchLogs() }, [filterModule, filterUser])
 
   const { items: sortedLogs, handleSort, sortConfig } = useTableSort(logs, 'timestamp')
 
@@ -1375,7 +1381,6 @@ export function DatabasePage() {
   const [selectedCollection, setSelectedCollection] = useState('')
   const [verificationResults, setVerificationResults] = useState<Array<{ name: string; status: 'Pass' | 'Fail' | 'Warning'; details: string; issueCount: number }>>([])
   const [verifying, setVerifying] = useState(false)
-  const [cleanupConfirm, setCleanupConfirm] = useState<string | null>(null)
   const [cleanupLoading, setCleanupLoading] = useState('')
   const [cleanupResults, setCleanupResults] = useState<Array<{ name: string; count: number; time: number; success: boolean }>>([])
   const [dtrMonths, setDtrMonths] = useState(6)
@@ -1388,8 +1393,6 @@ export function DatabasePage() {
     'payroll_templates', 'payroll_inclusive_dates', 'payroll_groups',
     'payroll_employees', 'salaries', 'dtr_entries', 'holidays', 'users', 'companies'
   ]
-
-  useEffect(() => { fetchStats(); fetchBackups() }, [])
 
   const fetchStats = async () => {
     setLoading(true)
@@ -1410,8 +1413,11 @@ export function DatabasePage() {
     try {
       const snap = await getDocs(query(collection(db, 'backups'), orderBy('timestamp', 'desc')))
       setBackups(snap.docs.map(d => ({ id: d.id, ...d.data(), timestamp: d.data().timestamp?.toDate() })) as never[])
-    } catch {}
+    } catch { /* empty - backup list may not exist */ }
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { fetchStats(); fetchBackups() }, [])
 
   const exportCollection = async (collectionName: string) => {
     setExportLoading(collectionName)
@@ -1580,6 +1586,7 @@ export function DatabasePage() {
 
   const runCleanup = async (operation: string) => {
     setCleanupLoading(operation)
+    // eslint-disable-next-line react-hooks/purity
     const startTime = Date.now()
     let count = 0
     try {
@@ -1709,11 +1716,13 @@ export function DatabasePage() {
         await batch.commit()
       }
       count = processed
+      // eslint-disable-next-line react-hooks/purity
       const timeTaken = Date.now() - startTime
       setCleanupResults(prev => [...prev, { name: operation, count, time: timeTaken, success: true }])
       addToast({ type: 'success', title: `Cleanup complete: ${count} records processed` })
       fetchStats()
     } catch (e) {
+      // eslint-disable-next-line react-hooks/purity
       const timeTaken = Date.now() - startTime
       setCleanupResults(prev => [...prev, { name: operation, count: 0, time: timeTaken, success: false }])
       addToast({ type: 'error', title: `Cleanup failed: ${e}` })
@@ -1954,7 +1963,7 @@ export function DatabasePage() {
                     <Button
                       variant={op.variant === 'danger' ? 'danger' : op.variant === 'warning' ? 'warning' : 'secondary'}
                       size="sm"
-                      onClick={() => { setCleanupConfirm(op.id); open() }}
+                      onClick={() => open()}
                       disabled={!!cleanupLoading}
                       className="w-full"
                     >

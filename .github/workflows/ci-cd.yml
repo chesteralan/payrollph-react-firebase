@@ -3,12 +3,11 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [main, develop]
-  pul_request:
+  pull_request:
     branches: [main, develop]
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '8'
 
 jobs:
   test:
@@ -22,28 +21,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: payroll-web/package-lock.json
+          cache: 'yarn'
+          cache-dependency-path: payroll-web/yarn.lock
 
       - name: Install dependencies
         working-directory: payroll-web
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Run linter
         working-directory: payroll-web
-        run: npm run lint
+        run: yarn lint
 
       - name: Run type check
         working-directory: payroll-web
-        run: npm run build -- --mode test
+        run: yarn build --mode test
 
       - name: Run unit tests
         working-directory: payroll-web
-        run: npm run test:run
+        run: yarn test:run
 
       - name: Run tests with coverage
         working-directory: payroll-web
-        run: npm run test:coverage
+        run: yarn test:coverage
 
       - name: Upload coverage reports
         if: always()
@@ -64,16 +63,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: payroll-web/package-lock.json
+          cache: 'yarn'
+          cache-dependency-path: payroll-web/yarn.lock
 
       - name: Install dependencies
         working-directory: payroll-web
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build production bundle
         working-directory: payroll-web
-        run: npm run build
+        run: yarn build
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
@@ -111,7 +110,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: yarn global add firebase-tools
 
       - name: Deploy to Firebase (Staging)
         working-directory: payroll-web
@@ -141,7 +140,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: yarn global add firebase-tools
 
       - name: Deploy to Firebase (Production)
         working-directory: payroll-web
@@ -161,20 +160,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: payroll-web/package-lock.json
+          cache: 'yarn'
+          cache-dependency-path: payroll-web/yarn.lock
 
       - name: Install dependencies
         working-directory: payroll-web
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Install Playwright browsers
         working-directory: payroll-web
-        run: npx playwright install --with-deps
+        run: yarn playwright install --with-deps
 
       - name: Run Playwright tests
         working-directory: payroll-web
-        run: npx playwright test
+        run: yarn playwright test
 
       - name: Upload Playwright report
         if: always()

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { doc, setDoc, updateDoc, getDoc } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { ArrowLeft, Save, Lock, Palette, DollarSign, Globe } from 'lucide-react'
-import { getAvailableCurrencies, setDefaultCurrency, getDefaultCurrency } from '../../utils/currency'
+import { ArrowLeft, Save, Lock, Palette } from 'lucide-react'
+import { getAvailableCurrencies } from '../../utils/currency'
 import { localeLabels } from '../../i18n'
 
 export function UserSettingsPage() {
@@ -15,11 +15,11 @@ export function UserSettingsPage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [formData, setFormData] = useState({
-    theme: 'light' as 'light' | 'dark',
-    itemsPerPage: 25,
-    defaultCompanyId: '',
-    currency: 'PHP',
-    locale: 'en-US',
+    theme: (settings?.theme as 'light' | 'dark') || 'light',
+    itemsPerPage: settings?.itemsPerPage || 25,
+    defaultCompanyId: settings?.defaultCompanyId || '',
+    currency: settings?.currency || 'PHP',
+    locale: settings?.locale || 'en-US',
   })
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -28,19 +28,6 @@ export function UserSettingsPage() {
   })
   const [passwordError, setPasswordError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState(false)
-
-  useEffect(() => {
-    if (settings) {
-      setFormData({
-        theme: settings.theme || 'light',
-        itemsPerPage: settings.itemsPerPage || 25,
-        defaultCompanyId: settings.defaultCompanyId || '',
-        currency: settings.currency || 'PHP',
-        locale: settings.locale || 'en-US',
-      })
-      setDefaultCurrency(settings.currency || 'PHP')
-    }
-  }, [settings])
 
   const handleSaveSettings = async () => {
     if (!user) return

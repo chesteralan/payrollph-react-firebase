@@ -41,14 +41,15 @@ export function CompaniesPage() {
     deductions: true
   })
 
-  useEffect(() => { fetchCompanies() }, [])
-
   const fetchCompanies = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'companies'))
     setCompanies(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[])
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchCompanies() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,14 +71,14 @@ export function CompaniesPage() {
       name: company.name,
       address: company.address || '',
       tin: company.tin || '',
-      printHeader: (company as any).printHeader || '',
-      printFooter: (company as any).printFooter || '',
-      printCss: (company as any).printCss || '',
-      defaultWorkdays: (company as any).defaultWorkdays || 22,
-      currency: (company as any).currency || 'PHP',
-      payrollPeriods: (company as any).payrollPeriods || []
+      printHeader: company.printHeader || '',
+      printFooter: company.printFooter || '',
+      printCss: company.printCss || '',
+      defaultWorkdays: company.defaultWorkdays || 22,
+      currency: company.currency || 'PHP',
+      payrollPeriods: company.payrollPeriods || []
     })
-    setColumnGroup((company as any).columnGroup || { dtr: true, salaries: true, earnings: true, benefits: true, deductions: true })
+    setColumnGroup(company.columnGroup || { dtr: true, salaries: true, earnings: true, benefits: true, deductions: true })
     setShowForm(true)
   }
 
@@ -95,7 +96,7 @@ export function CompaniesPage() {
     })
   }
 
-  const updatePayrollPeriod = (index: number, field: string, value: any) => {
+  const updatePayrollPeriod = (index: number, field: string, value: string | number | undefined) => {
     const updated = [...formData.payrollPeriods]
     updated[index] = { ...updated[index], [field]: value }
     setFormData({ ...formData, payrollPeriods: updated })
@@ -317,11 +318,11 @@ export function CompaniesPage() {
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{c.address || '-'}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{c.tin || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{(c as any).defaultWorkdays || 22}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{c.defaultWorkdays || 22}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
-                        {(c as any).columnGroup ? (
-                          Object.entries((c as any).columnGroup).filter(([_, v]) => v).map(([key]) => (
+                        {c.columnGroup ? (
+                          Object.entries(c.columnGroup).filter(([, v]) => v).map(([key]) => (
                             <span key={key} className="inline-flex px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">
                               {key}
                             </span>

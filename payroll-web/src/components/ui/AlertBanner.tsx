@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
+import { collection, query, where, getDocs, limit } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { X, AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react'
@@ -55,7 +55,6 @@ function generateSystemAlerts(payrollCount: number, employeeCount: number): Syst
   const alerts: SystemAlert[] = []
   const now = new Date()
   const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
   const dayOfMonth = now.getDate()
   const dayOfWeek = now.getDay()
   const isMonday = dayOfWeek === 1
@@ -64,7 +63,6 @@ function generateSystemAlerts(payrollCount: number, employeeCount: number): Syst
   const earlyMonth = dayOfMonth >= 1 && dayOfMonth <= 5
   const midMonth = dayOfMonth >= 10 && dayOfMonth <= 18
   const endMonth = dayOfMonth >= 25
-  const monthStart = dayOfMonth >= 1 && dayOfMonth <= 3
   const monthEnd = dayOfMonth >= 28
 
   if (payrollCount === 0) {

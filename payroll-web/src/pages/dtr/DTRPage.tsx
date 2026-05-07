@@ -10,7 +10,7 @@ import { SearchBar } from '../../components/ui/SearchBar'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import {
   ChevronLeft, ChevronRight, Calendar, Clock, Timer, AlertCircle,
-  Trash2, X, Check, Plus, Filter, Download, Upload, FileText,
+  Trash2, X, Check, Plus, Filter, Download, Upload,
   BarChart3, Table
 } from 'lucide-react'
 import type { Employee, NameRecord, DTREntry, LeaveApplication, LeaveBalance } from '../../types'
@@ -50,8 +50,6 @@ export function DTRPage() {
   const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>([])
   const [leaveApplications, setLeaveApplications] = useState<LeaveApplication[]>([])
   const [benefits, setBenefits] = useState<{ id: string; name: string }[]>([])
-  const [loading, setLoading] = useState(true)
-
   const [showDayModal, setShowDayModal] = useState(false)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [dayForm, setDayForm] = useState({ timeIn: '', timeOut: '', overtimeHours: 0, lateHours: 0, absenceType: '' as DTREntry['absenceType'], absenceReason: '', notes: '' })
@@ -66,15 +64,6 @@ export function DTRPage() {
   const [importPreview, setImportPreview] = useState<Partial<DTREntry>[]>([])
   const [importErrors, setImportErrors] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => { fetchEmployees() }, [])
-
-  useEffect(() => {
-    if (selectedEmployeeId) {
-      fetchDTRData()
-      fetchLeaveData()
-    }
-  }, [selectedEmployeeId, selectedMonth, selectedYear])
 
   const fetchEmployees = async () => {
     const [empSnap, nameSnap] = await Promise.all([
@@ -92,7 +81,6 @@ export function DTRPage() {
     })
     setEmployees(list)
     if (list.length > 0) setSelectedEmployeeId(list[0].id)
-    setLoading(false)
   }
 
   const fetchDTRData = async () => {
@@ -114,6 +102,18 @@ export function DTRPage() {
     setBenefits(benSnap.docs.map(d => ({ id: d.id, name: (d.data() as { name: string }).name })).filter(b => b.name.toLowerCase().includes('leave')))
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchEmployees() }, [])
+
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  useEffect(() => {
+    if (selectedEmployeeId) {
+      fetchDTRData()
+      fetchLeaveData()
+    }
+  }, [selectedEmployeeId, selectedMonth, selectedYear])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+
   const fetchAllMonthEntries = async () => {
     const start = dateStr(selectedYear, selectedMonth, 1)
     const end = dateStr(selectedYear, selectedMonth, daysInMonth(selectedYear, selectedMonth))
@@ -128,9 +128,11 @@ export function DTRPage() {
     setAllMonthEntries(allEntries)
   }
 
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (viewMode === 'summary' && employees.length > 0) fetchAllMonthEntries()
   }, [viewMode, selectedMonth, selectedYear, employees])
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const filteredMonthEntries = useMemo(() => {
     if (dtrSearchQuery === '') return allMonthEntries
