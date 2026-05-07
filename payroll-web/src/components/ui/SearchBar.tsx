@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import { Search, X } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -10,9 +10,14 @@ interface SearchBarProps {
   debounceMs?: number
 }
 
-export function SearchBar({ value, onChange, placeholder = 'Search...', className, debounceMs = 300 }: SearchBarProps) {
+export const SearchBar = memo(function SearchBar({ value, onChange, placeholder = 'Search...', className, debounceMs = 300 }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const onChangeRef = useRef(onChange)
+
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   useEffect(() => {
     setLocalValue(value)
@@ -21,18 +26,18 @@ export function SearchBar({ value, onChange, placeholder = 'Search...', classNam
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      onChange(localValue)
+      onChangeRef.current(localValue)
     }, debounceMs)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [localValue, debounceMs, onChange])
+  }, [localValue, debounceMs])
 
   const handleClear = useCallback(() => {
     setLocalValue('')
-    onChange('')
-  }, [onChange])
+    onChangeRef.current('')
+  }, [])
 
   return (
     <div className={clsx('relative flex-1 max-w-sm', className)}>
@@ -55,4 +60,4 @@ export function SearchBar({ value, onChange, placeholder = 'Search...', classNam
       )}
     </div>
   )
-}
+})

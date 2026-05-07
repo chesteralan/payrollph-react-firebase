@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 
 interface EditableCellProps {
   value: string | number
@@ -7,7 +7,7 @@ interface EditableCellProps {
   className?: string
 }
 
-export function EditableCell({ value, onChange, type = 'text', className }: EditableCellProps) {
+export const EditableCell = memo(function EditableCell({ value, onChange, type = 'text', className }: EditableCellProps) {
   const [editing, setEditing] = useState(false)
   const [localValue, setLocalValue] = useState(String(value))
 
@@ -33,4 +33,4 @@ export function EditableCell({ value, onChange, type = 'text', className }: Edit
       {type === 'number' ? Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value}
     </div>
   )
-}
+})

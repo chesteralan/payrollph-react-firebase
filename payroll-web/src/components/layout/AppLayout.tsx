@@ -1,12 +1,16 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { Breadcrumb } from './Breadcrumb'
 import { AlertBannerProvider } from '../ui/AlertBanner'
+import { useGlobalShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const navigate = useNavigate()
+
+  useGlobalShortcuts((path) => navigate(path))
 
   const handleClose = () => setMobileOpen(false)
 

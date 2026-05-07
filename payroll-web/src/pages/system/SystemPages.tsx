@@ -1379,6 +1379,7 @@ export function DatabasePage() {
   const [cleanupResults, setCleanupResults] = useState<Array<{ name: string; count: number; time: number; success: boolean }>>([])
   const [dtrMonths, setDtrMonths] = useState(6)
   const [softDeleteDays, setSoftDeleteDays] = useState(30)
+  const [archiveYears, setArchiveYears] = useState(2)
 
   const COLLECTIONS = [
     'names', 'employees', 'employee_groups', 'employee_positions', 'employee_areas',
@@ -1668,6 +1669,39 @@ export function DatabasePage() {
             }
           })
         }))
+      } else if (operation === 'archivePayroll') {
+        const cutoffYear = new Date().getFullYear() - archiveYears
+        const payrollSnap = await getDocs(collection(db, 'payroll'))
+        const toArchive: string[] = []
+
+        payrollSnap.docs.forEach(d => {
+          const data = d.data()
+          if (data.year && data.year < cutoffYear) {
+            toArchive.push(d.id)
+          }
+        })
+
+        for (const payrollId of toArchive) {
+          const payrollRef = doc(db, 'payroll', payrollId)
+          batch.update(payrollRef, { isArchived: true, archivedAt: new Date() })
+          processed++
+
+          const relatedCollections = [
+            { col: 'payroll_employees', field: 'payrollId' },
+            { col: 'payroll_employee_earnings', field: 'payrollId' },
+            { col: 'payroll_employee_deductions', field: 'payrollId' },
+            { col: 'payroll_employee_benefits', field: 'payrollId' },
+            { col: 'payroll_employee_salaries', field: 'payrollId' },
+          ]
+
+          for (const { col, field } of relatedCollections) {
+            const snap = await getDocs(query(collection(db, col), where(field, '==', payrollId)))
+            snap.docs.forEach(d => {
+              batch.update(d.ref, { isArchived: true, archivedAt: new Date() })
+              processed++
+            })
+          }
+        }
       }
 
       if (processed > 0) {
@@ -1887,6 +1921,9 @@ export function DatabasePage() {
               <span className="text-sm text-gray-500 ml-4">Soft-delete cutoff:</span>
               <input type="number" value={softDeleteDays} onChange={(e) => setSoftDeleteDays(Number(e.target.value))} className="w-16 px-2 py-1 border border-gray-300 rounded text-sm" min={1} max={365} />
               <span className="text-sm text-gray-500">days</span>
+              <span className="text-sm text-gray-500 ml-4">Archive cutoff:</span>
+              <input type="number" value={archiveYears} onChange={(e) => setArchiveYears(Number(e.target.value))} className="w-16 px-2 py-1 border border-gray-300 rounded text-sm" min={1} max={20} />
+              <span className="text-sm text-gray-500">years</span>
             </div>
           </div>
         </CardHeader>
@@ -1897,7 +1934,8 @@ export function DatabasePage() {
               { id: 'duplicates', name: 'Remove Duplicate Names', desc: 'Delete duplicate names in the names collection (keeps first occurrence)', variant: 'warning' as const },
               { id: 'oldDtr', name: 'Clear Old DTR Entries', desc: `Delete DTR entries older than ${dtrMonths} months`, variant: 'warning' as const },
               { id: 'expiredLeave', name: 'Expire Old Leave Applications', desc: 'Mark approved/pending leave applications as expired if end date passed', variant: 'secondary' as const },
-              { id: 'softDeleted', name: 'Purge Soft-Deleted Records', desc: `Permanently delete soft-deleted records older than ${softDeleteDays} days`, variant: 'danger' as const }
+              { id: 'softDeleted', name: 'Purge Soft-Deleted Records', desc: `Permanently delete soft-deleted records older than ${softDeleteDays} days`, variant: 'danger' as const },
+              { id: 'archivePayroll', name: 'Archive Old Payroll Runs', desc: `Mark payroll runs and related data older than ${archiveYears} years as archived`, variant: 'secondary' as const }
             ].map(op => (
               <div key={op.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
                 <div>

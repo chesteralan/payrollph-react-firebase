@@ -56,9 +56,15 @@ function generateSystemAlerts(payrollCount: number, employeeCount: number): Syst
   const currentMonth = now.getMonth() + 1
   const currentYear = now.getFullYear()
   const dayOfMonth = now.getDate()
+  const dayOfWeek = now.getDay()
+  const isMonday = dayOfWeek === 1
+  const isFriday = dayOfWeek === 5
 
+  const earlyMonth = dayOfMonth >= 1 && dayOfMonth <= 5
   const midMonth = dayOfMonth >= 10 && dayOfMonth <= 18
   const endMonth = dayOfMonth >= 25
+  const monthStart = dayOfMonth >= 1 && dayOfMonth <= 3
+  const monthEnd = dayOfMonth >= 28
 
   if (payrollCount === 0) {
     alerts.push({
@@ -66,6 +72,16 @@ function generateSystemAlerts(payrollCount: number, employeeCount: number): Syst
       type: 'warning',
       title: 'No Payroll Runs Found',
       message: 'You haven\'t created any payroll runs yet. Start by creating your first payroll run.',
+      dismissed: false,
+    })
+  }
+
+  if (earlyMonth && isMonday) {
+    alerts.push({
+      id: 'monthstart-deadline',
+      type: 'warning',
+      title: 'Payroll Processing Deadline',
+      message: `It's the first week of ${new Date(0, currentMonth - 1).toLocaleString('default', { month: 'long' })}. Ensure last month's payroll is finalized and published.`,
       dismissed: false,
     })
   }
@@ -86,6 +102,27 @@ function generateSystemAlerts(payrollCount: number, employeeCount: number): Syst
       type: 'warning',
       title: 'Month-End Payroll Due',
       message: `End of ${new Date(0, currentMonth - 1).toLocaleString('default', { month: 'long' })} approaching. Ensure your monthly payroll is processed on time.`,
+      dismissed: false,
+    })
+  }
+
+  if (isFriday && payrollCount > 0) {
+    alerts.push({
+      id: 'friday-reminder',
+      type: 'info',
+      title: 'Friday Payroll Check',
+      message: 'Review and finalize any pending payroll runs before the weekend.',
+      dismissed: false,
+    })
+  }
+
+  if (monthEnd && employeeCount > 0) {
+    const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1
+    alerts.push({
+      id: 'upcoming-month',
+      type: 'info',
+      title: `Prepare for ${new Date(0, nextMonth - 1).toLocaleString('default', { month: 'long' })}`,
+      message: 'Create next month\'s payroll run and update any employee changes.',
       dismissed: false,
     })
   }
