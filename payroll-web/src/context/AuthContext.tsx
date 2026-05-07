@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -7,11 +7,17 @@ import {
   sendPasswordResetEmail,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  setPersistence,
+  browserSessionPersistence,
+  browserLocalPersistence,
 } from 'firebase/auth'
 import type { User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { auth, db } from '../config/firebase'
 import type { UserAccount, UserRestriction, UserCompany, UserSettings, Department, Section } from '../types'
+
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
+const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll']
 
 interface AuthContextType {
   firebaseUser: FirebaseUser | null
@@ -21,12 +27,14 @@ interface AuthContextType {
   settings: UserSettings | null
   currentCompanyId: string | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  sessionExpiring: boolean
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>
   logout: () => Promise<void>
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>
   resetPassword: (email: string) => Promise<void>
   setCurrentCompanyId: (companyId: string) => void
   hasPermission: (department: Department, section: Section, action: 'view' | 'add' | 'edit' | 'delete') => boolean
+  refreshSession: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -39,6 +47,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [currentCompanyId, setCurrentCompanyIdState] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sessionExpiring, setSessionExpiring] = useState(false)
+
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const expiryWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastActivityRef = useRef<number>(Date.now())
+
+  const clearSessionTimers = useCallback(() => {
+    if (idleTimerRef.current) {
+      clearTimeout(idleTimerRef.current)
+      idleTimerRef.current = null
+    }
+    if (expiryWarningTimerRef.current) {
+      clearTimeout(expiryWarningTimerRef.current)
+      expiryWarningTimerRef.current = null
+    }
+  }, [])
+
+  const handleSessionExpired = useCallback(async () => {
+    clearSessionTimers()
+    setSessionExpiring(false)
+    await signOut(auth)
+  }, [clearSessionTimers])
+
+  const resetIdleTimer = useCallback(() => {
+    if (!firebaseUser) return
+
+    lastActivityRef.current = Date.now()
+    setSessionExpiring(false)
+    clearSessionTimers()
+
+    expiryWarningTimerRef.current = setTimeout(() => {
+      setSessionExpiring(true)
+    }, SESSION_TIMEOUT_MS - 60000) // Warning 1 minute before
+
+    idleTimerRef.current = setTimeout(() => {
+      handleSessionExpired()
+    }, SESSION_TIMEOUT_MS)
+  }, [firebaseUser, clearSessionTimers, handleSessionExpired])
+
+  const refreshSession = useCallback(() => {
+    resetIdleTimer()
+  }, [resetIdleTimer])
+
+  useEffect(() => {
+    const handleActivity = () => {
+      if (firebaseUser) {
+        resetIdleTimer()
+      }
+    }
+
+    ACTIVITY_EVENTS.forEach(event => {
+      window.addEventListener(event, handleActivity)
+    })
+
+    return () => {
+      ACTIVITY_EVENTS.forEach(event => {
+        window.removeEventListener(event, handleActivity)
+      })
+    }
+  }, [firebaseUser, resetIdleTimer])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -80,6 +148,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               settingsData?.defaultCompanyId || primary?.companyId || companiesData[0].companyId || null
             )
           }
+
+          resetIdleTimer()
         }
       } else {
         setUser(null)
@@ -87,19 +157,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUserCompanies([])
         setSettings(null)
         setCurrentCompanyIdState(null)
+        setSessionExpiring(false)
+        clearSessionTimers()
       }
 
       setLoading(false)
     })
 
-    return unsubscribe
-  }, [])
+    return () => {
+      unsubscribe()
+      clearSessionTimers()
+    }
+  }, [resetIdleTimer, clearSessionTimers])
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean = false) => {
+    await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence)
     await signInWithEmailAndPassword(auth, email, password)
   }
 
   const logout = async () => {
+    clearSessionTimers()
     await signOut(auth)
   }
 
@@ -116,6 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const setCurrentCompanyId = (companyId: string) => {
     setCurrentCompanyIdState(companyId)
+    resetIdleTimer()
   }
 
   const hasPermission = (
@@ -144,12 +222,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         settings,
         currentCompanyId,
         loading,
+        sessionExpiring,
         login,
         logout,
         changePassword,
         resetPassword,
         setCurrentCompanyId,
         hasPermission,
+        refreshSession,
       }}
     >
       {children}

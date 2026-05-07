@@ -1,115 +1,182 @@
-const XSS_PATTERNS = [
-  /<script[^>]*>[\s\S]*?<\/script>/gi,
-  /javascript\s*:/gi,
-  /on\w+\s*=/gi,
-  /<iframe[^>]*>[\s\S]*?<\/iframe>/gi,
-  /<object[^>]*>[\s\S]*?<\/object>/gi,
-  /<embed[^>]*>[\s\S]*?<\/embed>/gi,
-  /<form[^>]*>[\s\S]*?<\/form>/gi,
-  /<svg[^>]*>[\s\S]*?<\/svg>/gi,
-  /data\s*:/gi,
-  /vbscript\s*:/gi,
-  /expression\s*\(/gi,
-]
+// Input sanitization utilities for preventing XSS and injection attacks
 
-const SQL_PATTERNS = [
-  /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|EXEC|UNION|SCRIPT)\b)/gi,
-  /(--|;|\/\*|\*\/)/g,
-]
-
-export function sanitizeHTML(input: string): string {
-  return XSS_PATTERNS.reduce(
-    (str, pattern) => str.replace(pattern, ''),
-    input
-  )
+/**
+ * Sanitize a string by escaping HTML special characters
+ */
+export const sanitizeString = (input: string): string => {
+  if (typeof input !== 'string') return ''
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .trim()
 }
 
-export function sanitizeSQL(input: string): string {
-  return SQL_PATTERNS.reduce(
-    (str, pattern) => str.replace(pattern, ''),
-    input
-  )
+/**
+ * Sanitize and validate email
+ */
+export const sanitizeEmail = (email: string): string => {
+  if (typeof email !== 'string') return ''
+  const sanitized = email.trim().toLowerCase()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(sanitized) ? sanitized : ''
 }
 
-export function sanitizeInput(input: string, options?: {
-  trim?: boolean
-  lowerCase?: boolean
-  upperCase?: boolean
-  maxLength?: number
-  allowHTML?: boolean
-  allowSpecialChars?: boolean
-}): string {
-  const opts = {
-    trim: true,
-    lowerCase: false,
-    upperCase: false,
-    maxLength: 1000,
-    allowHTML: false,
-    allowSpecialChars: true,
-    ...options,
-  }
-
-  let result = input
-
-  if (opts.trim) {
-    result = result.trim()
-  }
-
-  if (opts.maxLength && result.length > opts.maxLength) {
-    result = result.slice(0, opts.maxLength)
-  }
-
-  if (!opts.allowHTML) {
-    result = sanitizeHTML(result)
-  }
-
-  result = sanitizeSQL(result)
-
-  if (opts.lowerCase) {
-    result = result.toLowerCase()
-  }
-
-  if (opts.upperCase) {
-    result = result.toUpperCase()
-  }
-
-  if (!opts.allowSpecialChars) {
-    result = result.replace(/[^a-zA-Z0-9\s]/g, '')
-  }
-
-  return result
+/**
+ * Sanitize phone number (allow only digits, +, -, (, ), and spaces)
+ */
+export const sanitizePhone = (phone: string): string => {
+  if (typeof phone !== 'string') return ''
+  return phone.replace(/[^0-9+\-()\s]/g, '').trim()
 }
 
-export function sanitizeEmail(email: string): string {
-  return email.trim().toLowerCase().replace(/[^a-zA-Z0-9@._+-]/g, '')
+/**
+ * Sanitize name (letters, spaces, hyphens, apostrophes only)
+ */
+export const sanitizeName = (name: string): string => {
+  if (typeof name !== 'string') return ''
+  return name.replace(/[^a-zA-Z\s\-']/g, '').trim()
 }
 
-export function sanitizePhone(phone: string): string {
-  return phone.replace(/[^0-9+\s()-]/g, '')
+/**
+ * Sanitize numeric input (allow only digits and decimal point)
+ */
+export const sanitizeNumber = (value: string, allowNegative: boolean = false): string => {
+  if (typeof value !== 'string') return ''
+  const pattern = allowNegative ? /[^0-9.\-]/g : /[^0-9.]/g
+  return value.replace(pattern, '')
 }
 
-export function sanitizeNumber(input: string): number | null {
-  const cleaned = input.replace(/[^0-9.-]/g, '')
-  const num = parseFloat(cleaned)
-  return isNaN(num) ? null : num
-}
-
-export function escapeHTML(str: string): string {
-  const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;',
+/**
+ * Sanitize currency input (allow digits, decimal point, and optional minus)
+ */
+export const sanitizeCurrency = (value: string): string => {
+  if (typeof value !== 'string') return ''
+  const sanitized = value.replace(/[^0-9.]/g, '')
+  const parts = sanitized.split('.')
+  if (parts.length > 2) {
+    return parts[0] + '.' + parts.slice(1).join('')
   }
-  return str.replace(/[&<>"'/]/g, c => map[c])
+  return sanitized
 }
 
-export function stripTags(html: string): string {
+/**
+ * Sanitize filename (remove path traversal and special characters)
+ */
+export const sanitizeFilename = (filename: string): string => {
+  if (typeof filename !== 'string') return ''
+  return filename
+    .replace(/\.\./g, '')
+    .replace(/[\/\\:*?"<>|]/g, '_')
+    .trim()
+    .substring(0, 255)
+}
+
+/**
+ * Sanitize HTML content (basic - strips all tags)
+ * For rich text, use a proper library like DOMPurify
+ */
+export const stripHtml = (html: string): string => {
+  if (typeof html !== 'string') return ''
   return html.replace(/<[^>]*>/g, '')
 }
 
-export function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+/**
+ * Validate and sanitize date string
+ */
+export const sanitizeDate = (dateStr: string): string | null => {
+  if (typeof dateStr !== 'string') return null
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
+  return date.toISOString()
+}
+
+/**
+ * Sanitize object recursively
+ */
+export const sanitizeObject = <T extends Record<string, unknown>>(
+  obj: T,
+  sanitizers: Partial<Record<keyof T, (value: unknown) => unknown>>
+): T => {
+  const sanitized = { ...obj }
+  for (const key in sanitizers) {
+    if (key in sanitized && sanitizers[key]) {
+      sanitized[key] = sanitizers[key]!(sanitized[key]) as T[keyof T]
+    }
+  }
+  return sanitized
+}
+
+/**
+ * Check if input contains potential SQL injection patterns
+ */
+export const containsSqlInjection = (input: string): boolean => {
+  if (typeof input !== 'string') return false
+  const sqlPatterns = [
+    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC)\b)/i,
+    /(--|\/\*|\*\/|;)/,
+    /(\bOR\b\s*\d+\s*=\s*\d+)/i,
+    /(\bAND\b\s*\d+\s*=\s*\d+)/i,
+  ]
+  return sqlPatterns.some(pattern => pattern.test(input))
+}
+
+/**
+ * Check if input contains potential XSS patterns
+ */
+export const containsXss = (input: string): boolean => {
+  if (typeof input !== 'string') return false
+  const xssPatterns = [
+    /<script\b[^>]*>(.*?)<\/script>/gi,
+    /on\w+\s*=/gi,
+    /javascript\s*:/gi,
+    /<iframe\b[^>]*>(.*?)<\/iframe>/gi,
+  ]
+  return xssPatterns.some(pattern => pattern.test(input))
+}
+
+/**
+ * Comprehensive input validation
+ */
+export const validateInput = (
+  input: string,
+  options: {
+    maxLength?: number
+    minLength?: number
+    pattern?: RegExp
+    allowHtml?: boolean
+  } = {}
+): { isValid: boolean; sanitized: string; errors: string[] } => {
+  const errors: string[] = []
+  let sanitized = options.allowHtml ? input : sanitizeString(input)
+
+  if (options.maxLength && sanitized.length > options.maxLength) {
+    errors.push(`Input exceeds maximum length of ${options.maxLength}`)
+    sanitized = sanitized.substring(0, options.maxLength)
+  }
+
+  if (options.minLength && sanitized.length < options.minLength) {
+    errors.push(`Input must be at least ${options.minLength} characters`)
+  }
+
+  if (options.pattern && !options.pattern.test(sanitized)) {
+    errors.push('Input does not match required pattern')
+  }
+
+  if (containsSqlInjection(sanitized)) {
+    errors.push('Input contains invalid characters')
+  }
+
+  if (!options.allowHtml && containsXss(sanitized)) {
+    errors.push('Input contains invalid characters')
+  }
+
+  return {
+    isValid: errors.length === 0,
+    sanitized,
+    errors,
+  }
 }

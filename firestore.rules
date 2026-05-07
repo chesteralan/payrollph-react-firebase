@@ -1,0 +1,375 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getCurrentUserId() {
+      return request.auth.uid;
+    }
+
+    function isUserActive(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId))
+        && get(/databases/$(database)/documents/users/$(userId)).data.isActive == true;
+    }
+
+    function getUserCompanies(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.companyIds;
+    }
+
+    function hasCompanyAccess(userId, companyId) {
+      return companyId in getUserCompanies(userId);
+    }
+
+    function getUserRestrictions(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.restrictions;
+    }
+
+    function hasPermission(userId, department, section, action) {
+      let restrictions = getUserRestrictions(userId);
+      return restrictions[department][section][action] == true;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Validate timestamp fields
+    function isValidTimestamp(value) {
+      return value is timestamp;
+    }
+
+    function hasValidTimestamps() {
+      return isValidTimestamp(request.resource.data.createdAt)
+        && isValidTimestamp(request.resource.data.updatedAt);
+    }
+
+    // USERS collection
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isUserActive(getCurrentUserId());
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'system', 'users', 'edit');
+      allow create: if isAuthenticated()
+        && hasPermission(getCurrentUserId(), 'system', 'users', 'add');
+
+      // User restrictions subcollection
+      match /restrictions/{restrictionId} {
+        allow read: if isAuthenticated() && isUserActive(getCurrentUserId());
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'system', 'users', 'edit');
+      }
+
+      // User companies subcollection
+      match /companies/{companyId} {
+        allow read: if isAuthenticated() && isUserActive(getCurrentUserId());
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'system', 'users', 'edit');
+      }
+
+      // User settings subcollection
+      match /settings/{settingsId} {
+        allow read: if isAuthenticated() && (isOwner(userId) || hasPermission(getCurrentUserId(), 'system', 'users', 'view'));
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+
+    // COMPANIES collection
+    match /companies/{companyId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), companyId);
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'system', 'companies', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'system', 'companies', 'add');
+
+      // Company periods subcollection
+      match /periods/{periodId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), companyId);
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'system', 'companies', 'edit');
+      }
+
+      // Company options subcollection
+      match /options/{optionsId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), companyId);
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'system', 'companies', 'edit');
+      }
+    }
+
+    // EMPLOYEES collection
+    match /employees/{employeeId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'employees', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'employees', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'employees', 'add');
+
+      // Employee contacts subcollection
+      match /contacts/{contactId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), get(/databases/$(database)/documents/employees/$(employeeId)).data.companyId)
+          && hasPermission(getCurrentUserId(), 'employees', 'employees', 'view');
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'employees', 'employees', 'edit');
+      }
+
+      // Employee documents subcollection
+      match /documents/{documentId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), get(/databases/$(database)/documents/employees/$(employeeId)).data.companyId)
+          && hasPermission(getCurrentUserId(), 'employees', 'employees', 'view');
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'employees', 'employees', 'edit');
+      }
+    }
+
+    // NAMES collection
+    match /names/{nameId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'names', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'names', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'names', 'add');
+    }
+
+    // GROUPS collection
+    match /groups/{groupId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'groups', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'groups', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'groups', 'add');
+    }
+
+    // POSITIONS collection
+    match /positions/{positionId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'positions', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'positions', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'positions', 'add');
+    }
+
+    // AREAS collection
+    match /areas/{areaId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'areas', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'areas', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'employees', 'areas', 'add');
+    }
+
+    // EARNINGS collection
+    match /earnings/{earningId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'earnings', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'earnings', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'earnings', 'add');
+    }
+
+    // DEDUCTIONS collection
+    match /deductions/{deductionId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'deductions', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'deductions', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'deductions', 'add');
+    }
+
+    // BENEFITS collection
+    match /benefits/{benefitId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'benefits', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'benefits', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'lists', 'benefits', 'add');
+    }
+
+    // PAYROLLS collection
+    match /payrolls/{payrollId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'edit')
+        && request.resource.data.status == 'draft';
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'add');
+
+      // Payroll employees subcollection
+      match /employees/{employeeId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), get(/databases/$(database)/documents/payrolls/$(payrollId)).data.companyId)
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'view');
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'edit')
+          && get(/databases/$(database)/documents/payrolls/$(payrollId)).data.status == 'draft';
+      }
+
+      // Payroll inclusive dates subcollection
+      match /inclusiveDates/{dateId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), get(/databases/$(database)/documents/payrolls/$(payrollId)).data.companyId)
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'view');
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'edit')
+          && get(/databases/$(database)/documents/payrolls/$(payrollId)).data.status == 'draft';
+      }
+
+      // Payroll groups subcollection
+      match /groups/{groupId} {
+        allow read: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasCompanyAccess(getCurrentUserId(), get(/databases/$(database)/documents/payrolls/$(payrollId)).data.companyId)
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'view');
+        allow write: if isAuthenticated()
+          && isUserActive(getCurrentUserId())
+          && hasPermission(getCurrentUserId(), 'payroll', 'payroll', 'edit')
+          && get(/databases/$(database)/documents/payrolls/$(payrollId)).data.status == 'draft';
+      }
+    }
+
+    // TEMPLATES collection
+    match /templates/{templateId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'templates', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'templates', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'payroll', 'templates', 'add');
+    }
+
+    // PRINT FORMATS collection
+    match /printFormats/{formatId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && (resource.data.companyId == null || hasCompanyAccess(getCurrentUserId(), resource.data.companyId));
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'payroll', 'templates', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'payroll', 'templates', 'add');
+    }
+
+    // CALENDAR collection (system)
+    match /calendar/{yearId} {
+      allow read: if isAuthenticated() && isUserActive(getCurrentUserId());
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'system', 'calendar', 'edit');
+    }
+
+    // TERMS collection
+    match /terms/{termId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), resource.data.companyId);
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'system', 'terms', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'system', 'terms', 'add');
+    }
+
+    // AUDIT LOGS collection
+    match /auditLogs/{logId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasPermission(getCurrentUserId(), 'system', 'audit', 'view');
+      allow create: if isAuthenticated() && isUserActive(getCurrentUserId());
+      allow write: if false; // No updates or deletes allowed
+    }
+
+    // DTR (Daily Time Record) collection
+    match /dtr/{dtrId} {
+      allow read: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'calendar', 'view');
+      allow write: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'calendar', 'edit');
+      allow create: if isAuthenticated()
+        && isUserActive(getCurrentUserId())
+        && hasCompanyAccess(getCurrentUserId(), request.resource.data.companyId)
+        && hasPermission(getCurrentUserId(), 'employees', 'calendar', 'add');
+    }
+  }
+}
