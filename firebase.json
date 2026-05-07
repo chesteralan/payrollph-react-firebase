@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "payroll-web/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
