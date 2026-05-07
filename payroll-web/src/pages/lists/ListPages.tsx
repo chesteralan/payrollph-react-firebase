@@ -6,8 +6,9 @@ import { useTableSort } from '../../hooks/useTableSort'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { Plus, Edit, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Download } from 'lucide-react'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { exportToXLS, exportToCSV, benefitExportColumns, earningExportColumns, deductionExportColumns } from '../../utils/exportUtils'
 
 interface ListItem { id: string; name: string; description?: string; isActive: boolean }
 
@@ -199,15 +200,46 @@ export function BenefitsPage() {
 
   const { items: sortedItems, handleSort, sortConfig } = useTableSort(items, 'name')
 
+  const handleExportXLS = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      allocationType: item.allocationType,
+      allocationValue: item.allocationValue || 0,
+      employeeShareType: item.employeeShareType,
+      employeeShareValue: item.employeeShareValue || 0,
+      employerShareType: item.employerShareType,
+      employerShareValue: item.employerShareValue || 0,
+      isActive: item.isActive,
+    }))
+    exportToXLS(data, { filename: 'Benefits', columns: benefitExportColumns, sheetName: 'Benefits' })
+  }
+
+  const handleExportCSV = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      allocationType: item.allocationType,
+      isActive: item.isActive,
+    }))
+    exportToCSV(data, benefitExportColumns, 'Benefits')
+  }
+
   if (!canView('lists', 'benefits')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Benefits</h1>
-        {canAdd('lists', 'benefits') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Benefit</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleExportCSV}><Download className="w-4 h-4 mr-2" />CSV</Button>
+          <Button variant="secondary" size="sm" onClick={handleExportXLS}><Download className="w-4 h-4 mr-2" />XLS</Button>
+          {canAdd('lists', 'benefits') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Benefit</Button>
+          )}
+        </div>
       </div>
       {showForm && (
         <Card>
@@ -387,15 +419,42 @@ export function EarningsPage() {
 
   const { items: sortedItems, handleSort, sortConfig } = useTableSort(items, 'name')
 
+  const handleExportXLS = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      formulaType: item.formulaType,
+      formulaValue: item.formulaValue || 0,
+      isActive: item.isActive,
+    }))
+    exportToXLS(data, { filename: 'Earnings', columns: earningExportColumns, sheetName: 'Earnings' })
+  }
+
+  const handleExportCSV = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      formulaType: item.formulaType,
+      isActive: item.isActive,
+    }))
+    exportToCSV(data, earningExportColumns, 'Earnings')
+  }
+
   if (!canView('lists', 'earnings')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Earnings</h1>
-        {canAdd('lists', 'earnings') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Earning</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleExportCSV}><Download className="w-4 h-4 mr-2" />CSV</Button>
+          <Button variant="secondary" size="sm" onClick={handleExportXLS}><Download className="w-4 h-4 mr-2" />XLS</Button>
+          {canAdd('lists', 'earnings') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Earning</Button>
+          )}
+        </div>
       </div>
       {showForm && (
         <Card>
@@ -544,15 +603,42 @@ export function DeductionsPage() {
 
   const { items: sortedItems, handleSort, sortConfig } = useTableSort(items, 'name')
 
+  const handleExportXLS = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      type: item.type,
+      ruleValue: item.ruleValue || 0,
+      isActive: item.isActive,
+    }))
+    exportToXLS(data, { filename: 'Deductions', columns: deductionExportColumns, sheetName: 'Deductions' })
+  }
+
+  const handleExportCSV = () => {
+    const data = items.map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || '',
+      type: item.type,
+      isActive: item.isActive,
+    }))
+    exportToCSV(data, deductionExportColumns, 'Deductions')
+  }
+
   if (!canView('lists', 'deductions')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Deductions</h1>
-        {canAdd('lists', 'deductions') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Deduction</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" onClick={handleExportCSV}><Download className="w-4 h-4 mr-2" />CSV</Button>
+          <Button variant="secondary" size="sm" onClick={handleExportXLS}><Download className="w-4 h-4 mr-2" />XLS</Button>
+          {canAdd('lists', 'deductions') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Deduction</Button>
+          )}
+        </div>
       </div>
       {showForm && (
         <Card>

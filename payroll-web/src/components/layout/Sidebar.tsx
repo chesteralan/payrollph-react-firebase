@@ -200,6 +200,20 @@ const navigation: NavItem[] = [
         department: 'reports',
         section: 'attendance',
       },
+      {
+        label: 'Benefits Utilization',
+        icon: <BarChart3 className="w-4 h-4" />,
+        path: '/reports/benefits-utilization',
+        department: 'reports',
+        section: 'payroll',
+      },
+      {
+        label: 'Year-End',
+        icon: <BarChart3 className="w-4 h-4" />,
+        path: '/reports/year-end',
+        department: 'reports',
+        section: 'payroll',
+      },
     ],
   },
   {

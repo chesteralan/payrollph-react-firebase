@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { Breadcrumb } from './Breadcrumb'
+import { AlertBannerProvider } from '../ui/AlertBanner'
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -20,7 +22,10 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6">
-          <Outlet />
+          <Breadcrumb />
+          <AlertBannerProvider>
+            <Outlet />
+          </AlertBannerProvider>
         </main>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { SearchBar } from '../../components/ui/SearchBar'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
-import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square, AlertTriangle, CheckCircle, Upload, AlertCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square, AlertTriangle, CheckCircle, Upload, AlertCircle, Calendar as CalendarIcon, Repeat } from 'lucide-react'
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry, Term } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
@@ -31,9 +31,18 @@ export function CalendarPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [showRecurringForm, setShowRecurringForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [formData, setFormData] = useState({ date: '', name: '', type: 'holiday' as 'holiday' | 'special' | 'workday', isPaid: true })
+  const [recurringFormData, setRecurringFormData] = useState({
+    month: 1,
+    day: 1,
+    name: '',
+    type: 'holiday' as 'holiday' | 'special' | 'workday',
+    isPaid: true,
+    years: 5,
+  })
 
   useEffect(() => { fetchEvents() }, [selectedYear])
 
@@ -100,6 +109,35 @@ export function CalendarPage() {
     URL.revokeObjectURL(url)
   }
 
+  const handleCreateRecurringHoliday = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const { month, day, name, type, isPaid, years } = recurringFormData
+    const currentYear = new Date().getFullYear()
+    const batch = writeBatch(db)
+
+    for (let i = 0; i < years; i++) {
+      const year = currentYear + i
+      const date = new Date(year, month - 1, day)
+      const entryData = {
+        date,
+        name,
+        type,
+        isPaid,
+        companyId: 'global',
+        recurring: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+      const newDocRef = doc(collection(db, 'calendar'))
+      batch.set(newDocRef, entryData)
+    }
+
+    await batch.commit()
+    setShowRecurringForm(false)
+    setRecurringFormData({ month: 1, day: 1, name: '', type: 'holiday', isPaid: true, years: 5 })
+    fetchEvents()
+  }
+
   const groupedByMonth = events.reduce((acc, event) => {
     const month = new Date(event.date).getMonth()
     if (!acc[month]) acc[month] = []
@@ -137,7 +175,12 @@ export function CalendarPage() {
             <Download className="w-4 h-4 mr-2" />Export CSV
           </Button>
           {canAdd('system', 'calendar') && (
-            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Date</Button>
+            <>
+              <Button variant="secondary" onClick={() => setShowRecurringForm(!showRecurringForm)}>
+                <Repeat className="w-4 h-4 mr-2" />Recurring Holiday
+              </Button>
+              <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add Date</Button>
+            </>
           )}
         </div>
       </div>
@@ -183,6 +226,81 @@ export function CalendarPage() {
         </Card>
       )}
 
+      {showRecurringForm && (
+        <Card>
+          <CardHeader><CardTitle><CalendarIcon className="w-4 h-4 mr-2 inline" />Create Recurring Holiday</CardTitle></CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateRecurringHoliday} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input id="recurringName" label="Holiday Name" value={recurringFormData.name} onChange={(e) => setRecurringFormData({ ...recurringFormData, name: e.target.value })} required />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    value={recurringFormData.type}
+                    onChange={(e) => setRecurringFormData({ ...recurringFormData, type: e.target.value as 'holiday' | 'special' | 'workday' })}
+                  >
+                    <option value="holiday">Regular Holiday</option>
+                    <option value="special">Special Holiday</option>
+                    <option value="workday">Special Workday</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    value={recurringFormData.month}
+                    onChange={(e) => setRecurringFormData({ ...recurringFormData, month: Number(e.target.value) })}
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                      <option key={m} value={m}>{new Date(0, m - 1).toLocaleString('default', { month: 'long' })}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Day of Month</label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="31"
+                    value={String(recurringFormData.day)}
+                    onChange={(e) => setRecurringFormData({ ...recurringFormData, day: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Years to Generate</label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    value={recurringFormData.years}
+                    onChange={(e) => setRecurringFormData({ ...recurringFormData, years: Number(e.target.value) })}
+                  >
+                    {[1, 2, 3, 5, 10].map(y => (
+                      <option key={y} value={y}>{y} year{y > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center pt-6">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={recurringFormData.isPaid}
+                      onChange={(e) => setRecurringFormData({ ...recurringFormData, isPaid: e.target.checked })}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-sm">Paid Holiday</span>
+                  </label>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit">Create Recurring Holiday</Button>
+                <Button type="button" variant="ghost" onClick={() => setShowRecurringForm(false)}>Cancel</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading...</div>
       ) : events.length === 0 ? (
@@ -198,30 +316,31 @@ export function CalendarPage() {
                   <CardTitle className="text-lg">{month}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-2">
-                  {monthEvents.map(event => (
-                    <div key={event.id} className="flex items-center justify-between p-2 border border-gray-100 rounded">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">{new Date(event.date).getDate()}</span>
-                          <span className="text-sm">{event.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${typeColors[event.type]}`}>
-                            {event.type}
-                          </span>
-                          {event.isPaid && <span className="text-xs text-gray-500">Paid</span>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {canEdit('system', 'calendar') && (
-                          <Button variant="ghost" size="sm" onClick={() => handleEdit(event)}><Edit className="w-3 h-3" /></Button>
-                        )}
-                        {canDelete('system', 'calendar') && (
-                          <Button variant="ghost" size="sm" onClick={() => handleDelete(event.id)}><Trash2 className="w-3 h-3" /></Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                   {monthEvents.map(event => (
+                     <div key={event.id} className="flex items-center justify-between p-2 border border-gray-100 rounded">
+                       <div className="flex-1">
+                         <div className="flex items-center gap-2">
+                           <span className="text-sm font-medium">{new Date(event.date).getDate()}</span>
+                           <span className="text-sm">{event.name}</span>
+                           {event.recurring && <Repeat className="w-3 h-3 text-blue-500" />}
+                         </div>
+                         <div className="flex items-center gap-2 mt-1">
+                           <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${typeColors[event.type]}`}>
+                             {event.type}
+                           </span>
+                           {event.isPaid && <span className="text-xs text-gray-500">Paid</span>}
+                         </div>
+                       </div>
+                       <div className="flex items-center gap-1">
+                         {canEdit('system', 'calendar') && (
+                           <Button variant="ghost" size="sm" onClick={() => handleEdit(event)}><Edit className="w-3 h-3" /></Button>
+                         )}
+                         {canDelete('system', 'calendar') && (
+                           <Button variant="ghost" size="sm" onClick={() => handleDelete(event.id)}><Trash2 className="w-3 h-3" /></Button>
+                         )}
+                       </div>
+                     </div>
+                   ))}
                 </CardContent>
               </Card>
             )

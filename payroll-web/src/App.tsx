@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { CompanyProvider } from './context/CompanyContext'
 import { ToastProvider } from './components/ui/Toast'
 import { ProtectedRoute } from './components/ui/ProtectedRoute'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { AppLayout } from './components/layout/AppLayout'
 import { LoginPage } from './pages/auth/LoginPage'
 import { SetupPage } from './pages/auth/SetupPage'
@@ -33,6 +34,8 @@ const PayrollSummaryPage = lazy(() => import('./pages/reports/PayrollSummaryPage
 const EmployeeReportPage = lazy(() => import('./pages/reports/EmployeeReportPage').then(m => ({ default: m.EmployeeReportPage })))
 const EarningsDeductionsReportPage = lazy(() => import('./pages/reports/EarningsDeductionsReportPage').then(m => ({ default: m.EarningsDeductionsReportPage })))
 const AttendanceReportPage = lazy(() => import('./pages/reports/AttendanceReportPage').then(m => ({ default: m.AttendanceReportPage })))
+const BenefitsUtilizationReportPage = lazy(() => import('./pages/reports/BenefitsUtilizationReportPage').then(m => ({ default: m.BenefitsUtilizationReportPage })))
+const YearEndReportPage = lazy(() => import('./pages/reports/YearEndReportPage').then(m => ({ default: m.YearEndReportPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
 const CompanySettingsPage = lazy(() => import('./pages/system/CompanySettingsPage').then(m => ({ default: m.CompanySettingsPage })))
 const CalendarPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.CalendarPage })))
@@ -53,8 +56,9 @@ function LazyPage({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
 }
 
-function App() {
+  function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
         <CompanyProvider>
@@ -96,6 +100,8 @@ function App() {
                <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
                <Route path="reports/earnings-deductions" element={<LazyPage><EarningsDeductionsReportPage /></LazyPage>} />
                <Route path="reports/attendance" element={<LazyPage><AttendanceReportPage /></LazyPage>} />
+               <Route path="reports/benefits-utilization" element={<LazyPage><BenefitsUtilizationReportPage /></LazyPage>} />
+               <Route path="reports/year-end" element={<LazyPage><YearEndReportPage /></LazyPage>} />
 <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
                <Route path="system/company-settings" element={<LazyPage><CompanySettingsPage /></LazyPage>} />
                <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
@@ -114,6 +120,7 @@ function App() {
         </CompanyProvider>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
