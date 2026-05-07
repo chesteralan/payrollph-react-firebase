@@ -6,6 +6,7 @@ import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { SearchBar } from '../../components/ui/SearchBar'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import {
   ChevronLeft, ChevronRight, Calendar, Clock, Timer, AlertCircle,
@@ -59,6 +60,7 @@ export function DTRPage() {
   const [leaveForm, setLeaveForm] = useState({ benefitId: '', startDate: '', endDate: '', reason: '' })
 
   const [viewMode, setViewMode] = useState<'calendar' | 'summary'>('calendar')
+  const [dtrSearchQuery, setDtrSearchQuery] = useState('')
   const [allMonthEntries, setAllMonthEntries] = useState<(DTREntry & { employeeName?: string; employeeCode?: string })[]>([])
   const [showImportModal, setShowImportModal] = useState(false)
   const [importPreview, setImportPreview] = useState<Partial<DTREntry>[]>([])
@@ -129,6 +131,16 @@ export function DTRPage() {
   useEffect(() => {
     if (viewMode === 'summary' && employees.length > 0) fetchAllMonthEntries()
   }, [viewMode, selectedMonth, selectedYear, employees])
+
+  const filteredMonthEntries = useMemo(() => {
+    if (dtrSearchQuery === '') return allMonthEntries
+    const q = dtrSearchQuery.toLowerCase()
+    return allMonthEntries.filter(e =>
+      (e.employeeName || '').toLowerCase().includes(q) ||
+      (e.employeeCode || '').toLowerCase().includes(q) ||
+      e.date.includes(q)
+    )
+  }, [allMonthEntries, dtrSearchQuery])
 
   const entryMap = useMemo(() => {
     const map = new Map<string, DTREntry>()
@@ -496,6 +508,18 @@ export function DTRPage() {
               <CardTitle className="flex items-center gap-2"><BarChart3 className="w-5 h-5" />DTR Summary - {MONTH_NAMES[selectedMonth]} {selectedYear}</CardTitle>
             </div>
           </CardHeader>
+          <CardHeader className="py-3">
+            <div className="flex items-center gap-4">
+              <SearchBar
+                value={dtrSearchQuery}
+                onChange={setDtrSearchQuery}
+                placeholder="Search by employee name or code..."
+              />
+              <span className="text-sm text-gray-500 ml-auto">
+                {filteredMonthEntries.length} entr{filteredMonthEntries.length !== 1 ? 'ies' : 'y'}
+              </span>
+            </div>
+          </CardHeader>
           <CardContent className="p-0">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -512,8 +536,8 @@ export function DTRPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {allMonthEntries.length === 0 ? <tr><td colSpan={9} className="px-6 py-4 text-center text-gray-500">No entries for this period</td></tr>
-                  : allMonthEntries.map(entry => (
+                {filteredMonthEntries.length === 0 ? <tr><td colSpan={9} className="px-6 py-4 text-center text-gray-500">No entries for this period</td></tr>
+                  : filteredMonthEntries.map(entry => (
                     <tr key={entry.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{entry.employeeName || '-'}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">{entry.employeeCode || '-'}</td>

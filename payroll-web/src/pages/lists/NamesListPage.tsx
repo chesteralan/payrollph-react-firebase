@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { collection, getDocs, addDoc, updateDoc, doc, query, where, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
@@ -6,6 +6,7 @@ import { useToast } from '../../components/ui/Toast'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { SearchBar } from '../../components/ui/SearchBar'
 import { Plus, Edit, Trash2, Upload, X, Check, AlertCircle, Download, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import { useTableSort } from '../../hooks/useTableSort'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
@@ -32,6 +33,7 @@ export function NamesListPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
   const { addToast } = useToast()
   const [names, setNames] = useState<NameRecord[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -85,8 +87,19 @@ export function NamesListPage() {
     setShowForm(false); setEditingId(null); setFormData({ firstName: '', middleName: '', lastName: '', suffix: '' }); fetchNames()
   }
 
+  const filteredNames = useMemo(() => {
+    if (searchQuery === '') return names
+    const q = searchQuery.toLowerCase()
+    return names.filter(n =>
+      n.firstName.toLowerCase().includes(q) ||
+      (n.middleName || '').toLowerCase().includes(q) ||
+      n.lastName.toLowerCase().includes(q) ||
+      (n.suffix || '').toLowerCase().includes(q)
+    )
+  }, [names, searchQuery])
+
   const { items: sortedNames, handleSort, sortConfig } = useTableSort(
-    names.map(n => ({ ...n, fullName: `${n.firstName} ${n.middleName || ''} ${n.lastName}` })),
+    filteredNames.map(n => ({ ...n, fullName: `${n.firstName} ${n.middleName || ''} ${n.lastName}` })),
     'lastName'
   )
 
@@ -501,8 +514,21 @@ export function NamesListPage() {
         </Card>
       )}
 
-      <Card><CardContent className="p-0">
-        <table className="w-full">
+      <Card>
+        <CardHeader className="py-3">
+          <div className="flex items-center gap-4">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search names..."
+            />
+            <span className="text-sm text-gray-500 ml-auto">
+              {sortedNames.length} name{sortedNames.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3"><button onClick={toggleSelectAll} className="text-gray-500 hover:text-gray-700">{selectedIds.size === sortedNames.length && sortedNames.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}</button></th>

@@ -1,0 +1,58 @@
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Search, X } from 'lucide-react'
+import { clsx } from 'clsx'
+
+interface SearchBarProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  className?: string
+  debounceMs?: number
+}
+
+export function SearchBar({ value, onChange, placeholder = 'Search...', className, debounceMs = 300 }: SearchBarProps) {
+  const [localValue, setLocalValue] = useState(value)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      onChange(localValue)
+    }, debounceMs)
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [localValue, debounceMs, onChange])
+
+  const handleClear = useCallback(() => {
+    setLocalValue('')
+    onChange('')
+  }, [onChange])
+
+  return (
+    <div className={clsx('relative flex-1 max-w-sm', className)}>
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+      <input
+        type="text"
+        placeholder={placeholder}
+        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+      />
+      {localValue && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  )
+}

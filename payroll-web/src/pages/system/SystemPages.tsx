@@ -4,10 +4,11 @@ import { db } from '../../config/firebase'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
+import { SearchBar } from '../../components/ui/SearchBar'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
-import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Check, Shield, ChevronUp, ChevronDown, ChevronsUpDown, Download, CheckSquare, Square, AlertTriangle, CheckCircle, Upload, AlertCircle } from 'lucide-react'
 import type { UserAccount, UserRestriction, Department, Section, CalendarEntry, Term } from '../../types'
 import type { AuditEntry } from '../../services/audit'
 import { useTableSort } from '../../hooks/useTableSort'
@@ -464,6 +465,7 @@ export function UsersPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions()
   const { addToast } = useToast()
   const [users, setUsers] = useState<(UserAccount & { restrictions?: UserRestriction[] })[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -472,8 +474,25 @@ export function UsersPage() {
   const [restrictions, setRestrictions] = useState<UserRestriction[]>([])
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkLoading, setBulkLoading] = useState(false)
+  const [showImport, setShowImport] = useState(false)
+  const [csvPreview, setCsvPreview] = useState<{ email: string; firstName: string; lastName: string; role: string; department: string; section: string; isValid: boolean; error?: string }[]>([])
+  const [csvFileName, setCsvFileName] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importStats, setImportStats] = useState<{ success: number; failed: number; duplicates: number } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchUsers() }, [])
+
+  const filteredUsers = useMemo(() => {
+    if (searchQuery === '') return users
+    const q = searchQuery.toLowerCase()
+    return users.filter(u =>
+      u.username.toLowerCase().includes(q) ||
+      (u.displayName || '').toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.role || '').toLowerCase().includes(q)
+    )
+  }, [users, searchQuery])
 
   const fetchUsers = async () => {
     setLoading(true)
@@ -491,7 +510,7 @@ export function UsersPage() {
     setLoading(false)
   }
 
-  const { items: sortedUsers, handleSort, sortConfig } = useTableSort(users, 'username')
+  const { items: sortedUsers, handleSort, sortConfig } = useTableSort(filteredUsers, 'username')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -567,6 +586,125 @@ export function UsersPage() {
 
   const clearSelection = () => setSelectedIds(new Set())
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCsvFileName(file.name)
+    setImportStats(null)
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const text = event.target?.result as string
+      const lines = text.split('\n').filter(line => line.trim())
+
+      const startIndex = lines[0].toLowerCase().includes('email') ? 1 : 0
+
+      const existingEmails = new Set(users.map(u => u.email.toLowerCase()))
+
+      const validRoles = ['admin', 'manager', 'user']
+      const validDepartments = ['payroll', 'employees', 'lists', 'reports', 'system']
+      const validSections = ['payroll', 'templates', 'employees', 'calendar', 'groups', 'positions', 'areas', 'names', 'benefits', 'earnings', 'deductions', '13month', 'companies', 'terms', 'users', 'audit', 'database']
+
+      const preview: { email: string; firstName: string; lastName: string; role: string; department: string; section: string; isValid: boolean; error?: string }[] = []
+      for (let i = startIndex; i < lines.length; i++) {
+        const line = lines[i].trim()
+        if (!line) continue
+
+        const columns = line.split(',').map(c => c.trim())
+
+        let email = '', firstName = '', lastName = '', role = 'user', department = '', section = ''
+        let isValid = true
+        let error = ''
+
+        if (columns.length >= 3) {
+          email = columns[0] || ''
+          firstName = columns[1] || ''
+          lastName = columns[2] || ''
+          if (columns.length >= 4) role = columns[3] || 'user'
+          if (columns.length >= 5) department = columns[4] || ''
+          if (columns.length >= 6) section = columns[5] || ''
+
+          if (!email || !firstName || !lastName) {
+            isValid = false
+            error = 'Email, firstName, and lastName required'
+          } else if (!email.includes('@')) {
+            isValid = false
+            error = 'Invalid email format'
+          } else if (existingEmails.has(email.toLowerCase())) {
+            isValid = false
+            error = 'Duplicate email'
+          } else if (role && !validRoles.includes(role.toLowerCase())) {
+            isValid = false
+            error = 'Invalid role (must be admin, manager, or user)'
+          } else if (department && !validDepartments.includes(department.toLowerCase() as Department)) {
+            isValid = false
+            error = 'Invalid department'
+          } else if (section && !validSections.includes(section.toLowerCase() as Section)) {
+            isValid = false
+            error = 'Invalid section'
+          }
+        } else {
+          isValid = false
+          error = 'Invalid format (need at least email, firstName, lastName)'
+        }
+
+        preview.push({ email, firstName, lastName, role: role || 'user', department, section, isValid, error })
+      }
+
+      setCsvPreview(preview)
+    }
+    reader.readAsText(file)
+  }
+
+  const handleImport = async () => {
+    const validRows = csvPreview.filter(row => row.isValid)
+    if (validRows.length === 0) return
+
+    setImporting(true)
+    let success = 0
+    let failed = 0
+    let duplicates = 0
+
+    const existingEmails = new Set(users.map(u => u.email.toLowerCase()))
+
+    for (const row of validRows) {
+      const emailLower = row.email.toLowerCase()
+      if (existingEmails.has(emailLower)) {
+        duplicates++
+        continue
+      }
+      try {
+        await addDoc(collection(db, 'user_accounts'), {
+          email: row.email,
+          username: row.email.split('@')[0],
+          displayName: `${row.firstName} ${row.lastName}`,
+          isActive: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          role: row.role || 'user',
+          department: row.department || '',
+          section: row.section || ''
+        })
+        existingEmails.add(emailLower)
+        success++
+      } catch {
+        failed++
+      }
+    }
+
+    setImportStats({ success, failed, duplicates })
+    setImporting(false)
+    fetchUsers()
+  }
+
+  const resetImport = () => {
+    setShowImport(false)
+    setCsvPreview([])
+    setCsvFileName('')
+    setImportStats(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   const handleBulkStatusUpdate = async (isActive: boolean) => {
     setBulkLoading(true)
     try {
@@ -605,9 +743,14 @@ export function UsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">User Accounts</h1>
-        {canAdd('system', 'users') && (
-          <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add User</Button>
-        )}
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => setShowImport(true)}>
+            <Upload className="w-4 h-4 mr-2" />Import CSV
+          </Button>
+          {canAdd('system', 'users') && (
+            <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 mr-2" />Add User</Button>
+          )}
+        </div>
       </div>
 
       {selectedCount > 0 && (
@@ -646,12 +789,129 @@ export function UsersPage() {
                 <Input id="email" label="Email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
                 <Input id="displayName" label="Display Name" value={formData.displayName} onChange={(e) => setFormData({ ...formData, displayName: e.target.value })} required />
                 {!editingId && <Input id="password" label="Password" type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />}
+      </div>
+      <div className="flex gap-2">
+        <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
+        <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
+      </div>
+    </form>
+  </CardContent>
+</Card>
+      )}
+
+      {showImport && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Import Users from CSV</CardTitle>
+              <Button variant="ghost" size="sm" onClick={resetImport}><X className="w-4 h-4" /></Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!csvPreview.length && !importStats && (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
+                <p className="text-sm text-gray-600 mb-2">Upload a CSV file with user data</p>
+                <p className="text-xs text-gray-500 mb-4">
+                  Format: email, firstName, lastName, role, department, section
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.txt"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                  Select File
+                </Button>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
-                <Button type="button" variant="ghost" onClick={() => { setShowForm(false); setEditingId(null) }}>Cancel</Button>
+            )}
+
+            {csvFileName && csvPreview.length > 0 && !importStats && (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-sm text-gray-600">
+                    File: <span className="font-medium">{csvFileName}</span>
+                    <span className="ml-2">({csvPreview.length} rows found)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-sm text-green-600">
+                      {csvPreview.filter(r => r.isValid).length} valid
+                    </span>
+                    <span className="text-sm text-red-600">
+                      {csvPreview.filter(r => !r.isValid).length} invalid
+                    </span>
+                  </div>
+                </div>
+
+                <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="text-left px-3 py-2">#</th>
+                        <th className="text-left px-3 py-2">Email</th>
+                        <th className="text-left px-3 py-2">First Name</th>
+                        <th className="text-left px-3 py-2">Last Name</th>
+                        <th className="text-left px-3 py-2">Role</th>
+                        <th className="text-left px-3 py-2">Department</th>
+                        <th className="text-left px-3 py-2">Section</th>
+                        <th className="text-left px-3 py-2">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {csvPreview.map((row, index) => (
+                        <tr key={index} className={row.isValid ? '' : 'bg-red-50'}>
+                          <td className="px-3 py-2 text-gray-500">{index + 1}</td>
+                          <td className="px-3 py-2">{row.email}</td>
+                          <td className="px-3 py-2">{row.firstName}</td>
+                          <td className="px-3 py-2">{row.lastName}</td>
+                          <td className="px-3 py-2">{row.role}</td>
+                          <td className="px-3 py-2">{row.department}</td>
+                          <td className="px-3 py-2">{row.section}</td>
+                          <td className="px-3 py-2">
+                            {row.isValid ? (
+                              <Check className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <span className="flex items-center gap-1 text-red-600 text-xs">
+                                <AlertCircle className="w-3 h-3" />{row.error}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="ghost" onClick={resetImport}>Cancel</Button>
+                  <Button
+                    onClick={handleImport}
+                    disabled={importing || csvPreview.filter(r => r.isValid).length === 0}
+                  >
+                    {importing ? 'Importing...' : `Import ${csvPreview.filter(r => r.isValid).length} Users`}
+                  </Button>
+                </div>
               </div>
-            </form>
+            )}
+
+            {importStats && (
+              <div className="text-center py-8">
+                <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Import Complete</h3>
+                <p className="text-gray-600 mb-4">
+                  Successfully imported <span className="font-medium text-green-600">{importStats.success}</span> users
+                  {importStats.failed > 0 && (
+                    <span>, <span className="font-medium text-red-600">{importStats.failed}</span> failed</span>
+                  )}
+                  {importStats.duplicates > 0 && (
+                    <span>, <span className="font-medium text-yellow-600">{importStats.duplicates}</span> duplicates skipped</span>
+                  )}
+                </p>
+                <Button onClick={resetImport}>Done</Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -720,7 +980,20 @@ export function UsersPage() {
         </Card>
       )}
 
-      <Card><CardContent className="p-0">
+      <Card>
+        <CardHeader className="py-3">
+          <div className="flex items-center gap-4">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search users by name, email, or role..."
+            />
+            <span className="text-sm text-gray-500 ml-auto">
+              {sortedUsers.length} user{sortedUsers.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
         <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -982,6 +1255,11 @@ export function DatabasePage() {
   const [selectedCollection, setSelectedCollection] = useState('')
   const [verificationResults, setVerificationResults] = useState<Array<{ name: string; status: 'Pass' | 'Fail' | 'Warning'; details: string; issueCount: number }>>([])
   const [verifying, setVerifying] = useState(false)
+  const [cleanupConfirm, setCleanupConfirm] = useState<string | null>(null)
+  const [cleanupLoading, setCleanupLoading] = useState('')
+  const [cleanupResults, setCleanupResults] = useState<Array<{ name: string; count: number; time: number; success: boolean }>>([])
+  const [dtrMonths, setDtrMonths] = useState(6)
+  const [softDeleteDays, setSoftDeleteDays] = useState(30)
 
   const COLLECTIONS = [
     'names', 'employees', 'employee_groups', 'employee_positions', 'employee_areas',
@@ -1179,6 +1457,117 @@ export function DatabasePage() {
     setVerifying(false)
   }
 
+  const runCleanup = async (operation: string) => {
+    setCleanupLoading(operation)
+    const startTime = Date.now()
+    let count = 0
+    try {
+      const batch = writeBatch(db)
+      let processed = 0
+
+      if (operation === 'orphaned') {
+        const [employeesSnap, namesSnap, payrollSnap] = await Promise.all([
+          getDocs(collection(db, 'employees')),
+          getDocs(collection(db, 'names')),
+          getDocs(collection(db, 'payroll')),
+          getDocs(collection(db, 'payroll_employees'))
+        ])
+        const names = namesSnap.docs.map(d => d.id)
+        const nameSet = new Set(names)
+        const payroll = payrollSnap.docs.map(d => d.id)
+        const payrollSet = new Set(payroll)
+
+        employeesSnap.docs.forEach(d => {
+          const data = d.data()
+          if (data.nameId && !nameSet.has(data.nameId)) {
+            batch.delete(d.ref)
+            processed++
+          }
+        })
+
+        const payrollEmpsSnap = await getDocs(collection(db, 'payroll_employees'))
+        payrollEmpsSnap.docs.forEach(d => {
+          const data = d.data()
+          if (data.payrollId && !payrollSet.has(data.payrollId)) {
+            batch.delete(d.ref)
+            processed++
+          }
+        })
+      } else if (operation === 'duplicates') {
+        const snap = await getDocs(collection(db, 'names'))
+        const names = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Array<{ id: string; name?: string }>
+        const seen = new Set<string>()
+        const toDelete: string[] = []
+        names.forEach(n => {
+          const nameKey = (n.name || '').toLowerCase().trim()
+          if (nameKey && seen.has(nameKey)) {
+            toDelete.push(n.id)
+          } else if (nameKey) {
+            seen.add(nameKey)
+          }
+        })
+        toDelete.forEach(id => {
+          batch.delete(doc(db, 'names', id))
+          processed++
+        })
+      } else if (operation === 'oldDtr') {
+        const cutoff = new Date()
+        cutoff.setMonth(cutoff.getMonth() - dtrMonths)
+        const snap = await getDocs(collection(db, 'dtr_entries'))
+        snap.docs.forEach(d => {
+          const data = d.data()
+          const entryDate = data.date?.toDate ? data.date.toDate() : new Date(data.date)
+          if (entryDate < cutoff) {
+            batch.delete(d.ref)
+            processed++
+          }
+        })
+      } else if (operation === 'expiredLeave') {
+        const snap = await getDocs(collection(db, 'leave_applications'))
+        const now = new Date()
+        snap.docs.forEach(d => {
+          const data = d.data()
+          if (data.status === 'approved' || data.status === 'pending') {
+            const endDate = data.endDate?.toDate ? data.endDate.toDate() : new Date(data.endDate)
+            if (endDate && endDate < now) {
+              batch.update(d.ref, { status: 'expired', updatedAt: new Date() })
+              processed++
+            }
+          }
+        })
+      } else if (operation === 'softDeleted') {
+        const cutoff = new Date()
+        cutoff.setDate(cutoff.getDate() - softDeleteDays)
+        const collections = ['employees', 'names', 'earnings', 'deductions', 'benefits', 'payroll']
+        await Promise.all(collections.map(async col => {
+          const snap = await getDocs(collection(db, col))
+          snap.docs.forEach(d => {
+            const data = d.data()
+            if (data.isDeleted && data.deletedAt?.toDate() < cutoff) {
+              batch.delete(d.ref)
+              processed++
+            }
+          })
+        }))
+      }
+
+      if (processed > 0) {
+        await batch.commit()
+      }
+      count = processed
+      const timeTaken = Date.now() - startTime
+      setCleanupResults(prev => [...prev, { name: operation, count, time: timeTaken, success: true }])
+      addToast({ type: 'success', title: `Cleanup complete: ${count} records processed` })
+      fetchStats()
+    } catch (e) {
+      const timeTaken = Date.now() - startTime
+      setCleanupResults(prev => [...prev, { name: operation, count: 0, time: timeTaken, success: false }])
+      addToast({ type: 'error', title: `Cleanup failed: ${e}` })
+    }
+    setCleanupLoading('')
+    setCleanupConfirm(null)
+  }
+
   const totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0)
 
   if (!canView('system', 'database')) return <div className="text-center py-12 text-gray-500">Access denied</div>
@@ -1364,6 +1753,89 @@ export function DatabasePage() {
                 ))}
               </tbody>
             </table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Data Cleanup</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">DTR cutoff:</span>
+              <input type="number" value={dtrMonths} onChange={(e) => setDtrMonths(Number(e.target.value))} className="w-16 px-2 py-1 border border-gray-300 rounded text-sm" min={1} max={36} />
+              <span className="text-sm text-gray-500">mo</span>
+              <span className="text-sm text-gray-500 ml-4">Soft-delete cutoff:</span>
+              <input type="number" value={softDeleteDays} onChange={(e) => setSoftDeleteDays(Number(e.target.value))} className="w-16 px-2 py-1 border border-gray-300 rounded text-sm" min={1} max={365} />
+              <span className="text-sm text-gray-500">days</span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { id: 'orphaned', name: 'Remove Orphaned Records', desc: 'Delete employees with invalid name refs and payroll_employees without valid payroll', variant: 'danger' as const },
+              { id: 'duplicates', name: 'Remove Duplicate Names', desc: 'Delete duplicate names in the names collection (keeps first occurrence)', variant: 'warning' as const },
+              { id: 'oldDtr', name: 'Clear Old DTR Entries', desc: `Delete DTR entries older than ${dtrMonths} months`, variant: 'warning' as const },
+              { id: 'expiredLeave', name: 'Expire Old Leave Applications', desc: 'Mark approved/pending leave applications as expired if end date passed', variant: 'secondary' as const },
+              { id: 'softDeleted', name: 'Purge Soft-Deleted Records', desc: `Permanently delete soft-deleted records older than ${softDeleteDays} days`, variant: 'danger' as const }
+            ].map(op => (
+              <div key={op.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div>
+                  <h4 className="font-medium text-gray-900">{op.name}</h4>
+                  <p className="text-sm text-gray-500 mt-1">{op.desc}</p>
+                </div>
+                <ConfirmDialog
+                  title={`Confirm: ${op.name}`}
+                  message={`This operation cannot be undone. Are you sure you want to proceed?`}
+                  confirmText="Run Cleanup"
+                  variant={op.variant}
+                  onConfirm={() => runCleanup(op.id)}
+                >
+                  {(open) => (
+                    <Button
+                      variant={op.variant === 'danger' ? 'danger' : op.variant === 'warning' ? 'warning' : 'secondary'}
+                      size="sm"
+                      onClick={() => { setCleanupConfirm(op.id); open() }}
+                      disabled={!!cleanupLoading}
+                      className="w-full"
+                    >
+                      {cleanupLoading === op.id ? 'Running...' : 'Run'}
+                    </Button>
+                  )}
+                </ConfirmDialog>
+              </div>
+            ))}
+          </div>
+
+          {cleanupResults.length > 0 && (
+            <div className="mt-6">
+              <h4 className="font-medium text-gray-900 mb-3">Cleanup History</h4>
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Operation</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Records</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Time (ms)</th>
+                    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {cleanupResults.map((result, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{result.name}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-right">{result.count}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500 text-right">{result.time}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {result.success ? 'Success' : 'Failed'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>

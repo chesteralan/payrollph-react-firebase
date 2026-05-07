@@ -32,6 +32,7 @@ const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPa
 const PayrollSummaryPage = lazy(() => import('./pages/reports/PayrollSummaryPage').then(m => ({ default: m.PayrollSummaryPage })))
 const EmployeeReportPage = lazy(() => import('./pages/reports/EmployeeReportPage').then(m => ({ default: m.EmployeeReportPage })))
 const EarningsDeductionsReportPage = lazy(() => import('./pages/reports/EarningsDeductionsReportPage').then(m => ({ default: m.EarningsDeductionsReportPage })))
+const AttendanceReportPage = lazy(() => import('./pages/reports/AttendanceReportPage').then(m => ({ default: m.AttendanceReportPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
 const CompanySettingsPage = lazy(() => import('./pages/system/CompanySettingsPage').then(m => ({ default: m.CompanySettingsPage })))
 const CalendarPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.CalendarPage })))
@@ -94,6 +95,7 @@ function App() {
                <Route path="reports/payroll-summary" element={<LazyPage><PayrollSummaryPage /></LazyPage>} />
                <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
                <Route path="reports/earnings-deductions" element={<LazyPage><EarningsDeductionsReportPage /></LazyPage>} />
+               <Route path="reports/attendance" element={<LazyPage><AttendanceReportPage /></LazyPage>} />
 <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
                <Route path="system/company-settings" element={<LazyPage><CompanySettingsPage /></LazyPage>} />
                <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />

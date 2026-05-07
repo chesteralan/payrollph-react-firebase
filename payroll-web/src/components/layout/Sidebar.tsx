@@ -193,6 +193,13 @@ const navigation: NavItem[] = [
         department: 'reports',
         section: 'payroll',
       },
+      {
+        label: 'Attendance',
+        icon: <BarChart3 className="w-4 h-4" />,
+        path: '/reports/attendance',
+        department: 'reports',
+        section: 'attendance',
+      },
     ],
   },
   {

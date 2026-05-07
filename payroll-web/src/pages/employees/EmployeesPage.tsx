@@ -9,11 +9,12 @@ import { useTableSort } from '../../hooks/useTableSort'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { SearchBar } from '../../components/ui/SearchBar'
 import { Pagination } from '../../components/ui/Pagination'
-import { Plus, Edit, Trash2, Eye, Search, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square, X } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, UserCheck, UserX, ChevronUp, ChevronDown, ChevronsUpDown, CheckSquare, Square } from 'lucide-react'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { TableSkeleton } from '../../components/ui/Skeleton'
-import type { Employee } from '../../types'
+import type { Employee, EmployeeGroup } from '../../types'
 
 export function EmployeesPage() {
   const { currentCompanyId } = useAuth()
@@ -21,6 +22,7 @@ export function EmployeesPage() {
   const navigate = useNavigate()
   const { addToast } = useToast()
   const [employees, setEmployees] = useState<(Employee & { name?: string })[]>([])
+  const [groups, setGroups] = useState<EmployeeGroup[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -45,8 +47,14 @@ export function EmployeesPage() {
   useEffect(() => {
     if (currentCompanyId) {
       fetchEmployees()
+      fetchGroups()
     }
   }, [currentCompanyId])
+
+  const fetchGroups = async () => {
+    const snap = await getDocs(query(collection(db, 'groups')))
+    setGroups(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[])
+  }
 
   const fetchEmployees = async () => {
     if (!currentCompanyId) return
@@ -178,7 +186,8 @@ export function EmployeesPage() {
       const matchesSearch = searchQuery === '' ||
         emp.employeeCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (emp.name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (emp.nameId?.toLowerCase().includes(searchQuery.toLowerCase()))
+        (emp.nameId?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        groups.find(g => g.id === emp.groupId)?.name.toLowerCase().includes(searchQuery.toLowerCase())
 
       const matchesStatus = statusFilter === 'all' ||
         (statusFilter === 'active' && emp.isActive) ||
@@ -186,7 +195,7 @@ export function EmployeesPage() {
 
       return matchesSearch && matchesStatus
     })
-  }, [employees, searchQuery, statusFilter])
+  }, [employees, searchQuery, statusFilter, groups])
 
   const { items: sortedEmployees, handleSort, sortConfig } = useTableSort(
     filteredEmployees.map(emp => ({ ...emp, sortName: emp.name || emp.nameId || '' })),
@@ -328,16 +337,11 @@ export function EmployeesPage() {
       <Card>
         <CardHeader className="py-3">
           <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search employees..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search employees by name, code, or group..."
+            />
             <select
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
               value={statusFilter}
