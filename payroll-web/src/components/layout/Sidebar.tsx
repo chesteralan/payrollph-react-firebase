@@ -171,6 +171,13 @@ const navigation: NavItem[] = [
         department: 'reports',
         section: '13month',
       },
+      {
+        label: 'Employee Master List',
+        icon: <Users className="w-4 h-4" />,
+        path: '/reports/employees',
+        department: 'reports',
+        section: 'employees',
+      },
     ],
   },
   {
@@ -182,6 +189,13 @@ const navigation: NavItem[] = [
         label: 'Companies',
         icon: <Building2 className="w-4 h-4" />,
         path: '/system/companies',
+        department: 'system',
+        section: 'companies',
+      },
+      {
+        label: 'Company Settings',
+        icon: <Settings className="w-4 h-4" />,
+        path: '/system/company-settings',
         department: 'system',
         section: 'companies',
       },
@@ -226,6 +240,13 @@ const navigation: NavItem[] = [
         path: '/system/database',
         department: 'system',
         section: 'database',
+      },
+      {
+        label: 'Settings',
+        icon: <Settings className="w-4 h-4" />,
+        path: '/system/settings',
+        department: 'system',
+        section: 'companies',
       },
       {
         label: 'Trash',

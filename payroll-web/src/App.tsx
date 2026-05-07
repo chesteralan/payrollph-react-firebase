@@ -29,13 +29,16 @@ const TemplatesPage = lazy(() => import('./pages/payroll/TemplatesPage').then(m 
 const PrintFormatsPage = lazy(() => import('./pages/payroll/PrintFormatsPage').then(m => ({ default: m.PrintFormatsPage })))
 const DTRPage = lazy(() => import('./pages/dtr/DTRPage').then(m => ({ default: m.DTRPage })))
 const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPage').then(m => ({ default: m.Report13thMonthPage })))
+const EmployeeReportPage = lazy(() => import('./pages/reports/EmployeeReportPage').then(m => ({ default: m.EmployeeReportPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
+const CompanySettingsPage = lazy(() => import('./pages/system/CompanySettingsPage').then(m => ({ default: m.CompanySettingsPage })))
 const CalendarPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.CalendarPage })))
 const TermsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.TermsPage })))
 const UsersPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.UsersPage })))
 const RestrictionsPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.RestrictionsPage })))
 const AuditPage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.AuditPage })))
 const DatabasePage = lazy(() => import('./pages/system/SystemPages').then(m => ({ default: m.DatabasePage })))
+const SystemSettingsPage = lazy(() => import('./pages/system/SystemSettingsPage').then(m => ({ default: m.SystemSettingsPage })))
 const TrashPage = lazy(() => import('./pages/system/TrashPage').then(m => ({ default: m.TrashPage })))
 
 function LoadingFallback() {
@@ -85,14 +88,17 @@ function App() {
               <Route path="payroll/print-formats" element={<LazyPage><PrintFormatsPage /></LazyPage>} />
               <Route path="dtr" element={<LazyPage><DTRPage /></LazyPage>} />
               <Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
-              <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
-              <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
+              <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
+<Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
+               <Route path="system/company-settings" element={<LazyPage><CompanySettingsPage /></LazyPage>} />
+               <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
               <Route path="system/terms" element={<LazyPage><TermsPage /></LazyPage>} />
               <Route path="system/users" element={<LazyPage><UsersPage /></LazyPage>} />
               <Route path="system/restrictions" element={<LazyPage><RestrictionsPage /></LazyPage>} />
               <Route path="system/audit" element={<LazyPage><AuditPage /></LazyPage>} />
-              <Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
-              <Route path="system/trash" element={<LazyPage><TrashPage /></LazyPage>} />
+<Route path="system/database" element={<LazyPage><DatabasePage /></LazyPage>} />
+               <Route path="system/settings" element={<LazyPage><SystemSettingsPage /></LazyPage>} />
+               <Route path="system/trash" element={<LazyPage><TrashPage /></LazyPage>} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

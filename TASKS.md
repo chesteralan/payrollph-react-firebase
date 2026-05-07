@@ -137,7 +137,7 @@
   - [x] 11.1.2 Holiday management (regular, special)
   - [x] 11.1.3 Special workday configuration
   - [x] 11.1.4 Paid/unpaid toggle
-- [ ] 11.2 Integrate calendar with payroll calculations
+- [x] 11.2 Integrate calendar with payroll calculations
 - [ ] 11.3 Add recurring holiday patterns
 - [x] 11.4 Export calendar data
 
@@ -164,7 +164,7 @@
 - [x] 14.3 Add company payroll period configuration
 - [x] 14.4 Configure company print settings (logo, header, CSS)
 - [x] 14.5 Add company column-group settings
-- [ ] 14.6 Implement company options/settings
+- [x] 14.6 Implement company options/settings
 - [x] 14.7 Add workday configuration (default workdays per month)
 
 ## 15. System Administration
@@ -176,7 +176,7 @@
   - [x] 15.5.1 Audit logging service
   - [x] 15.5.2 Filterable audit log display
   - [x] 15.5.3 Audit log export
-- [ ] 15.6 Add system settings page
+- [x] 15.6 Add system settings page
 - [ ] 15.7 Implement system health checks
 
 ## 16. Reports
@@ -185,7 +185,7 @@
   - [x] 16.1.2 Employee-level calculations
   - [x] 16.1.3 Summary totals
   - [x] 16.1.4 XLS export
-- [ ] 16.2 Add employee report (master list with details)
+- [x] 16.2 Add employee report (master list with details)
 - [ ] 16.3 Implement payroll summary report
 - [ ] 16.4 Add earnings/deductions breakdown report
 - [ ] 16.5 Create attendance/DTR reports
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 145 tasks
-- **Remaining:** 95 tasks
+- **Completed:** 150 tasks
+- **Remaining:** 90 tasks
 - **Total:** 240 tasks
-- **Progress:** 145/240 (60.4%)
+- **Progress:** 150/240 (62.5%)

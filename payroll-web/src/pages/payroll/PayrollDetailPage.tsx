@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button'
 import { ArrowLeft, Lock, Unlock, Save, AlertCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
+import { calculateWorkingDaysSync } from '../../utils/calendarUtils'
 import type { Payroll, PayrollEmployee, PayrollValidationError } from '../../types'
 
 const STAGES = ['dtr', 'salaries', 'earnings', 'benefits', 'deductions', 'summary', 'output']
@@ -49,6 +50,7 @@ export function PayrollDetailPage() {
   const [showValidation, setShowValidation] = useState(false)
   const [validationErrors, setValidationErrors] = useState<PayrollValidationError[]>([])
   const [defaultWorkdays, setDefaultWorkdays] = useState(22)
+  const [actualWorkdays, setActualWorkdays] = useState<number | null>(null)
   const [company, setCompany] = useState<{ name: string; address?: string; tin?: string; printHeader?: string; printFooter?: string } | null>(null)
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
@@ -61,13 +63,14 @@ export function PayrollDetailPage() {
     if (!id) return
     setLoading(true)
     try {
-      const [payrollSnap, empSnap, earningsSnap, deductionsSnap, benefitsSnap, inclusiveDatesSnap] = await Promise.all([
+      const [payrollSnap, empSnap, earningsSnap, deductionsSnap, benefitsSnap, inclusiveDatesSnap, calendarSnap] = await Promise.all([
         getDoc(doc(db, 'payroll', id)),
         getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', id))),
         getDocs(query(collection(db, 'earnings'))),
         getDocs(query(collection(db, 'deductions'))),
         getDocs(query(collection(db, 'benefits'))),
         getDocs(query(collection(db, 'payroll_inclusive_dates'), where('payrollId', '==', id))),
+        getDocs(query(collection(db, 'calendar'), where('companyId', '==', payrollData?.companyId || 'global'))),
       ])
 
       if (payrollSnap.exists()) {
@@ -85,6 +88,14 @@ export function PayrollDetailPage() {
             printHeader: companyData.printHeader,
             printFooter: companyData.printFooter
           })
+        }
+
+        const sd = dateRange?.startDate || null
+        const ed = dateRange?.endDate || null
+        if (sd && ed) {
+          const calendarEntries = calendarSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[]
+          const workDaysResult = calculateWorkingDaysSync(sd, ed, calendarEntries)
+          setActualWorkdays(workDaysResult.totalWorkingDays)
         }
       }
 
@@ -118,9 +129,10 @@ export function PayrollDetailPage() {
       setBenefitsList(benefitsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as { name: string }) })))
 
       const rowsData: ProcessingRow[] = []
+      const effectiveWorkdays = actualWorkdays ?? defaultWorkdays
       for (const emp of payEmps) {
         const basicSalary = emp.basicSalary || 0
-        const ratePerDay = basicSalary / defaultWorkdays
+        const ratePerDay = basicSalary / effectiveWorkdays
         const empDtr = dtrData.get(emp.employeeId || emp.nameId)
         const daysWorked = empDtr?.daysWorked ?? emp.daysWorked ?? 0
         const absences = empDtr?.absences ?? emp.absences ?? 0
@@ -165,11 +177,12 @@ export function PayrollDetailPage() {
 
   const recalculateSalaries = useCallback((updatedRows: ProcessingRow[], workdays: number) => {
     return updatedRows.map(row => {
-      const ratePerDay = row.basicSalary / workdays
+      const effectiveWorkdays = actualWorkdays ?? workdays
+      const ratePerDay = row.basicSalary / effectiveWorkdays
       const salaryAmount = ratePerDay * row.daysWorked
       return { ...row, ratePerDay, salaryAmount }
     })
-  }, [])
+  }, [actualWorkdays])
 
   const toggleLock = async () => {
     if (!payroll || !id) return
@@ -394,17 +407,18 @@ export function PayrollDetailPage() {
   }
 
   const autoCalculated = useMemo(() => {
+    const effectiveWorkdays = actualWorkdays ?? defaultWorkdays
     return rows.map(row => ({
       nameId: row.nameId,
-      ratePerDay: row.basicSalary / defaultWorkdays,
-      salaryAmount: (row.basicSalary / defaultWorkdays) * row.daysWorked,
+      ratePerDay: row.basicSalary / effectiveWorkdays,
+      salaryAmount: (row.basicSalary / effectiveWorkdays) * row.daysWorked,
       gross: getEmployeeGross(row),
       net: getEmployeeNet(row),
       totalEarnings: Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
       totalDeductions: Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0),
       totalBenefits: Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0),
     }))
-  }, [rows, earningData, deductionData, benefitData, defaultWorkdays])
+  }, [rows, earningData, deductionData, benefitData, defaultWorkdays, actualWorkdays])
 
   if (loading || !payroll) {
     return <div className="text-center py-12 text-gray-500">Loading...</div>
@@ -545,7 +559,10 @@ export function PayrollDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>Salaries</CardTitle>
-            <p className="text-sm text-gray-500">Based on {defaultWorkdays} workdays/month. Rate/Day and Salary Amount auto-calculated.</p>
+            <p className="text-sm text-gray-500">
+              Based on {actualWorkdays !== null ? `${actualWorkdays} actual workdays (calendar-adjusted)` : `${defaultWorkdays} workdays/month (default)`}.
+              Rate/Day and Salary Amount auto-calculated.
+            </p>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full">
