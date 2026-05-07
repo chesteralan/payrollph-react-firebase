@@ -25,7 +25,7 @@ import { Input } from "../../components/ui/Input";
 import { SearchBar } from "../../components/ui/SearchBar";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import {
   Plus,
   Edit,

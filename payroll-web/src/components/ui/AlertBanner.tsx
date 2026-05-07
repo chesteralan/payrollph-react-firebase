@@ -18,26 +18,26 @@ interface AlertBannerProps {
   onDismiss: (id: string) => void;
 }
 
+const alertIcons: Record<string, React.ReactNode> = {
+  info: <Info className="w-5 h-5" />,
+  warning: <AlertTriangle className="w-5 h-5" />,
+  error: <AlertCircle className="w-5 h-5" />,
+  success: <CheckCircle className="w-5 h-5" />,
+};
+
+const alertColors: Record<string, string> = {
+  info: "bg-blue-50 border-blue-200 text-blue-800",
+  warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
+  error: "bg-red-50 border-red-200 text-red-800",
+  success: "bg-green-50 border-green-200 text-green-800",
+};
+
 function AlertBanner({ alert, onDismiss }: AlertBannerProps) {
-  const icons = {
-    info: <Info className="w-5 h-5" />,
-    warning: <AlertTriangle className="w-5 h-5" />,
-    error: <AlertCircle className="w-5 h-5" />,
-    success: <CheckCircle className="w-5 h-5" />,
-  };
-
-  const colors = {
-    info: "bg-blue-50 border-blue-200 text-blue-800",
-    warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
-    error: "bg-red-50 border-red-200 text-red-800",
-    success: "bg-green-50 border-green-200 text-green-800",
-  };
-
   return (
     <div
-      className={`flex items-start gap-3 p-4 border rounded-lg ${colors[alert.type]}`}
+      className={`flex items-start gap-3 p-4 border rounded-lg ${alertColors[alert.type]}`}
     >
-      <span className="flex-shrink-0 mt-0.5">{icons[alert.type]}</span>
+      <span className="flex-shrink-0 mt-0.5">{alertIcons[alert.type]}</span>
       <div className="flex-1">
         <h3 className="text-sm font-semibold">{alert.title}</h3>
         <p className="text-sm mt-1 opacity-90">{alert.message}</p>

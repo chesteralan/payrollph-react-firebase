@@ -112,10 +112,10 @@ This document tracks files that need refactoring in the Payroll v2 React/Firebas
 - [x] `./src/components/ui/VirtualScroll.tsx`
 - [x] `./src/components/ui/SearchBar.tsx`
 - [x] `./src/components/ui/NetworkStatusBanner.tsx`
-- [ ] `./src/components/ui/AlertBanner.tsx`
-- [ ] `./src/components/ui/Button.tsx`
-- [ ] `./src/components/ui/Toast.tsx`
-- [ ] `./src/components/ui/EditableCell.tsx`
+- [x] `./src/components/ui/AlertBanner.tsx`
+- [x] `./src/components/ui/Button.tsx`
+- [x] `./src/components/ui/Toast.tsx`
+- [x] `./src/components/ui/EditableCell.tsx`
 - [ ] `./src/components/ui/Stepper.tsx`
 - [ ] `./src/components/ui/EmptyState.tsx`
 - [ ] `./src/components/ui/Input.tsx`

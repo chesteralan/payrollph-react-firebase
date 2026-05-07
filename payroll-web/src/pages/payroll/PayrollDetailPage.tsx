@@ -13,7 +13,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { useToast } from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import { EditableCell } from "../../components/ui/EditableCell";
 import { PayrollOutputView } from "../../components/payroll/PayrollOutputView";
 import {

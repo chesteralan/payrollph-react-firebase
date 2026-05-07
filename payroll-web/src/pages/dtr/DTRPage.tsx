@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import { Button } from "../../components/ui/Button";
 import {
   Card,

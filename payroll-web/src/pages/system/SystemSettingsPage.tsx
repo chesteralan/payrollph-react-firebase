@@ -6,7 +6,7 @@ import { Card, CardContent } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import { Settings, Shield, Wrench, Palette } from "lucide-react";
 
 const TABS = [

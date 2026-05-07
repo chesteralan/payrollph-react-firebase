@@ -28,7 +28,7 @@ import {
 } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
-import { useToast } from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import {
   ArrowLeft,
   Plus,

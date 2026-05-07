@@ -6,7 +6,7 @@ import { Breadcrumb } from "./Breadcrumb";
 import { AlertBannerProvider } from "../ui/AlertBanner";
 import { useGlobalShortcuts } from "../../hooks/useKeyboardShortcuts";
 import { NetworkStatusBanner } from "../ui/NetworkStatusBanner";
-import { useToast } from "../ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import {
   syncQueuedActions,
   getQueuedActionCount,
