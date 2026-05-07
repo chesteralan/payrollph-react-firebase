@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const expiryWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastActivityRef = useRef<number>(Date.now())
+  const lastActivityRef = useRef<number>(0)
 
   const clearSessionTimers = useCallback(() => {
     if (idleTimerRef.current) {
@@ -144,6 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSettings(settingsData)
 
           if (settingsData?.locale) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             setHtmlLang(settingsData.locale as any)
           }
 
@@ -242,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {

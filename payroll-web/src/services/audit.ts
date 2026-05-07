@@ -75,7 +75,7 @@ export const fetchAuditLogs = async (options?: {
   startDate?: Date
   endDate?: Date
 }) => {
-  let q = query(
+  const q = query(
     collection(db, 'system_audit'),
     orderBy('timestamp', 'desc'),
     limit(options?.limit || 100)

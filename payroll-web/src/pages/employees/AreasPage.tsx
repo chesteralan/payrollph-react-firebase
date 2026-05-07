@@ -19,14 +19,14 @@ export function AreasPage() {
   const [formData, setFormData] = useState({ name: '', description: '' })
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => { fetchAreas() }, [])
-
   const fetchAreas = async () => {
     setLoading(true)
     const snap = await getDocs(collection(db, 'employee_areas'))
     setAreas(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeArea[])
     setLoading(false)
   }
+
+  useEffect(() => { fetchAreas() }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +35,7 @@ export function AreasPage() {
     setShowForm(false); setEditingId(null); setFormData({ name: '', description: '' }); fetchAreas()
   }
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = async (id: string, _name: string) => {
     await deleteDoc(doc(db, 'employee_areas', id))
     fetchAreas()
   }

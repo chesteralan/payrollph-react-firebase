@@ -41,17 +41,6 @@ const routeLabels: Record<string, string> = {
   'trash': 'Trash',
   'health': 'Health Check',
 }
-
-const sectionOverrides: Record<string, Record<string, string>> = {
-  'employees': {
-    'employees': 'Employees',
-    'groups': 'Groups',
-    'positions': 'Positions',
-    'areas': 'Areas',
-    'calendar': 'Calendar',
-  },
-}
-
 function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
   const segments = pathname.split('/').filter(Boolean)
   const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/' }]

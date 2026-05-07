@@ -22,7 +22,7 @@ export const storage = getStorage(app)
 // Initialize App Check with reCAPTCHA v3 (CSRF and abuse protection)
 if (import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
   initializeAppCheck(app, {
-    provider: new ReCAPTCHA_V3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true
   })
 }

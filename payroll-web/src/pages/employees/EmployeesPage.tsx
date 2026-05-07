@@ -44,13 +44,6 @@ export function EmployeesPage() {
   const [bulkStatusLoading, setBulkStatusLoading] = useState(false)
   const [bulkStatusValue, setBulkStatusValue] = useState<'active' | 'inactive' | 'terminated'>('active')
 
-  useEffect(() => {
-    if (currentCompanyId) {
-      fetchEmployees()
-      fetchGroups()
-    }
-  }, [currentCompanyId])
-
   const fetchGroups = async () => {
     const snap = await getDocs(query(collection(db, 'groups')))
     setGroups(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[])
@@ -60,10 +53,19 @@ export function EmployeesPage() {
     if (!currentCompanyId) return
     setLoading(true)
     const snap = await getDocs(query(collection(db, 'employees'), where('companyId', '==', currentCompanyId)))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as (Employee & { name?: string; deletedAt?: any })[]
     setEmployees(all.filter((e) => !e.deletedAt))
     setLoading(false)
   }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (currentCompanyId) {
+      fetchEmployees()
+      fetchGroups()
+    }
+  }, [currentCompanyId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -107,18 +109,6 @@ export function EmployeesPage() {
   const handleDelete = async (id: string, code: string) => {
     await updateDoc(doc(db, 'employees', id), { deletedAt: serverTimestamp(), isActive: false, updatedAt: new Date() })
     addToast({ type: 'success', title: 'Employee archived', message: `${code} has been moved to trash` })
-    fetchEmployees()
-  }
-
-  const handlePermanentDelete = async (id: string, code: string) => {
-    await deleteDoc(doc(db, 'employees', id))
-    addToast({ type: 'success', title: 'Employee permanently deleted', message: `${code} has been permanently removed` })
-    fetchEmployees()
-  }
-
-  const handleRestore = async (id: string, code: string) => {
-    await updateDoc(doc(db, 'employees', id), { deletedAt: null, isActive: true, updatedAt: new Date() })
-    addToast({ type: 'success', title: 'Employee restored', message: `${code} has been restored` })
     fetchEmployees()
   }
 
@@ -208,6 +198,7 @@ export function EmployeesPage() {
     currentPage * itemsPerPage
   )
 
+  // eslint-disable-next-line
   useEffect(() => {
     setCurrentPage(1)
   }, [searchQuery, statusFilter])

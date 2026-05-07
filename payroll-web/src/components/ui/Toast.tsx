@@ -43,8 +43,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, [removeToast])
 
   useEffect(() => {
+    const timers = timersRef.current
     return () => {
-      timersRef.current.forEach((timer) => clearTimeout(timer))
+      timers.forEach((timer) => clearTimeout(timer))
     }
   }, [])
 
@@ -111,6 +112,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast() {
   const context = useContext(ToastContext)
   if (!context) {

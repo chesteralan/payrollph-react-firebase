@@ -26,6 +26,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCompany() {
   const context = useContext(CompanyContext)
   if (!context) {

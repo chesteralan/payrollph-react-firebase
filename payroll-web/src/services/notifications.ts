@@ -83,7 +83,7 @@ export const getNotifications = async (
     includeArchived?: boolean
   }
 ): Promise<Notification[]> => {
-  let constraints: Parameters<typeof query>[1][] = [
+  const constraints: Parameters<typeof query>[1][] = [
     where('recipientId', '==', userId),
   ]
 

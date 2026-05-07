@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import * as XLSX from 'xlsx'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
@@ -46,7 +46,7 @@ interface OutputViewProps {
   benefitsList: { id: string; name: string }[]
 }
 
-export function PayrollOutputView({ payroll, company, rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList }: OutputViewProps) {
+export function PayrollOutputView({ payroll, rows, earningData, deductionData, benefitData, earningsList, deductionsList, benefitsList }: OutputViewProps) {
   const [activeMode, setActiveMode] = useState<OutputMode>('register')
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -74,17 +74,6 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
 
   const formatCurrency = (value: number) => value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-  const getEmployeeGross = (row: ProcessingRow) => {
-    const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
-    return row.salaryAmount + earnings
-  }
-
-  const getEmployeeNet = (row: ProcessingRow) => {
-    const deductions = Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
-    const benefits = Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0)
-    return getEmployeeGross(row) - deductions - benefits
-  }
-
   const getEmployeeEarnings = (row: ProcessingRow) => {
     const empEarnings = earningData.get(row.nameId) || new Map()
     return earningsList.map(e => ({
@@ -109,6 +98,17 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
     }).filter(b => b.employeeShare > 0 || b.employerShare > 0)
   }
 
+  const getEmployeeGross = useCallback((row: ProcessingRow) => {
+    const earnings = Array.from(earningData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
+    return row.salaryAmount + earnings
+  }, [earningData])
+
+  const getEmployeeNet = useCallback((row: ProcessingRow) => {
+    const deductions = Array.from(deductionData.get(row.nameId)?.values() || []).reduce((s, v) => s + v, 0)
+    const benefits = Array.from(benefitData.get(row.nameId)?.values() || []).reduce((s, v) => s + v.employeeShare, 0)
+    return getEmployeeGross(row) - deductions - benefits
+  }, [deductionData, benefitData, getEmployeeGross])
+
   const totals = useMemo(() => {
     const totalBasic = filteredRows.reduce((s, r) => s + r.salaryAmount, 0)
     const totalEarnings = filteredRows.reduce((s, r) => s + Array.from(earningData.get(r.nameId)?.values() || []).reduce((a, v) => a + v, 0), 0)
@@ -118,7 +118,7 @@ export function PayrollOutputView({ payroll, company, rows, earningData, deducti
     const totalBenefitsER = filteredRows.reduce((s, r) => s + Array.from(benefitData.get(r.nameId)?.values() || []).reduce((a, v) => a + v.employerShare, 0), 0)
     const totalNet = filteredRows.reduce((s, r) => s + getEmployeeNet(r), 0)
     return { totalBasic, totalEarnings, totalGross, totalDeductions, totalBenefitsEE, totalBenefitsER, totalNet }
-  }, [filteredRows, earningData, deductionData, benefitData])
+  }, [filteredRows, earningData, deductionData, benefitData, getEmployeeGross, getEmployeeNet])
 
   const handlePrint = () => {
     window.print()

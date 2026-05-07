@@ -44,10 +44,6 @@ export function EmployeeProfilePage() {
 
   const [salaryForm, setSalaryForm] = useState({ amount: '', frequency: 'monthly' as 'monthly' | 'semi-monthly' | 'weekly' | 'daily', effectiveDate: '' })
 
-  useEffect(() => {
-    if (id) loadData()
-  }, [id])
-
   const loadData = async () => {
     if (!id) return
     setLoading(true)
@@ -88,6 +84,11 @@ export function EmployeeProfilePage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (id) loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const handleSaveProfile = async () => {
     if (!id || !employee) return
@@ -202,8 +203,9 @@ export function EmployeeProfilePage() {
           loadData()
         }
       )
-    } catch (error: any) {
-      addToast({ type: 'error', title: 'Upload failed', message: error.message })
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addToast({ type: 'error', title: 'Upload failed', message: (error as any).message })
       setUploading(false)
     }
   }
@@ -216,8 +218,9 @@ export function EmployeeProfilePage() {
       await deleteDoc(doc(db, 'employee_documents', doc.id))
       addToast({ type: 'success', title: 'Document deleted', message: `${doc.fileName} deleted successfully` })
       loadData()
-    } catch (error: any) {
-      addToast({ type: 'error', title: 'Delete failed', message: error.message })
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addToast({ type: 'error', title: 'Delete failed', message: (error as any).message })
     }
   }
 
