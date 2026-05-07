@@ -19,6 +19,8 @@
     "backup:list": "firebase firestore:backups list"
   },
   "dependencies": {
+    "@sentry/react": "^10.52.0",
+    "@sentry/tracing": "^7.120.4",
     "clsx": "^2.1.1",
     "firebase": "^12.12.1",
     "lucide-react": "^1.14.0",
