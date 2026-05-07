@@ -10,7 +10,7 @@ import { Button } from '../../components/ui/Button'
 import { ArrowLeft, Lock, Unlock, Save, AlertCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react'
 import { formatCurrency } from '../../utils/currency'
 import { calculateWorkingDaysSync } from '../../utils/calendarUtils'
-import type { Payroll, PayrollEmployee, PayrollValidationError } from '../../types'
+import type { Payroll, PayrollEmployee, PayrollValidationError, Term } from '../../types'
 
 const STAGES = ['dtr', 'salaries', 'earnings', 'benefits', 'deductions', 'summary', 'output']
 
@@ -52,6 +52,7 @@ export function PayrollDetailPage() {
   const [defaultWorkdays, setDefaultWorkdays] = useState(22)
   const [actualWorkdays, setActualWorkdays] = useState<number | null>(null)
   const [company, setCompany] = useState<{ name: string; address?: string; tin?: string; printHeader?: string; printFooter?: string } | null>(null)
+  const [term, setTerm] = useState<Term | null>(null)
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
 
@@ -76,6 +77,13 @@ export function PayrollDetailPage() {
       if (payrollSnap.exists()) {
         const payrollData = { id: payrollSnap.id, ...payrollSnap.data() } as Payroll
         setPayroll(payrollData)
+
+        if (payrollData.termId) {
+          const termSnap = await getDoc(doc(db, 'payroll_terms', payrollData.termId))
+          if (termSnap.exists()) {
+            setTerm({ id: termSnap.id, ...termSnap.data() } as Term)
+          }
+        }
 
         const companySnap = await getDoc(doc(db, 'companies', payrollData.companyId))
         if (companySnap.exists()) {
@@ -433,6 +441,7 @@ export function PayrollDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900">{payroll.name}</h1>
             <p className="text-gray-500">
               {new Date(0, payroll.month - 1).toLocaleString('default', { month: 'long' })} {payroll.year}
+              {term && <span className="ml-2 text-blue-600 font-medium">Term: {term.name}</span>}
               {payroll.isPublished && <span className="ml-2 text-green-600 font-medium">Published</span>}
               {payroll.isLocked && !payroll.isPublished && <span className="ml-2 text-orange-600 font-medium">Locked</span>}
             </p>

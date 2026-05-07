@@ -62,7 +62,7 @@
 - [x] 6.3 Create DeductionsPage (CRUD for deduction items)
 - [x] 6.4 Add earning formula configuration
 - [x] 6.5 Implement deduction rules (fixed/percentage)
-- [ ] 6.6 Add benefit allocation rules
+- [x] 6.6 Add benefit allocation rules
 
 ## 7. Payroll Templates
 - [x] 7.1 Create TemplatesPage (basic listing)
@@ -144,7 +144,7 @@
 ## 12. Terms Management
 - [x] 12.1 Create TermsPage (placeholder)
 - [x] 12.2 Implement terms CRUD
-- [ ] 12.3 Link terms to payroll periods
+- [x] 12.3 Link terms to payroll periods
 - [ ] 12.4 Add term validation rules
 
 ## 13. User Accounts & Administration
@@ -169,7 +169,7 @@
 
 ## 15. System Administration
 - [x] 15.1 Create DatabasePage (placeholder)
-- [ ] 15.2 Implement database backup functionality
+- [x] 15.2 Implement database backup functionality
 - [ ] 15.3 Add database verification tools
 - [ ] 15.4 Implement data cleanup utilities
 - [x] 15.5 Build Audit Log page
@@ -186,7 +186,7 @@
   - [x] 16.1.3 Summary totals
   - [x] 16.1.4 XLS export
 - [x] 16.2 Add employee report (master list with details)
-- [ ] 16.3 Implement payroll summary report
+- [x] 16.3 Implement payroll summary report
 - [ ] 16.4 Add earnings/deductions breakdown report
 - [ ] 16.5 Create attendance/DTR reports
 - [ ] 16.6 Add benefits utilization report
@@ -297,7 +297,7 @@
 
 ## Progress Summary
 
-- **Completed:** 150 tasks
-- **Remaining:** 90 tasks
+- **Completed:** 154 tasks
+- **Remaining:** 86 tasks
 - **Total:** 240 tasks
-- **Progress:** 150/240 (62.5%)
+- **Progress:** 154/240 (64.2%)

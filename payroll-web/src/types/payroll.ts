@@ -2,6 +2,7 @@ export interface Payroll {
   id: string
   companyId: string
   templateId?: string
+  termId?: string
   name: string
   month: number
   year: number

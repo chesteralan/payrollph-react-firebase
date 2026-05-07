@@ -172,6 +172,13 @@ const navigation: NavItem[] = [
         section: '13month',
       },
       {
+        label: 'Payroll Summary',
+        icon: <BarChart3 className="w-4 h-4" />,
+        path: '/reports/payroll-summary',
+        department: 'reports',
+        section: 'payroll',
+      },
+      {
         label: 'Employee Master List',
         icon: <Users className="w-4 h-4" />,
         path: '/reports/employees',

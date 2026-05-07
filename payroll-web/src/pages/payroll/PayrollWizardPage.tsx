@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
 import { ArrowLeft, ArrowRight, Check, Trash2 } from 'lucide-react'
-import type { PayrollGroup, PayrollTemplate, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus } from '../../types'
+import type { PayrollGroup, PayrollTemplate, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus, Term } from '../../types'
 
 const STEPS = ['Config', 'Inclusive Dates', 'Groups', 'Employees', 'Review & Generate']
 
@@ -18,12 +18,13 @@ export function PayrollWizardPage() {
   const { currentCompanyId } = useAuth()
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({ name: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), templateId: '' })
+  const [formData, setFormData] = useState({ name: '', month: new Date().getMonth() + 1, year: new Date().getFullYear(), templateId: '', termId: '' })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [inclusiveDates, setInclusiveDates] = useState<Date[]>([])
   const [groups, setGroups] = useState<PayrollGroup[]>([])
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([])
   const [templates, setTemplates] = useState<{ id: string; name: string; data?: PayrollTemplate }[]>([])
+  const [terms, setTerms] = useState<Term[]>([])
   const [employees, setEmployees] = useState<{ id: string; nameId: string; employeeCode: string }[]>([])
   const [dateStr, setDateStr] = useState('')
   const [lookups, setLookups] = useState({ groups: [] as EmployeeGroup[], positions: [] as EmployeePosition[], areas: [] as EmployeeArea[], statuses: [] as EmployeeStatus[] })
@@ -31,11 +32,57 @@ export function PayrollWizardPage() {
   useEffect(() => {
     if (currentCompanyId) {
       fetchTemplates()
+      fetchTerms()
       fetchLookups()
       fetchEmployees()
       if (id) fetchPayroll()
     }
   }, [id, currentCompanyId])
+
+  const fetchTerms = async () => {
+    const snap = await getDocs(query(collection(db, 'payroll_terms'), where('isActive', '==', true)))
+    setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[])
+  }
+
+  const generateDatesFromTerm = (term: Term) => {
+    const dates: Date[] = []
+    const { year, month } = formData
+    const daysInMonth = new Date(year, month, 0).getDate()
+
+    if (term.type === 'monthly') {
+      for (let i = 1; i <= Math.min(term.daysPerPeriod || daysInMonth, daysInMonth); i++) {
+        dates.push(new Date(year, month - 1, i))
+      }
+    } else if (term.type === 'semi-monthly') {
+      for (let i = 1; i <= 15; i++) dates.push(new Date(year, month - 1, i))
+      const secondHalfStart = 16
+      const secondHalfEnd = term.daysPerPeriod || daysInMonth
+      for (let i = secondHalfStart; i <= Math.min(secondHalfEnd, daysInMonth); i++) {
+        dates.push(new Date(year, month - 1, i))
+      }
+    } else if (term.type === 'weekly' || term.type === 'bi-weekly') {
+      const weeks = term.type === 'bi-weekly' ? 2 : 4
+      const daysPerWeek = term.daysPerPeriod ? Math.floor(term.daysPerPeriod / weeks) : 7
+      for (let w = 0; w < weeks; w++) {
+        for (let d = 1; d <= daysPerWeek; d++) {
+          const date = new Date(year, month - 1, w * 7 + d)
+          if (date.getMonth() === month - 1) dates.push(date)
+        }
+      }
+    }
+    return dates
+  }
+
+  const handleTermChange = (termId: string) => {
+    setFormData({ ...formData, termId })
+    if (termId) {
+      const term = terms.find(t => t.id === termId)
+      if (term) {
+        const dates = generateDatesFromTerm(term)
+        setInclusiveDates(dates)
+      }
+    }
+  }
 
   useEffect(() => {
     if (!formData.templateId) return
@@ -78,8 +125,8 @@ export function PayrollWizardPage() {
     if (!id) return
     const snap = await getDoc(doc(db, 'payroll', id))
     if (snap.exists()) {
-      const data = snap.data() as { name: string; month: number; year: number; templateId?: string }
-      setFormData({ name: data.name, month: data.month, year: data.year, templateId: data.templateId || '' })
+      const data = snap.data() as { name: string; month: number; year: number; templateId?: string; termId?: string }
+      setFormData({ name: data.name, month: data.month, year: data.year, templateId: data.templateId || '', termId: data.termId || '' })
 
       const [datesSnap, groupsSnap] = await Promise.all([
         getDocs(query(collection(db, 'payroll_inclusive_dates'), where('payrollId', '==', id))),
@@ -97,6 +144,7 @@ export function PayrollWizardPage() {
       month: formData.month,
       year: formData.year,
       templateId: formData.templateId || null,
+      termId: formData.termId || null,
       companyId: currentCompanyId,
       status: 'draft',
       isActive: true,
@@ -124,7 +172,7 @@ export function PayrollWizardPage() {
         if (!payrollId) {
           payrollId = await createPayroll()
         } else {
-          await updateDoc(doc(db, 'payroll', payrollId), { name: formData.name, month: formData.month, year: formData.year, templateId: formData.templateId || null })
+          await updateDoc(doc(db, 'payroll', payrollId), { name: formData.name, month: formData.month, year: formData.year, templateId: formData.templateId || null, termId: formData.termId || null })
         }
         navigate(`/payroll/${payrollId}/wizard`, { replace: true })
         setStep(1)
@@ -233,6 +281,15 @@ export function PayrollWizardPage() {
                 <select value={formData.templateId} onChange={(e) => setFormData({ ...formData, templateId: e.target.value })} className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
                   <option value="">No template</option>
                   {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+            )}
+            {terms.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Term (Optional)</label>
+                <select value={formData.termId} onChange={(e) => handleTermChange(e.target.value)} className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                  <option value="">No term</option>
+                  {terms.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.type})</option>)}
                 </select>
               </div>
             )}

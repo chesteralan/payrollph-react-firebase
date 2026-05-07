@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, writeBatch, serverTimestamp } from 'firebase/firestore'
+import { collection, getDocs, addDoc, updateDoc, doc, query, where, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { usePermissions } from '../../hooks/usePermissions'
 import { useToast } from '../../components/ui/Toast'
@@ -85,6 +85,11 @@ export function NamesListPage() {
     setShowForm(false); setEditingId(null); setFormData({ firstName: '', middleName: '', lastName: '', suffix: '' }); fetchNames()
   }
 
+  const { items: sortedNames, handleSort, sortConfig } = useTableSort(
+    names.map(n => ({ ...n, fullName: `${n.firstName} ${n.middleName || ''} ${n.lastName}` })),
+    'lastName'
+  )
+
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -145,18 +150,6 @@ export function NamesListPage() {
   const handleDelete = async (id: string, name: string) => {
     await updateDoc(doc(db, 'names', id), { deletedAt: serverTimestamp() })
     addToast({ type: 'success', title: 'Name archived', message: `${name} has been moved to trash` })
-    fetchNames()
-  }
-
-  const handlePermanentDelete = async (id: string, name: string) => {
-    await deleteDoc(doc(db, 'names', id))
-    addToast({ type: 'success', title: 'Name permanently deleted' })
-    fetchNames()
-  }
-
-  const handleRestore = async (id: string, name: string) => {
-    await updateDoc(doc(db, 'names', id), { deletedAt: null })
-    addToast({ type: 'success', title: 'Name restored' })
     fetchNames()
   }
 
@@ -281,11 +274,6 @@ export function NamesListPage() {
     setImportStats(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
-
-  const { items: sortedNames, handleSort, sortConfig } = useTableSort(
-    names.map(n => ({ ...n, fullName: `${n.firstName} ${n.middleName || ''} ${n.lastName}` })),
-    'lastName'
-  )
 
   if (!canView('lists', 'names')) return <div className="text-center py-12 text-gray-500">Access denied</div>
 

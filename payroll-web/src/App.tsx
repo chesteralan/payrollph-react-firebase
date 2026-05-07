@@ -29,6 +29,7 @@ const TemplatesPage = lazy(() => import('./pages/payroll/TemplatesPage').then(m 
 const PrintFormatsPage = lazy(() => import('./pages/payroll/PrintFormatsPage').then(m => ({ default: m.PrintFormatsPage })))
 const DTRPage = lazy(() => import('./pages/dtr/DTRPage').then(m => ({ default: m.DTRPage })))
 const Report13thMonthPage = lazy(() => import('./pages/reports/Report13thMonthPage').then(m => ({ default: m.Report13thMonthPage })))
+const PayrollSummaryPage = lazy(() => import('./pages/reports/PayrollSummaryPage').then(m => ({ default: m.PayrollSummaryPage })))
 const EmployeeReportPage = lazy(() => import('./pages/reports/EmployeeReportPage').then(m => ({ default: m.EmployeeReportPage })))
 const CompaniesPage = lazy(() => import('./pages/system/CompaniesPage').then(m => ({ default: m.CompaniesPage })))
 const CompanySettingsPage = lazy(() => import('./pages/system/CompanySettingsPage').then(m => ({ default: m.CompanySettingsPage })))
@@ -87,8 +88,9 @@ function App() {
               <Route path="payroll/templates" element={<LazyPage><TemplatesPage /></LazyPage>} />
               <Route path="payroll/print-formats" element={<LazyPage><PrintFormatsPage /></LazyPage>} />
               <Route path="dtr" element={<LazyPage><DTRPage /></LazyPage>} />
-              <Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
-              <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
+<Route path="reports/13th-month" element={<LazyPage><Report13thMonthPage /></LazyPage>} />
+               <Route path="reports/payroll-summary" element={<LazyPage><PayrollSummaryPage /></LazyPage>} />
+               <Route path="reports/employees" element={<LazyPage><EmployeeReportPage /></LazyPage>} />
 <Route path="system/companies" element={<LazyPage><CompaniesPage /></LazyPage>} />
                <Route path="system/company-settings" element={<LazyPage><CompanySettingsPage /></LazyPage>} />
                <Route path="system/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />

@@ -879,7 +879,257 @@ export function AuditPage() {
 }
 
 export function DatabasePage() {
-  const { canView } = usePermissions()
+  const { canView, canAdd } = usePermissions()
+  const { addToast } = useToast()
+  const [stats, setStats] = useState<Record<string, number>>({})
+  const [backups, setBackups] = useState<Array<{ id: string; timestamp: Date; collections: string[]; size: number; status: string }>>([])
+  const [loading, setLoading] = useState(true)
+  const [backupLoading, setBackupLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState('')
+  const [selectedCollection, setSelectedCollection] = useState('')
+
+  const COLLECTIONS = [
+    'names', 'employees', 'employee_groups', 'employee_positions', 'employee_areas',
+    'employee_statuses', 'earnings', 'deductions', 'benefits', 'payroll',
+    'payroll_templates', 'payroll_inclusive_dates', 'payroll_groups',
+    'payroll_employees', 'salaries', 'dtr_entries', 'holidays', 'users', 'companies'
+  ]
+
+  useEffect(() => { fetchStats(); fetchBackups() }, [])
+
+  const fetchStats = async () => {
+    setLoading(true)
+    const counts: Record<string, number> = {}
+    await Promise.all(COLLECTIONS.map(async (col) => {
+      try {
+        const snap = await getDocs(collection(db, col))
+        counts[col] = snap.size
+      } catch {
+        counts[col] = 0
+      }
+    }))
+    setStats(counts)
+    setLoading(false)
+  }
+
+  const fetchBackups = async () => {
+    try {
+      const snap = await getDocs(query(collection(db, 'backups'), orderBy('timestamp', 'desc')))
+      setBackups(snap.docs.map(d => ({ id: d.id, ...d.data(), timestamp: d.data().timestamp?.toDate() })) as never[])
+    } catch {}
+  }
+
+  const exportCollection = async (collectionName: string) => {
+    setExportLoading(collectionName)
+    try {
+      const snap = await getDocs(collection(db, collectionName))
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      const json = JSON.stringify(data, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${collectionName}_${new Date().toISOString().split('T')[0]}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      addToast({ type: 'success', title: `Exported ${collectionName}` })
+    } catch (e) {
+      addToast({ type: 'error', title: `Export failed: ${e}` })
+    }
+    setExportLoading('')
+  }
+
+  const exportAllData = async () => {
+    setExportLoading('all')
+    try {
+      const allData: Record<string, unknown[]> = {}
+      await Promise.all(COLLECTIONS.map(async (col) => {
+        const snap = await getDocs(collection(db, col))
+        allData[col] = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      }))
+      const json = JSON.stringify(allData, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `full_backup_${new Date().toISOString().split('T')[0]}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      addToast({ type: 'success', title: 'Full export complete' })
+    } catch (e) {
+      addToast({ type: 'error', title: `Export failed: ${e}` })
+    }
+    setExportLoading('')
+  }
+
+  const createBackup = async () => {
+    setBackupLoading(true)
+    try {
+      const allData: Record<string, unknown[]> = {}
+      let totalDocs = 0
+      await Promise.all(COLLECTIONS.map(async (col) => {
+        const snap = await getDocs(collection(db, col))
+        allData[col] = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        totalDocs += snap.size
+      }))
+      const json = JSON.stringify(allData)
+      const size = new Blob([json]).size
+      await addDoc(collection(db, 'backups'), {
+        timestamp: new Date(),
+        collections: COLLECTIONS,
+        totalDocuments: totalDocs,
+        size,
+        status: 'completed'
+      })
+      await exportAllData()
+      fetchBackups()
+      addToast({ type: 'success', title: 'Backup created' })
+    } catch (e) {
+      addToast({ type: 'error', title: `Backup failed: ${e}` })
+    }
+    setBackupLoading(false)
+  }
+
+  const totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0)
+
   if (!canView('system', 'database')) return <div className="text-center py-12 text-gray-500">Access denied</div>
-  return (<div className="space-y-6"><h1 className="text-2xl font-bold text-gray-900">Database</h1><Card><CardContent className="pt-6"><p className="text-gray-500">Database maintenance and backup tools.</p></CardContent></Card></div>)
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Database Management</h1>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={exportAllData} disabled={!!exportLoading}>
+            <Download className="w-4 h-4 mr-2" />{exportLoading === 'all' ? 'Exporting...' : 'Export All Data'}
+          </Button>
+          {canAdd('system', 'database') && (
+            <Button onClick={createBackup} disabled={backupLoading}>
+              <Save className="w-4 h-4 mr-2" />{backupLoading ? 'Creating Backup...' : 'Create Backup'}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-gray-900">{COLLECTIONS.length}</div>
+            <div className="text-sm text-gray-500">Collections</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-gray-900">{loading ? '...' : totalDocuments}</div>
+            <div className="text-sm text-gray-500">Total Documents</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-gray-900">{backups.length}</div>
+            <div className="text-sm text-gray-500">Backups Created</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle>Export Collection</CardTitle></CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <select
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+              value={selectedCollection}
+              onChange={(e) => setSelectedCollection(e.target.value)}
+            >
+              <option value="">Select a collection...</option>
+              {COLLECTIONS.map(c => <option key={c} value={c}>{c} ({stats[c] || 0})</option>)}
+            </select>
+            <Button
+              variant="secondary"
+              disabled={!selectedCollection || !!exportLoading}
+              onClick={() => selectedCollection && exportCollection(selectedCollection)}
+            >
+              <Download className="w-4 h-4 mr-2" />{exportLoading ? 'Exporting...' : 'Export'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Collection Statistics</CardTitle></CardHeader>
+        <CardContent className="p-0">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Collection</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Documents</th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
+                <tr><td colSpan={3} className="px-6 py-4 text-center text-gray-500">Loading...</td></tr>
+              ) : COLLECTIONS.map(col => (
+                <tr key={col} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{col}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 text-right">{stats[col] || 0}</td>
+                  <td className="px-6 py-4 text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={!!exportLoading}
+                      onClick={() => exportCollection(col)}
+                    >
+                      <Download className="w-4 h-4 mr-1" />{exportLoading === col ? 'Exporting...' : 'Export'}
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      {canView('system', 'database') && (
+        <Card>
+          <CardHeader><CardTitle>Backup History</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Date/Time</th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">Collections</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Documents</th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">Size</th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {backups.length === 0 ? (
+                  <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No backups yet</td></tr>
+                ) : backups.map(backup => (
+                  <tr key={backup.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {backup.timestamp ? new Date(backup.timestamp).toLocaleString() : '-'}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{backup.collections?.length || 0} collections</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">{backup.totalDocuments || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      {backup.size ? `${(backup.size / 1024).toFixed(1)} KB` : '-'}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        backup.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {backup.status || 'unknown'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
 }
