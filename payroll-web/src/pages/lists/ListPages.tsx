@@ -177,6 +177,8 @@ export function BenefitsPage() {
         };
       case "tiered":
         return { label: "Tiered", color: "bg-purple-100 text-purple-800" };
+      default:
+        return { label: "Unknown", color: "bg-gray-100 text-gray-800" };
     }
   };
 
@@ -657,6 +659,8 @@ export function EarningsPage() {
         };
       case "custom":
         return { label: "Custom", color: "bg-purple-100 text-purple-800" };
+      default:
+        return { label: "Unknown", color: "bg-gray-100 text-gray-800" };
     }
   };
 
