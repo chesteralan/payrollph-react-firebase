@@ -1,45 +1,48 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-import { Button } from '../../components/ui/Button'
-import { Input } from '../../components/ui/Input'
-import { CreditCard } from 'lucide-react'
-import { checkSetupNeeded } from '../../services/setup'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { CreditCard } from "lucide-react";
+import { checkSetupNeeded } from "../../services/setup";
 
 export function LoginPage() {
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [checking, setChecking] = useState(true)
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     checkSetupNeeded()
       .then((needed: boolean) => {
         if (needed) {
-          navigate('/setup', { replace: true })
+          navigate("/setup", { replace: true });
         }
       })
-      .finally(() => setChecking(false))
-  }, [navigate])
+      .finally(() => setChecking(false));
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      await login(email, password)
-      navigate('/')
+      await login(email, password);
+      navigate("/");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Invalid credentials'
-      setError(message.includes('auth/') ? 'Invalid email or password' : message)
+      const message =
+        err instanceof Error ? err.message : "Invalid credentials";
+      setError(
+        message.includes("auth/") ? "Invalid email or password" : message,
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (checking) {
     return (
@@ -49,7 +52,7 @@ export function LoginPage() {
           <p className="mt-4 text-gray-500">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -91,13 +94,13 @@ export function LoginPage() {
           />
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate('/forgot-password')}
+            onClick={() => navigate("/forgot-password")}
             className="text-sm text-primary-600 hover:text-primary-700"
           >
             Forgot your password?
@@ -105,5 +108,5 @@ export function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

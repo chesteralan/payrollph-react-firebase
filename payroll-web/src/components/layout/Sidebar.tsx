@@ -1,6 +1,6 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-import { usePermissions } from '../../hooks/usePermissions'
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { usePermissions } from "../../hooks/usePermissions";
 import {
   LayoutDashboard,
   Users,
@@ -29,317 +29,333 @@ import {
   Plus,
   Trash2,
   Activity,
-} from 'lucide-react'
-import { clsx } from 'clsx'
-import { useState } from 'react'
+} from "lucide-react";
+import { clsx } from "clsx";
+import { useState } from "react";
 
 interface NavItem {
-  label: string
-  icon: React.ReactNode
-  path?: string
-  children?: NavItem[]
-  department?: string
-  section?: string
+  label: string;
+  icon: React.ReactNode;
+  path?: string;
+  children?: NavItem[];
+  department?: string;
+  section?: string;
 }
 
 const navigation: NavItem[] = [
   {
-    label: 'Dashboard',
+    label: "Dashboard",
     icon: <LayoutDashboard className="w-4 h-4" />,
-    path: '/',
+    path: "/",
   },
   {
-    label: 'Employees',
+    label: "Employees",
     icon: <Users className="w-4 h-4" />,
-    department: 'employees',
+    department: "employees",
     children: [
       {
-        label: 'Employee Registry',
+        label: "Employee Registry",
         icon: <Users className="w-4 h-4" />,
-        path: '/employees',
-        department: 'employees',
-        section: 'employees',
+        path: "/employees",
+        department: "employees",
+        section: "employees",
       },
       {
-        label: 'Calendar',
+        label: "Calendar",
         icon: <CalendarDays className="w-4 h-4" />,
-        path: '/employees/calendar',
-        department: 'employees',
-        section: 'calendar',
+        path: "/employees/calendar",
+        department: "employees",
+        section: "calendar",
       },
       {
-        label: 'Groups',
+        label: "Groups",
         icon: <Layers className="w-4 h-4" />,
-        path: '/employees/groups',
-        department: 'employees',
-        section: 'groups',
+        path: "/employees/groups",
+        department: "employees",
+        section: "groups",
       },
       {
-        label: 'Positions',
+        label: "Positions",
         icon: <Briefcase className="w-4 h-4" />,
-        path: '/employees/positions',
-        department: 'employees',
-        section: 'positions',
+        path: "/employees/positions",
+        department: "employees",
+        section: "positions",
       },
       {
-        label: 'Areas',
+        label: "Areas",
         icon: <MapPin className="w-4 h-4" />,
-        path: '/employees/areas',
-        department: 'employees',
-        section: 'areas',
+        path: "/employees/areas",
+        department: "employees",
+        section: "areas",
       },
     ],
   },
   {
-    label: 'Lists',
+    label: "Lists",
     icon: <ListChecks className="w-4 h-4" />,
-    department: 'lists',
+    department: "lists",
     children: [
       {
-        label: 'Names',
+        label: "Names",
         icon: <FileText className="w-4 h-4" />,
-        path: '/lists/names',
-        department: 'lists',
-        section: 'names',
+        path: "/lists/names",
+        department: "lists",
+        section: "names",
       },
       {
-        label: 'Benefits',
+        label: "Benefits",
         icon: <Banknote className="w-4 h-4" />,
-        path: '/lists/benefits',
-        department: 'lists',
-        section: 'benefits',
+        path: "/lists/benefits",
+        department: "lists",
+        section: "benefits",
       },
       {
-        label: 'Earnings',
+        label: "Earnings",
         icon: <ArrowUpFromLine className="w-4 h-4" />,
-        path: '/lists/earnings',
-        department: 'lists',
-        section: 'earnings',
+        path: "/lists/earnings",
+        department: "lists",
+        section: "earnings",
       },
       {
-        label: 'Deductions',
+        label: "Deductions",
         icon: <ArrowDownToLine className="w-4 h-4" />,
-        path: '/lists/deductions',
-        department: 'lists',
-        section: 'deductions',
+        path: "/lists/deductions",
+        department: "lists",
+        section: "deductions",
       },
     ],
   },
   {
-    label: 'Payroll',
+    label: "Payroll",
     icon: <CreditCard className="w-4 h-4" />,
-    department: 'payroll',
+    department: "payroll",
     children: [
       {
-        label: 'Payroll Runs',
+        label: "Payroll Runs",
         icon: <CreditCard className="w-4 h-4" />,
-        path: '/payroll',
-        department: 'payroll',
-        section: 'payroll',
+        path: "/payroll",
+        department: "payroll",
+        section: "payroll",
       },
       {
-        label: 'New Payroll',
+        label: "New Payroll",
         icon: <Plus className="w-4 h-4" />,
-        path: '/payroll/new',
-        department: 'payroll',
-        section: 'payroll',
+        path: "/payroll/new",
+        department: "payroll",
+        section: "payroll",
       },
       {
-        label: 'Templates',
+        label: "Templates",
         icon: <CopyPlus className="w-4 h-4" />,
-        path: '/payroll/templates',
-        department: 'payroll',
-        section: 'templates',
+        path: "/payroll/templates",
+        department: "payroll",
+        section: "templates",
       },
       {
-        label: 'Print Formats',
+        label: "Print Formats",
         icon: <FileText className="w-4 h-4" />,
-        path: '/payroll/print-formats',
-        department: 'payroll',
-        section: 'templates',
+        path: "/payroll/print-formats",
+        department: "payroll",
+        section: "templates",
       },
     ],
   },
   {
-    label: 'Reports',
+    label: "Reports",
     icon: <BarChart3 className="w-4 h-4" />,
-    department: 'reports',
+    department: "reports",
     children: [
       {
-        label: '13th Month',
+        label: "13th Month",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/13th-month',
-        department: 'reports',
-        section: '13month',
+        path: "/reports/13th-month",
+        department: "reports",
+        section: "13month",
       },
       {
-        label: 'Payroll Summary',
+        label: "Payroll Summary",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/payroll-summary',
-        department: 'reports',
-        section: 'payroll',
+        path: "/reports/payroll-summary",
+        department: "reports",
+        section: "payroll",
       },
       {
-        label: 'Employee Master List',
+        label: "Employee Master List",
         icon: <Users className="w-4 h-4" />,
-        path: '/reports/employees',
-        department: 'reports',
-        section: 'employees',
+        path: "/reports/employees",
+        department: "reports",
+        section: "employees",
       },
       {
-        label: 'Earnings/Deductions',
+        label: "Earnings/Deductions",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/earnings-deductions',
-        department: 'reports',
-        section: 'payroll',
+        path: "/reports/earnings-deductions",
+        department: "reports",
+        section: "payroll",
       },
       {
-        label: 'Attendance',
+        label: "Attendance",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/attendance',
-        department: 'reports',
-        section: 'attendance',
+        path: "/reports/attendance",
+        department: "reports",
+        section: "attendance",
       },
       {
-        label: 'Benefits Utilization',
+        label: "Benefits Utilization",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/benefits-utilization',
-        department: 'reports',
-        section: 'payroll',
+        path: "/reports/benefits-utilization",
+        department: "reports",
+        section: "payroll",
       },
       {
-        label: 'Year-End',
+        label: "Year-End",
         icon: <BarChart3 className="w-4 h-4" />,
-        path: '/reports/year-end',
-        department: 'reports',
-        section: 'payroll',
+        path: "/reports/year-end",
+        department: "reports",
+        section: "payroll",
       },
     ],
   },
   {
-    label: 'System',
+    label: "System",
     icon: <Settings className="w-4 h-4" />,
-    department: 'system',
+    department: "system",
     children: [
       {
-        label: 'Companies',
+        label: "Companies",
         icon: <Building2 className="w-4 h-4" />,
-        path: '/system/companies',
-        department: 'system',
-        section: 'companies',
+        path: "/system/companies",
+        department: "system",
+        section: "companies",
       },
       {
-        label: 'Company Settings',
+        label: "Company Settings",
         icon: <Settings className="w-4 h-4" />,
-        path: '/system/company-settings',
-        department: 'system',
-        section: 'companies',
+        path: "/system/company-settings",
+        department: "system",
+        section: "companies",
       },
       {
-        label: 'Calendar',
+        label: "Calendar",
         icon: <Calendar className="w-4 h-4" />,
-        path: '/system/calendar',
-        department: 'system',
-        section: 'calendar',
+        path: "/system/calendar",
+        department: "system",
+        section: "calendar",
       },
       {
-        label: 'Terms',
+        label: "Terms",
         icon: <FileText className="w-4 h-4" />,
-        path: '/system/terms',
-        department: 'system',
-        section: 'terms',
+        path: "/system/terms",
+        department: "system",
+        section: "terms",
       },
       {
-        label: 'Users',
+        label: "Users",
         icon: <UserCog className="w-4 h-4" />,
-        path: '/system/users',
-        department: 'system',
-        section: 'users',
+        path: "/system/users",
+        department: "system",
+        section: "users",
       },
       {
-        label: 'Restrictions',
+        label: "Restrictions",
         icon: <ShieldCheck className="w-4 h-4" />,
-        path: '/system/restrictions',
-        department: 'system',
-        section: 'users',
+        path: "/system/restrictions",
+        department: "system",
+        section: "users",
       },
       {
-        label: 'Audit Log',
+        label: "Audit Log",
         icon: <Lock className="w-4 h-4" />,
-        path: '/system/audit',
-        department: 'system',
-        section: 'audit',
+        path: "/system/audit",
+        department: "system",
+        section: "audit",
       },
       {
-        label: 'Database',
+        label: "Database",
         icon: <Database className="w-4 h-4" />,
-        path: '/system/database',
-        department: 'system',
-        section: 'database',
+        path: "/system/database",
+        department: "system",
+        section: "database",
       },
       {
-        label: 'Settings',
+        label: "Settings",
         icon: <Settings className="w-4 h-4" />,
-        path: '/system/settings',
-        department: 'system',
-        section: 'companies',
+        path: "/system/settings",
+        department: "system",
+        section: "companies",
       },
       {
-        label: 'Trash',
+        label: "Trash",
         icon: <Trash2 className="w-4 h-4" />,
-        path: '/system/trash',
-        department: 'system',
-        section: 'companies',
+        path: "/system/trash",
+        department: "system",
+        section: "companies",
       },
       {
-        label: 'Health Check',
+        label: "Health Check",
         icon: <Activity className="w-4 h-4" />,
-        path: '/system/health',
-        department: 'system',
-        section: 'database',
+        path: "/system/health",
+        department: "system",
+        section: "database",
       },
       {
-        label: 'Activity Monitor',
+        label: "Activity Monitor",
         icon: <Activity className="w-4 h-4" />,
-        path: '/system/activity',
-        department: 'system',
-        section: 'users',
+        path: "/system/activity",
+        department: "system",
+        section: "users",
       },
     ],
   },
-]
+];
 
-function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; level?: number; onItemClick?: () => void }) {
-  const location = useLocation()
-  const [expanded, setExpanded] = useState(false)
-  const { canView } = usePermissions()
+function NavItemComponent({
+  item,
+  level = 0,
+  onItemClick,
+}: {
+  item: NavItem;
+  level?: number;
+  onItemClick?: () => void;
+}) {
+  const location = useLocation();
+  const [expanded, setExpanded] = useState(false);
+  const { canView } = usePermissions();
 
-  const isActive = item.path === location.pathname
-  const isChildActive = item.children?.some((child) => child.path === location.pathname)
+  const isActive = item.path === location.pathname;
+  const isChildActive = item.children?.some(
+    (child) => child.path === location.pathname,
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (item.department && item.section && !canView(item.department as any, item.section as any)) {
-    return null
+  if (
+    item.department &&
+    item.section &&
+    !canView(item.department as any, item.section as any)
+  ) {
+    return null;
   }
 
   if (item.children) {
     const hasVisibleChildren = item.children.some(
       (child) =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        !child.department || !child.section || canView(child.department as any, child.section as any)
-    )
+        !child.department ||
+        !child.section ||
+        canView(child.department as any, child.section as any),
+    );
 
-    if (!hasVisibleChildren) return null
+    if (!hasVisibleChildren) return null;
 
     return (
       <div>
         <button
           onClick={() => setExpanded(!expanded)}
           className={clsx(
-            'w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors',
+            "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors",
             isChildActive
-              ? 'bg-sidebar-active text-white'
-              : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
+              ? "bg-sidebar-active text-white"
+              : "text-gray-300 hover:bg-sidebar-hover hover:text-white",
           )}
           aria-expanded={expanded}
           aria-label={`${item.label} section`}
@@ -355,56 +371,61 @@ function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; lev
         {expanded && (
           <div className="ml-4 mt-1 space-y-1">
             {item.children.map((child, i) => (
-              <NavItemComponent key={i} item={child} level={level + 1} onItemClick={onItemClick} />
+              <NavItemComponent
+                key={i}
+                item={child}
+                level={level + 1}
+                onItemClick={onItemClick}
+              />
             ))}
           </div>
         )}
       </div>
-    )
+    );
   }
 
   return (
     <Link
-      to={item.path || '#'}
+      to={item.path || "#"}
       onClick={onItemClick}
       className={clsx(
-        'flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors',
+        "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors",
         isActive
-          ? 'bg-sidebar-active text-white'
-          : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
+          ? "bg-sidebar-active text-white"
+          : "text-gray-300 hover:bg-sidebar-hover hover:text-white",
       )}
-      aria-current={isActive ? 'page' : undefined}
+      aria-current={isActive ? "page" : undefined}
     >
       {item.icon}
       <span>{item.label}</span>
     </Link>
-  )
+  );
 }
 
 interface SidebarProps {
-  isOpen?: boolean
-  onClose?: () => void
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login')
-  }
+    await logout();
+    navigate("/login");
+  };
 
   const handleNavClick = () => {
-    onClose?.()
-  }
+    onClose?.();
+  };
 
   return (
     <>
       <div
         className={clsx(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-sidebar flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
@@ -417,21 +438,41 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             className="md:hidden text-gray-300 hover:text-white"
             aria-label="Close sidebar menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Main navigation">
+        <nav
+          className="flex-1 overflow-y-auto px-3 py-4 space-y-1"
+          aria-label="Main navigation"
+        >
           {navigation.map((item, i) => (
-            <NavItemComponent key={i} item={item} onItemClick={handleNavClick} />
+            <NavItemComponent
+              key={i}
+              item={item}
+              onItemClick={handleNavClick}
+            />
           ))}
         </nav>
 
         <div className="px-3 py-4 border-t border-gray-700">
           <div className="px-3 py-2">
-            <p className="text-sm text-white font-medium">{user?.displayName}</p>
+            <p className="text-sm text-white font-medium">
+              {user?.displayName}
+            </p>
             <p className="text-xs text-gray-400">{user?.email}</p>
           </div>
           <button
@@ -445,5 +486,5 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </div>
       </div>
     </>
-  )
+  );
 }

@@ -1,37 +1,39 @@
-import { clsx } from 'clsx'
+import { clsx } from "clsx";
 
 interface SkeletonProps {
-  className?: string
-  variant?: 'text' | 'circular' | 'rectangular'
-  width?: string | number
-  height?: string | number
-  lines?: number
-  animation?: 'pulse' | 'wave' | 'none'
+  className?: string;
+  variant?: "text" | "circular" | "rectangular";
+  width?: string | number;
+  height?: string | number;
+  lines?: number;
+  animation?: "pulse" | "wave" | "none";
 }
 
 export function Skeleton({
   className,
-  variant = 'text',
+  variant = "text",
   width,
   height,
   lines = 1,
-  animation = 'pulse',
+  animation = "pulse",
 }: SkeletonProps) {
   const baseStyle = clsx(
-    'bg-gray-200 rounded',
+    "bg-gray-200 rounded",
     {
-      'animate-pulse': animation === 'pulse',
-      'rounded-full': variant === 'circular',
+      "animate-pulse": animation === "pulse",
+      "rounded-full": variant === "circular",
     },
-    className
-  )
+    className,
+  );
 
   const style: React.CSSProperties = {
-    width: width || (variant === 'circular' ? '40px' : '100%'),
-    height: height || (variant === 'text' ? '1em' : variant === 'circular' ? '40px' : '100%'),
-  }
+    width: width || (variant === "circular" ? "40px" : "100%"),
+    height:
+      height ||
+      (variant === "text" ? "1em" : variant === "circular" ? "40px" : "100%"),
+  };
 
-  if (variant === 'text' && lines > 1) {
+  if (variant === "text" && lines > 1) {
     return (
       <div className="space-y-2" aria-hidden="true">
         {Array.from({ length: lines }).map((_, i) => (
@@ -40,24 +42,33 @@ export function Skeleton({
             className={baseStyle}
             style={{
               ...style,
-              width: i === lines - 1 ? '75%' : undefined,
+              width: i === lines - 1 ? "75%" : undefined,
             }}
           />
         ))}
       </div>
-    )
+    );
   }
 
-  return <div className={baseStyle} style={style} aria-hidden="true" />
+  return <div className={baseStyle} style={style} aria-hidden="true" />;
 }
 
 export function CardSkeleton({
   lines = 3,
   showHeader = true,
   className,
-}: { lines?: number; showHeader?: boolean; className?: string }) {
+}: {
+  lines?: number;
+  showHeader?: boolean;
+  className?: string;
+}) {
   return (
-    <div className={clsx('bg-white rounded-lg border border-gray-200 p-6 space-y-4', className)}>
+    <div
+      className={clsx(
+        "bg-white rounded-lg border border-gray-200 p-6 space-y-4",
+        className,
+      )}
+    >
       {showHeader && (
         <div className="flex items-center justify-between">
           <Skeleton width="150px" height="24px" />
@@ -66,10 +77,16 @@ export function CardSkeleton({
       )}
       <Skeleton lines={lines} />
     </div>
-  )
+  );
 }
 
-export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
+export function TableSkeleton({
+  rows = 5,
+  cols = 4,
+}: {
+  rows?: number;
+  cols?: number;
+}) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
@@ -91,7 +108,7 @@ export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: nu
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export function PageSkeleton({ sections = 3 }: { sections?: number }) {
@@ -105,5 +122,5 @@ export function PageSkeleton({ sections = 3 }: { sections?: number }) {
         <CardSkeleton key={i} lines={2 + i} />
       ))}
     </div>
-  )
+  );
 }

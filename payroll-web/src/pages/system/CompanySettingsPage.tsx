@@ -1,139 +1,180 @@
-import { useState, useEffect } from 'react'
-import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '../../config/firebase'
-import { usePermissions } from '../../hooks/usePermissions'
-import { useToast } from '../../components/ui/Toast'
-import { Button } from '../../components/ui/Button'
-import { Card, CardContent, CardHeader } from '../../components/ui/Card'
-import { Input } from '../../components/ui/Input'
-import { Settings, Calculator, Monitor, Bell } from 'lucide-react'
-import type { Company } from '../../types'
+import { useState, useEffect } from "react";
+import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { usePermissions } from "../../hooks/usePermissions";
+import { useToast } from "../../components/ui/Toast";
+import { Button } from "../../components/ui/Button";
+import { Card, CardContent, CardHeader } from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
+import { Settings, Calculator, Monitor, Bell } from "lucide-react";
+import type { Company } from "../../types";
 
 interface CompanySettings {
-  id?: string
-  companyId: string
+  id?: string;
+  companyId: string;
   general: {
-    defaultCurrency: string
-    fiscalYearStartMonth: number
-    taxYear: string
-  }
+    defaultCurrency: string;
+    fiscalYearStartMonth: number;
+    taxYear: string;
+  };
   payrollOptions: {
-    autoApproveLeaves: boolean
-    requireDtrBeforePayroll: boolean
-    roundTimeEntries: 'none' | '15min' | '30min'
-  }
+    autoApproveLeaves: boolean;
+    requireDtrBeforePayroll: boolean;
+    roundTimeEntries: "none" | "15min" | "30min";
+  };
   displayOptions: {
-    itemsPerPage: number
-    dateFormat: string
-    timeFormat: '12h' | '24h'
-    theme: 'light' | 'dark' | 'system'
-  }
+    itemsPerPage: number;
+    dateFormat: string;
+    timeFormat: "12h" | "24h";
+    theme: "light" | "dark" | "system";
+  };
   notifications: {
-    emailOnPayrollLock: boolean
-    emailOnLeaveApproval: boolean
-  }
+    emailOnPayrollLock: boolean;
+    emailOnLeaveApproval: boolean;
+  };
 }
 
-const defaultSettings: Omit<CompanySettings, 'companyId'> = {
+const defaultSettings: Omit<CompanySettings, "companyId"> = {
   general: {
-    defaultCurrency: 'PHP',
+    defaultCurrency: "PHP",
     fiscalYearStartMonth: 1,
-    taxYear: new Date().getFullYear().toString()
+    taxYear: new Date().getFullYear().toString(),
   },
   payrollOptions: {
     autoApproveLeaves: false,
     requireDtrBeforePayroll: true,
-    roundTimeEntries: 'none'
+    roundTimeEntries: "none",
   },
   displayOptions: {
     itemsPerPage: 20,
-    dateFormat: 'MM/dd/yyyy',
-    timeFormat: '12h',
-    theme: 'system'
+    dateFormat: "MM/dd/yyyy",
+    timeFormat: "12h",
+    theme: "system",
   },
   notifications: {
     emailOnPayrollLock: true,
-    emailOnLeaveApproval: true
-  }
-}
+    emailOnLeaveApproval: true,
+  },
+};
 
 export function CompanySettingsPage() {
-  const { canView } = usePermissions()
-  const { addToast } = useToast()
-  const [companies, setCompanies] = useState<Company[]>([])
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('')
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [activeTab, setActiveTab] = useState<'general' | 'payroll' | 'display' | 'notifications'>('general')
-  const [settings, setSettings] = useState<CompanySettings>({ companyId: '', ...defaultSettings })
+  const { canView } = usePermissions();
+  const { addToast } = useToast();
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "general" | "payroll" | "display" | "notifications"
+  >("general");
+  const [settings, setSettings] = useState<CompanySettings>({
+    companyId: "",
+    ...defaultSettings,
+  });
 
   const fetchCompanies = async () => {
-    setLoading(true)
-    const snap = await getDocs(collection(db, 'companies'))
-    const list = (snap.docs
-      .map((d) => ({ id: d.id, ...d.data() })) as Company[])
-      .filter((c) => c.isActive && !c.isDeleted)
-    setCompanies(list)
+    setLoading(true);
+    const snap = await getDocs(collection(db, "companies"));
+    const list = (
+      snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[]
+    ).filter((c) => c.isActive && !c.isDeleted);
+    setCompanies(list);
     if (list.length > 0 && !selectedCompanyId) {
-      setSelectedCompanyId(list[0].id)
+      setSelectedCompanyId(list[0].id);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const fetchSettings = async (companyId: string) => {
-    const ref = doc(db, 'company_settings', companyId)
-    const snap = await getDoc(ref)
+    const ref = doc(db, "company_settings", companyId);
+    const snap = await getDoc(ref);
     if (snap.exists()) {
-      setSettings({ id: snap.id, ...snap.data() } as CompanySettings)
+      setSettings({ id: snap.id, ...snap.data() } as CompanySettings);
     } else {
-      setSettings({ companyId, ...defaultSettings })
+      setSettings({ companyId, ...defaultSettings });
     }
-  }
+  };
 
   // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
-  useEffect(() => { fetchCompanies() }, [])
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
   useEffect(() => {
     if (selectedCompanyId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchSettings(selectedCompanyId)
+      fetchSettings(selectedCompanyId);
     }
-  }, [selectedCompanyId])
+  }, [selectedCompanyId]);
 
   const handleSave = async () => {
-    if (!selectedCompanyId) return
-    setSaving(true)
+    if (!selectedCompanyId) return;
+    setSaving(true);
     try {
-      const ref = doc(db, 'company_settings', selectedCompanyId)
-      await setDoc(ref, { ...settings, companyId: selectedCompanyId }, { merge: true })
-      addToast({ type: 'success', title: 'Settings saved', message: 'Company settings have been updated' })
+      const ref = doc(db, "company_settings", selectedCompanyId);
+      await setDoc(
+        ref,
+        { ...settings, companyId: selectedCompanyId },
+        { merge: true },
+      );
+      addToast({
+        type: "success",
+        title: "Settings saved",
+        message: "Company settings have been updated",
+      });
     } catch {
-      addToast({ type: 'error', title: 'Save failed', message: 'Could not save settings' })
+      addToast({
+        type: "error",
+        title: "Save failed",
+        message: "Could not save settings",
+      });
     }
-    setSaving(false)
-  }
+    setSaving(false);
+  };
 
-  const updateSettings = (section: keyof CompanySettings, field: string, value: string | number | boolean) => {
+  const updateSettings = (
+    section: keyof CompanySettings,
+    field: string,
+    value: string | number | boolean,
+  ) => {
     setSettings({
       ...settings,
       [section]: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(settings[section] as any),
-        [field]: value
-      }
-    })
-  }
+        [field]: value,
+      },
+    });
+  };
 
-  if (!canView('system', 'companies')) return <div className="text-center py-12 text-gray-500">Access denied</div>
+  if (!canView("system", "companies"))
+    return <div className="text-center py-12 text-gray-500">Access denied</div>;
 
   const tabs = [
-    { key: 'general' as const, label: 'General', icon: <Settings className="w-4 h-4" /> },
-    { key: 'payroll' as const, label: 'Payroll Options', icon: <Calculator className="w-4 h-4" /> },
-    { key: 'display' as const, label: 'Display Options', icon: <Monitor className="w-4 h-4" /> },
-    { key: 'notifications' as const, label: 'Notifications', icon: <Bell className="w-4 h-4" /> }
-  ]
+    {
+      key: "general" as const,
+      label: "General",
+      icon: <Settings className="w-4 h-4" />,
+    },
+    {
+      key: "payroll" as const,
+      label: "Payroll Options",
+      icon: <Calculator className="w-4 h-4" />,
+    },
+    {
+      key: "display" as const,
+      label: "Display Options",
+      icon: <Monitor className="w-4 h-4" />,
+    },
+    {
+      key: "notifications" as const,
+      label: "Notifications",
+      icon: <Bell className="w-4 h-4" />,
+    },
+  ];
 
-  if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>
+  if (loading)
+    return <div className="text-center py-12 text-gray-500">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -143,7 +184,9 @@ export function CompanySettingsPage() {
 
       <Card>
         <CardContent className="pt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Select Company</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Select Company
+          </label>
           <select
             value={selectedCompanyId}
             onChange={(e) => setSelectedCompanyId(e.target.value)}
@@ -151,7 +194,9 @@ export function CompanySettingsPage() {
           >
             <option value="">Select a company...</option>
             {companies.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
         </CardContent>
@@ -167,8 +212,8 @@ export function CompanySettingsPage() {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                     activeTab === tab.key
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? "border-blue-600 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   {tab.icon}
@@ -178,15 +223,25 @@ export function CompanySettingsPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            {activeTab === 'general' && (
+            {activeTab === "general" && (
               <div className="space-y-4 max-w-2xl">
-                <h3 className="text-lg font-medium text-gray-900">General Settings</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  General Settings
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Default Currency
+                    </label>
                     <select
                       value={settings.general.defaultCurrency}
-                      onChange={(e) => updateSettings('general', 'defaultCurrency', e.target.value)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "general",
+                          "defaultCurrency",
+                          e.target.value,
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value="PHP">PHP - Philippine Peso</option>
@@ -195,15 +250,25 @@ export function CompanySettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fiscal Year Start Month</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Fiscal Year Start Month
+                    </label>
                     <select
                       value={settings.general.fiscalYearStartMonth}
-                      onChange={(e) => updateSettings('general', 'fiscalYearStartMonth', Number(e.target.value))}
+                      onChange={(e) =>
+                        updateSettings(
+                          "general",
+                          "fiscalYearStartMonth",
+                          Number(e.target.value),
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       {Array.from({ length: 12 }, (_, i) => (
                         <option key={i} value={i + 1}>
-                          {new Date(2000, i, 1).toLocaleString('default', { month: 'long' })}
+                          {new Date(2000, i, 1).toLocaleString("default", {
+                            month: "long",
+                          })}
                         </option>
                       ))}
                     </select>
@@ -212,39 +277,67 @@ export function CompanySettingsPage() {
                     id="taxYear"
                     label="Tax Year"
                     value={settings.general.taxYear}
-                    onChange={(e) => updateSettings('general', 'taxYear', e.target.value)}
+                    onChange={(e) =>
+                      updateSettings("general", "taxYear", e.target.value)
+                    }
                   />
                 </div>
               </div>
             )}
 
-            {activeTab === 'payroll' && (
+            {activeTab === "payroll" && (
               <div className="space-y-4 max-w-2xl">
-                <h3 className="text-lg font-medium text-gray-900">Payroll Options</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Payroll Options
+                </h3>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={settings.payrollOptions.autoApproveLeaves}
-                      onChange={(e) => updateSettings('payrollOptions', 'autoApproveLeaves', e.target.checked)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "payrollOptions",
+                          "autoApproveLeaves",
+                          e.target.checked,
+                        )
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Auto-approve leaves</span>
+                    <span className="text-sm text-gray-700">
+                      Auto-approve leaves
+                    </span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={settings.payrollOptions.requireDtrBeforePayroll}
-                      onChange={(e) => updateSettings('payrollOptions', 'requireDtrBeforePayroll', e.target.checked)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "payrollOptions",
+                          "requireDtrBeforePayroll",
+                          e.target.checked,
+                        )
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Require DTR before payroll processing</span>
+                    <span className="text-sm text-gray-700">
+                      Require DTR before payroll processing
+                    </span>
                   </label>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Round Time Entries</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Round Time Entries
+                    </label>
                     <select
                       value={settings.payrollOptions.roundTimeEntries}
-                      onChange={(e) => updateSettings('payrollOptions', 'roundTimeEntries', e.target.value)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "payrollOptions",
+                          "roundTimeEntries",
+                          e.target.value,
+                        )
+                      }
                       className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value="none">No rounding</option>
@@ -256,15 +349,25 @@ export function CompanySettingsPage() {
               </div>
             )}
 
-            {activeTab === 'display' && (
+            {activeTab === "display" && (
               <div className="space-y-4 max-w-2xl">
-                <h3 className="text-lg font-medium text-gray-900">Display Options</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Display Options
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Items Per Page</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Items Per Page
+                    </label>
                     <select
                       value={settings.displayOptions.itemsPerPage}
-                      onChange={(e) => updateSettings('displayOptions', 'itemsPerPage', Number(e.target.value))}
+                      onChange={(e) =>
+                        updateSettings(
+                          "displayOptions",
+                          "itemsPerPage",
+                          Number(e.target.value),
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value={10}>10</option>
@@ -274,10 +377,18 @@ export function CompanySettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Format</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Date Format
+                    </label>
                     <select
                       value={settings.displayOptions.dateFormat}
-                      onChange={(e) => updateSettings('displayOptions', 'dateFormat', e.target.value)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "displayOptions",
+                          "dateFormat",
+                          e.target.value,
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value="MM/dd/yyyy">MM/dd/yyyy</option>
@@ -286,10 +397,18 @@ export function CompanySettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Time Format</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Time Format
+                    </label>
                     <select
                       value={settings.displayOptions.timeFormat}
-                      onChange={(e) => updateSettings('displayOptions', 'timeFormat', e.target.value)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "displayOptions",
+                          "timeFormat",
+                          e.target.value,
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value="12h">12-hour (AM/PM)</option>
@@ -297,10 +416,18 @@ export function CompanySettingsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Theme</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Theme
+                    </label>
                     <select
                       value={settings.displayOptions.theme}
-                      onChange={(e) => updateSettings('displayOptions', 'theme', e.target.value)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "displayOptions",
+                          "theme",
+                          e.target.value,
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                     >
                       <option value="light">Light</option>
@@ -312,27 +439,45 @@ export function CompanySettingsPage() {
               </div>
             )}
 
-            {activeTab === 'notifications' && (
+            {activeTab === "notifications" && (
               <div className="space-y-4 max-w-2xl">
-                <h3 className="text-lg font-medium text-gray-900">Notification Settings</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Notification Settings
+                </h3>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={settings.notifications.emailOnPayrollLock}
-                      onChange={(e) => updateSettings('notifications', 'emailOnPayrollLock', e.target.checked)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "notifications",
+                          "emailOnPayrollLock",
+                          e.target.checked,
+                        )
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Send email notification when payroll is locked</span>
+                    <span className="text-sm text-gray-700">
+                      Send email notification when payroll is locked
+                    </span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={settings.notifications.emailOnLeaveApproval}
-                      onChange={(e) => updateSettings('notifications', 'emailOnLeaveApproval', e.target.checked)}
+                      onChange={(e) =>
+                        updateSettings(
+                          "notifications",
+                          "emailOnLeaveApproval",
+                          e.target.checked,
+                        )
+                      }
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">Send email notification on leave approval</span>
+                    <span className="text-sm text-gray-700">
+                      Send email notification on leave approval
+                    </span>
                   </label>
                 </div>
               </div>
@@ -340,12 +485,12 @@ export function CompanySettingsPage() {
 
             <div className="flex gap-2 mt-6 pt-4 border-t">
               <Button onClick={handleSave} disabled={saving}>
-                {saving ? 'Saving...' : 'Save Settings'}
+                {saving ? "Saving..." : "Save Settings"}
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

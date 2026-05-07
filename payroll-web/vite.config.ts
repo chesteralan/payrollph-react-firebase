@@ -1,10 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
 // Security headers for development server
 const securityHeaders = {
-  'Content-Security-Policy': `
+  "Content-Security-Policy": `
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.googleapis.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
@@ -16,28 +16,30 @@ const securityHeaders = {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-  `.replace(/\s+/g, ' ').trim(),
-  'X-Frame-Options': 'DENY',
-  'X-Content-Type-Options': 'nosniff',
-  'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-}
+  `
+    .replace(/\s+/g, " ")
+    .trim(),
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
   build: {
-    target: 'es2020',
-    outDir: 'dist',
-    assetsDir: 'assets',
-    minify: 'terser',
+    target: "es2020",
+    outDir: "dist",
+    assetsDir: "assets",
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true,
@@ -47,9 +49,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
-          ui: ['lucide-react', 'clsx', 'tailwind-merge'],
+          vendor: ["react", "react-dom", "react-router-dom"],
+          firebase: [
+            "firebase/app",
+            "firebase/auth",
+            "firebase/firestore",
+            "firebase/storage",
+          ],
+          ui: ["lucide-react", "clsx", "tailwind-merge"],
         },
       },
     },
@@ -66,23 +73,23 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    exclude: ['node_modules', 'dist', '.idea', 'coverage'],
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
+    include: ["src/**/*.{test,spec}.{js,jsx,ts,tsx}"],
+    exclude: ["node_modules", "dist", ".idea", "coverage"],
     coverage: {
-      provider: 'v8',
-      include: ['src/**/*.{ts,tsx}'],
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
       exclude: [
-        'node_modules/**',
-        'coverage/**',
-        'dist/**',
-        'src/test/**',
-        'src/types/**',
-        '**/*.d.ts',
-        '**/*.config.*',
+        "node_modules/**",
+        "coverage/**",
+        "dist/**",
+        "src/test/**",
+        "src/types/**",
+        "**/*.d.ts",
+        "**/*.config.*",
       ],
-      reporter: ['text', 'json', 'html'],
+      reporter: ["text", "json", "html"],
       thresholds: {
         lines: 80,
         branches: 80,
@@ -91,4 +98,4 @@ export default defineConfig({
       },
     },
   },
-})
+});

@@ -1,47 +1,56 @@
-import { useState, useEffect, useCallback, useRef, memo } from 'react'
-import { Search, X } from 'lucide-react'
-import { clsx } from 'clsx'
+import { useState, useEffect, useCallback, useRef, memo } from "react";
+import { Search, X } from "lucide-react";
+import { clsx } from "clsx";
 
 interface SearchBarProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
-  debounceMs?: number
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  debounceMs?: number;
 }
 
-export const SearchBar = memo(function SearchBar({ value, onChange, placeholder = 'Search...', className, debounceMs = 300 }: SearchBarProps) {
-  const [localValue, setLocalValue] = useState(value)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
-  const onChangeRef = useRef(onChange)
+export const SearchBar = memo(function SearchBar({
+  value,
+  onChange,
+  placeholder = "Search...",
+  className,
+  debounceMs = 300,
+}: SearchBarProps) {
+  const [localValue, setLocalValue] = useState(value);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const onChangeRef = useRef(onChange);
 
   useEffect(() => {
-    onChangeRef.current = onChange
-  }, [onChange])
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
-    setLocalValue(value)
-  }, [value])
+    setLocalValue(value);
+  }, [value]);
 
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      onChangeRef.current(localValue)
-    }, debounceMs)
+      onChangeRef.current(localValue);
+    }, debounceMs);
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-  }, [localValue, debounceMs])
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [localValue, debounceMs]);
 
   const handleClear = useCallback(() => {
-    setLocalValue('')
-    onChangeRef.current('')
-  }, [])
+    setLocalValue("");
+    onChangeRef.current("");
+  }, []);
 
   return (
-    <div className={clsx('relative flex-1 max-w-sm', className)} role="search">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
+    <div className={clsx("relative flex-1 max-w-sm", className)} role="search">
+      <Search
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+        aria-hidden="true"
+      />
       <input
         type="text"
         placeholder={placeholder}
@@ -60,5 +69,5 @@ export const SearchBar = memo(function SearchBar({ value, onChange, placeholder 
         </button>
       )}
     </div>
-  )
-})
+  );
+});

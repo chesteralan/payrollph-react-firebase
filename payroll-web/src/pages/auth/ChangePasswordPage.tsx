@@ -1,59 +1,69 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-import { Button } from '../../components/ui/Button'
-import { Input } from '../../components/ui/Input'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { ArrowLeft, Lock } from 'lucide-react'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/Card";
+import { ArrowLeft, Lock } from "lucide-react";
 
 export function ChangePasswordPage() {
-  const { changePassword } = useAuth()
-  const navigate = useNavigate()
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const { changePassword } = useAuth();
+  const navigate = useNavigate();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setSuccess(false)
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match')
-      return
+      setError("New passwords do not match");
+      return;
     }
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
+      setError("Password must be at least 6 characters");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      await changePassword(currentPassword, newPassword)
-      setSuccess(true)
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
+      await changePassword(currentPassword, newPassword);
+      setSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to change password'
-      if (message.includes('wrong-password') || message.includes('INVALID_LOGIN_CREDENTIALS')) {
-        setError('Current password is incorrect')
+      const message =
+        err instanceof Error ? err.message : "Failed to change password";
+      if (
+        message.includes("wrong-password") ||
+        message.includes("INVALID_LOGIN_CREDENTIALS")
+      ) {
+        setError("Current password is incorrect");
       } else {
-        setError(message)
+        setError(message);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <Button variant="ghost" onClick={() => navigate('/')} className="mb-4">
-          <ArrowLeft className="w-4 h-4 mr-2" />Back to Dashboard
+        <Button variant="ghost" onClick={() => navigate("/")} className="mb-4">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
         </Button>
 
         <Card>
@@ -64,7 +74,9 @@ export function ChangePasswordPage() {
               </div>
               <div>
                 <CardTitle>Change Password</CardTitle>
-                <p className="text-sm text-gray-500">Update your account password</p>
+                <p className="text-sm text-gray-500">
+                  Update your account password
+                </p>
               </div>
             </div>
           </CardHeader>
@@ -107,12 +119,12 @@ export function ChangePasswordPage() {
               />
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Changing...' : 'Change Password'}
+                {loading ? "Changing..." : "Change Password"}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }
