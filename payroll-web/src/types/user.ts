@@ -33,6 +33,7 @@ export interface UserSettings {
   theme: 'light' | 'dark'
   itemsPerPage: number
   defaultCompanyId?: string
+  locale?: string
 }
 
 export type Department =

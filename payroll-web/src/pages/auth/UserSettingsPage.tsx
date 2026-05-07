@@ -5,8 +5,9 @@ import { db } from '../../config/firebase'
 import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
-import { ArrowLeft, Save, Lock, Palette, DollarSign } from 'lucide-react'
+import { ArrowLeft, Save, Lock, Palette, DollarSign, Globe } from 'lucide-react'
 import { getAvailableCurrencies, setDefaultCurrency, getDefaultCurrency } from '../../utils/currency'
+import { localeLabels } from '../../i18n'
 
 export function UserSettingsPage() {
   const { user, userCompanies, settings, changePassword } = useAuth()
@@ -18,6 +19,7 @@ export function UserSettingsPage() {
     itemsPerPage: 25,
     defaultCompanyId: '',
     currency: 'PHP',
+    locale: 'en-US',
   })
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -34,6 +36,7 @@ export function UserSettingsPage() {
         itemsPerPage: settings.itemsPerPage || 25,
         defaultCompanyId: settings.defaultCompanyId || '',
         currency: settings.currency || 'PHP',
+        locale: settings.locale || 'en-US',
       })
       setDefaultCurrency(settings.currency || 'PHP')
     }
@@ -54,6 +57,7 @@ export function UserSettingsPage() {
         itemsPerPage: formData.itemsPerPage,
         defaultCompanyId: formData.defaultCompanyId || undefined,
         currency: formData.currency,
+        locale: formData.locale,
         updatedAt: new Date()
       }
 
@@ -163,6 +167,19 @@ export function UserSettingsPage() {
               >
                 {getAvailableCurrencies().map(c => (
                   <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Language / Locale</label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                value={formData.locale}
+                onChange={(e) => setFormData({ ...formData, locale: e.target.value })}
+              >
+                {Object.entries(localeLabels).map(([code, label]) => (
+                  <option key={code} value={code}>{label}</option>
                 ))}
               </select>
             </div>

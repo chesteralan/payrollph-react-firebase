@@ -81,7 +81,7 @@ export function Breadcrumb() {
   if (breadcrumbs.length <= 1) return null
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-gray-500 mb-4">
+    <nav className="flex items-center gap-1 text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
       {breadcrumbs.map((crumb, index) => (
         <div key={index} className="flex items-center gap-1">
           {index > 0 && <ChevronRight className="w-3 h-3 text-gray-400" />}

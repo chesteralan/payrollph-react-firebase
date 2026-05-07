@@ -43,8 +43,9 @@ function AlertBanner({ alert, onDismiss }: AlertBannerProps) {
       <button
         onClick={() => onDismiss(alert.id)}
         className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors"
+        aria-label={`Dismiss ${alert.type} alert`}
       >
-        <X className="w-4 h-4" />
+        <X className="w-4 h-4" aria-hidden="true" />
       </button>
     </div>
   )

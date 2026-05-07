@@ -339,13 +339,15 @@ function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; lev
               ? 'bg-sidebar-active text-white'
               : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
           )}
+          aria-expanded={expanded}
+          aria-label={`${item.label} section`}
         >
           {item.icon}
           <span className="flex-1 text-left">{item.label}</span>
           {expanded ? (
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4" aria-hidden="true" />
           ) : (
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
           )}
         </button>
         {expanded && (
@@ -369,6 +371,7 @@ function NavItemComponent({ item, level = 0, onItemClick }: { item: NavItem; lev
           ? 'bg-sidebar-active text-white'
           : 'text-gray-300 hover:bg-sidebar-hover hover:text-white'
       )}
+      aria-current={isActive ? 'page' : undefined}
     >
       {item.icon}
       <span>{item.label}</span>
@@ -410,14 +413,15 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <button
             onClick={onClose}
             className="md:hidden text-gray-300 hover:text-white"
+            aria-label="Close sidebar menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Main navigation">
           {navigation.map((item, i) => (
             <NavItemComponent key={i} item={item} onItemClick={handleNavClick} />
           ))}
@@ -431,8 +435,9 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-sidebar-hover hover:text-white rounded-md transition-colors"
+            aria-label="Logout"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4" aria-hidden="true" />
             <span>Logout</span>
           </button>
         </div>

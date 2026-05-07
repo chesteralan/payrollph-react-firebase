@@ -74,6 +74,7 @@ export function VirtualScroll<T>({
       ref={containerRef}
       className={`overflow-auto ${className}`}
       style={{ height: containerHeight }}
+      role="list"
     >
       <div style={{ position: 'relative', height: totalHeight }}>
         {visibleItems.map(({ item, index, style }) => (

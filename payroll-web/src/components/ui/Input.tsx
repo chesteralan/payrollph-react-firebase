@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, forwardRef } from 'react'
+import { type InputHTMLAttributes, forwardRef, useId } from 'react'
 import { clsx } from 'clsx'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -7,7 +7,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, id, ...props }, ref) => {
+  ({ className, label, error, id: externalId, ...props }, ref) => {
+    const autoId = useId()
+    const id = externalId || autoId
+    const errorId = `${id}-error`
+
     return (
       <div className="space-y-1">
         {label && (
@@ -23,9 +27,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
             className
           )}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? errorId : undefined}
           {...props}
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p id={errorId} className="text-sm text-red-600" role="alert">{error}</p>}
       </div>
     )
   }

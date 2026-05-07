@@ -8,8 +8,15 @@ interface CardProps {
 }
 
 export const Card = memo(function Card({ children, className, onClick }: CardProps) {
+  const isClickable = !!onClick
   return (
-    <div className={clsx('bg-white rounded-lg border border-gray-200 shadow-sm', className)} onClick={onClick}>
+    <div
+      className={clsx('bg-white rounded-lg border border-gray-200 shadow-sm', isClickable && 'cursor-pointer hover:shadow-md transition-shadow', className)}
+      onClick={onClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } } : undefined}
+    >
       {children}
     </div>
   )

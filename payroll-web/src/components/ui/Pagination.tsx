@@ -40,17 +40,18 @@ export function Pagination({ currentPage, totalPages, onPageChange, totalItems, 
           </>
         )}
       </div>
-      <div className="flex items-center gap-1">
+      <nav className="flex items-center gap-1" aria-label="Pagination">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          aria-label="Previous page"
         >
           Previous
         </button>
         {getPageNumbers().map((page, index) =>
           typeof page === 'string' ? (
-            <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
+            <span key={`ellipsis-${index}`} className="px-2 text-gray-400" aria-hidden="true">
               {page}
             </span>
           ) : (
@@ -62,6 +63,8 @@ export function Pagination({ currentPage, totalPages, onPageChange, totalItems, 
                   ? 'bg-primary-600 text-white border-primary-600'
                   : 'border-gray-300 hover:bg-gray-50'
               }`}
+              aria-current={page === currentPage ? 'page' : undefined}
+              aria-label={`Page ${page}`}
             >
               {page}
             </button>
@@ -71,10 +74,11 @@ export function Pagination({ currentPage, totalPages, onPageChange, totalItems, 
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          aria-label="Next page"
         >
           Next
         </button>
-      </div>
+      </nav>
     </div>
   )
 }

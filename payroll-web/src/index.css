@@ -33,6 +33,14 @@
   animation: slide-in 0.3s ease-out;
 }
 
+@custom-variant focus-visible (&:focus-visible);
+
+@media (prefers-contrast: more) {
+  * {
+    --color-primary-600: #1d4ed8;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
@@ -50,5 +58,12 @@
   }
   thead {
     display: table-header-group;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

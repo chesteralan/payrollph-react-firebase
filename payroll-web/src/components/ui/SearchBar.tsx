@@ -40,8 +40,8 @@ export const SearchBar = memo(function SearchBar({ value, onChange, placeholder 
   }, [])
 
   return (
-    <div className={clsx('relative flex-1 max-w-sm', className)}>
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+    <div className={clsx('relative flex-1 max-w-sm', className)} role="search">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
       <input
         type="text"
         placeholder={placeholder}
@@ -54,8 +54,9 @@ export const SearchBar = memo(function SearchBar({ value, onChange, placeholder 
           type="button"
           onClick={handleClear}
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          aria-label="Clear search"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       )}
     </div>

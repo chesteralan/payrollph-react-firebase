@@ -51,7 +51,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm" aria-live="polite" aria-relevant="additions">
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
         ))}
@@ -92,7 +92,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   }
 
   return (
-    <div className={`flex items-start gap-3 p-4 border rounded-lg shadow-lg ${colors[toast.type]} animate-slide-in`}>
+    <div className={`flex items-start gap-3 p-4 border rounded-lg shadow-lg ${colors[toast.type]} animate-slide-in`} role="status">
       {icons[toast.type]}
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm">{toast.title}</p>
@@ -101,8 +101,9 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       <button
         onClick={() => onRemove(toast.id)}
         className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+        aria-label="Dismiss notification"
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
       </button>

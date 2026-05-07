@@ -33,7 +33,7 @@ export function Skeleton({
 
   if (variant === 'text' && lines > 1) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-2" aria-hidden="true">
         {Array.from({ length: lines }).map((_, i) => (
           <div
             key={i}
@@ -48,7 +48,7 @@ export function Skeleton({
     )
   }
 
-  return <div className={baseStyle} style={style} />
+  return <div className={baseStyle} style={style} aria-hidden="true" />
 }
 
 export function CardSkeleton({

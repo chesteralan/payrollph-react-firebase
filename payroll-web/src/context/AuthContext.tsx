@@ -15,6 +15,7 @@ import type { User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { auth, db } from '../config/firebase'
 import type { UserAccount, UserRestriction, UserCompany, UserSettings, Department, Section } from '../types'
+import { setHtmlLang } from '../i18n'
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll']
@@ -141,6 +142,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setRestrictions(restrictionsData)
           setUserCompanies(companiesData)
           setSettings(settingsData)
+
+          if (settingsData?.locale) {
+            setHtmlLang(settingsData.locale as any)
+          }
 
           if (companiesData.length > 0) {
             const primary = companiesData.find((c) => c.isPrimary)

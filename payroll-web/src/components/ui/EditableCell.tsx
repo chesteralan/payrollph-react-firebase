@@ -18,7 +18,7 @@ export const EditableCell = memo(function EditableCell({ value, onChange, type =
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={() => { setEditing(false); onChange(localValue) }}
-        onKeyDown={(e) => { if (e.key === 'Enter') { setEditing(false); onChange(localValue) } }}
+        onKeyDown={(e) => { if (e.key === 'Enter') { setEditing(false); onChange(localValue) } if (e.key === 'Escape') { setEditing(false); setLocalValue(String(value)) } }}
         className="w-full px-2 py-1 text-sm border border-primary-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500"
         autoFocus
       />
@@ -28,7 +28,11 @@ export const EditableCell = memo(function EditableCell({ value, onChange, type =
   return (
     <div
       onClick={() => { setEditing(true); setLocalValue(String(value)) }}
-      className={`px-2 py-1 text-sm rounded cursor-text hover:bg-primary-50 ${className || ''}`}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setEditing(true); setLocalValue(String(value)) } }}
+      className={`px-2 py-1 text-sm rounded cursor-pointer hover:bg-primary-50 ${className || ''}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`Edit value: ${type === 'number' ? Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value}`}
     >
       {type === 'number' ? Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : value}
     </div>
