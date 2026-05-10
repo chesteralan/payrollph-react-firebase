@@ -51,9 +51,9 @@ import type {
   EmployeeSalary,
   EmployeeDocument,
   DocumentCategory,
-} from "../../types";
+} from "./EmployeeProfilePage.types";
 
-type ProfileTab = "info" | "contact" | "compensation" | "dtr" | "documents";
+import type { ProfileTab } from "./EmployeeProfilePage.types";
 
 export function EmployeeProfilePage() {
   const { id } = useParams<{ id: string }>();

@@ -1,15 +1,6 @@
 import { clsx } from "clsx";
 import { Check } from "lucide-react";
-
-interface Step {
-  label: string;
-  completed: boolean;
-  active: boolean;
-}
-
-interface StepperProps {
-  steps: Step[];
-}
+import type { Step, StepperProps } from "./Stepper.types";
 
 export function Stepper({ steps }: StepperProps) {
   return (

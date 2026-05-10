@@ -24,14 +24,7 @@ import {
 } from "lucide-react";
 import { useTableSort } from "../../hooks/useTableSort";
 
-interface TrashItem {
-  id: string;
-  collection: string;
-  collectionLabel: string;
-  name: string;
-  deletedAt: Date | null;
-  rawDeletedAt: unknown;
-}
+import type { TrashItem, TrashCollectionDef } from "./TrashPage.types";
 
 const COLLECTIONS = [
   { key: "companies", label: "Companies", nameField: "name" },

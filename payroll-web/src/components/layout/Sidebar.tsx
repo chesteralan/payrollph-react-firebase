@@ -33,14 +33,7 @@ import {
 import { clsx } from "clsx";
 import { useState } from "react";
 
-interface NavItem {
-  label: string;
-  icon: React.ReactNode;
-  path?: string;
-  children?: NavItem[];
-  department?: string;
-  section?: string;
-}
+import type { NavItem, SidebarProps } from "./Sidebar.types";
 
 const navigation: NavItem[] = [
   {
@@ -402,10 +395,7 @@ function NavItemComponent({
   );
 }
 
-interface SidebarProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-}
+// ...existing code...
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const { user, logout } = useAuth();

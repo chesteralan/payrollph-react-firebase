@@ -1,3 +1,4 @@
+import type { LoginPageForm } from "./LoginPage.types";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -9,8 +10,7 @@ import { checkSetupNeeded } from "../../services/setup";
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState<LoginPageForm>({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -29,9 +29,8 @@ export function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      await login(email, password);
+      await login(form.email, form.password);
       navigate("/");
     } catch (err: unknown) {
       const message =
@@ -77,8 +76,8 @@ export function LoginPage() {
             id="email"
             type="email"
             label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             placeholder="you@company.com"
             required
           />
@@ -87,8 +86,8 @@ export function LoginPage() {
             id="password"
             type="password"
             label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
             placeholder="••••••••"
             required
           />

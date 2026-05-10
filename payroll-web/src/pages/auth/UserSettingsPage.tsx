@@ -1,3 +1,4 @@
+import type { UserSettingsForm, UserSettingsPasswordForm } from "./UserSettingsPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
@@ -19,14 +20,14 @@ export function UserSettingsPage() {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UserSettingsForm>({
     theme: (settings?.theme as "light" | "dark") || "light",
     itemsPerPage: settings?.itemsPerPage || 25,
     defaultCompanyId: settings?.defaultCompanyId || "",
     currency: (settings as { currency?: string } | undefined)?.currency || "PHP",
     locale: settings?.locale || "en-US",
   });
-  const [passwordForm, setPasswordForm] = useState({
+  const [passwordForm, setPasswordForm] = useState<UserSettingsPasswordForm>({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",

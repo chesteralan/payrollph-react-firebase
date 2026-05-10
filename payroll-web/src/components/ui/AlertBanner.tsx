@@ -3,20 +3,7 @@ import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useAuth } from "../../hooks/useAuth";
 import { X, AlertTriangle, Info, CheckCircle, AlertCircle } from "lucide-react";
-
-interface SystemAlert {
-  id: string;
-  type: "info" | "warning" | "error" | "success";
-  title: string;
-  message: string;
-  dismissed: boolean;
-  expiresAt?: Date;
-}
-
-interface AlertBannerProps {
-  alert: SystemAlert;
-  onDismiss: (id: string) => void;
-}
+import type { SystemAlert, AlertBannerProps } from "./AlertBanner.types";
 
 const alertIcons: Record<string, React.ReactNode> = {
   info: <Info className="w-5 h-5" />,
@@ -37,14 +24,14 @@ function AlertBanner({ alert, onDismiss }: AlertBannerProps) {
     <div
       className={`flex items-start gap-3 p-4 border rounded-lg ${alertColors[alert.type]}`}
     >
-      <span className="flex-shrink-0 mt-0.5">{alertIcons[alert.type]}</span>
+      <span className="shrink-0 mt-0.5">{alertIcons[alert.type]}</span>
       <div className="flex-1">
         <h3 className="text-sm font-semibold">{alert.title}</h3>
         <p className="text-sm mt-1 opacity-90">{alert.message}</p>
       </div>
       <button
         onClick={() => onDismiss(alert.id)}
-        className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors"
+        className="shrink-0 p-1 rounded hover:bg-black/5 transition-colors"
         aria-label={`Dismiss ${alert.type} alert`}
       >
         <X className="w-4 h-4" aria-hidden="true" />

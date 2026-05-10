@@ -1,3 +1,4 @@
+import type { SetupPageForm } from "./SetupPage.types";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, CheckCircle2 } from "lucide-react";
@@ -8,7 +9,7 @@ import { setupAdminUser, checkSetupNeeded } from "../../services/setup";
 export function SetupPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState<"check" | "form" | "success">("check");
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SetupPageForm>({
     email: "",
     password: "",
     confirmPassword: "",

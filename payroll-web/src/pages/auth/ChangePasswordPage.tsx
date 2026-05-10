@@ -1,3 +1,4 @@
+import type { ChangePasswordForm } from "./ChangePasswordPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -14,9 +15,11 @@ import { ArrowLeft, Lock } from "lucide-react";
 export function ChangePasswordPage() {
   const { changePassword } = useAuth();
   const navigate = useNavigate();
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [form, setForm] = useState<ChangePasswordForm>({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,23 +28,19 @@ export function ChangePasswordPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
-
-    if (newPassword !== confirmPassword) {
+    if (form.newPassword !== form.confirmPassword) {
       setError("New passwords do not match");
       return;
     }
-    if (newPassword.length < 6) {
+    if (form.newPassword.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
-
     setLoading(true);
     try {
-      await changePassword(currentPassword, newPassword);
+      await changePassword(form.currentPassword, form.newPassword);
       setSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Failed to change password";
@@ -97,24 +96,24 @@ export function ChangePasswordPage() {
                 id="currentPassword"
                 type="password"
                 label="Current Password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
+                value={form.currentPassword}
+                onChange={(e) => setForm((f) => ({ ...f, currentPassword: e.target.value }))}
                 required
               />
               <Input
                 id="newPassword"
                 type="password"
                 label="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                value={form.newPassword}
+                onChange={(e) => setForm((f) => ({ ...f, newPassword: e.target.value }))}
                 required
               />
               <Input
                 id="confirmPassword"
                 type="password"
                 label="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={form.confirmPassword}
+                onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
                 required
               />
 

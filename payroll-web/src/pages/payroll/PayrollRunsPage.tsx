@@ -27,7 +27,7 @@ import {
   Eye,
   Copy,
 } from "lucide-react";
-import type { Payroll } from "../../types";
+import type { Payroll } from "./PayrollRunsPage.types";
 
 export function PayrollRunsPage() {
   const { currentCompanyId } = useAuth();

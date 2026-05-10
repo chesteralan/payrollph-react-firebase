@@ -20,48 +20,13 @@ import type {
   PayrollEmployeeBenefit,
 } from "../../types";
 
-interface EarningTypeSummary {
-  earningId: string;
-  name: string;
-  totalAmount: number;
-  employeeCount: number;
-}
-
-interface DeductionTypeSummary {
-  deductionId: string;
-  name: string;
-  totalAmount: number;
-  employeeCount: number;
-}
-
-interface BenefitSummary {
-  benefitId: string;
-  name: string;
-  totalEE: number;
-  totalER: number;
-  employeeCount: number;
-}
-
-interface EmployeeBreakdown {
-  nameId: string;
-  employeeCode: string;
-  firstName: string;
-  lastName: string;
-  groupName: string;
-  earnings: { name: string; amount: number }[];
-  deductions: { name: string; amount: number }[];
-  benefits: { name: string; eeShare: number; erShare: number }[];
-  totalEarnings: number;
-  totalDeductions: number;
-  totalBenefits: number;
-}
-
-interface PayrollOption {
-  id: string;
-  name: string;
-  month: number;
-  year: number;
-}
+import type {
+  EarningTypeSummary,
+  DeductionTypeSummary,
+  BenefitSummary,
+  EmployeeBreakdown,
+  PayrollOption,
+} from "./EarningsDeductionsReportPage.types";
 
 export function EarningsDeductionsReportPage() {
   const { currentCompanyId } = useAuth();
@@ -916,7 +881,7 @@ export function EarningsDeductionsReportPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[800px]">
+                    <table className="w-full min-w-200">
                       <thead className="bg-gray-50 border-b border-gray-200">
                         <tr>
                           <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">

@@ -36,41 +36,7 @@ import {
   deductionExportColumns,
 } from "../../utils/exportUtils";
 
-interface DeductionItem {
-  id: string;
-  name: string;
-  description?: string;
-  type: "fixed" | "percentage";
-  ruleValue?: number;
-  isActive: boolean;
-}
-
-interface EarningItem {
-  id: string;
-  name: string;
-  description?: string;
-  formulaType: "fixed" | "percentage" | "per_hour" | "per_day" | "custom";
-  formulaValue?: number;
-  formulaExpression?: string;
-  isActive: boolean;
-}
-
-interface BenefitItem {
-  id: string;
-  name: string;
-  description?: string;
-  allocationType:
-    | "fixed"
-    | "percentage_of_salary"
-    | "percentage_of_basic"
-    | "tiered";
-  allocationValue?: number;
-  employeeShareType: "fixed" | "percentage";
-  employeeShareValue?: number;
-  employerShareType: "fixed" | "percentage";
-  employerShareValue?: number;
-  isActive: boolean;
-}
+import type { DeductionItem, EarningItem, BenefitItem } from "./ListPages.types";
 
 export function BenefitsPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

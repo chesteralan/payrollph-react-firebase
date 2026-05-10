@@ -116,48 +116,48 @@ This document tracks files that need refactoring in the Payroll v2 React/Firebas
 - [x] `./src/components/ui/Button.tsx`
 - [x] `./src/components/ui/Toast.tsx`
 - [x] `./src/components/ui/EditableCell.tsx`
-- [ ] `./src/components/ui/Stepper.tsx`
-- [ ] `./src/components/ui/EmptyState.tsx`
-- [ ] `./src/components/ui/Input.tsx`
-- [ ] `./src/components/ui/Skeleton.tsx`
-- [ ] `./src/components/ui/ErrorBoundary.tsx`
-- [ ] `./src/components/layout/AppLayout.tsx`
-- [ ] `./src/components/layout/Breadcrumb.tsx`
-- [ ] `./src/components/layout/Header.tsx`
-- [ ] `./src/components/layout/Sidebar.tsx`
-- [ ] `./src/components/payroll/PayrollOutputView.tsx`
-- [ ] `./src/pages/dtr/DTRPage.tsx`
-- [ ] `./src/pages/lists/ListPages.tsx`
-- [ ] `./src/pages/lists/NamesListPage.tsx`
-- [ ] `./src/pages/auth/LoginPage.tsx`
-- [ ] `./src/pages/auth/ForgotPasswordPage.tsx`
-- [ ] `./src/pages/auth/ChangePasswordPage.tsx`
-- [ ] `./src/pages/auth/UserSettingsPage.tsx`
-- [ ] `./src/pages/auth/SetupPage.tsx`
-- [ ] `./src/pages/dashboard/DashboardPage.tsx`
-- [ ] `./src/pages/system/SystemSettingsPage.tsx`
-- [ ] `./src/pages/system/TrashPage.tsx`
-- [ ] `./src/pages/system/CompanySettingsPage.tsx`
-- [ ] `./src/pages/system/SystemPages.tsx`
-- [ ] `./src/pages/system/CompaniesPage.tsx`
-- [ ] `./src/pages/system/HealthCheckPage.tsx`
-- [ ] `./src/pages/company-select/CompanySelectPage.tsx`
-- [ ] `./src/pages/payroll/TemplatesPage.tsx`
-- [ ] `./src/pages/payroll/PayrollWizardPage.tsx`
-- [ ] `./src/pages/payroll/PayrollDetailPage.tsx`
-- [ ] `./src/pages/payroll/PrintFormatsPage.tsx`
-- [ ] `./src/pages/payroll/PayrollRunsPage.tsx`
-- [ ] `./src/pages/reports/YearEndReportPage.tsx`
-- [ ] `./src/pages/reports/EmployeeReportPage.tsx`
-- [ ] `./src/pages/reports/EarningsDeductionsReportPage.tsx`
-- [ ] `./src/pages/reports/CustomReportBuilderPage.tsx`
-- [ ] `./src/pages/reports/Report13thMonthPage.tsx`
-- [ ] `./src/pages/reports/PayrollSummaryPage.tsx`
-- [ ] `./src/pages/reports/AttendanceReportPage.tsx`
-- [ ] `./src/pages/reports/BenefitsUtilizationReportPage.tsx`
-- [ ] `./src/pages/employees/EmployeeProfilePage.tsx`
-- [ ] `./src/pages/employees/CalendarPage.tsx`
-- [ ] `./src/pages/employees/PositionsPage.tsx`
-- [ ] `./src/pages/employees/GroupsPage.tsx`
-- [ ] `./src/pages/employees/AreasPage.tsx`
-- [ ] `./src/pages/employees/EmployeesPage.tsx`
+- [x] `./src/components/ui/Stepper.tsx`
+- [x] `./src/components/ui/EmptyState.tsx`
+- [x] `./src/components/ui/Input.tsx`
+- [x] `./src/components/ui/Skeleton.tsx`
+- [x] `./src/components/ui/ErrorBoundary.tsx`
+- [x] `./src/components/layout/AppLayout.tsx`
+- [x] `./src/components/layout/Breadcrumb.tsx`
+- [x] `./src/components/layout/Header.tsx`
+- [x] `./src/components/layout/Sidebar.tsx`
+- [x] `./src/components/payroll/PayrollOutputView.tsx`
+- [x] `./src/pages/dtr/DTRPage.tsx`
+- [x] `./src/pages/lists/ListPages.tsx`
+- [x] `./src/pages/lists/NamesListPage.tsx`
+- [x] `./src/pages/auth/LoginPage.tsx`
+- [x] `./src/pages/auth/ForgotPasswordPage.tsx`
+- [x] `./src/pages/auth/ChangePasswordPage.tsx`
+- [x] `./src/pages/auth/UserSettingsPage.tsx`
+- [x] `./src/pages/auth/SetupPage.tsx`
+- [x] `./src/pages/dashboard/DashboardPage.tsx`
+- [x] `./src/pages/system/SystemSettingsPage.tsx`
+- [x] `./src/pages/system/TrashPage.tsx`
+- [x] `./src/pages/system/CompanySettingsPage.tsx`
+- [x] `./src/pages/system/SystemPages.tsx`
+- [x] `./src/pages/system/CompaniesPage.tsx`
+- [x] `./src/pages/system/HealthCheckPage.tsx`
+- [x] `./src/pages/company-select/CompanySelectPage.tsx`
+- [x] `./src/pages/payroll/TemplatesPage.tsx`
+- [x] `./src/pages/payroll/PayrollWizardPage.tsx`
+- [x] `./src/pages/payroll/PayrollDetailPage.tsx`
+- [x] `./src/pages/payroll/PrintFormatsPage.tsx`
+- [x] `./src/pages/payroll/PayrollRunsPage.tsx`
+- [x] `./src/pages/reports/YearEndReportPage.tsx`
+- [x] `./src/pages/reports/EmployeeReportPage.tsx`
+- [x] `./src/pages/reports/EarningsDeductionsReportPage.tsx`
+- [x] `./src/pages/reports/CustomReportBuilderPage.tsx`
+- [x] `./src/pages/reports/Report13thMonthPage.tsx`
+- [x] `./src/pages/reports/PayrollSummaryPage.tsx`
+- [x] `./src/pages/reports/AttendanceReportPage.tsx`
+- [x] `./src/pages/reports/BenefitsUtilizationReportPage.tsx`
+- [x] `./src/pages/employees/EmployeeProfilePage.tsx`
+- [x] `./src/pages/employees/CalendarPage.tsx`
+- [x] `./src/pages/employees/PositionsPage.tsx`
+- [x] `./src/pages/employees/GroupsPage.tsx`
+- [x] `./src/pages/employees/AreasPage.tsx`
+- [x] `./src/pages/employees/EmployeesPage.tsx`

@@ -1,24 +1,16 @@
-import { Component, type ReactNode, type ErrorInfo } from "react";
+import { Component } from "react";
+import type { ErrorBoundaryProps, ErrorBoundaryState } from "./ErrorBoundary.types";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
+// ...existing code...
 
-interface State {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error, errorInfo: null };
   }
 
@@ -58,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="text-sm font-medium text-gray-700 mb-1">
                   Error details:
                 </p>
-                <p className="text-sm text-gray-500 font-mono break-words">
+                <p className="text-sm text-gray-500 font-mono wrap-break-word">
                   {this.state.error.message}
                 </p>
               </div>

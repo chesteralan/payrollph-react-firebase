@@ -1,3 +1,4 @@
+import type { ForgotPasswordForm } from "./ForgotPasswordPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -8,7 +9,7 @@ import { ArrowLeft, Mail } from "lucide-react";
 export function ForgotPasswordPage() {
   const { resetPassword } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [form, setForm] = useState<ForgotPasswordForm>({ email: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,9 +19,8 @@ export function ForgotPasswordPage() {
     setError("");
     setSuccess(false);
     setLoading(true);
-
     try {
-      await resetPassword(email);
+      await resetPassword(form.email);
       setSuccess(true);
     } catch (err: unknown) {
       const message =
@@ -65,8 +65,8 @@ export function ForgotPasswordPage() {
             id="email"
             type="email"
             label="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             placeholder="you@company.com"
             required
           />

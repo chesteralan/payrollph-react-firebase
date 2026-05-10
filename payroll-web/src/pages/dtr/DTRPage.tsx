@@ -46,6 +46,9 @@ import type {
   LeaveApplication,
   LeaveBalance,
 } from "../../types";
+import type { Employee, NameRecord } from "../../types/employee";
+import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
+import type { DTRPageDayForm, DTRPageLeaveForm, DTRPageBenefit, DTRPageViewMode } from "./DTRPage.types";
 
 const MONTH_NAMES = [
   "January",
@@ -90,6 +93,7 @@ export function DTRPage() {
   const [employees, setEmployees] = useState<(Employee & { name?: string })[]>(
     [],
   );
+    const [employees, setEmployees] = useState<(Employee & { name?: string })[]>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -110,6 +114,17 @@ export function DTRPage() {
     absenceReason: "",
     notes: "",
   });
+  const [showDayModal, setShowDayModal] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [dayForm, setDayForm] = useState<DTRPageDayForm>({
+    timeIn: "",
+    timeOut: "",
+    overtimeHours: 0,
+    lateHours: 0,
+    absenceType: undefined,
+    absenceReason: "",
+    notes: "",
+  });
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [leaveForm, setLeaveForm] = useState({
@@ -117,9 +132,18 @@ export function DTRPage() {
     startDate: "",
     endDate: "",
     reason: "",
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+    const [leaveForm, setLeaveForm] = useState<DTRPageLeaveForm>({
+      benefitId: "",
+      startDate: "",
+      endDate: "",
+      reason: "",
+    });
+    const [benefits, setBenefits] = useState<DTRPageBenefit[]>([]);
   });
 
   const [viewMode, setViewMode] = useState<"calendar" | "summary">("calendar");
+    const [viewMode, setViewMode] = useState<DTRPageViewMode>("calendar");
   const [dtrSearchQuery, setDtrSearchQuery] = useState("");
   const [allMonthEntries, setAllMonthEntries] = useState<
     (DTREntry & { employeeName?: string; employeeCode?: string })[]
@@ -691,7 +715,7 @@ export function DTRPage() {
               <Button variant="ghost" size="sm" onClick={handlePrevMonth}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="text-sm font-medium min-w-[140px] text-center">
+              <span className="text-sm font-medium min-w-35 text-center">
                 {MONTH_NAMES[selectedMonth]} {selectedYear}
               </span>
               <Button variant="ghost" size="sm" onClick={handleNextMonth}>

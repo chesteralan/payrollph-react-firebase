@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import type { EmptyStateProps } from "./EmptyState.types";
 import {
   FileText,
   Users,
@@ -10,22 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-interface EmptyStateProps {
-  icon?: ReactNode;
-  type?:
-    | "data"
-    | "employees"
-    | "payroll"
-    | "calendar"
-    | "reports"
-    | "settings"
-    | "files"
-    | "error";
-  title: string;
-  description?: string;
-  action?: ReactNode;
-  className?: string;
-}
+// ...existing code...
 
 const iconMap = {
   data: <FileText className="w-12 h-12 text-gray-300" />,

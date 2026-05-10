@@ -47,22 +47,7 @@ import type {
   EmployeeStatus,
 } from "../../types/employee";
 
-interface NameRecord {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  suffix?: string;
-}
-
-interface CsvPreviewRow {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  suffix: string;
-  isValid: boolean;
-  error?: string;
-}
+import type { NameRecord, CsvPreviewRow } from "./NamesListPage.types";
 
 export function NamesListPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

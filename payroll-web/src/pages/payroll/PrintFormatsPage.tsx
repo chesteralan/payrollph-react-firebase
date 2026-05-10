@@ -33,7 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import type { PrintFormat } from "../../types";
+import type { PrintFormat } from "./PrintFormatsPage.types";
 
 const WIZARD_STEPS = [
   "Basic Info",

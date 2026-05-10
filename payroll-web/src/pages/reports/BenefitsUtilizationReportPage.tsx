@@ -20,25 +20,7 @@ import type {
   EmployeeGroup,
 } from "../../types";
 
-interface BenefitSummary {
-  benefitId: string;
-  benefitName: string;
-  employeeCount: number;
-  totalEmployeeShare: number;
-  totalEmployerShare: number;
-  totalCost: number;
-  employees: BenefitEmployeeDetail[];
-}
-
-interface BenefitEmployeeDetail {
-  employeeName: string;
-  nameId: string;
-  groupName: string;
-  employeeShare: number;
-  employerShare: number;
-  payrollName: string;
-  period: string;
-}
+import type { BenefitSummary, BenefitEmployeeDetail } from "./BenefitsUtilizationReportPage.types";
 
 export function BenefitsUtilizationReportPage() {
   const { currentCompanyId } = useAuth();

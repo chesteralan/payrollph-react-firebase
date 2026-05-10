@@ -1,13 +1,6 @@
 import { clsx } from "clsx";
 
-interface SkeletonProps {
-  className?: string;
-  variant?: "text" | "circular" | "rectangular";
-  width?: string | number;
-  height?: string | number;
-  lines?: number;
-  animation?: "pulse" | "wave" | "none";
-}
+import type { SkeletonProps, CardSkeletonProps, TableSkeletonProps, PageSkeletonProps } from "./Skeleton.types";
 
 export function Skeleton({
   className,
@@ -57,11 +50,7 @@ export function CardSkeleton({
   lines = 3,
   showHeader = true,
   className,
-}: {
-  lines?: number;
-  showHeader?: boolean;
-  className?: string;
-}) {
+}: CardSkeletonProps) {
   return (
     <div
       className={clsx(
@@ -83,10 +72,7 @@ export function CardSkeleton({
 export function TableSkeleton({
   rows = 5,
   cols = 4,
-}: {
-  rows?: number;
-  cols?: number;
-}) {
+}: TableSkeletonProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
@@ -111,7 +97,7 @@ export function TableSkeleton({
   );
 }
 
-export function PageSkeleton({ sections = 3 }: { sections?: number }) {
+export function PageSkeleton({ sections = 3 }: PageSkeletonProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

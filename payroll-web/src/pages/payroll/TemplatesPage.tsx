@@ -40,7 +40,7 @@ import type {
   EmployeeArea,
   EmployeeStatus,
   PrintFormat,
-} from "../../types";
+} from "./TemplatesPage.types";
 
 const WIZARD_STEPS = [
   "Basic Info",

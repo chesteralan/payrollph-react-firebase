@@ -31,19 +31,7 @@ import {
   Clock,
 } from "lucide-react";
 
-interface HealthCheckResult {
-  name: string;
-  status: "pass" | "fail" | "warning";
-  message: string;
-  details?: string;
-  responseTime?: number;
-}
-
-interface CollectionHealth {
-  name: string;
-  count: number;
-  status: "good" | "warning" | "error";
-}
+import type { HealthCheckResult, CollectionHealth } from "./HealthCheckPage.types";
 
 const MAJOR_COLLECTIONS = [
   "names",

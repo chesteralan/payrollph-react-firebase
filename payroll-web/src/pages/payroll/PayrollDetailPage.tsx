@@ -51,22 +51,7 @@ const STAGES = [
   "output",
 ];
 
-interface ProcessingRow {
-  nameId: string;
-  employeeCode: string;
-  firstName: string;
-  lastName: string;
-  groupId: string;
-  positionId: string;
-  areaId: string;
-  daysWorked: number;
-  absences: number;
-  lateHours: number;
-  overtimeHours: number;
-  basicSalary: number;
-  ratePerDay: number;
-  salaryAmount: number;
-}
+import type { ProcessingRow } from "./PayrollDetailPage.types";
 
 export function PayrollDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -1097,7 +1082,7 @@ export function PayrollDetailPage() {
                   {earningsList.map((e) => (
                     <th
                       key={e.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-[120px]"
+                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-30"
                     >
                       {e.name}
                     </th>
@@ -1160,7 +1145,7 @@ export function PayrollDetailPage() {
                   {benefitsList.map((b) => (
                     <th
                       key={b.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-[200px]"
+                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-50"
                       colSpan={2}
                     >
                       {b.name} (EE / ER)
@@ -1240,7 +1225,7 @@ export function PayrollDetailPage() {
                   {deductionsList.map((d) => (
                     <th
                       key={d.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-[120px]"
+                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-30"
                     >
                       {d.name}
                     </th>

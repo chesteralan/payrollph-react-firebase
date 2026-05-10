@@ -51,16 +51,10 @@ export function CompaniesPage() {
     printCss: "",
     defaultWorkdays: 22,
     currency: "PHP",
-    payrollPeriods: [] as Array<{
-      type: "monthly" | "semi-monthly" | "bi-weekly" | "weekly";
-      cutOff1Day?: number;
-      cutOff2Day?: number;
-      payDay?: number;
-      frequency?: string;
-    }>,
+    payrollPeriods: [] as import("./CompaniesPage.types").PayrollPeriod[],
   });
 
-  const [columnGroup, setColumnGroup] = useState({
+  const [columnGroup, setColumnGroup] = useState<import("./CompaniesPage.types").CompanyColumnGroup>({
     dtr: true,
     salaries: true,
     earnings: true,

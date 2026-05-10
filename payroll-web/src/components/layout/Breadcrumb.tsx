@@ -1,10 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
 
-interface BreadcrumbItem {
-  label: string;
-  path?: string;
-}
+import type { BreadcrumbItem } from "./Breadcrumb.types";
 
 const routeLabels: Record<string, string> = {
   employees: "Employee Master List",

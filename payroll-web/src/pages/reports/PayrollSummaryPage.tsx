@@ -15,20 +15,7 @@ import { FileSpreadsheet, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import type { Payroll } from "../../types";
 
-interface PayrollSummary extends Payroll {
-  employeeCount: number;
-  grossPay: number;
-  netPay: number;
-  groups: GroupSummary[];
-}
-
-interface GroupSummary {
-  groupId: string;
-  groupName: string;
-  employeeCount: number;
-  grossPay: number;
-  netPay: number;
-}
+import type { PayrollSummary, GroupSummary } from "./PayrollSummaryPage.types";
 
 export function PayrollSummaryPage() {
   const { currentCompanyId } = useAuth();

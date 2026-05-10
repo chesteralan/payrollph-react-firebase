@@ -19,30 +19,7 @@ import type {
   PayrollEmployee,
 } from "../../types";
 
-interface YearEndSummary {
-  employeeName: string;
-  nameId: string;
-  totalGrossPay: number;
-  totalNetPay: number;
-  totalBasicSalary: number;
-  totalEarnings: number;
-  totalBenefits: number;
-  totalDeductions: number;
-  total13thMonth: number;
-  payrollRuns: number;
-}
-
-interface YearEndTotals {
-  totalGrossPay: number;
-  totalNetPay: number;
-  totalBasicSalary: number;
-  totalEarnings: number;
-  totalBenefits: number;
-  totalDeductions: number;
-  total13thMonth: number;
-  totalEmployees: number;
-  totalPayrollRuns: number;
-}
+import type { YearEndSummary, YearEndTotals } from "./YearEndReportPage.types";
 
 export function YearEndReportPage() {
   const { currentCompanyId } = useAuth();

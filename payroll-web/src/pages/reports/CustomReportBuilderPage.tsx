@@ -6,32 +6,7 @@ import { useCompany } from "../../hooks/useCompany";
 import type { Employee, Payroll, PayrollEmployee } from "../../types";
 import { exportToXlsx } from "../../utils/exportUtils";
 
-interface ReportField {
-  id: string;
-  label: string;
-  category: "employee" | "payroll" | "earnings" | "deductions" | "benefits";
-  type: "string" | "number" | "date";
-  enabled: boolean;
-}
-
-interface ReportFilter {
-  field: string;
-  operator: "equals" | "contains" | "greater_than" | "less_than" | "between";
-  value: string;
-  value2?: string;
-}
-
-interface SavedReport {
-  id: string;
-  name: string;
-  description?: string;
-  fields: string[];
-  filters: ReportFilter[];
-  groupBy?: string;
-  sortBy?: string;
-  sortDirection: "asc" | "desc";
-  createdAt: Date;
-}
+import type { ReportField, ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
 
 const AVAILABLE_FIELDS: ReportField[] = [
   // Employee fields

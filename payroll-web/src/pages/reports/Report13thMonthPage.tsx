@@ -13,32 +13,7 @@ import {
 import { FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 
-interface Employee13thMonth {
-  employeeCode: string;
-  firstName: string;
-  lastName: string;
-  hireDate: Date | null;
-  totalBasicSalary: number;
-  monthsWorked: number;
-  thirteenthMonth: number;
-}
-
-interface EmployeeDoc {
-  id: string;
-  employeeCode: string;
-  nameId: string;
-  firstName?: string;
-  lastName?: string;
-  hireDate?: Date;
-}
-
-interface PayrollDoc {
-  id: string;
-  month: number;
-  year: number;
-  employees?: { nameId: string }[];
-  totalBasic?: number;
-}
+import type { Employee13thMonth, EmployeeDoc, PayrollDoc } from "./Report13thMonthPage.types";
 
 export function Report13thMonthPage() {
   const { currentCompanyId } = useAuth();

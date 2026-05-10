@@ -13,9 +13,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import type { Company } from "../../types";
 
-interface HeaderProps {
-  onMenuClick?: () => void;
-}
+import type { HeaderProps } from "./Header.types";
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, currentCompanyId, setCurrentCompanyId, logout } = useAuth();

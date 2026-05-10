@@ -60,9 +60,8 @@ import { useTableSort } from "../../hooks/useTableSort";
 import { useActivityMonitor } from "../../hooks/useActivityMonitor";
 import * as XLSX from "xlsx";
 
-interface CalendarEvent extends CalendarEntry {
-  isPaid?: boolean;
-}
+
+import type { CalendarEvent, Department, Section } from "./SystemPages.types";
 
 const DEPARTMENTS: { key: Department; sections: Section[] }[] = [
   { key: "payroll", sections: ["payroll", "templates"] },

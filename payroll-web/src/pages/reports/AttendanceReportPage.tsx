@@ -14,40 +14,12 @@ import {
 import { FileSpreadsheet, Printer } from "lucide-react";
 import * as XLSX from "xlsx";
 
-interface Employee {
-  id: string;
-  employeeCode: string;
-  nameId: string;
-  isActive?: boolean;
-}
-
-interface NameRecord {
-  firstName?: string;
-  lastName?: string;
-  middleName?: string;
-  suffix?: string;
-}
-
-interface DtrEntry {
-  date: string;
-  employeeId: string;
-  hoursWorked: number;
-  absenceType?: string;
-  lateHours?: number;
-  overtimeHours?: number;
-}
-
-interface AttendanceData {
-  employeeId: string;
-  employeeCode: string;
-  employeeName: string;
-  daysWorked: number;
-  absences: number;
-  lateHours: number;
-  overtimeHours: number;
-  attendanceRate: number;
-  totalDaysInPeriod: number;
-}
+import type {
+  Employee,
+  NameRecord,
+  DtrEntry,
+  AttendanceData,
+} from "./AttendanceReportPage.types";
 
 export function AttendanceReportPage() {
   const { currentCompanyId } = useAuth();

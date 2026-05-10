@@ -33,7 +33,7 @@ import type {
   EmployeeArea,
   EmployeeStatus,
   Term,
-} from "../../types";
+} from "./PayrollWizardPage.types";
 
 const STEPS = [
   "Config",
