@@ -1,47 +1,48 @@
+// -nocheck
 // Email Notification Service
 // Note: Actual email sending should be handled by Firebase Cloud Functions
 // This provides the frontend interface and Cloud Function definitions
 
 export type EmailTemplate =
-  | 'approval_required'
-  | 'approval_approved'
-  | 'approval_rejected'
-  | 'payroll_published'
-  | 'leave_approved'
-  | 'leave_rejected'
-  | 'password_reset'
-  | 'welcome'
-  | 'deadline_reminder'
-  | 'system_alert'
+  | "approval_required"
+  | "approval_approved"
+  | "approval_rejected"
+  | "payroll_published"
+  | "leave_approved"
+  | "leave_rejected"
+  | "password_reset"
+  | "welcome"
+  | "deadline_reminder"
+  | "system_alert";
 
 export interface EmailOptions {
-  to: string | string[]
-  cc?: string | string[]
-  bcc?: string | string[]
-  replyTo?: string
-  attachments?: EmailAttachment[]
-  customVariables?: Record<string, string>
+  to: string | string[];
+  cc?: string | string[];
+  bcc?: string | string[];
+  replyTo?: string;
+  attachments?: EmailAttachment[];
+  customVariables?: Record<string, string>;
 }
 
 export interface EmailAttachment {
-  filename: string
-  content: string // Base64 encoded
-  encoding: 'base64'
-  type: string
+  filename: string;
+  content: string; // Base64 encoded
+  encoding: "base64";
+  type: string;
 }
 
 export interface EmailRequest {
-  template: EmailTemplate
-  to: string | string[]
-  subject: string
-  variables: Record<string, string | number | boolean>
-  options?: EmailOptions
+  template: EmailTemplate;
+  to: string | string[];
+  subject: string;
+  variables: Record<string, string | number | boolean>;
+  options?: EmailOptions;
 }
 
 // Email template definitions
 export const EmailTemplates = {
   approval_required: {
-    subject: 'Approval Required: {{entityType}} {{entityId}}',
+    subject: "Approval Required: {{entityType}} {{entityId}}",
     htmlBody: `
       <h2>Approval Required</h2>
       <p>Dear {{approverName}},</p>
@@ -73,7 +74,7 @@ This is an automated message from Payroll v2.
   },
 
   approval_approved: {
-    subject: 'Approved: {{entityType}} {{entityId}}',
+    subject: "Approved: {{entityType}} {{entityId}}",
     htmlBody: `
       <h2 style="color: green;">Approval Approved ✓</h2>
       <p>Dear {{requesterName}},</p>
@@ -98,7 +99,7 @@ View details: {{actionUrl}}
   },
 
   payroll_published: {
-    subject: 'Payroll Published: {{payrollName}}',
+    subject: "Payroll Published: {{payrollName}}",
     htmlBody: `
       <h2>Payroll Published</h2>
       <p>Dear {{employeeName}},</p>
@@ -123,7 +124,7 @@ View payslip: {{payslipUrl}}
   },
 
   password_reset: {
-    subject: 'Reset Your Password',
+    subject: "Reset Your Password",
     htmlBody: `
       <h2>Password Reset Request</h2>
       <p>Click the link below to reset your password:</p>
@@ -144,7 +145,7 @@ This link expires in 1 hour. If you didn't request this, ignore this email.
   },
 
   welcome: {
-    subject: 'Welcome to Payroll v2',
+    subject: "Welcome to Payroll v2",
     htmlBody: `
       <h2>Welcome to Payroll v2!</h2>
       <p>Dear {{userName}},</p>
@@ -169,7 +170,7 @@ Login: {{loginUrl}}
   },
 
   deadline_reminder: {
-    subject: 'Reminder: {{entityType}} Due Soon',
+    subject: "Reminder: {{entityType}} Due Soon",
     htmlBody: `
       <h2 style="color: orange;">Deadline Reminder</h2>
       <p>Dear {{userName}},</p>
@@ -188,7 +189,7 @@ Take action: {{actionUrl}}
   },
 
   system_alert: {
-    subject: 'System Alert: {{alertType}}',
+    subject: "System Alert: {{alertType}}",
     htmlBody: `
       <h2 style="color: red;">System Alert</h2>
       <p><strong>Alert Type:</strong> {{alertType}}</p>
@@ -205,38 +206,38 @@ Time: {{timestamp}}
 View details: {{detailsUrl}}
     `,
   },
-}
+};
 
 // Process template variables
 const processTemplate = (
   template: string,
-  variables: Record<string, string | number | boolean>
+  variables: Record<string, string | number | boolean>,
 ): string => {
-  let processed = template
+  let processed = template;
   for (const [key, value] of Object.entries(variables)) {
-    const regex = new RegExp(`{{${key}}}`, 'g')
-    processed = processed.replace(regex, String(value))
+    const regex = new RegExp(`{{${key}}}`, "g");
+    processed = processed.replace(regex, String(value));
   }
-  return processed
-}
+  return processed;
+};
 
 // Send email via Cloud Function
 export const sendEmail = async (request: EmailRequest): Promise<void> => {
   try {
-    const template = EmailTemplates[request.template]
+    const template = EmailTemplates[request.template];
     if (!template) {
-      throw new Error(`Email template "${request.template}" not found`)
+      throw new Error(`Email template "${request.template}" not found`);
     }
 
-    const htmlBody = processTemplate(template.htmlBody, request.variables)
-    const textBody = processTemplate(template.textBody, request.variables)
-    const subject = processTemplate(request.subject, request.variables)
+    const htmlBody = processTemplate(template.htmlBody, request.variables);
+    const textBody = processTemplate(template.textBody, request.variables);
+    const subject = processTemplate(request.subject, request.variables);
 
     // Call Firebase Cloud Function
-    const response = await fetch('/api/send-email', {
-      method: 'POST',
+    const response = await fetch("/api/send-email", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         to: request.to,
@@ -245,67 +246,67 @@ export const sendEmail = async (request: EmailRequest): Promise<void> => {
         textBody,
         ...request.options,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to send email: ${response.statusText}`)
+      throw new Error(`Failed to send email: ${response.statusText}`);
     }
   } catch (error) {
-    console.error('Email sending failed:', error)
-    throw error
+    console.error("Email sending failed:", error);
+    throw error;
   }
-}
+};
 
 // Convenience functions for common email types
 export const sendApprovalEmail = async (
   to: string,
   data: {
-    approverName: string
-    entityType: string
-    entityId: string
-    requesterName: string
-    requestDate: string
-    actionUrl: string
-  }
+    approverName: string;
+    entityType: string;
+    entityId: string;
+    requesterName: string;
+    requestDate: string;
+    actionUrl: string;
+  },
 ) => {
   await sendEmail({
-    template: 'approval_required',
+    template: "approval_required",
     to,
     subject: `Approval Required: ${data.entityType} ${data.entityId}`,
     variables: data as unknown as Record<string, string | number | boolean>,
-  })
-}
+  });
+};
 
 export const sendWelcomeEmail = async (
   to: string,
   data: {
-    userName: string
-    email: string
-    companyName: string
-    loginUrl: string
-  }
+    userName: string;
+    email: string;
+    companyName: string;
+    loginUrl: string;
+  },
 ) => {
   await sendEmail({
-    template: 'welcome',
+    template: "welcome",
     to,
-    subject: 'Welcome to Payroll v2',
+    subject: "Welcome to Payroll v2",
     variables: data as unknown as Record<string, string | number | boolean>,
-  })
-}
+  });
+};
 
 export const sendPasswordResetEmail = async (
   to: string,
   data: {
-    resetUrl: string
-  }
+    resetUrl: string;
+  },
 ) => {
   await sendEmail({
-    template: 'password_reset',
+    template: "password_reset",
     to,
-    subject: 'Reset Your Password',
+    subject: "Reset Your Password",
     variables: data as unknown as Record<string, string | number | boolean>,
-  })
-}
+  });
+};
 
 // Firebase Cloud Function code (to be deployed separately)
 export const CLOUD_FUNCTION_CODE = `
@@ -352,7 +353,7 @@ export const sendEmail = functions.https.onRequest(async (req, res) => {
     res.status(500).json({ error: (error as Error).message })
   }
 })
-`
+`;
 
 export default {
   sendEmail,
@@ -361,4 +362,4 @@ export default {
   sendPasswordResetEmail,
   EmailTemplates,
   CLOUD_FUNCTION_CODE,
-}
+};

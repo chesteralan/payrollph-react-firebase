@@ -1,0 +1,111 @@
+import type { LoginPageForm } from "./LoginPage.types";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { CreditCard } from "lucide-react";
+import { checkSetupNeeded } from "../../services/setup";
+
+export function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState<LoginPageForm>({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    checkSetupNeeded()
+      .then((needed: boolean) => {
+        if (needed) {
+          navigate("/setup", { replace: true });
+        }
+      })
+      .finally(() => setChecking(false));
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await login(form.email, form.password);
+      navigate("/");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Invalid credentials";
+      setError(
+        message.includes("auth/") ? "Invalid email or password" : message,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-600 rounded-lg mb-4">
+            <CreditCard className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">SMB Payroll</h1>
+          <p className="text-gray-500 mt-1">Sign in to your account</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <Input
+            id="email"
+            type="email"
+            label="Email"
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            placeholder="you@company.com"
+            required
+          />
+
+          <Input
+            id="password"
+            type="password"
+            label="Password"
+            value={form.password}
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+            placeholder="••••••••"
+            required
+          />
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate("/forgot-password")}
+            className="text-sm text-primary-600 hover:text-primary-700"
+          >
+            Forgot your password?
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
