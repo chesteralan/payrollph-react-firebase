@@ -8,12 +8,12 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
-import { Card, CardContent, CardHeader } from "../../components/ui/Card";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   Trash2,
   RotateCcw,
@@ -22,9 +22,9 @@ import {
   ChevronDown,
   ChevronsUpDown,
 } from "lucide-react";
-import { useTableSort } from "../../hooks/useTableSort";
+import { useTableSort } from "@/hooks/useTableSort";
 
-import type { TrashItem, TrashCollectionDef } from "./TrashPage.types";
+import type { TrashItem } from "./TrashPage.types";
 
 const COLLECTIONS = [
   { key: "companies", label: "Companies", nameField: "name" },

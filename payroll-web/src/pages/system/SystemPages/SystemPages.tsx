@@ -1,5 +1,5 @@
 // -nocheck
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   collection,
   getDocs,
@@ -13,19 +13,19 @@ import {
   limit,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db } from "@/config/firebase";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { SearchBar } from "../../components/ui/SearchBar";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
 import {
   Plus,
   Edit,
@@ -52,12 +52,11 @@ import type {
   UserRestriction,
   Department,
   Section,
-  CalendarEntry,
   Term,
 } from "../../types";
-import type { AuditEntry } from "../../services/audit";
-import { useTableSort } from "../../hooks/useTableSort";
-import { useActivityMonitor } from "../../hooks/useActivityMonitor";
+import type { AuditEntry } from "@/services/audit";
+import { useTableSort } from "@/hooks/useTableSort";
+import { useActivityMonitor } from "@/hooks/useActivityMonitor";
 import * as XLSX from "xlsx";
 
 
@@ -100,7 +99,7 @@ export function CalendarPage() {
     years: 5,
   });
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     const snap = await getDocs(query(collection(db, "calendar")));
     const allEvents = snap.docs.map((d) => ({
@@ -113,17 +112,15 @@ export function CalendarPage() {
           const d = new Date(e.date);
           return d.getFullYear() === selectedYear;
         })
-        .sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        ),
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     );
     setLoading(false);
-  };
+  }, [selectedYear]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+   
   useEffect(() => {
     fetchEvents();
-  }, [selectedYear]);
+  }, [fetchEvents, selectedYear]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -623,7 +620,7 @@ export function TermsPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
     fetchTerms();
   }, []);
@@ -688,7 +685,7 @@ export function TermsPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     if (showForm) validateForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, showForm]);
@@ -1159,7 +1156,7 @@ export function UsersPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -2173,7 +2170,7 @@ export function AuditPage() {
   const [filterModule, setFilterModule] = useState<string>("");
   const [filterUser, setFilterUser] = useState<string>("");
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     const q = query(
       collection(db, "system_audit"),
@@ -2192,10 +2189,10 @@ export function AuditPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+   
   useEffect(() => {
     fetchLogs();
-  }, [filterModule, filterUser]);
+  }, [fetchLogs, filterModule, filterUser]);
 
   const {
     items: sortedLogs,
@@ -2527,7 +2524,7 @@ export function DatabasePage() {
     "companies",
   ];
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoading(true);
     const counts: Record<string, number> = {};
     await Promise.all(
@@ -2542,9 +2539,9 @@ export function DatabasePage() {
     );
     setStats(counts);
     setLoading(false);
-  };
+  }, []);
 
-  const fetchBackups = async () => {
+  const fetchBackups = useCallback(async () => {
     try {
       const snap = await getDocs(
         query(collection(db, "backups"), orderBy("timestamp", "desc")),
@@ -2559,13 +2556,13 @@ export function DatabasePage() {
     } catch {
       /* empty - backup list may not exist */
     }
-  };
+  }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+   
   useEffect(() => {
     fetchStats();
     fetchBackups();
-  }, []);
+  }, [fetchStats, fetchBackups]);
 
   const exportCollection = async (collectionName: string) => {
     setExportLoading(collectionName);
@@ -2813,7 +2810,7 @@ export function DatabasePage() {
 
   const runCleanup = async (operation: string) => {
     setCleanupLoading(operation);
-    // eslint-disable-next-line react-hooks/purity
+     
     const startTime = Date.now();
     let count = 0;
     try {
@@ -2966,7 +2963,7 @@ export function DatabasePage() {
         await batch.commit();
       }
       count = processed;
-      // eslint-disable-next-line react-hooks/purity
+       
       const timeTaken = Date.now() - startTime;
       setCleanupResults((prev) => [
         ...prev,
@@ -2978,7 +2975,7 @@ export function DatabasePage() {
       });
       fetchStats();
     } catch (e) {
-      // eslint-disable-next-line react-hooks/purity
+       
       const timeTaken = Date.now() - startTime;
       setCleanupResults((prev) => [
         ...prev,

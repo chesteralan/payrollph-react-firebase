@@ -1,11 +1,11 @@
 import type { LoginPageForm } from "./LoginPage.types";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { CreditCard } from "lucide-react";
-import { checkSetupNeeded } from "../../services/setup";
+import { checkSetupNeeded } from "@/services/setup";
 
 export function LoginPage() {
   const { login } = useAuth();

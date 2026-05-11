@@ -1,4 +1,4 @@
-// ...existing code...
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
 
 const alertIcons: Record<string, React.ReactNode> = {
   info: <Info className="w-5 h-5" />,
@@ -14,7 +14,7 @@ const alertColors: Record<string, string> = {
   success: "bg-green-50 border-green-200 text-green-800",
 };
 
-function AlertBanner({ alert, onDismiss }: AlertBannerProps) {
+export function AlertBanner({ alert, onDismiss }: AlertBannerProps) {
   return (
     <div
       className={`flex items-start gap-3 p-4 border rounded-lg ${alertColors[alert.type]}`}

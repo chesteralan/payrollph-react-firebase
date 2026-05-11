@@ -11,18 +11,18 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   Plus,
   Edit,
@@ -173,11 +173,17 @@ export function TemplatesPage() {
   };
 
   useEffect(() => {
-    fetchTemplates();
-  }, []); // eslint-disable-line react-hooks/set-state-in-effect
+    const loadTemplates = async () => {
+      await fetchTemplates();
+    };
+    loadTemplates();
+  }, []);
   useEffect(() => {
-    fetchLookups();
-  }, []); // eslint-disable-line react-hooks/set-state-in-effect
+    const loadLookups = async () => {
+      await fetchLookups();
+    };
+    loadLookups();
+  }, []);
 
   const resetWizard = () => {
     setWizardStep(0);

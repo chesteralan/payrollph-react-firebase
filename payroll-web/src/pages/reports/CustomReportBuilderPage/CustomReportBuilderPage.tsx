@@ -1,10 +1,10 @@
 // -nocheck
 import { useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useCompany } from "../../hooks/useCompany";
+import { db } from "@/config/firebase";
+import { useCompany } from "@/hooks/useCompany";
 import type { Employee, Payroll, PayrollEmployee } from "../../types";
-import { exportToXlsx } from "../../utils/exportUtils";
+import { exportToXlsx } from "@/utils/exportUtils";
 
 import type { ReportField, ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
 

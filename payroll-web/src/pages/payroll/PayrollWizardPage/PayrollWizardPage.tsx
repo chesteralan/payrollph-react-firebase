@@ -12,18 +12,18 @@ import {
   deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { Stepper } from "../../components/ui/Stepper";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { Stepper } from "@/components/ui/Stepper";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardFooter,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { ArrowLeft, ArrowRight, Check, Trash2 } from "lucide-react";
 import type {
   PayrollGroup,

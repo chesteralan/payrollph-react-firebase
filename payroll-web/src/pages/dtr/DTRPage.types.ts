@@ -1,5 +1,4 @@
-import type { Employee, NameRecord } from "../../types/employee";
-import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
+// Removed unused imports
 
 export interface DTRPageDayForm {
   timeIn: string;
@@ -25,4 +24,4 @@ export interface DTRPageBenefit {
 
 export type DTRPageViewMode = "calendar" | "summary";
 
-export interface DTRPageProps {}
+export type DTRPageProps = object;

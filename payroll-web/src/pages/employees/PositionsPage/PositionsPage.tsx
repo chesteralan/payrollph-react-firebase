@@ -7,17 +7,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useTableSort } from "../../hooks/useTableSort";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useTableSort } from "@/hooks/useTableSort";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import {
   Plus,
   Edit,
@@ -27,7 +27,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
 } from "lucide-react";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { EmployeePosition } from "../../types";
 
 export function PositionsPage() {
@@ -48,9 +48,12 @@ export function PositionsPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
-    fetchPositions();
+    const loadPositions = async () => {
+      await fetchPositions();
+    };
+    loadPositions();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

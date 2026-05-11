@@ -10,19 +10,19 @@ import {
   where,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   Plus,
   Edit,

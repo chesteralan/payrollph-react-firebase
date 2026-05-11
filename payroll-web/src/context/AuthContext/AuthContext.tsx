@@ -20,7 +20,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { auth, db } from "../config/firebase";
+import { auth, db } from "@/config/firebase";
 import type {
   UserAccount,
   UserRestriction,
@@ -29,9 +29,9 @@ import type {
   Department,
   Section,
 } from "../types";
-import type { Locale } from "../i18n";
-import { setHtmlLang } from "../i18n";
-import { AuthContext } from "./auth";
+import type { Locale } from "@/i18n";
+import { setHtmlLang } from "@/i18n";
+import { AuthContext } from "@/context/auth";
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const ACTIVITY_EVENTS = ["mousedown", "keydown", "touchstart", "scroll"];

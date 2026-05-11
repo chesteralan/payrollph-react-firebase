@@ -7,17 +7,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useTableSort } from "../../hooks/useTableSort";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useTableSort } from "@/hooks/useTableSort";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import {
   Plus,
   Edit,
@@ -27,14 +27,14 @@ import {
   ChevronsUpDown,
   Download,
 } from "lucide-react";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   exportToXLS,
   exportToCSV,
   benefitExportColumns,
   earningExportColumns,
   deductionExportColumns,
-} from "../../utils/exportUtils";
+} from "@/utils/exportUtils";
 
 import type { DeductionItem, EarningItem, BenefitItem } from "./ListPages.types";
 
@@ -69,8 +69,11 @@ export function BenefitsPage() {
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []); // eslint-disable-line react-hooks/set-state-in-effect
+    const loadItems = async () => {
+      await fetchItems();
+    };
+    loadItems();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -557,8 +560,11 @@ export function EarningsPage() {
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []); // eslint-disable-line react-hooks/set-state-in-effect
+    const loadItems = async () => {
+      await fetchItems();
+    };
+    loadItems();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -954,8 +960,11 @@ export function DeductionsPage() {
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []); // eslint-disable-line react-hooks/set-state-in-effect
+    const loadItems = async () => {
+      await fetchItems();
+    };
+    loadItems();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

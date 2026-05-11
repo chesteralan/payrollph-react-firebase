@@ -2,18 +2,18 @@ import type { UserSettingsForm, UserSettingsPasswordForm } from "./UserSettingsP
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
+} from "@/components/ui/Card";
 import { ArrowLeft, Save, Lock, Palette } from "lucide-react";
-import { getAvailableCurrencies } from "../../utils/currency";
-import { localeLabels } from "../../i18n";
+import { getAvailableCurrencies } from "@/utils/currency";
+import { localeLabels } from "@/i18n";
 
 export function UserSettingsPage() {
   const { user, userCompanies, settings, changePassword } = useAuth();

@@ -8,15 +8,15 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import {
   Users,
   FileText,
@@ -26,7 +26,7 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
-import { Skeleton, TableSkeleton } from "../../components/ui/Skeleton";
+import { Skeleton, TableSkeleton } from "@/components/ui/Skeleton";
 
 import type { DashboardStats } from "./DashboardPage.types";
 

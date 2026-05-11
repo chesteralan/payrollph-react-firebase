@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { Check } from "lucide-react";
-import type { Step, StepperProps } from "./Stepper/Stepper.types";
+import type { StepperProps } from "./Stepper/Stepper.types";
 
 export function Stepper({ steps }: StepperProps) {
   return (

@@ -1,4 +1,4 @@
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Building2,
   ChevronDown,
@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db } from "@/config/firebase";
 import type { Company } from "../../types";
 
 import type { HeaderProps } from "./Header/Header.types";

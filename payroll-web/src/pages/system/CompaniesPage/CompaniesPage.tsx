@@ -7,18 +7,18 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { useTableSort } from "../../hooks/useTableSort";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { useTableSort } from "@/hooks/useTableSort";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import {
   Plus,
   Edit,
@@ -30,7 +30,7 @@ import {
   ChevronsUpDown,
   X,
 } from "lucide-react";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { Company } from "../../types";
 
 export function CompaniesPage() {
@@ -71,9 +71,12 @@ export function CompaniesPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
-    fetchCompanies();
+    const loadCompanies = async () => {
+      await fetchCompanies();
+    };
+    loadCompanies();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

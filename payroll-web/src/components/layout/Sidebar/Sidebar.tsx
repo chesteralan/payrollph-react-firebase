@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import {
   LayoutDashboard,
   Users,
@@ -34,6 +34,7 @@ import { clsx } from "clsx";
 import { useState } from "react";
 
 import type { NavItem, SidebarProps } from "./Sidebar/Sidebar.types";
+import type { Department, Section } from "../../../types";
 
 const navigation: NavItem[] = [
   {
@@ -320,11 +321,10 @@ function NavItemComponent({
     (child) => child.path === location.pathname,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (
     item.department &&
     item.section &&
-    !canView(item.department as any, item.section as any)
+    !canView(item.department as Department, item.section as Section)
   ) {
     return null;
   }
@@ -332,10 +332,9 @@ function NavItemComponent({
   if (item.children) {
     const hasVisibleChildren = item.children.some(
       (child) =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         !child.department ||
         !child.section ||
-        canView(child.department as any, child.section as any),
+        canView(child.department as Department, child.section as Section),
     );
 
     if (!hasVisibleChildren) return null;

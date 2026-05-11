@@ -11,18 +11,18 @@ import {
   serverTimestamp,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { SearchBar } from "../../components/ui/SearchBar";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { SearchBar } from "@/components/ui/SearchBar";
 import {
   Plus,
   Edit,
@@ -38,8 +38,8 @@ import {
   CheckSquare,
   Square,
 } from "lucide-react";
-import { useTableSort } from "../../hooks/useTableSort";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { useTableSort } from "@/hooks/useTableSort";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type {
   EmployeeGroup,
   EmployeePosition,

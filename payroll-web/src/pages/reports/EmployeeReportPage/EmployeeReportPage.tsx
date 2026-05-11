@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
+} from "@/components/ui/Card";
 import {
   FileSpreadsheet,
   FileText,

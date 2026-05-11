@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Sidebar } from "./Sidebar/Sidebar";
-import { Header } from "./Header/Header";
-import { Breadcrumb } from "./Breadcrumb/Breadcrumb";
-import { AlertBannerProvider } from "../ui/AlertBanner";
-import { useGlobalShortcuts } from "../../hooks/useKeyboardShortcuts";
-import { NetworkStatusBanner } from "../ui/NetworkStatusBanner";
-import { useToast } from "../../hooks/useToast";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { AlertBannerProvider } from "@/components/ui/AlertBanner";
+import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { NetworkStatusBanner } from "@/components/ui/NetworkStatusBanner";
+import { useToast } from "@/hooks/useToast";
 import {
   syncQueuedActions,
   getQueuedActionCount,
-} from "../../services/offline";
+} from "@/services/offline";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);

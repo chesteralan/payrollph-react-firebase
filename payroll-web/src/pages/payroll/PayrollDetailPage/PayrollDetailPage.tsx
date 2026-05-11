@@ -12,17 +12,17 @@ import {
   addDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useToast } from "../../hooks/useToast";
-import { EditableCell } from "../../components/ui/EditableCell";
-import { PayrollOutputView } from "../../components/payroll/PayrollOutputView";
+import { db } from "@/config/firebase";
+import { useToast } from "@/hooks/useToast";
+import { EditableCell } from "@/components/ui/EditableCell";
+import { PayrollOutputView } from "@/components/payroll/PayrollOutputView";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
   Lock,
@@ -32,8 +32,8 @@ import {
   AlertTriangle,
   Send,
 } from "lucide-react";
-import { formatCurrency } from "../../utils/currency";
-import { calculateWorkingDaysSync } from "../../utils/calendarUtils";
+import { formatCurrency } from "@/utils/currency";
+import { calculateWorkingDaysSync } from "@/utils/calendarUtils";
 import type {
   Payroll,
   PayrollEmployee,

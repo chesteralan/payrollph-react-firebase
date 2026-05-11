@@ -1,4 +1,4 @@
-// @ts-nocheck
+// ...existing code...
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -18,17 +18,17 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { db, storage } from "../../config/firebase";
-import { Button } from "../../components/ui/Button";
+import { db, storage } from "@/config/firebase";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
-import { useToast } from "../../hooks/useToast";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/hooks/useToast";
 import {
   ArrowLeft,
   Plus,
@@ -358,11 +358,11 @@ export function EmployeeProfilePage() {
         },
       );
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       addToast({
         type: "error",
         title: "Upload failed",
-        message: (error as any).message,
+        message: (error instanceof Error ? error.message : String(error)),
       });
       setUploading(false);
     }
@@ -381,11 +381,11 @@ export function EmployeeProfilePage() {
       });
       loadData();
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       addToast({
         type: "error",
         title: "Delete failed",
-        message: (error as any).message,
+        message: (error instanceof Error ? error.message : String(error)),
       });
     }
   };

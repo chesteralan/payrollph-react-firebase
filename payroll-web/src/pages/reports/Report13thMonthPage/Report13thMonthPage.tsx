@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
+} from "@/components/ui/Card";
 import { FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 

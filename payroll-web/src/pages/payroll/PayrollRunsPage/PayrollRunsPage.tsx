@@ -10,13 +10,13 @@ import {
   updateDoc,
   addDoc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
-import { Card, CardContent } from "../../components/ui/Card";
-import { Pagination } from "../../components/ui/Pagination";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Pagination } from "@/components/ui/Pagination";
 import {
   Plus,
   Trash2,

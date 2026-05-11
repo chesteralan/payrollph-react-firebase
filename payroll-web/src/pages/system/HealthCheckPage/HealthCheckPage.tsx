@@ -9,15 +9,15 @@ import {
   limit,
 } from "firebase/firestore";
 import { ref, listAll, getMetadata } from "firebase/storage";
-import { db, storage } from "../../config/firebase";
+import { db, storage } from "@/config/firebase";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { usePermissions } from "../../hooks/usePermissions";
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { usePermissions } from "@/hooks/usePermissions";
 import {
   Activity,
   CheckCircle,
@@ -225,7 +225,6 @@ export function HealthCheckPage() {
       let totalSize = 0;
       let fileCount = 0;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const countFiles = async (ref: any): Promise<void> => {
         const listResult = await listAll(ref);
         fileCount += listResult.items.length;
@@ -257,21 +256,21 @@ export function HealthCheckPage() {
         health: healthData,
       };
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const healthData = {
         accessible: false,
         fileCount: 0,
         totalSize: 0,
-        error: (error as any)?.message,
+        error: (error instanceof Error ? error.message : String(error)),
       };
       return {
         result: {
           name: "Storage Bucket",
           status: "warning",
           message: "Unable to access storage",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           details:
-            (error as any)?.message || "Check storage rules or configuration",
+            (error instanceof Error ? error.message : String(error)) || "Check storage rules or configuration",
         },
         health: healthData,
       };
@@ -296,15 +295,15 @@ export function HealthCheckPage() {
       };
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const healthData = { userCount: 0, error: (error as any)?.message };
+      const healthData = { userCount: 0, error: (error instanceof Error ? error.message : String(error)) };
       return {
         result: {
           name: "Auth / Users",
           status: "warning",
           message: "Unable to fetch user count",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           details:
-            (error as any)?.message ||
+            (error instanceof Error ? error.message : String(error)) ||
             "Check Firestore rules for user_accounts",
         },
         health: healthData,

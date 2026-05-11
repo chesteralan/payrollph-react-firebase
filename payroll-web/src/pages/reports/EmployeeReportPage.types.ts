@@ -1,13 +1,4 @@
-import type {
-  Employee,
-  EmployeeProfile,
-  EmployeeContact,
-  EmployeeSalary,
-  EmployeeGroup,
-  EmployeePosition,
-  EmployeeArea,
-  EmployeeStatus,
-} from "../../types";
+import type { Employee, EmployeeContact } from "../../types";
 
 export interface EmployeeReportData extends Employee {
   name?: string;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Company } from "../types";
-import { CompanyContext } from "./company";
+import { CompanyContext } from "@/context/company";
 
 export function CompanyProvider({ children }: { children: React.ReactNode }) {
   const [companies] = useState<Company[]>([]);

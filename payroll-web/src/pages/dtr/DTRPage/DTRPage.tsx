@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   collection,
   getDocs,
@@ -9,19 +9,19 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { SearchBar } from "../../components/ui/SearchBar";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   ChevronLeft,
   ChevronRight,
@@ -103,8 +103,6 @@ export function DTRPage() {
     LeaveApplication[]
   >([]);
   const [benefits, setBenefits] = useState<{ id: string; name: string }[]>([]);
-  const [showDayModal, setShowDayModal] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [dayForm, setDayForm] = useState({
     timeIn: "",
     timeOut: "",
@@ -127,23 +125,15 @@ export function DTRPage() {
   });
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [leaveForm, setLeaveForm] = useState({
+  const [leaveForm, setLeaveForm] = useState<DTRPageLeaveForm>({
     benefitId: "",
     startDate: "",
     endDate: "",
     reason: "",
-    const [showLeaveModal, setShowLeaveModal] = useState(false);
-    const [leaveForm, setLeaveForm] = useState<DTRPageLeaveForm>({
-      benefitId: "",
-      startDate: "",
-      endDate: "",
-      reason: "",
-    });
-    const [benefits, setBenefits] = useState<DTRPageBenefit[]>([]);
   });
+  const [benefits, setBenefits] = useState<DTRPageBenefit[]>([]);
 
-  const [viewMode, setViewMode] = useState<"calendar" | "summary">("calendar");
-    const [viewMode, setViewMode] = useState<DTRPageViewMode>("calendar");
+  const [viewMode, setViewMode] = useState<DTRPageViewMode>("calendar");
   const [dtrSearchQuery, setDtrSearchQuery] = useState("");
   const [allMonthEntries, setAllMonthEntries] = useState<
     (DTREntry & { employeeName?: string; employeeCode?: string })[]
@@ -153,7 +143,7 @@ export function DTRPage() {
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     const [empSnap, nameSnap] = await Promise.all([
       getDocs(
         query(collection(db, "employees"), where("isActive", "==", true)),
@@ -233,19 +223,19 @@ export function DTRPage() {
     );
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (selectedEmployeeId) {
       fetchDTRData();
       fetchLeaveData();
     }
   }, [selectedEmployeeId, selectedMonth, selectedYear]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const fetchAllMonthEntries = async () => {
     const start = dateStr(selectedYear, selectedMonth, 1);
@@ -275,11 +265,11 @@ export function DTRPage() {
     setAllMonthEntries(allEntries);
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (viewMode === "summary" && employees.length > 0) fetchAllMonthEntries();
   }, [viewMode, selectedMonth, selectedYear, employees]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const filteredMonthEntries = useMemo(() => {
     if (dtrSearchQuery === "") return allMonthEntries;

@@ -1,10 +1,3 @@
-import type {
-  Employee,
-  EmployeeContact,
-  EmployeeProfile,
-  EmployeeSalary,
-  EmployeeDocument,
-  DocumentCategory,
-} from "../../types";
+// ...existing code...
 
-type ProfileTab = "info" | "contact" | "compensation" | "dtr" | "documents";
+// ...existing code...

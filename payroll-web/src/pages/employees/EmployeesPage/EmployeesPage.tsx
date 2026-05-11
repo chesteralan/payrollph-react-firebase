@@ -11,21 +11,21 @@ import {
   writeBatch,
   serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../../hooks/useAuth";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { useTableSort } from "../../hooks/useTableSort";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { useTableSort } from "@/hooks/useTableSort";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { SearchBar } from "../../components/ui/SearchBar";
-import { Pagination } from "../../components/ui/Pagination";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { Pagination } from "@/components/ui/Pagination";
 import {
   Plus,
   Edit,
@@ -40,8 +40,8 @@ import {
   Square,
   X,
 } from "lucide-react";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
-import { TableSkeleton } from "../../components/ui/Skeleton";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { TableSkeleton } from "@/components/ui/Skeleton";
 import type { Employee, EmployeeGroup } from "../../types";
 
 export function EmployeesPage() {
@@ -94,11 +94,11 @@ export function EmployeesPage() {
         where("companyId", "==", currentCompanyId),
       ),
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const all = snap.docs.map((d) => ({
       id: d.id,
       ...d.data(),
-    })) as (Employee & { name?: string; deletedAt?: any })[];
+    })) as (Employee & { name?: string; deletedAt?: unknown })[];
     setEmployees(all.filter((e) => !e.deletedAt));
     setLoading(false);
   };

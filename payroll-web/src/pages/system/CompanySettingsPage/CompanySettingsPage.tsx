@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useToast } from "../../hooks/useToast";
-import { Button } from "../../components/ui/Button";
-import { Card, CardContent, CardHeader } from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { Settings, Calculator, Monitor, Bell } from "lucide-react";
 import type { Company } from "../../types";
 
@@ -49,7 +49,7 @@ export function CompanySettingsPage() {
     ...defaultSettings,
   });
 
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     setLoading(true);
     const snap = await getDocs(collection(db, "companies"));
     const list = (
@@ -72,10 +72,13 @@ export function CompanySettingsPage() {
     }
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+   
   useEffect(() => {
-    fetchCompanies();
-  }, []);
+    const loadCompanies = async () => {
+      await fetchCompanies();
+    };
+    loadCompanies();
+  }, [fetchCompanies]);
 
   useEffect(() => {
     if (selectedCompanyId) {

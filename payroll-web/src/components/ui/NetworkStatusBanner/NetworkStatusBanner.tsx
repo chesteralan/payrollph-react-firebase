@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WifiOff, X } from "lucide-react";
-import { useNetworkStatus } from "../../hooks/useNetworkStatus";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 export function NetworkStatusBanner() {
   const { isOffline } = useNetworkStatus();

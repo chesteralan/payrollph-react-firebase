@@ -1,15 +1,15 @@
 import type { ChangePasswordForm } from "./ChangePasswordPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
+} from "@/components/ui/Card";
 import { ArrowLeft, Lock } from "lucide-react";
 
 export function ChangePasswordPage() {

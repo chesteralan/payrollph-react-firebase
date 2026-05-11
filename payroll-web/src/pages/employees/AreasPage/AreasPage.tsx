@@ -7,17 +7,17 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { usePermissions } from "../../hooks/usePermissions";
-import { useTableSort } from "../../hooks/useTableSort";
-import { Button } from "../../components/ui/Button";
+import { db } from "@/config/firebase";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useTableSort } from "@/hooks/useTableSort";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import {
   Plus,
   Edit,
@@ -27,7 +27,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
 } from "lucide-react";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { EmployeeArea } from "../../types";
 
 export function AreasPage() {
@@ -48,9 +48,12 @@ export function AreasPage() {
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+   
   useEffect(() => {
-    fetchAreas();
+    const loadAreas = async () => {
+      await fetchAreas();
+    };
+    loadAreas();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
