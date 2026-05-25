@@ -93,7 +93,6 @@ export function DTRPage() {
   const [employees, setEmployees] = useState<(Employee & { name?: string })[]>(
     [],
   );
-    const [employees, setEmployees] = useState<(Employee & { name?: string })[]>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -102,16 +101,6 @@ export function DTRPage() {
   const [leaveApplications, setLeaveApplications] = useState<
     LeaveApplication[]
   >([]);
-  const [benefits, setBenefits] = useState<{ id: string; name: string }[]>([]);
-  const [dayForm, setDayForm] = useState({
-    timeIn: "",
-    timeOut: "",
-    overtimeHours: 0,
-    lateHours: 0,
-    absenceType: "" as DTREntry["absenceType"],
-    absenceReason: "",
-    notes: "",
-  });
   const [showDayModal, setShowDayModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [dayForm, setDayForm] = useState<DTRPageDayForm>({
@@ -168,7 +157,7 @@ export function DTRPage() {
     });
     setEmployees(list);
     if (list.length > 0) setSelectedEmployeeId(list[0].id);
-  };
+  }, []);
 
   const fetchDTRData = async () => {
     const start = dateStr(selectedYear, selectedMonth, 1);

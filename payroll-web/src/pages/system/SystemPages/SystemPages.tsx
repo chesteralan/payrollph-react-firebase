@@ -2187,7 +2187,7 @@ export function AuditPage() {
     if (filterUser) allLogs = allLogs.filter((l) => l.userId === filterUser);
     setLogs(allLogs);
     setLoading(false);
-  };
+  }, [filterModule, filterUser]);
 
    
   useEffect(() => {
@@ -2468,6 +2468,28 @@ export function AuditPage() {
   );
 }
 
+const COLLECTIONS = [
+  "names",
+  "employees",
+  "employee_groups",
+  "employee_positions",
+  "employee_areas",
+  "employee_statuses",
+  "earnings",
+  "deductions",
+  "benefits",
+  "payroll",
+  "payroll_templates",
+  "payroll_inclusive_dates",
+  "payroll_groups",
+  "payroll_employees",
+  "salaries",
+  "dtr_entries",
+  "holidays",
+  "users",
+  "companies",
+];
+
 export function DatabasePage() {
   const { canView, canAdd } = usePermissions();
   const { addToast } = useToast();
@@ -2501,28 +2523,6 @@ export function DatabasePage() {
   const [dtrMonths, setDtrMonths] = useState(6);
   const [softDeleteDays, setSoftDeleteDays] = useState(30);
   const [archiveYears, setArchiveYears] = useState(2);
-
-  const COLLECTIONS = [
-    "names",
-    "employees",
-    "employee_groups",
-    "employee_positions",
-    "employee_areas",
-    "employee_statuses",
-    "earnings",
-    "deductions",
-    "benefits",
-    "payroll",
-    "payroll_templates",
-    "payroll_inclusive_dates",
-    "payroll_groups",
-    "payroll_employees",
-    "salaries",
-    "dtr_entries",
-    "holidays",
-    "users",
-    "companies",
-  ];
 
   const fetchStats = useCallback(async () => {
     setLoading(true);

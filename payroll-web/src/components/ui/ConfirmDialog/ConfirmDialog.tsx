@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Button } from "./Button/Button";
+import { Button } from "../Button";
 import { AlertTriangle } from "lucide-react";
 
 interface ConfirmDialogProps {

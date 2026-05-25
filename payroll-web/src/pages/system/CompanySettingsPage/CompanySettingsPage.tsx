@@ -60,7 +60,7 @@ export function CompanySettingsPage() {
       setSelectedCompanyId(list[0].id);
     }
     setLoading(false);
-  };
+  }, []);
 
   const fetchSettings = async (companyId: string) => {
     const ref = doc(db, "company_settings", companyId);

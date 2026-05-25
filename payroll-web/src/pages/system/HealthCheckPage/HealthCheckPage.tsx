@@ -8,7 +8,7 @@ import {
   query,
   limit,
 } from "firebase/firestore";
-import { ref, listAll, getMetadata } from "firebase/storage";
+import { ref, listAll, getMetadata, type StorageReference } from "firebase/storage";
 import { db, storage } from "@/config/firebase";
 import {
   Card,
@@ -137,8 +137,7 @@ export function HealthCheckPage() {
         name: "Firebase Connection",
         status: "fail",
         message: "Connection failed",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        details: (error as any)?.message || "Unable to connect to Firestore",
+        details: error instanceof Error ? error.message : String(error),
       };
     }
   };
@@ -194,8 +193,7 @@ export function HealthCheckPage() {
           name: `Collection: ${col}`,
           status: "fail",
           message: "Unable to access collection",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          details: (error as any)?.message || "Check Firestore rules",
+          details: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -225,7 +223,7 @@ export function HealthCheckPage() {
       let totalSize = 0;
       let fileCount = 0;
 
-      const countFiles = async (ref: any): Promise<void> => {
+      const countFiles = async (ref: StorageReference): Promise<void> => {
         const listResult = await listAll(ref);
         fileCount += listResult.items.length;
 
@@ -294,8 +292,7 @@ export function HealthCheckPage() {
         health: healthData,
       };
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const healthData = { userCount: 0, error: (error instanceof Error ? error.message : String(error)) };
+      const healthData = { userCount: 0, error: error instanceof Error ? error.message : String(error) };
       return {
         result: {
           name: "Auth / Users",
