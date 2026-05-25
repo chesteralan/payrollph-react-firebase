@@ -183,6 +183,60 @@ export async function savePayrollBenefit(
   }
 }
 
+export function computeGrossPay(salaryAmount: number, earnings: number[]): number {
+  return salaryAmount + earnings.reduce((sum, v) => sum + v, 0);
+}
+
+export function computeNetPay(
+  grossPay: number,
+  deductions: number[],
+  benefitShares: number[],
+): number {
+  const totalDeductions = deductions.reduce((sum, v) => sum + v, 0);
+  const totalBenefits = benefitShares.reduce((sum, v) => sum + v, 0);
+  return grossPay - totalDeductions - totalBenefits;
+}
+
+export function sumEarnings(earningMap: Map<string, number>): number {
+  return Array.from(earningMap.values()).reduce((s, v) => s + v, 0);
+}
+
+export function sumDeductions(deductionMap: Map<string, number>): number {
+  return Array.from(deductionMap.values()).reduce((s, v) => s + v, 0);
+}
+
+export function sumBenefits(
+  benefitMap: Map<string, { employeeShare: number }>,
+): number {
+  return Array.from(benefitMap.values()).reduce(
+    (s, v) => s + v.employeeShare,
+    0,
+  );
+}
+
+export function computeOvertimePay(
+  hourlyRate: number,
+  overtimeHours: number,
+  multiplier = 1.5,
+): number {
+  return hourlyRate * multiplier * overtimeHours;
+}
+
+export function computeHourlyRate(
+  monthlySalary: number,
+  workDaysPerMonth = 22,
+  hoursPerDay = 8,
+): number {
+  return monthlySalary / (workDaysPerMonth * hoursPerDay);
+}
+
+export function computeDailyRate(
+  monthlySalary: number,
+  workDaysPerMonth = 22,
+): number {
+  return monthlySalary / workDaysPerMonth;
+}
+
 export interface PayrollProcessingRow {
   nameId: string;
   employeeCode: string;
