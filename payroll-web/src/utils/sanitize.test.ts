@@ -7,6 +7,9 @@ import {
   sanitizeNumber,
   sanitizeCurrency,
   sanitizeFilename,
+  stripHtml,
+  sanitizeDate,
+  sanitizeObject,
   containsSqlInjection,
   containsXss,
   validateInput,
@@ -153,5 +156,167 @@ describe("validateInput", () => {
   it("should truncate to maxLength", () => {
     const result = validateInput("too long", { maxLength: 5 });
     expect(result.sanitized).toBe("too l");
+  });
+
+  it("should detect SQL injection patterns", () => {
+    const result = validateInput("1 OR 1=1", { maxLength: 20 });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Input contains invalid characters");
+  });
+
+  it("should detect XSS patterns", () => {
+    const result = validateInput("<script>alert(1)</script>", { maxLength: 50 });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Input contains invalid characters");
+  });
+
+  it("should allow HTML when allowHtml is true", () => {
+    const result = validateInput("<b>bold</b>", { allowHtml: true, maxLength: 20 });
+    expect(result.isValid).toBe(true);
+    expect(result.sanitized).toBe("<b>bold</b>");
+  });
+
+  it("should validate against pattern", () => {
+    const result = validateInput("abc", { pattern: /^[A-Z]+$/ });
+    expect(result.isValid).toBe(false);
+    expect(result.errors).toContain("Input does not match required pattern");
+  });
+
+  it("should fail on SQL injection with allowHtml", () => {
+    const result = validateInput("DROP TABLE users", { allowHtml: true });
+    expect(result.isValid).toBe(false);
+  });
+});
+
+describe("stripHtml", () => {
+  it("should remove HTML tags", () => {
+    expect(stripHtml("<p>Hello <b>world</b></p>")).toBe("Hello world");
+  });
+
+  it("should handle empty string", () => {
+    expect(stripHtml("")).toBe("");
+  });
+
+  it("should return plain text unchanged", () => {
+    expect(stripHtml("just text")).toBe("just text");
+  });
+
+  it("should handle non-string input", () => {
+    expect(stripHtml(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("sanitizeDate", () => {
+  it("should return ISO string for valid date", () => {
+    const result = sanitizeDate("2024-01-15");
+    expect(result).toBe("2024-01-15T00:00:00.000Z");
+  });
+
+  it("should return null for invalid date", () => {
+    expect(sanitizeDate("not-a-date")).toBeNull();
+  });
+
+  it("should return null for non-string input", () => {
+    expect(sanitizeDate(123 as unknown as string)).toBeNull();
+  });
+});
+
+describe("sanitizeObject", () => {
+  it("should apply sanitizers to specified keys", () => {
+    const obj = { name: "  John  ", email: " USER@EXAMPLE.COM " };
+    const result = sanitizeObject(obj, {
+      name: (v) => (typeof v === "string" ? v.trim() : v),
+      email: (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
+    });
+    expect(result.name).toBe("John");
+    expect(result.email).toBe("user@example.com");
+  });
+
+  it("should skip missing keys", () => {
+    const obj = { name: "John" };
+    const result = sanitizeObject(obj, {
+      email: (v) => v,
+    });
+    expect(result).toEqual({ name: "John" });
+  });
+});
+
+describe("sanitizeString edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizeString(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("sanitizeEmail edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizeEmail(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("sanitizePhone edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizePhone(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("sanitizeNumber edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizeNumber(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("sanitizeCurrency edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizeCurrency(123 as unknown as string)).toBe("");
+  });
+
+  it("should handle single decimal", () => {
+    expect(sanitizeCurrency("123.45")).toBe("123.45");
+  });
+});
+
+describe("sanitizeFilename edge cases", () => {
+  it("should handle non-string input", () => {
+    expect(sanitizeFilename(123 as unknown as string)).toBe("");
+  });
+});
+
+describe("containsSqlInjection edge cases", () => {
+  it("should detect DROP statement", () => {
+    expect(containsSqlInjection("DROP TABLE users")).toBe(true);
+  });
+
+  it("should detect comment injection", () => {
+    expect(containsSqlInjection("admin'--")).toBe(true);
+  });
+
+  it("should detect OR injection", () => {
+    expect(containsSqlInjection("1 OR 1=1")).toBe(true);
+  });
+
+  it("should detect AND injection", () => {
+    expect(containsSqlInjection("1 AND 1=1")).toBe(true);
+  });
+
+  it("should handle non-string input", () => {
+    expect(containsSqlInjection(123 as unknown as string)).toBe(false);
+  });
+});
+
+describe("containsXss edge cases", () => {
+  it("should detect iframe injection", () => {
+    expect(containsXss("<iframe src='http://evil.com'></iframe>")).toBe(true);
+  });
+
+  it("should detect javascript: URI", () => {
+    expect(containsXss("javascript:alert(1)")).toBe(true);
+  });
+
+  it("should detect on* event handlers", () => {
+    expect(containsXss("onload=alert(1)")).toBe(true);
+  });
+
+  it("should handle non-string input", () => {
+    expect(containsXss(123 as unknown as string)).toBe(false);
   });
 });

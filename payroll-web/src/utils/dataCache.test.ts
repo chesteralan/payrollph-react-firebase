@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { cache } from "./dataCache";
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { cache, useCache, useMultiCache } from "./dataCache";
 
 describe("DataCache (singleton)", () => {
   beforeEach(() => {
@@ -163,5 +164,106 @@ describe("DataCache (singleton)", () => {
       expect(cache.get("overflow")).toBe("last");
       expect(cache.size()).toBe(100);
     });
+  });
+});
+
+describe("useCache hook", () => {
+  beforeEach(() => {
+    cache.clear();
+  });
+
+  it("should return cached data when available", async () => {
+    cache.set("test-key", "cached-value");
+    const fetchFn = vi.fn().mockResolvedValue("fresh-value");
+
+    const { result } = renderHook(() => useCache("test-key", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe("cached-value");
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("should call fetchFn when cache miss", async () => {
+    const fetchFn = vi.fn().mockResolvedValue("fresh-value");
+
+    const { result } = renderHook(() => useCache("miss-key", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe("fresh-value");
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it("should handle fetch error", async () => {
+    const fetchFn = vi.fn().mockRejectedValue(new Error("Fetch failed"));
+
+    const { result } = renderHook(() => useCache("error-key", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error!.message).toBe("Fetch failed");
+    expect(result.current.data).toBeNull();
+  });
+
+  it("should refresh data on demand", async () => {
+    const fetchFn = vi.fn().mockResolvedValue("fresh-value");
+
+    const { result } = renderHook(() => useCache("refresh-key", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe("fresh-value");
+
+    fetchFn.mockResolvedValue("updated-value");
+    cache.delete("refresh-key");
+    act(() => {
+      result.current.refresh();
+    });
+
+    await waitFor(() => expect(result.current.data).toBe("updated-value"));
+  });
+});
+
+describe("useMultiCache hook", () => {
+  beforeEach(() => {
+    cache.clear();
+  });
+
+  it("should fetch all keys", async () => {
+    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-value`);
+
+    const { result } = renderHook(() =>
+      useMultiCache(["a", "b"], fetchFn),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.results).toEqual({ a: "a-value", b: "b-value" });
+  });
+
+  it("should use cached values when available", async () => {
+    cache.set("a", "cached-a");
+    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-fetched`);
+
+    const { result } = renderHook(() =>
+      useMultiCache(["a", "b"], fetchFn),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.results.a).toBe("cached-a");
+    expect(result.current.results.b).toBe("b-fetched");
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it("should handle fetch failures gracefully", async () => {
+    const fetchFn = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Fail"))
+      .mockResolvedValueOnce("ok");
+
+    const { result } = renderHook(() =>
+      useMultiCache(["a", "b"], fetchFn),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.results.a).toBeNull();
+    expect(result.current.results.b).toBe("ok");
   });
 });

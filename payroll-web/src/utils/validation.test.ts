@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { validate, rules } from "./validation";
+import { describe, it, expect, vi } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { validate, rules, useValidation } from "./validation";
 
 describe("validation utils", () => {
   describe("rules.required", () => {
@@ -332,7 +333,98 @@ describe("validation utils", () => {
       expect(result.errors.name).toBe("Name is required");
     });
 
-    it("should handle multiple fields with same validator", () => {
+    describe("useValidation hook", () => {
+    interface TestForm {
+      name: string;
+      email: string;
+    }
+
+    const validators = [
+      {
+        field: "name" as const,
+        validate: rules.required().validate,
+        message: rules.required().message,
+      },
+      {
+        field: "email" as const,
+        validate: rules.email().validate,
+        message: rules.email().message,
+      },
+    ];
+
+    it("should initialize with provided data", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "John", email: "john@test.com" }),
+      );
+      expect(result.current.data.name).toBe("John");
+      expect(result.current.data.email).toBe("john@test.com");
+      expect(result.current.isValid).toBe(true);
+    });
+
+    it("should update a field value", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "", email: "" }),
+      );
+      act(() => {
+        result.current.updateField("name", "John");
+      });
+      expect(result.current.data.name).toBe("John");
+    });
+
+    it("should mark a field as touched", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "", email: "" }),
+      );
+      act(() => {
+        result.current.touchField("name");
+      });
+      expect(result.current.touched.has("name")).toBe(true);
+    });
+
+    it("should return field error only when touched", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "", email: "" }),
+      );
+      act(() => {
+        result.current.validate(validators);
+        result.current.touchField("name");
+      });
+      expect(result.current.getFieldError("name")).toBeDefined();
+      expect(result.current.getFieldError("email")).toBeUndefined();
+    });
+
+    it("should run validation and set errors", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "", email: "" }),
+      );
+      act(() => {
+        result.current.validate(validators);
+      });
+      expect(result.current.isValid).toBe(false);
+      expect(result.current.errors.name).toBeDefined();
+      expect(result.current.errors.email).toBeDefined();
+    });
+
+    it("should reset to initial state", () => {
+      const { result } = renderHook(() =>
+        useValidation<TestForm>({ name: "John", email: "john@test.com" }),
+      );
+      act(() => {
+        result.current.updateField("name", "Jane");
+        result.current.touchField("name");
+        result.current.validate(validators);
+      });
+      act(() => {
+        result.current.reset();
+      });
+      expect(result.current.data.name).toBe("John");
+      expect(result.current.touched.size).toBe(0);
+      expect(result.current.errors).toEqual({});
+      expect(result.current.isValid).toBe(true);
+    });
+  });
+
+  it("should handle multiple fields with same validator", () => {
       const data = { field1: "", field2: "" };
       const result = validate(data, [
         {

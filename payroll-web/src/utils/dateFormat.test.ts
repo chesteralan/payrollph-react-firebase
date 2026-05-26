@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { renderHook, act } from "@testing-library/react";
 import {
   formatDate,
   formatTime,
   formatDateTime,
   formatDateRange,
   parseDate,
+  useDateTimeFormat,
 } from "./dateFormat";
 
 describe("dateFormat utils", () => {
@@ -284,6 +286,72 @@ describe("dateFormat utils", () => {
     it("should return null for unknown format", () => {
       // @ts-expect-error testing invalid format
       expect(parseDate("12/25/2024", "UNKNOWN")).toBeNull();
+    });
+
+    it("should return null for non-matching format", () => {
+      const result = parseDate("July 15 2024 year", "MMM DD, YYYY");
+      expect(result).toBeNull();
+    });
+
+    it("should handle non-matching regex in MMM format", () => {
+      const result = parseDate("July 2024", "MMM DD, YYYY");
+      expect(result).toBeNull();
+    });
+
+    it("should handle Date parse failure", () => {
+      const result = parseDate("99/99/9999", "MM/DD/YYYY");
+      // JS Date will still produce a Date object but it's technically valid
+      expect(result).toBeInstanceOf(Date);
+    });
+  });
+
+  describe("useDateTimeFormat hook", () => {
+    it("should use default config", () => {
+      const { result } = renderHook(() => useDateTimeFormat());
+      expect(result.current.config.dateFormat).toBe("MM/DD/YYYY");
+      expect(result.current.config.timeFormat).toBe("12h");
+    });
+
+    it("should override with partial config", () => {
+      const { result } = renderHook(() =>
+        useDateTimeFormat({ dateFormat: "YYYY-MM-DD" }),
+      );
+      expect(result.current.config.dateFormat).toBe("YYYY-MM-DD");
+      expect(result.current.config.timeFormat).toBe("12h");
+    });
+
+    it("should format a date", () => {
+      const d = new Date(2024, 6, 15);
+      const { result } = renderHook(() => useDateTimeFormat());
+      expect(result.current.format(d)).toBe("07/15/2024");
+    });
+
+    it("should format time in 12h", () => {
+      const d = new Date(2024, 0, 1, 14, 30, 0);
+      const { result } = renderHook(() => useDateTimeFormat());
+      expect(result.current.formatTime(d)).toBe("2:30 PM");
+    });
+
+    it("should format time in 24h", () => {
+      const d = new Date(2024, 0, 1, 14, 30, 0);
+      const { result } = renderHook(() =>
+        useDateTimeFormat({ timeFormat: "24h" }),
+      );
+      expect(result.current.formatTime(d)).toBe("14:30");
+    });
+
+    it("should format date and time together", () => {
+      const d = new Date(2024, 6, 15, 9, 5, 0);
+      const { result } = renderHook(() => useDateTimeFormat());
+      expect(result.current.formatDateTime(d)).toBe("07/15/2024 9:05 AM");
+    });
+
+    it("should update config", () => {
+      const { result } = renderHook(() => useDateTimeFormat());
+      act(() => {
+        result.current.updateConfig({ dateFormat: "DD/MM/YYYY" });
+      });
+      expect(result.current.config.dateFormat).toBe("DD/MM/YYYY");
     });
   });
 });
