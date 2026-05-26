@@ -51,7 +51,10 @@ const STAGES = [
   "output",
 ];
 
-import type { ProcessingRow } from "./PayrollDetailPage.types";
+import type { ProcessingRow } from "../PayrollDetailPage.types";
+import { StageSelector, DTRStage } from "./PayrollStages";
+import { ComputationSummary } from "./ComputationSummary";
+import { ValidationPanel } from "./ValidationPanel";
 
 export function PayrollDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +112,6 @@ export function PayrollDetailPage() {
         deductionsSnap,
         benefitsSnap,
         inclusiveDatesSnap,
-        calendarSnap,
       ] = await Promise.all([
         getDoc(doc(db, "payroll", id)),
         getDocs(
@@ -127,13 +129,16 @@ export function PayrollDetailPage() {
             where("payrollId", "==", id),
           ),
         ),
-        getDocs(
-          query(
-            collection(db, "calendar"),
-            where("companyId", "==", payrollData?.companyId || "global"),
-          ),
-        ),
       ]);
+
+      const calendarSnap = payrollSnap.exists()
+        ? await getDocs(
+            query(
+              collection(db, "calendar"),
+              where("companyId", "==", (payrollSnap.data() as Record<string, unknown>)?.companyId || "global"),
+            ),
+          )
+        : await getDocs(query(collection(db, "calendar"), where("companyId", "==", "global")));
 
       if (payrollSnap.exists()) {
         const payrollData = {
@@ -806,184 +811,13 @@ export function PayrollDetailPage() {
       </div>
 
       {showValidation && validationErrors.length > 0 && (
-        <Card
-          className={
-            validationErrors.some((e) => e.severity === "error")
-              ? "border-red-200"
-              : "border-yellow-200"
-          }
-        >
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {validationErrors.some((e) => e.severity === "error") ? (
-                <>
-                  <AlertCircle className="w-5 h-5 text-red-500" />
-                  Validation Errors
-                </>
-              ) : (
-                <>
-                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                  Validation Warnings
-                </>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {validationErrors.map((err, i) => (
-                <div
-                  key={i}
-                  className={`flex items-start gap-2 p-2 rounded ${err.severity === "error" ? "bg-red-50" : "bg-yellow-50"}`}
-                >
-                  {err.severity === "error" ? (
-                    <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
-                  )}
-                  <div>
-                    <span className="text-sm font-medium">
-                      {err.employeeName ? `${err.employeeName}: ` : ""}
-                      {err.message}
-                    </span>
-                    {err.nameId && (
-                      <span className="text-xs text-gray-500 ml-2">
-                        ({err.nameId})
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <ValidationPanel errors={validationErrors} onClose={() => setShowValidation(false)} />
       )}
 
-      <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
-        {STAGES.map((stage) => (
-          <button
-            key={stage}
-            onClick={() => setActiveStage(stage)}
-            className={`px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors whitespace-nowrap ${
-              activeStage === stage
-                ? "border-primary-600 text-primary-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {stage}
-          </button>
-        ))}
-      </div>
+      <StageSelector stages={STAGES} activeStage={activeStage} onStageChange={setActiveStage} />
 
       {activeStage === "dtr" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Daily Time Record</CardTitle>
-                {startDate && endDate && (
-                  <p className="text-sm text-gray-500">
-                    Auto-populated from DTR entries ({startDate} to {endDate})
-                  </p>
-                )}
-              </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate("/dtr")}
-              >
-                Manage DTR Entries
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Employee
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Days Worked
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Absences
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Late (hrs)
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Overtime (hrs)
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {row.lastName}
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <EditableCell
-                        value={row.daysWorked}
-                        onChange={(v) =>
-                          updateRow(row.nameId, "daysWorked", Number(v))
-                        }
-                        type="number"
-                        className="text-center"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <EditableCell
-                        value={row.absences}
-                        onChange={(v) =>
-                          updateRow(row.nameId, "absences", Number(v))
-                        }
-                        type="number"
-                        className="text-center"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <EditableCell
-                        value={row.lateHours}
-                        onChange={(v) =>
-                          updateRow(row.nameId, "lateHours", Number(v))
-                        }
-                        type="number"
-                        className="text-center"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <EditableCell
-                        value={row.overtimeHours}
-                        onChange={(v) =>
-                          updateRow(row.nameId, "overtimeHours", Number(v))
-                        }
-                        type="number"
-                        className="text-center"
-                      />
-                    </td>
-                  </tr>
-                ))}
-                {rows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      No employees in this payroll. Go to the wizard to add
-                      employees.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <DTRStage rows={rows} startDate={startDate} endDate={endDate} updateRow={updateRow} onManageDTR={() => navigate("/dtr")} />
       )}
 
       {activeStage === "salaries" && (
@@ -1283,146 +1117,14 @@ export function PayrollDetailPage() {
             </p>
           </CardHeader>
           <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
-                    Employee
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Basic
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Earnings
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Gross
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Deductions
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Benefits (EE)
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Net Pay
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => {
-                  const earnings = Array.from(
-                    earningData.get(row.nameId)?.values() || [],
-                  ).reduce((s, v) => s + v, 0);
-                  const deductions = Array.from(
-                    deductionData.get(row.nameId)?.values() || [],
-                  ).reduce((s, v) => s + v, 0);
-                  const benefits = Array.from(
-                    benefitData.get(row.nameId)?.values() || [],
-                  ).reduce((s, v) => s + v.employeeShare, 0);
-                  const gross = row.salaryAmount + earnings;
-                  const net = gross - deductions - benefits;
-                  return (
-                    <tr key={row.nameId} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 sticky left-0 bg-white">
-                        <div className="text-sm font-medium text-gray-900">
-                          {row.employeeCode}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {row.lastName}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm">
-                        {formatCurrency(row.salaryAmount)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm text-green-600">
-                        {formatCurrency(earnings)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm font-medium">
-                        {formatCurrency(gross)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm text-red-600">
-                        {formatCurrency(deductions)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm">
-                        {formatCurrency(benefits)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">
-                        {formatCurrency(net)}
-                      </td>
-                    </tr>
-                  );
-                })}
-                {rows.length > 0 && (
-                  <tr className="bg-gray-50 font-bold">
-                    <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">
-                      Total
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(
-                        rows.reduce((s, r) => s + r.salaryAmount, 0),
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm text-green-600">
-                      {formatCurrency(
-                        rows.reduce(
-                          (s, r) =>
-                            s +
-                            Array.from(
-                              earningData.get(r.nameId)?.values() || [],
-                            ).reduce((a, v) => a + v, 0),
-                          0,
-                        ),
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(
-                        rows.reduce((s, r) => s + getEmployeeGross(r), 0),
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm text-red-600">
-                      {formatCurrency(
-                        rows.reduce(
-                          (s, r) =>
-                            s +
-                            Array.from(
-                              deductionData.get(r.nameId)?.values() || [],
-                            ).reduce((a, v) => a + v, 0),
-                          0,
-                        ),
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(
-                        rows.reduce(
-                          (s, r) =>
-                            s +
-                            Array.from(
-                              benefitData.get(r.nameId)?.values() || [],
-                            ).reduce((a, v) => a + v.employeeShare, 0),
-                          0,
-                        ),
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(
-                        rows.reduce((s, r) => s + getEmployeeNet(r), 0),
-                      )}
-                    </td>
-                  </tr>
-                )}
-                {rows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      No employees in this payroll.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <ComputationSummary
+              rows={rows}
+              earningData={earningData}
+              deductionData={deductionData}
+              benefitData={benefitData}
+              getEmployeeGross={getEmployeeGross}
+              getEmployeeNet={getEmployeeNet}
+            />
           </CardContent>
         </Card>
       )}

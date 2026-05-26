@@ -172,18 +172,18 @@ export function TemplatesPage() {
     );
   };
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const loadTemplates = async () => {
-      await fetchTemplates();
-    };
-    loadTemplates();
+    fetchTemplates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const loadLookups = async () => {
-      await fetchLookups();
-    };
-    loadLookups();
+    fetchLookups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const resetWizard = () => {
     setWizardStep(0);

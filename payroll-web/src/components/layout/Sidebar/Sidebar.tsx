@@ -33,7 +33,7 @@ import {
 import { clsx } from "clsx";
 import { useState } from "react";
 
-import type { NavItem, SidebarProps } from "./Sidebar/Sidebar.types";
+import type { NavItem, SidebarProps } from "./Sidebar.types";
 import type { Department, Section } from "../../../types";
 
 const navigation: NavItem[] = [

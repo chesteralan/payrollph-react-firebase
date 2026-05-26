@@ -49,12 +49,12 @@ export function AreasPage() {
   };
 
    
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const loadAreas = async () => {
-      await fetchAreas();
-    };
-    loadAreas();
+    fetchAreas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -130,10 +130,11 @@ export function NamesListPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    fetchNames();
-    fetchLookups();
-    /* eslint-enable react-hooks/set-state-in-effect */
+    const init = async () => {
+      await fetchNames();
+      await fetchLookups();
+    };
+    init();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

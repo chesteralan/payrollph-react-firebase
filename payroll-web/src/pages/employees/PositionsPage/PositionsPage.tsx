@@ -49,12 +49,12 @@ export function PositionsPage() {
   };
 
    
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const loadPositions = async () => {
-      await fetchPositions();
-    };
-    loadPositions();
+    fetchPositions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

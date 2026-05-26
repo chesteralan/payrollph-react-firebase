@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 
-import type { ProcessingRow, CompanyInfo, OutputViewProps, OutputMode } from "./PayrollOutputView/PayrollOutputView.types";
+import type { ProcessingRow, CompanyInfo, OutputViewProps, OutputMode } from "./PayrollOutputView.types";
 
 // PrintHeader and PrintFooter must be declared outside the main component to avoid lint errors
 interface PrintHeaderProps {
@@ -49,6 +49,821 @@ function PrintFooter({ company }: PrintFooterProps) {
         <span>{new Date().toLocaleDateString()}</span>
       </div>
     </div>
+  );
+}
+
+function formatCurrency(value: number): string {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+interface RegisterModeProps {
+  rows: ProcessingRow[];
+  filteredRows: ProcessingRow[];
+  earningData: Map<string, Map<string, number>>;
+  deductionData: Map<string, Map<string, number>>;
+  benefitData: Map<string, Map<string, { employeeShare: number; employerShare: number }>>;
+  visibleColumns: Record<string, boolean>;
+  setVisibleColumns: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  showColumns: boolean;
+  setShowColumns: React.Dispatch<React.SetStateAction<boolean>>;
+  showFilters: boolean;
+  setShowFilters: React.Dispatch<React.SetStateAction<boolean>>;
+  filterGroup: string;
+  setFilterGroup: React.Dispatch<React.SetStateAction<string>>;
+  filterPosition: string;
+  setFilterPosition: React.Dispatch<React.SetStateAction<string>>;
+  filterArea: string;
+  setFilterArea: React.Dispatch<React.SetStateAction<string>>;
+  groups: string[];
+  positions: string[];
+  areas: string[];
+  hasActiveFilters: boolean;
+  activeFilterCount: number;
+  totals: {
+    totalBasic: number;
+    totalEarnings: number;
+    totalGross: number;
+    totalDeductions: number;
+    totalBenefitsEE: number;
+    totalBenefitsER: number;
+    totalNet: number;
+  };
+  company?: CompanyInfo;
+  payroll: { name: string; month: number; year: number };
+  monthName: string;
+}
+
+function PayrollRegisterMode({
+  rows,
+  filteredRows,
+  earningData,
+  deductionData,
+  benefitData,
+  visibleColumns,
+  setVisibleColumns,
+  showColumns,
+  setShowColumns,
+  showFilters,
+  setShowFilters,
+  filterGroup,
+  setFilterGroup,
+  filterPosition,
+  setFilterPosition,
+  filterArea,
+  setFilterArea,
+  groups,
+  positions,
+  areas,
+  hasActiveFilters,
+  activeFilterCount,
+  totals,
+  company,
+  payroll,
+  monthName,
+}: RegisterModeProps) {
+  return (
+    <>
+      <div className="flex gap-2">
+        <div className="relative">
+          <Button
+            variant={hasActiveFilters ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-1 bg-white/20 px-1.5 rounded-full text-xs">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+          {showFilters && (
+            <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-72">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Group</label>
+                  <select
+                    className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
+                    value={filterGroup}
+                    onChange={(e) => setFilterGroup(e.target.value)}
+                  >
+                    <option value="">All Groups</option>
+                    {groups.map((g) => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Position</label>
+                  <select
+                    className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
+                    value={filterPosition}
+                    onChange={(e) => setFilterPosition(e.target.value)}
+                  >
+                    <option value="">All Positions</option>
+                    {positions.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Area</label>
+                  <select
+                    className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
+                    value={filterArea}
+                    onChange={(e) => setFilterArea(e.target.value)}
+                  >
+                    <option value="">All Areas</option>
+                    {areas.map((a) => (
+                      <option key={a} value={a}>{a}</option>
+                    ))}
+                  </select>
+                </div>
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setFilterGroup("");
+                      setFilterPosition("");
+                      setFilterArea("");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="relative">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowColumns(!showColumns)}
+          >
+            <Columns className="w-4 h-4 mr-2" />
+            Columns
+          </Button>
+          {showColumns && (
+            <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-64">
+              <div className="space-y-2">
+                {Object.entries({
+                  basic: "Basic Salary",
+                  earnings: "Earnings",
+                  gross: "Gross Pay",
+                  deductions: "Deductions",
+                  benefits: "Benefits (EE)",
+                  net: "Net Pay",
+                  daysWorked: "Days Worked",
+                  absences: "Absences",
+                  late: "Late Hours",
+                  overtime: "Overtime Hours",
+                }).map(([key, label]) => (
+                  <label
+                    key={key}
+                    className="flex items-center gap-2 text-sm cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(visibleColumns as Record<string, boolean>)[key]}
+                      onChange={() =>
+                        setVisibleColumns((prev) => ({
+                          ...prev,
+                          [key]: !prev[key as keyof typeof prev],
+                        }))
+                      }
+                      className="rounded border-gray-300"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {hasActiveFilters && (
+          <span className="text-sm text-gray-500 self-center">
+            Showing {filteredRows.length} of {rows.length} employees
+          </span>
+        )}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Payroll Register</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 overflow-x-auto">
+          <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+          <table className="w-full print:text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
+                  Employee
+                </th>
+                {visibleColumns.daysWorked && (
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days</th>
+                )}
+                {visibleColumns.absences && (
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Absences</th>
+                )}
+                {visibleColumns.late && (
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Late</th>
+                )}
+                {visibleColumns.overtime && (
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">OT</th>
+                )}
+                {visibleColumns.basic && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Basic</th>
+                )}
+                {visibleColumns.earnings && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Earnings</th>
+                )}
+                {visibleColumns.gross && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Gross</th>
+                )}
+                {visibleColumns.deductions && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deductions</th>
+                )}
+                {visibleColumns.benefits && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Benefits (EE)</th>
+                )}
+                {visibleColumns.net && (
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredRows.map((row) => {
+                const earnings = Array.from(
+                  earningData.get(row.nameId)?.values() || [],
+                ).reduce((s, v) => s + v, 0);
+                const deductions = Array.from(
+                  deductionData.get(row.nameId)?.values() || [],
+                ).reduce((s, v) => s + v, 0);
+                const benefits = Array.from(
+                  benefitData.get(row.nameId)?.values() || [],
+                ).reduce((s, v) => s + v.employeeShare, 0);
+                const gross = row.salaryAmount + earnings;
+                const net = gross - deductions - benefits;
+                return (
+                  <tr key={row.nameId} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 sticky left-0 bg-white">
+                      <div className="text-sm font-medium text-gray-900">{row.employeeCode}</div>
+                      <div className="text-xs text-gray-500">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</div>
+                    </td>
+                    {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{row.daysWorked}</td>}
+                    {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{row.absences}</td>}
+                    {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{row.lateHours}</td>}
+                    {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{row.overtimeHours}</td>}
+                    {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(row.salaryAmount)}</td>}
+                    {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(earnings)}</td>}
+                    {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm font-medium">{formatCurrency(gross)}</td>}
+                    {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(deductions)}</td>}
+                    {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(benefits)}</td>}
+                    {visibleColumns.net && <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">{formatCurrency(net)}</td>}
+                  </tr>
+                );
+              })}
+              {filteredRows.length > 0 && (
+                <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                  <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">Total ({filteredRows.length} employees)</td>
+                  {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.daysWorked, 0)}</td>}
+                  {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.absences, 0)}</td>}
+                  {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.lateHours, 0)}</td>}
+                  {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.overtimeHours, 0)}</td>}
+                  {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBasic)}</td>}
+                  {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(totals.totalEarnings)}</td>}
+                  {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalGross)}</td>}
+                  {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(totals.totalDeductions)}</td>}
+                  {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>}
+                  {visibleColumns.net && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>}
+                </tr>
+              )}
+              {filteredRows.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">No employees match the selected filters.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <PrintFooter company={company} />
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+interface PayslipModeProps {
+  rows: ProcessingRow[];
+  filteredRows: ProcessingRow[];
+  selectedEmployee: string | null;
+  setSelectedEmployee: React.Dispatch<React.SetStateAction<string | null>>;
+  getEmployeeEarnings: (row: ProcessingRow) => { name: string; amount: number }[];
+  getEmployeeDeductions: (row: ProcessingRow) => { name: string; amount: number }[];
+  getEmployeeBenefits: (row: ProcessingRow) => { name: string; employeeShare: number; employerShare: number }[];
+  getEmployeeNet: (row: ProcessingRow) => number;
+  payroll: { name: string; month: number; year: number };
+  monthName: string;
+}
+
+function PayslipMode({
+  rows,
+  filteredRows,
+  selectedEmployee,
+  setSelectedEmployee,
+  getEmployeeEarnings,
+  getEmployeeDeductions,
+  getEmployeeBenefits,
+  getEmployeeNet,
+  payroll,
+  monthName,
+}: PayslipModeProps) {
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        {selectedEmployee && (
+          <Button
+            variant="secondary"
+            onClick={() => setSelectedEmployee(null)}
+          >
+            Back to All Payslips
+          </Button>
+        )}
+        {!selectedEmployee && (
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const printWindow = window.open("", "_blank");
+                if (!printWindow) return;
+                const payslipHtml = filteredRows
+                  .map((row) => {
+                    const earnings = getEmployeeEarnings(row);
+                    const deductions = getEmployeeDeductions(row);
+                    const benefits = getEmployeeBenefits(row);
+                    const totalEarnings = earnings.reduce(
+                      (s, e) => s + e.amount,
+                      0,
+                    );
+                    const totalDeductions = deductions.reduce(
+                      (s, d) => s + d.amount,
+                      0,
+                    );
+                    const totalBenefitsEE = benefits.reduce(
+                      (s, b) => s + b.employeeShare,
+                      0,
+                    );
+                    const gross = row.salaryAmount + totalEarnings;
+                    const net = gross - totalDeductions - totalBenefitsEE;
+                    return `
+                  <div class="payslip" style="page-break-after:always;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-bottom:16px;font-family:system-ui;">
+                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px;margin-bottom:16px;">
+                      <div><h2 style="margin:0;">Payslip</h2><p style="margin:4px 0 0;color:#6b7280;font-size:14px;">${monthName} ${payroll.year}</p></div>
+                      <div style="text-align:right;font-size:14px;"><div style="font-weight:500;">${row.employeeCode}</div><div>${row.lastName}${row.firstName ? ", " + row.firstName : ""}</div></div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                      <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Earnings</h3>
+                      <div style="font-size:14px;">
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Basic Salary</span><span style="font-weight:500;">${formatCurrency(row.salaryAmount)}</span></div>
+                        ${earnings.map((e) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${e.name}</span><span>${formatCurrency(e.amount)}</span></div>`).join("")}
+                        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Earnings</span><span>${formatCurrency(row.salaryAmount + totalEarnings)}</span></div>
+                      </div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                      <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Deductions</h3>
+                      <div style="font-size:14px;">
+                        ${deductions.map((d) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${d.name}</span><span>${formatCurrency(d.amount)}</span></div>`).join("")}
+                        ${benefits.map((b) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${b.name} (EE)</span><span>${formatCurrency(b.employeeShare)}</span></div>`).join("")}
+                        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Deductions</span><span>${formatCurrency(totalDeductions + totalBenefitsEE)}</span></div>
+                      </div>
+                    </div>
+                    <div style="background:#f9fafb;padding:16px;border-radius:8px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold;"><span>Net Pay</span><span>${formatCurrency(net)}</span></div>
+                  </div>`;
+                  })
+                  .join("");
+                printWindow.document.write(
+                  `<!DOCTYPE html><html><head><title>Payslips - ${payroll.name}</title><style>@media print{.payslip{page-break-after:always;}}body{margin:0;padding:16px;}</style></head><body><h1>${payroll.name} - ${monthName} ${payroll.year}</h1>${payslipHtml}</body></html>`,
+                );
+                printWindow.document.close();
+                setTimeout(() => printWindow.print(), 500);
+              }}
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              Print All ({filteredRows.length})
+            </Button>
+          </>
+        )}
+      </div>
+
+      {selectedEmployee ? (
+        <div className="max-w-2xl mx-auto">
+          {rows
+            .filter((r) => r.nameId === selectedEmployee)
+            .map((row) => {
+              const earnings = getEmployeeEarnings(row);
+              const deductions = getEmployeeDeductions(row);
+              const benefits = getEmployeeBenefits(row);
+              const totalEarnings = earnings.reduce(
+                (s, e) => s + e.amount,
+                0,
+              );
+              const totalDeductions = deductions.reduce(
+                (s, d) => s + d.amount,
+                0,
+              );
+              const totalBenefitsEE = benefits.reduce(
+                (s, b) => s + b.employeeShare,
+                0,
+              );
+              const gross = row.salaryAmount + totalEarnings;
+              const net = gross - totalDeductions - totalBenefitsEE;
+
+              return (
+                <Card key={row.nameId} className="print:shadow-none">
+                  <CardHeader className="border-b border-gray-200">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-xl">Payslip</CardTitle>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {monthName} {payroll.year}
+                        </p>
+                      </div>
+                      <div className="text-right text-sm">
+                        <div className="font-medium">
+                          {row.employeeCode}
+                        </div>
+                        <div>
+                          {row.lastName}
+                          {row.firstName ? `, ${row.firstName}` : ""}
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
+                        Earnings
+                      </h3>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>Basic Salary</span>
+                          <span className="font-medium">
+                            {formatCurrency(row.salaryAmount)}
+                          </span>
+                        </div>
+                        {earnings.map((e) => (
+                          <div
+                            key={e.name}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>{e.name}</span>
+                            <span>{formatCurrency(e.amount)}</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
+                          <span>Total Earnings</span>
+                          <span>
+                            {formatCurrency(
+                              row.salaryAmount + totalEarnings,
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
+                        Deductions
+                      </h3>
+                      <div className="space-y-1">
+                        {deductions.map((d) => (
+                          <div
+                            key={d.name}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>{d.name}</span>
+                            <span>{formatCurrency(d.amount)}</span>
+                          </div>
+                        ))}
+                        {benefits.map((b) => (
+                          <div
+                            key={b.name}
+                            className="flex justify-between text-sm"
+                          >
+                            <span>{b.name} (Employee Share)</span>
+                            <span>{formatCurrency(b.employeeShare)}</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
+                          <span>Total Deductions</span>
+                          <span>
+                            {formatCurrency(
+                              totalDeductions + totalBenefitsEE,
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Net Pay</span>
+                        <span>{formatCurrency(net)}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Employee Payslips</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rows.map((row) => (
+                <button
+                  key={row.nameId}
+                  onClick={() => setSelectedEmployee(row.nameId)}
+                  className="p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 text-left transition-colors"
+                >
+                  <div className="text-sm font-medium text-gray-900">
+                    {row.employeeCode}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {row.lastName}
+                    {row.firstName ? `, ${row.firstName}` : ""}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-900 mt-2">
+                    Net: {formatCurrency(getEmployeeNet(row))}
+                  </div>
+                </button>
+              ))}
+            </div>
+            {rows.length === 0 && (
+              <p className="text-center text-gray-500 py-8">
+                No employees in this payroll.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function TransmittalMode({
+  rows,
+  getEmployeeNet,
+  totals,
+  company,
+  payroll,
+  monthName,
+}: {
+  rows: ProcessingRow[];
+  getEmployeeNet: (row: ProcessingRow) => number;
+  totals: { totalNet: number };
+  company?: CompanyInfo;
+  payroll: { name: string; month: number; year: number };
+  monthName: string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Bank Transmittal List</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">
+          Employee net pay amounts for bank transfer
+        </p>
+      </CardHeader>
+      <CardContent className="p-0">
+        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">#</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee ID</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee Name</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {rows.map((row, index) => (
+              <tr key={row.nameId} className="hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm text-gray-500">{index + 1}</td>
+                <td className="px-4 py-2 text-sm font-medium">{row.employeeCode}</td>
+                <td className="px-4 py-2 text-sm">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</td>
+                <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(getEmployeeNet(row))}</td>
+              </tr>
+            ))}
+            {rows.length > 0 && (
+              <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                <td className="px-4 py-2" colSpan={3}>Total ({rows.length} employees)</td>
+                <td className="px-4 py-2 text-right">{formatCurrency(totals.totalNet)}</td>
+              </tr>
+            )}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">No employees in this payroll.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        <PrintFooter company={company} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function JournalMode({
+  totals,
+  company,
+  payroll,
+  monthName,
+}: {
+  totals: {
+    totalBasic: number;
+    totalEarnings: number;
+    totalBenefitsER: number;
+    totalBenefitsEE: number;
+    totalDeductions: number;
+    totalNet: number;
+  };
+  company?: CompanyInfo;
+  payroll: { name: string; month: number; year: number };
+  monthName: string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Journal Entry</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">
+          {monthName} {payroll.year} - Accounting summary
+        </p>
+      </CardHeader>
+      <CardContent className="p-0">
+        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Account</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Debit</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Credit</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Salaries & Wages Expense</td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalBasic)}</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Earnings Expense</td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalEarnings)}</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Employer Benefits Expense</td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalBenefitsER)}</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Withholding Tax Payable</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+              <td className="px-4 py-2 text-right text-sm">{formatCurrency(0.0)}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Employee Benefits Payable</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+              <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Other Deductions Payable</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+              <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalDeductions)}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="px-4 py-2 text-sm font-medium">Salaries & Wages Payable</td>
+              <td className="px-4 py-2 text-right text-sm">-</td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalNet)}</td>
+            </tr>
+            <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+              <td className="px-4 py-2 text-sm">Total</td>
+              <td className="px-4 py-2 text-right text-sm">
+                {formatCurrency(totals.totalBasic + totals.totalEarnings + totals.totalBenefitsER)}
+              </td>
+              <td className="px-4 py-2 text-right text-sm">
+                {formatCurrency(totals.totalBenefitsEE + totals.totalDeductions + totals.totalNet)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <PrintFooter company={company} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function DenominationMode({
+  rows,
+  totals,
+  getEmployeeNet,
+  company,
+  payroll,
+  monthName,
+}: {
+  rows: ProcessingRow[];
+  totals: { totalNet: number };
+  getEmployeeNet: (row: ProcessingRow) => number;
+  company?: CompanyInfo;
+  payroll: { name: string; month: number; year: number };
+  monthName: string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Cash Denomination Breakdown</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">
+          Cash payout preparation
+        </p>
+      </CardHeader>
+      <CardContent>
+        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">
+              Denomination Count
+            </h3>
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Denomination</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25, 0.1, 0.05].map((denom) => {
+                  const count = Math.floor(totals.totalNet / denom);
+                  return (
+                    <tr key={denom} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm font-medium">
+                        ₱{denom >= 1 ? denom.toLocaleString() : denom.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm">{count}</td>
+                      <td className="px-4 py-2 text-right text-sm">{formatCurrency(count * denom)}</td>
+                    </tr>
+                  );
+                })}
+                <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                  <td className="px-4 py-2 text-sm">Total</td>
+                  <td className="px-4 py-2 text-right text-sm"></td>
+                  <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">
+              Per Employee Cash Breakdown
+            </h3>
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Employee</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {rows.map((row) => (
+                  <tr key={row.nameId} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 text-sm">
+                      <div className="font-medium">{row.employeeCode}</div>
+                      <div className="text-xs text-gray-500">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</div>
+                    </td>
+                    <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(getEmployeeNet(row))}</td>
+                  </tr>
+                ))}
+                {rows.length > 0 && (
+                  <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                    <td className="px-4 py-2 text-sm">Total</td>
+                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <PrintFooter company={company} />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -114,12 +929,6 @@ export function PayrollOutputView({
   });
 
 
-
-  const formatCurrency = (value: number) =>
-    value.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
 
   const getEmployeeEarnings = (row: ProcessingRow) => {
     const empEarnings = earningData.get(row.nameId) || new Map();
@@ -460,894 +1269,80 @@ export function PayrollOutputView({
       </div>
 
       {activeMode === "register" && (
-        <>
-          <div className="flex gap-2">
-            <div className="relative">
-              <Button
-                variant={hasActiveFilters ? "primary" : "secondary"}
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span className="ml-1 bg-white/20 px-1.5 rounded-full text-xs">
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
-              {showFilters && (
-                <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-72">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        Group
-                      </label>
-                      <select
-                        className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
-                        value={filterGroup}
-                        onChange={(e) => setFilterGroup(e.target.value)}
-                      >
-                        <option value="">All Groups</option>
-                        {groups.map((g) => (
-                          <option key={g} value={g}>
-                            {g}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        Position
-                      </label>
-                      <select
-                        className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
-                        value={filterPosition}
-                        onChange={(e) => setFilterPosition(e.target.value)}
-                      >
-                        <option value="">All Positions</option>
-                        {positions.map((p) => (
-                          <option key={p} value={p}>
-                            {p}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        Area
-                      </label>
-                      <select
-                        className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
-                        value={filterArea}
-                        onChange={(e) => setFilterArea(e.target.value)}
-                      >
-                        <option value="">All Areas</option>
-                        {areas.map((a) => (
-                          <option key={a} value={a}>
-                            {a}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    {hasActiveFilters && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => {
-                          setFilterGroup("");
-                          setFilterPosition("");
-                          setFilterArea("");
-                        }}
-                      >
-                        Clear Filters
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="relative">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowColumns(!showColumns)}
-              >
-                <Columns className="w-4 h-4 mr-2" />
-                Columns
-              </Button>
-              {showColumns && (
-                <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-64">
-                  <div className="space-y-2">
-                    {Object.entries({
-                      basic: "Basic Salary",
-                      earnings: "Earnings",
-                      gross: "Gross Pay",
-                      deductions: "Deductions",
-                      benefits: "Benefits (EE)",
-                      net: "Net Pay",
-                      daysWorked: "Days Worked",
-                      absences: "Absences",
-                      late: "Late Hours",
-                      overtime: "Overtime Hours",
-                    }).map(([key, label]) => (
-                      <label
-                        key={key}
-                        className="flex items-center gap-2 text-sm cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={
-                            (visibleColumns as Record<string, boolean>)[key]
-                          }
-                          onChange={() =>
-                            setVisibleColumns((prev) => ({
-                              ...prev,
-                              [key]: !prev[key as keyof typeof prev],
-                            }))
-                          }
-                          className="rounded border-gray-300"
-                        />
-                        {label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            {hasActiveFilters && (
-              <span className="text-sm text-gray-500 self-center">
-                Showing {filteredRows.length} of {rows.length} employees
-              </span>
-            )}
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Payroll Register</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 overflow-x-auto">
-              <PrintHeader company={company} payroll={payroll} monthName={monthName} />
-              <table className="w-full print:text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
-                      Employee
-                    </th>
-                    {visibleColumns.daysWorked && (
-                      <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Days
-                      </th>
-                    )}
-                    {visibleColumns.absences && (
-                      <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Absences
-                      </th>
-                    )}
-                    {visibleColumns.late && (
-                      <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Late
-                      </th>
-                    )}
-                    {visibleColumns.overtime && (
-                      <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        OT
-                      </th>
-                    )}
-                    {visibleColumns.basic && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Basic
-                      </th>
-                    )}
-                    {visibleColumns.earnings && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Earnings
-                      </th>
-                    )}
-                    {visibleColumns.gross && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Gross
-                      </th>
-                    )}
-                    {visibleColumns.deductions && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Deductions
-                      </th>
-                    )}
-                    {visibleColumns.benefits && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Benefits (EE)
-                      </th>
-                    )}
-                    {visibleColumns.net && (
-                      <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                        Net Pay
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredRows.map((row) => {
-                    const earnings = Array.from(
-                      earningData.get(row.nameId)?.values() || [],
-                    ).reduce((s, v) => s + v, 0);
-                    const deductions = Array.from(
-                      deductionData.get(row.nameId)?.values() || [],
-                    ).reduce((s, v) => s + v, 0);
-                    const benefits = Array.from(
-                      benefitData.get(row.nameId)?.values() || [],
-                    ).reduce((s, v) => s + v.employeeShare, 0);
-                    const gross = row.salaryAmount + earnings;
-                    const net = gross - deductions - benefits;
-                    return (
-                      <tr key={row.nameId} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 sticky left-0 bg-white">
-                          <div className="text-sm font-medium text-gray-900">
-                            {row.employeeCode}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {row.lastName}
-                            {row.firstName ? `, ${row.firstName}` : ""}
-                          </div>
-                        </td>
-                        {visibleColumns.daysWorked && (
-                          <td className="px-4 py-2 text-center text-sm">
-                            {row.daysWorked}
-                          </td>
-                        )}
-                        {visibleColumns.absences && (
-                          <td className="px-4 py-2 text-center text-sm">
-                            {row.absences}
-                          </td>
-                        )}
-                        {visibleColumns.late && (
-                          <td className="px-4 py-2 text-center text-sm">
-                            {row.lateHours}
-                          </td>
-                        )}
-                        {visibleColumns.overtime && (
-                          <td className="px-4 py-2 text-center text-sm">
-                            {row.overtimeHours}
-                          </td>
-                        )}
-                        {visibleColumns.basic && (
-                          <td className="px-4 py-2 text-right text-sm">
-                            {formatCurrency(row.salaryAmount)}
-                          </td>
-                        )}
-                        {visibleColumns.earnings && (
-                          <td className="px-4 py-2 text-right text-sm text-green-600">
-                            {formatCurrency(earnings)}
-                          </td>
-                        )}
-                        {visibleColumns.gross && (
-                          <td className="px-4 py-2 text-right text-sm font-medium">
-                            {formatCurrency(gross)}
-                          </td>
-                        )}
-                        {visibleColumns.deductions && (
-                          <td className="px-4 py-2 text-right text-sm text-red-600">
-                            {formatCurrency(deductions)}
-                          </td>
-                        )}
-                        {visibleColumns.benefits && (
-                          <td className="px-4 py-2 text-right text-sm">
-                            {formatCurrency(benefits)}
-                          </td>
-                        )}
-                        {visibleColumns.net && (
-                          <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">
-                            {formatCurrency(net)}
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                  {filteredRows.length > 0 && (
-                    <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                      <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">
-                        Total ({filteredRows.length} employees)
-                      </td>
-                      {visibleColumns.daysWorked && (
-                        <td className="px-4 py-2 text-center text-sm">
-                          {filteredRows.reduce((s, r) => s + r.daysWorked, 0)}
-                        </td>
-                      )}
-                      {visibleColumns.absences && (
-                        <td className="px-4 py-2 text-center text-sm">
-                          {filteredRows.reduce((s, r) => s + r.absences, 0)}
-                        </td>
-                      )}
-                      {visibleColumns.late && (
-                        <td className="px-4 py-2 text-center text-sm">
-                          {filteredRows.reduce((s, r) => s + r.lateHours, 0)}
-                        </td>
-                      )}
-                      {visibleColumns.overtime && (
-                        <td className="px-4 py-2 text-center text-sm">
-                          {filteredRows.reduce(
-                            (s, r) => s + r.overtimeHours,
-                            0,
-                          )}
-                        </td>
-                      )}
-                      {visibleColumns.basic && (
-                        <td className="px-4 py-2 text-right text-sm">
-                          {formatCurrency(totals.totalBasic)}
-                        </td>
-                      )}
-                      {visibleColumns.earnings && (
-                        <td className="px-4 py-2 text-right text-sm text-green-600">
-                          {formatCurrency(totals.totalEarnings)}
-                        </td>
-                      )}
-                      {visibleColumns.gross && (
-                        <td className="px-4 py-2 text-right text-sm">
-                          {formatCurrency(totals.totalGross)}
-                        </td>
-                      )}
-                      {visibleColumns.deductions && (
-                        <td className="px-4 py-2 text-right text-sm text-red-600">
-                          {formatCurrency(totals.totalDeductions)}
-                        </td>
-                      )}
-                      {visibleColumns.benefits && (
-                        <td className="px-4 py-2 text-right text-sm">
-                          {formatCurrency(totals.totalBenefitsEE)}
-                        </td>
-                      )}
-                      {visibleColumns.net && (
-                        <td className="px-4 py-2 text-right text-sm">
-                          {formatCurrency(totals.totalNet)}
-                        </td>
-                      )}
-                    </tr>
-                  )}
-                  {filteredRows.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={10}
-                        className="px-4 py-8 text-center text-gray-500"
-                      >
-                        No employees match the selected filters.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              <PrintFooter company={company} />
-            </CardContent>
-          </Card>
-        </>
+        <PayrollRegisterMode
+          rows={rows}
+          filteredRows={filteredRows}
+          earningData={earningData}
+          deductionData={deductionData}
+          benefitData={benefitData}
+          visibleColumns={visibleColumns}
+          setVisibleColumns={setVisibleColumns}
+          showColumns={showColumns}
+          setShowColumns={setShowColumns}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+          filterGroup={filterGroup}
+          setFilterGroup={setFilterGroup}
+          filterPosition={filterPosition}
+          setFilterPosition={setFilterPosition}
+          filterArea={filterArea}
+          setFilterArea={setFilterArea}
+          groups={groups}
+          positions={positions}
+          areas={areas}
+          hasActiveFilters={hasActiveFilters}
+          activeFilterCount={activeFilterCount}
+          totals={totals}
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
       )}
 
       {activeMode === "payslip" && (
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            {selectedEmployee && (
-              <Button
-                variant="secondary"
-                onClick={() => setSelectedEmployee(null)}
-              >
-                Back to All Payslips
-              </Button>
-            )}
-            {!selectedEmployee && (
-              <>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    const printWindow = window.open("", "_blank");
-                    if (!printWindow) return;
-                    const payslipHtml = filteredRows
-                      .map((row) => {
-                        const earnings = getEmployeeEarnings(row);
-                        const deductions = getEmployeeDeductions(row);
-                        const benefits = getEmployeeBenefits(row);
-                        const totalEarnings = earnings.reduce(
-                          (s, e) => s + e.amount,
-                          0,
-                        );
-                        const totalDeductions = deductions.reduce(
-                          (s, d) => s + d.amount,
-                          0,
-                        );
-                        const totalBenefitsEE = benefits.reduce(
-                          (s, b) => s + b.employeeShare,
-                          0,
-                        );
-                        const gross = row.salaryAmount + totalEarnings;
-                        const net = gross - totalDeductions - totalBenefitsEE;
-                        return `
-                      <div class="payslip" style="page-break-after:always;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-bottom:16px;font-family:system-ui;">
-                        <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px;margin-bottom:16px;">
-                          <div><h2 style="margin:0;">Payslip</h2><p style="margin:4px 0 0;color:#6b7280;font-size:14px;">${monthName} ${payroll.year}</p></div>
-                          <div style="text-align:right;font-size:14px;"><div style="font-weight:500;">${row.employeeCode}</div><div>${row.lastName}${row.firstName ? ", " + row.firstName : ""}</div></div>
-                        </div>
-                        <div style="margin-bottom:16px;">
-                          <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Earnings</h3>
-                          <div style="font-size:14px;">
-                            <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Basic Salary</span><span style="font-weight:500;">${formatCurrency(row.salaryAmount)}</span></div>
-                            ${earnings.map((e) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${e.name}</span><span>${formatCurrency(e.amount)}</span></div>`).join("")}
-                            <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Earnings</span><span>${formatCurrency(row.salaryAmount + totalEarnings)}</span></div>
-                          </div>
-                        </div>
-                        <div style="margin-bottom:16px;">
-                          <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Deductions</h3>
-                          <div style="font-size:14px;">
-                            ${deductions.map((d) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${d.name}</span><span>${formatCurrency(d.amount)}</span></div>`).join("")}
-                            ${benefits.map((b) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${b.name} (EE)</span><span>${formatCurrency(b.employeeShare)}</span></div>`).join("")}
-                            <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Deductions</span><span>${formatCurrency(totalDeductions + totalBenefitsEE)}</span></div>
-                          </div>
-                        </div>
-                        <div style="background:#f9fafb;padding:16px;border-radius:8px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold;"><span>Net Pay</span><span>${formatCurrency(net)}</span></div>
-                      </div>`;
-                      })
-                      .join("");
-                    printWindow.document.write(
-                      `<!DOCTYPE html><html><head><title>Payslips - ${payroll.name}</title><style>@media print{.payslip{page-break-after:always;}}body{margin:0;padding:16px;}</style></head><body><h1>${payroll.name} - ${monthName} ${payroll.year}</h1>${payslipHtml}</body></html>`,
-                    );
-                    printWindow.document.close();
-                    setTimeout(() => printWindow.print(), 500);
-                  }}
-                >
-                  <Printer className="w-4 h-4 mr-2" />
-                  Print All ({filteredRows.length})
-                </Button>
-              </>
-            )}
-          </div>
-
-          {selectedEmployee ? (
-            <div className="max-w-2xl mx-auto">
-              {rows
-                .filter((r) => r.nameId === selectedEmployee)
-                .map((row) => {
-                  const earnings = getEmployeeEarnings(row);
-                  const deductions = getEmployeeDeductions(row);
-                  const benefits = getEmployeeBenefits(row);
-                  const totalEarnings = earnings.reduce(
-                    (s, e) => s + e.amount,
-                    0,
-                  );
-                  const totalDeductions = deductions.reduce(
-                    (s, d) => s + d.amount,
-                    0,
-                  );
-                  const totalBenefitsEE = benefits.reduce(
-                    (s, b) => s + b.employeeShare,
-                    0,
-                  );
-                  const gross = row.salaryAmount + totalEarnings;
-                  const net = gross - totalDeductions - totalBenefitsEE;
-
-                  return (
-                    <Card key={row.nameId} className="print:shadow-none">
-                      <CardHeader className="border-b border-gray-200">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-xl">Payslip</CardTitle>
-                            <p className="text-sm text-gray-500 mt-1">
-                              {monthName} {payroll.year}
-                            </p>
-                          </div>
-                          <div className="text-right text-sm">
-                            <div className="font-medium">
-                              {row.employeeCode}
-                            </div>
-                            <div>
-                              {row.lastName}
-                              {row.firstName ? `, ${row.firstName}` : ""}
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-6 space-y-4">
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
-                            Earnings
-                          </h3>
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-sm">
-                              <span>Basic Salary</span>
-                              <span className="font-medium">
-                                {formatCurrency(row.salaryAmount)}
-                              </span>
-                            </div>
-                            {earnings.map((e) => (
-                              <div
-                                key={e.name}
-                                className="flex justify-between text-sm"
-                              >
-                                <span>{e.name}</span>
-                                <span>{formatCurrency(e.amount)}</span>
-                              </div>
-                            ))}
-                            <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
-                              <span>Total Earnings</span>
-                              <span>
-                                {formatCurrency(
-                                  row.salaryAmount + totalEarnings,
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">
-                            Deductions
-                          </h3>
-                          <div className="space-y-1">
-                            {deductions.map((d) => (
-                              <div
-                                key={d.name}
-                                className="flex justify-between text-sm"
-                              >
-                                <span>{d.name}</span>
-                                <span>{formatCurrency(d.amount)}</span>
-                              </div>
-                            ))}
-                            {benefits.map((b) => (
-                              <div
-                                key={b.name}
-                                className="flex justify-between text-sm"
-                              >
-                                <span>{b.name} (Employee Share)</span>
-                                <span>{formatCurrency(b.employeeShare)}</span>
-                              </div>
-                            ))}
-                            <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
-                              <span>Total Deductions</span>
-                              <span>
-                                {formatCurrency(
-                                  totalDeductions + totalBenefitsEE,
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex justify-between text-lg font-bold">
-                            <span>Net Pay</span>
-                            <span>{formatCurrency(net)}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-            </div>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Employee Payslips</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {rows.map((row) => (
-                    <button
-                      key={row.nameId}
-                      onClick={() => setSelectedEmployee(row.nameId)}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 text-left transition-colors"
-                    >
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {row.lastName}
-                        {row.firstName ? `, ${row.firstName}` : ""}
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900 mt-2">
-                        Net: {formatCurrency(getEmployeeNet(row))}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {rows.length === 0 && (
-                  <p className="text-center text-gray-500 py-8">
-                    No employees in this payroll.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        <PayslipMode
+          rows={rows}
+          filteredRows={filteredRows}
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          getEmployeeEarnings={getEmployeeEarnings}
+          getEmployeeDeductions={getEmployeeDeductions}
+          getEmployeeBenefits={getEmployeeBenefits}
+          getEmployeeNet={getEmployeeNet}
+          payroll={payroll}
+          monthName={monthName}
+        />
       )}
 
       {activeMode === "transmittal" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Bank Transmittal List</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">
-              Employee net pay amounts for bank transfer
-            </p>
-          </CardHeader>
-          <CardContent className="p-0">
-            <PrintHeader company={company} payroll={payroll} monthName={monthName} />
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    #
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Employee ID
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Employee Name
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Net Pay
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row, index) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-sm text-gray-500">
-                      {index + 1}
-                    </td>
-                    <td className="px-4 py-2 text-sm font-medium">
-                      {row.employeeCode}
-                    </td>
-                    <td className="px-4 py-2 text-sm">
-                      {row.lastName}
-                      {row.firstName ? `, ${row.firstName}` : ""}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm font-semibold">
-                      {formatCurrency(getEmployeeNet(row))}
-                    </td>
-                  </tr>
-                ))}
-                {rows.length > 0 && (
-                  <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                    <td className="px-4 py-2" colSpan={3}>
-                      Total ({rows.length} employees)
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      {formatCurrency(totals.totalNet)}
-                    </td>
-                  </tr>
-                )}
-                {rows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      No employees in this payroll.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-            <PrintFooter company={company} />
-          </CardContent>
-        </Card>
+        <TransmittalMode
+          rows={rows}
+          getEmployeeNet={getEmployeeNet}
+          totals={totals}
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
       )}
 
       {activeMode === "journal" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Journal Entry</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">
-              {monthName} {payroll.year} - Accounting summary
-            </p>
-          </CardHeader>
-          <CardContent className="p-0">
-            <PrintHeader company={company} payroll={payroll} monthName={monthName} />
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Account
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Debit
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Credit
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Salaries & Wages Expense
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm font-semibold">
-                    {formatCurrency(totals.totalBasic)}
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Earnings Expense
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm font-semibold">
-                    {formatCurrency(totals.totalEarnings)}
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Employer Benefits Expense
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm font-semibold">
-                    {formatCurrency(totals.totalBenefitsER)}
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Withholding Tax Payable
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                  <td className="px-4 py-2 text-right text-sm">
-                    {formatCurrency(0.0)}
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Employee Benefits Payable
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                  <td className="px-4 py-2 text-right text-sm">
-                    {formatCurrency(totals.totalBenefitsEE)}
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Other Deductions Payable
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                  <td className="px-4 py-2 text-right text-sm">
-                    {formatCurrency(totals.totalDeductions)}
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm font-medium">
-                    Salaries & Wages Payable
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">-</td>
-                  <td className="px-4 py-2 text-right text-sm font-semibold">
-                    {formatCurrency(totals.totalNet)}
-                  </td>
-                </tr>
-                <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                  <td className="px-4 py-2 text-sm">Total</td>
-                  <td className="px-4 py-2 text-right text-sm">
-                    {formatCurrency(
-                      totals.totalBasic +
-                        totals.totalEarnings +
-                        totals.totalBenefitsER,
-                    )}
-                  </td>
-                  <td className="px-4 py-2 text-right text-sm">
-                    {formatCurrency(
-                      totals.totalBenefitsEE +
-                        totals.totalDeductions +
-                        totals.totalNet,
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <PrintFooter company={company} />
-          </CardContent>
-        </Card>
+        <JournalMode
+          totals={totals}
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
       )}
 
       {activeMode === "denomination" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Cash Denomination Breakdown</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">
-              Cash payout preparation
-            </p>
-          </CardHeader>
-          <CardContent>
-            <PrintHeader company={company} payroll={payroll} monthName={monthName} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">
-                  Denomination Count
-                </h3>
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                        Denomination
-                      </th>
-                      <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                        Quantity
-                      </th>
-                      <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                        Amount
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {[
-                      1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25, 0.1, 0.05,
-                    ].map((denom) => {
-                      const count = Math.floor(totals.totalNet / denom);
-                      return (
-                        <tr key={denom} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 text-sm font-medium">
-                            ₱
-                            {denom >= 1
-                              ? denom.toLocaleString()
-                              : denom.toFixed(2)}
-                          </td>
-                          <td className="px-4 py-2 text-right text-sm">
-                            {count}
-                          </td>
-                          <td className="px-4 py-2 text-right text-sm">
-                            {formatCurrency(count * denom)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                      <td className="px-4 py-2 text-sm">Total</td>
-                      <td className="px-4 py-2 text-right text-sm"></td>
-                      <td className="px-4 py-2 text-right text-sm">
-                        {formatCurrency(totals.totalNet)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">
-                  Per Employee Cash Breakdown
-                </h3>
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                        Employee
-                      </th>
-                      <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
-                        Net Pay
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {rows.map((row) => (
-                      <tr key={row.nameId} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-sm">
-                          <div className="font-medium">{row.employeeCode}</div>
-                          <div className="text-xs text-gray-500">
-                            {row.lastName}
-                            {row.firstName ? `, ${row.firstName}` : ""}
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-right text-sm font-semibold">
-                          {formatCurrency(getEmployeeNet(row))}
-                        </td>
-                      </tr>
-                    ))}
-                    {rows.length > 0 && (
-                      <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                        <td className="px-4 py-2 text-sm">Total</td>
-                        <td className="px-4 py-2 text-right text-sm">
-                          {formatCurrency(totals.totalNet)}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <PrintFooter company={company} />
-          </CardContent>
-        </Card>
+        <DenominationMode
+          rows={rows}
+          totals={totals}
+          getEmployeeNet={getEmployeeNet}
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
       )}
     </div>
   );

@@ -49,12 +49,12 @@ export function EmployeeGroupsPage() {
   };
 
    
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const loadGroups = async () => {
-      await fetchGroups();
-    };
-    loadGroups();
+    fetchGroups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

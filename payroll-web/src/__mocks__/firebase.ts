@@ -28,8 +28,9 @@ export function createMockCollection(collectionPath: string): MockCollection {
 
 export const mockDoc = (data: MockDoc) => ({
   id: data.id,
-  exists: true,
+  exists: () => true,
   data: () => data,
+  get: (field: string) => data[field],
 });
 
 export const mockSnapshot = (collectionPath: string) => {
@@ -37,6 +38,7 @@ export const mockSnapshot = (collectionPath: string) => {
   return {
     docs: docs.map((d) => mockDoc(d)),
     size: docs.length,
+    empty: docs.length === 0,
     forEach: (cb: (doc: ReturnType<typeof mockDoc>) => void) =>
       docs.forEach((d) => cb(mockDoc(d))),
   };
@@ -49,7 +51,7 @@ export const createFirestoreMocks = () => {
   );
   const getDoc = vi.fn(async (docPath: string) => {
     const doc = mockDocs.get(docPath)?.[0];
-    return doc ? mockDoc(doc) : { exists: false, data: () => null, id: docPath };
+    return doc ? mockDoc(doc) : { exists: () => false, data: () => null, id: docPath };
   });
   const getDocs = vi.fn(async (collectionPath: string) => {
     return mockSnapshot(collectionPath);

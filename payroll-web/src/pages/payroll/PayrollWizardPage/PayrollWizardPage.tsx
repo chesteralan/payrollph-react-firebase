@@ -21,10 +21,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { ArrowLeft, ArrowRight, Check, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type {
   PayrollGroup,
   PayrollTemplate,
@@ -34,6 +32,11 @@ import type {
   EmployeeStatus,
   Term,
 } from "./PayrollWizardPage.types";
+import { PayrollConfigStep } from "./PayrollConfigStep";
+import { InclusiveDatesStep } from "./InclusiveDatesStep";
+import { GroupsStep } from "./GroupsStep";
+import { EmployeeSelectionStep } from "./EmployeeSelectionStep";
+import { ReviewStep } from "./ReviewStep";
 
 const STEPS = [
   "Config",
@@ -433,305 +436,66 @@ export function PayrollWizardPage() {
       </Card>
 
       {step === 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Payroll Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Input
-                id="name"
-                label="Payroll Name"
-                value={formData.name}
-                onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value });
-                  setErrors((prev) => ({ ...prev, name: "" }));
-                }}
-                placeholder="e.g., January 2026 Payroll"
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Month
-                </label>
-                <select
-                  value={formData.month}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      month: parseInt(e.target.value),
-                    })
-                  }
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {new Date(0, i).toLocaleString("default", {
-                        month: "long",
-                      })}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <Input
-                  id="year"
-                  label="Year"
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      year: parseInt(e.target.value),
-                    });
-                    setErrors((prev) => ({ ...prev, year: "" }));
-                  }}
-                />
-                {errors.year && (
-                  <p className="mt-1 text-sm text-red-600">{errors.year}</p>
-                )}
-              </div>
-            </div>
-            {templates.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Template (Optional)
-                </label>
-                <select
-                  value={formData.templateId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, templateId: e.target.value })
-                  }
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">No template</option>
-                  {templates.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-            {terms.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Term (Optional)
-                </label>
-                <select
-                  value={formData.termId}
-                  onChange={(e) => handleTermChange(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">No term</option>
-                  {terms.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({t.type})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-end gap-2">
-            <Button onClick={handleNext} disabled={!formData.name || loading}>
-              {loading ? "Saving..." : "Next"}
-            </Button>
-          </CardFooter>
-        </Card>
+        <PayrollConfigStep
+          formData={formData}
+          setFormData={setFormData}
+          errors={errors}
+          setErrors={setErrors}
+          templates={templates}
+          terms={terms}
+          onTermChange={handleTermChange}
+          onNext={handleNext}
+          loading={loading}
+        />
       )}
 
       {step === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Inclusive Dates</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {errors.dates && (
-              <p className="text-sm text-red-600">{errors.dates}</p>
-            )}
-            <div className="flex gap-2">
-              <Input
-                id="date"
-                type="date"
-                value={dateStr}
-                onChange={(e) => setDateStr(e.target.value)}
-              />
-              <Button onClick={addDate} disabled={!dateStr}>
-                Add Date
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {inclusiveDates.map((date, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                >
-                  <span>{date.toLocaleDateString()}</span>
-                  <button
-                    onClick={() => removeDate(i)}
-                    className="text-primary-400 hover:text-primary-600"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              Back
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={inclusiveDates.length === 0 || loading}
-            >
-              Next
-            </Button>
-          </CardFooter>
-        </Card>
+        <InclusiveDatesStep
+          errors={errors}
+          dateStr={dateStr}
+          onDateStrChange={setDateStr}
+          inclusiveDates={inclusiveDates}
+          onAddDate={addDate}
+          onRemoveDate={removeDate}
+          onNext={handleNext}
+          onBack={handleBack}
+          loading={loading}
+        />
       )}
 
       {step === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Employee Groups</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <GroupForm onAdd={addGroup} lookups={lookups} />
-            <div className="space-y-2">
-              {groups.map((g, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
-                >
-                  <span className="text-sm">
-                    Group: {g.groupId || "All"} | Position:{" "}
-                    {g.positionId || "All"} | Area: {g.areaId || "All"} |
-                    Status: {g.statusId || "All"}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeGroup(i)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-              {groups.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  No groups added. Add filters or leave empty to include all
-                  employees.
-                </p>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              Back
-            </Button>
-            <Button onClick={handleNext} disabled={loading}>
-              Next
-            </Button>
-          </CardFooter>
-        </Card>
+        <GroupsStep
+          groups={groups}
+          onAddGroup={addGroup}
+          onRemoveGroup={removeGroup}
+          onNext={handleNext}
+          onBack={handleBack}
+          loading={loading}
+          lookups={lookups}
+        />
       )}
 
       {step === 3 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Employees</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {employees.map((emp) => (
-                <label
-                  key={emp.id}
-                  className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-md cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedEmployeeIds.includes(emp.id)}
-                    onChange={() => toggleEmployee(emp.id)}
-                    className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  />
-                  <span className="text-sm font-medium">
-                    {emp.employeeCode}
-                  </span>
-                  <span className="text-sm text-gray-500">{emp.nameId}</span>
-                </label>
-              ))}
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              Back
-            </Button>
-            <Button onClick={handleNext}>Next</Button>
-          </CardFooter>
-        </Card>
+        <EmployeeSelectionStep
+          employees={employees}
+          selectedEmployeeIds={selectedEmployeeIds}
+          onToggleEmployee={toggleEmployee}
+          onNext={handleNext}
+          onBack={handleBack}
+        />
       )}
 
       {step === 4 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Review & Generate</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-500">Name:</span>
-                <p className="font-medium">{formData.name}</p>
-              </div>
-              <div>
-                <span className="text-gray-500">Period:</span>
-                <p className="font-medium">
-                  {new Date(0, formData.month - 1).toLocaleString("default", {
-                    month: "long",
-                  })}{" "}
-                  {formData.year}
-                </p>
-              </div>
-              {formData.templateId && (
-                <div>
-                  <span className="text-gray-500">Template:</span>
-                  <p className="font-medium">
-                    {templates.find((t) => t.id === formData.templateId)
-                      ?.name || "None"}
-                  </p>
-                </div>
-              )}
-              <div>
-                <span className="text-gray-500">Inclusive Dates:</span>
-                <p className="font-medium">{inclusiveDates.length} dates</p>
-              </div>
-              <div>
-                <span className="text-gray-500">Groups:</span>
-                <p className="font-medium">{groups.length} filters</p>
-              </div>
-              <div>
-                <span className="text-gray-500">Employees:</span>
-                <p className="font-medium">
-                  {selectedEmployeeIds.length || employees.length} selected
-                </p>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              Back
-            </Button>
-            <Button onClick={() => navigate(`/payroll/${id}`)}>
-              <Check className="w-4 h-4 mr-2" />
-              Complete Setup
-            </Button>
-          </CardFooter>
-        </Card>
+        <ReviewStep
+          formData={formData}
+          templates={templates}
+          inclusiveDates={inclusiveDates}
+          groups={groups}
+          selectedEmployeeIds={selectedEmployeeIds}
+          employees={employees}
+          id={id}
+          onBack={handleBack}
+        />
       )}
 
       {step < 4 && (
@@ -750,102 +514,6 @@ export function PayrollWizardPage() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function GroupForm({
-  onAdd,
-  lookups,
-}: {
-  onAdd: (group: PayrollGroup) => void;
-  lookups: {
-    groups: EmployeeGroup[];
-    positions: EmployeePosition[];
-    areas: EmployeeArea[];
-    statuses: EmployeeStatus[];
-  };
-}) {
-  const [groupId, setGroupId] = useState("");
-  const [positionId, setPositionId] = useState("");
-  const [areaId, setAreaId] = useState("");
-  const [statusId, setStatusId] = useState("");
-
-  const handleAdd = () => {
-    if (groupId || positionId || areaId || statusId) {
-      onAdd({
-        id: "",
-        payrollId: "",
-        groupId,
-        positionId,
-        areaId,
-        statusId,
-        order: 0,
-        page: 1,
-      });
-      setGroupId("");
-      setPositionId("");
-      setAreaId("");
-      setStatusId("");
-    }
-  };
-
-  return (
-    <div className="flex gap-2 flex-wrap">
-      <select
-        value={groupId}
-        onChange={(e) => setGroupId(e.target.value)}
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-      >
-        <option value="">Any Group</option>
-        {lookups.groups.map((g) => (
-          <option key={g.id} value={g.id}>
-            {g.name}
-          </option>
-        ))}
-      </select>
-      <select
-        value={positionId}
-        onChange={(e) => setPositionId(e.target.value)}
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-      >
-        <option value="">Any Position</option>
-        {lookups.positions.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
-      <select
-        value={areaId}
-        onChange={(e) => setAreaId(e.target.value)}
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-      >
-        <option value="">Any Area</option>
-        {lookups.areas.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.name}
-          </option>
-        ))}
-      </select>
-      <select
-        value={statusId}
-        onChange={(e) => setStatusId(e.target.value)}
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-      >
-        <option value="">Any Status</option>
-        {lookups.statuses.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
-      <Button
-        onClick={handleAdd}
-        disabled={!groupId && !positionId && !areaId && !statusId}
-      >
-        Add Filter
-      </Button>
     </div>
   );
 }
