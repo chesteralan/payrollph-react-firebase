@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { parseCSV, csvToObjects, validateRequired, findDuplicates } from "./importUtils";
+import {
+  parseCSV,
+  csvToObjects,
+  validateRequired,
+  findDuplicates,
+} from "./importUtils";
 
 describe("parseCSV", () => {
   it("should parse basic CSV", () => {
@@ -117,7 +122,11 @@ describe("csvToObjects", () => {
     const csv = "name,email,phone\nAlice,alice@test.com\nBob";
     const result = csvToObjects<Record<string, string>>(csv);
     expect(result.rows).toHaveLength(2);
-    expect(result.rows[0]).toEqual({ name: "Alice", email: "alice@test.com", phone: "" });
+    expect(result.rows[0]).toEqual({
+      name: "Alice",
+      email: "alice@test.com",
+      phone: "",
+    });
     expect(result.rows[1]).toEqual({ name: "Bob", email: "", phone: "" });
   });
 
@@ -159,7 +168,10 @@ describe("validateRequired", () => {
 
   it("should handle null/undefined values as empty", () => {
     const data = [
-      { name: null as unknown as string, email: undefined as unknown as string },
+      {
+        name: null as unknown as string,
+        email: undefined as unknown as string,
+      },
     ];
     const errors = validateRequired(data, ["name", "email"]);
     expect(errors).toHaveLength(2);
@@ -186,47 +198,32 @@ describe("findDuplicates", () => {
   });
 
   it("should handle case-insensitive duplicates", () => {
-    const data = [
-      { email: "Alice@test.com" },
-      { email: "alice@test.com" },
-    ];
+    const data = [{ email: "Alice@test.com" }, { email: "alice@test.com" }];
     const result = findDuplicates(data, "email");
     expect(result.count).toBe(2);
   });
 
   it("should trim whitespace before comparing", () => {
-    const data = [
-      { email: "alice@test.com" },
-      { email: "  alice@test.com  " },
-    ];
+    const data = [{ email: "alice@test.com" }, { email: "  alice@test.com  " }];
     const result = findDuplicates(data, "email");
     expect(result.count).toBe(2);
   });
 
   it("should return empty set when no duplicates", () => {
-    const data = [
-      { email: "alice@test.com" },
-      { email: "bob@test.com" },
-    ];
+    const data = [{ email: "alice@test.com" }, { email: "bob@test.com" }];
     const result = findDuplicates(data, "email");
     expect(result.count).toBe(0);
     expect(result.duplicates.size).toBe(0);
   });
 
   it("should handle empty values (skip)", () => {
-    const data = [
-      { email: "" },
-      { email: "" },
-    ];
+    const data = [{ email: "" }, { email: "" }];
     const result = findDuplicates(data, "email");
     expect(result.count).toBe(0); // empty values are skipped
   });
 
   it("should use custom start row", () => {
-    const data = [
-      { id: "A" },
-      { id: "A" },
-    ];
+    const data = [{ id: "A" }, { id: "A" }];
     const result = findDuplicates(data, "id", 10);
     expect(result.duplicates.has(10)).toBe(true);
     expect(result.duplicates.has(11)).toBe(true);

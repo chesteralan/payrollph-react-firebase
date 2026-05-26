@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-} from "../../__mocks__/firebase";
+import { addMockDocs, clearMockDocs } from "../../__mocks__/firebase";
 import {
   addDoc,
   getDocs,
@@ -141,8 +138,7 @@ describe("DTR Flow — Clock-In → Clock-Out → Overtime → Approve", () => {
 
       const [sH, sM] = scheduledEnd.split(":").map(Number);
       const [aH, aM] = actualOut.split(":").map(Number);
-      const undertimeMinutes =
-        (sH * 60 + sM) - (aH * 60 + aM);
+      const undertimeMinutes = sH * 60 + sM - (aH * 60 + aM);
 
       expect(undertimeMinutes).toBe(90); // 1.5 hours undertime
     });

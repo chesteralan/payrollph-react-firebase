@@ -7,10 +7,7 @@ import { AlertBannerProvider } from "@/components/ui/AlertBanner";
 import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { NetworkStatusBanner } from "@/components/ui/NetworkStatusBanner";
 import { useToast } from "@/hooks/useToast";
-import {
-  syncQueuedActions,
-  getQueuedActionCount,
-} from "@/services/offline";
+import { syncQueuedActions, getQueuedActionCount } from "@/services/offline";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);

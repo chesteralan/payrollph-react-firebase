@@ -4,12 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ArrowLeft, Lock } from "lucide-react";
 
 export function ChangePasswordPage() {
@@ -97,7 +92,9 @@ export function ChangePasswordPage() {
                 type="password"
                 label="Current Password"
                 value={form.currentPassword}
-                onChange={(e) => setForm((f) => ({ ...f, currentPassword: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, currentPassword: e.target.value }))
+                }
                 required
               />
               <Input
@@ -105,7 +102,9 @@ export function ChangePasswordPage() {
                 type="password"
                 label="New Password"
                 value={form.newPassword}
-                onChange={(e) => setForm((f) => ({ ...f, newPassword: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, newPassword: e.target.value }))
+                }
                 required
               />
               <Input
@@ -113,7 +112,9 @@ export function ChangePasswordPage() {
                 type="password"
                 label="Confirm New Password"
                 value={form.confirmPassword}
-                onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, confirmPassword: e.target.value }))
+                }
                 required
               />
 

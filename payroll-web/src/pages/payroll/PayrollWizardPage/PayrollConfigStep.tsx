@@ -1,6 +1,12 @@
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 
 interface PayrollConfigStepProps {
   formData: {
@@ -10,13 +16,15 @@ interface PayrollConfigStepProps {
     templateId: string;
     termId: string;
   };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    name: string;
-    month: number;
-    year: number;
-    templateId: string;
-    termId: string;
-  }>>;
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      month: number;
+      year: number;
+      templateId: string;
+      termId: string;
+    }>
+  >;
   errors: Record<string, string>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   templates: { id: string; name: string }[];
@@ -50,7 +58,7 @@ export function PayrollConfigStep({
             value={formData.name}
             onChange={(e) => {
               setFormData((prev: any) => ({ ...prev, name: e.target.value }));
-              setErrors((prev: any) => ({ ...prev, name: '' }));
+              setErrors((prev: any) => ({ ...prev, name: "" }));
             }}
             placeholder="e.g., January 2026 Payroll"
           />
@@ -75,8 +83,8 @@ export function PayrollConfigStep({
             >
               {Array.from({ length: 12 }, (_, i) => (
                 <option key={i + 1} value={i + 1}>
-                  {new Date(0, i).toLocaleString('default', {
-                    month: 'long',
+                  {new Date(0, i).toLocaleString("default", {
+                    month: "long",
                   })}
                 </option>
               ))}
@@ -93,7 +101,7 @@ export function PayrollConfigStep({
                   ...prev,
                   year: parseInt(e.target.value),
                 }));
-                setErrors((prev: any) => ({ ...prev, year: '' }));
+                setErrors((prev: any) => ({ ...prev, year: "" }));
               }}
             />
             {errors.year && (
@@ -109,7 +117,10 @@ export function PayrollConfigStep({
             <select
               value={formData.templateId}
               onChange={(e) =>
-                setFormData((prev: any) => ({ ...prev, templateId: e.target.value }))
+                setFormData((prev: any) => ({
+                  ...prev,
+                  templateId: e.target.value,
+                }))
               }
               className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
             >
@@ -144,7 +155,7 @@ export function PayrollConfigStep({
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button onClick={onNext} disabled={!formData.name || loading}>
-          {loading ? 'Saving...' : 'Next'}
+          {loading ? "Saving..." : "Next"}
         </Button>
       </CardFooter>
     </Card>

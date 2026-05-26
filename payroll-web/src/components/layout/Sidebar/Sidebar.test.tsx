@@ -9,7 +9,10 @@ import * as usePermissionsModule from "@/hooks/usePermissions";
 /**
  * Helper to render Sidebar inside a MemoryRouter
  */
-function renderSidebar(props?: { isOpen?: boolean; onClose?: () => void }, initialEntries = ["/"]) {
+function renderSidebar(
+  props?: { isOpen?: boolean; onClose?: () => void },
+  initialEntries = ["/"],
+) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <Sidebar isOpen={props?.isOpen ?? true} onClose={props?.onClose} />

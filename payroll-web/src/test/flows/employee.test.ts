@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-} from "../../__mocks__/firebase";
+import { addMockDocs, clearMockDocs } from "../../__mocks__/firebase";
 import {
   getDoc,
   getDocs,
@@ -14,7 +11,13 @@ import {
   collection,
   serverTimestamp,
 } from "firebase/firestore";
-import { getById, getAll, create, update, remove } from "../../services/firestore";
+import {
+  getById,
+  getAll,
+  create,
+  update,
+  remove,
+} from "../../services/firestore";
 import { auditCreate, auditUpdate, auditDelete } from "../../services/audit";
 import { fetchPayrollEmployees } from "../../services/payroll";
 import type { Employee, EmployeeProfile, EmployeeContact } from "../../types";
@@ -192,9 +195,24 @@ describe("Employee Flow — Create → Update → List → View Profile", () => 
   describe("List employees", () => {
     it("should return all employees when no filters applied", async () => {
       addMockDocs("employees", [
-        { id: "emp-1", nameId: "name-1", employeeCode: "EMP001", isActive: true },
-        { id: "emp-2", nameId: "name-2", employeeCode: "EMP002", isActive: true },
-        { id: "emp-3", nameId: "name-3", employeeCode: "EMP003", isActive: false },
+        {
+          id: "emp-1",
+          nameId: "name-1",
+          employeeCode: "EMP001",
+          isActive: true,
+        },
+        {
+          id: "emp-2",
+          nameId: "name-2",
+          employeeCode: "EMP002",
+          isActive: true,
+        },
+        {
+          id: "emp-3",
+          nameId: "name-3",
+          employeeCode: "EMP003",
+          isActive: false,
+        },
       ]);
 
       const results = await getAll("employees");
@@ -205,13 +223,21 @@ describe("Employee Flow — Create → Update → List → View Profile", () => 
 
     it("should filter employees by active status", async () => {
       addMockDocs("employees", [
-        { id: "emp-1", nameId: "name-1", employeeCode: "EMP001", isActive: true },
-        { id: "emp-2", nameId: "name-2", employeeCode: "EMP002", isActive: false },
+        {
+          id: "emp-1",
+          nameId: "name-1",
+          employeeCode: "EMP001",
+          isActive: true,
+        },
+        {
+          id: "emp-2",
+          nameId: "name-2",
+          employeeCode: "EMP002",
+          isActive: false,
+        },
       ]);
 
-      await getAll("employees", [
-        { field: "isActive", op: "==", value: true },
-      ]);
+      await getAll("employees", [{ field: "isActive", op: "==", value: true }]);
 
       expect(where).toHaveBeenCalledWith("isActive", "==", true);
     });
@@ -424,9 +450,9 @@ describe("Employee Flow — Create → Update → List → View Profile", () => 
       );
 
       // Verify three audit calls were made
-      const auditCalls = vi.mocked(addDoc).mock.calls.filter(
-        ([path]) => path === "system_audit",
-      );
+      const auditCalls = vi
+        .mocked(addDoc)
+        .mock.calls.filter(([path]) => path === "system_audit");
       expect(auditCalls.length).toBe(3);
     });
   });

@@ -1,10 +1,16 @@
 import { Component } from "react";
-import type { ErrorBoundaryProps, ErrorBoundaryState } from "./ErrorBoundary/ErrorBoundary.types";
+import type {
+  ErrorBoundaryProps,
+  ErrorBoundaryState,
+} from "./ErrorBoundary/ErrorBoundary.types";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 // ...existing code...
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };

@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-} from "../../__mocks__/firebase";
+import { addMockDocs, clearMockDocs } from "../../__mocks__/firebase";
 import { addDoc, getDocs, updateDoc, where, query } from "firebase/firestore";
 import { create, update, getAll } from "../../services/firestore";
 import {
@@ -192,8 +189,18 @@ describe("Payroll Flow — Template → Run → Assign → Compute → Lock", ()
 
     it("should fetch employee details for assigned employees", async () => {
       addMockDocs("employees", [
-        { id: "emp-1", nameId: "name-1", employeeCode: "EMP001", isActive: true },
-        { id: "emp-2", nameId: "name-2", employeeCode: "EMP002", isActive: true },
+        {
+          id: "emp-1",
+          nameId: "name-1",
+          employeeCode: "EMP001",
+          isActive: true,
+        },
+        {
+          id: "emp-2",
+          nameId: "name-2",
+          employeeCode: "EMP002",
+          isActive: true,
+        },
       ]);
 
       const details = await fetchEmployeeDetails(["name-1", "name-2"]);
@@ -204,8 +211,20 @@ describe("Payroll Flow — Template → Run → Assign → Compute → Lock", ()
 
     it("should fetch salaries for payroll employees", async () => {
       addMockDocs("employee_salaries", [
-        { id: "sal-1", employeeId: "emp-1", amount: 25000, isPrimary: true, isActive: true },
-        { id: "sal-2", employeeId: "emp-2", amount: 30000, isPrimary: true, isActive: true },
+        {
+          id: "sal-1",
+          employeeId: "emp-1",
+          amount: 25000,
+          isPrimary: true,
+          isActive: true,
+        },
+        {
+          id: "sal-2",
+          employeeId: "emp-2",
+          amount: 30000,
+          isPrimary: true,
+          isActive: true,
+        },
       ]);
 
       const salaries = await fetchEmployeeSalaries(["emp-1", "emp-2"]);
@@ -527,9 +546,27 @@ describe("Payroll Flow — Template → Run → Assign → Compute → Lock", ()
     it("should handle payroll with multiple employees and aggregate totals", () => {
       // Simulate computing pay for multiple employees
       const employees = [
-        { nameId: "n1", basicSalary: 25000, earnings: [1500, 500], deductions: [5000, 1200], benefits: [500, 300] },
-        { nameId: "n2", basicSalary: 30000, earnings: [2000], deductions: [6000, 1500], benefits: [600, 400] },
-        { nameId: "n3", basicSalary: 18000, earnings: [1000], deductions: [3600, 800], benefits: [300, 200] },
+        {
+          nameId: "n1",
+          basicSalary: 25000,
+          earnings: [1500, 500],
+          deductions: [5000, 1200],
+          benefits: [500, 300],
+        },
+        {
+          nameId: "n2",
+          basicSalary: 30000,
+          earnings: [2000],
+          deductions: [6000, 1500],
+          benefits: [600, 400],
+        },
+        {
+          nameId: "n3",
+          basicSalary: 18000,
+          earnings: [1000],
+          deductions: [3600, 800],
+          benefits: [300, 200],
+        },
       ];
 
       let totalGross = 0;

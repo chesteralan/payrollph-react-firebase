@@ -35,6 +35,8 @@ describe("HealthCheckPage", () => {
     renderWithProviders(<HealthCheckPage />);
 
     // The heading shows immediately (not dependent on loading)
-    expect(screen.getByRole("heading", { name: /system health check/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /system health check/i }),
+    ).toBeInTheDocument();
   });
 });

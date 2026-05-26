@@ -2,12 +2,7 @@ import { useState } from "react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useActivityMonitor } from "@/hooks/useActivityMonitor";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 export function UserActivityPage() {
   const { canView } = usePermissions();

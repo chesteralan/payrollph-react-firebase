@@ -10,8 +10,12 @@ beforeEach(() => {
 describe("UserSettingsPage", () => {
   it("renders without crashing", () => {
     renderWithProviders(<UserSettingsPage />);
-    expect(screen.getByRole("heading", { name: /user settings/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /preferences/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /user settings/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /preferences/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders form inputs for settings", () => {
@@ -22,6 +26,8 @@ describe("UserSettingsPage", () => {
     expect(screen.getByText("Default Currency")).toBeInTheDocument();
     expect(screen.getByText("Language / Locale")).toBeInTheDocument();
     // Save settings button
-    expect(screen.getByRole("button", { name: /save settings/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /save settings/i }),
+    ).toBeInTheDocument();
   });
 });

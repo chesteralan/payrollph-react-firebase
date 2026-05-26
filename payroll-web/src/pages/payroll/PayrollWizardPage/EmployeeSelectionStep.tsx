@@ -1,5 +1,11 @@
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/Card';
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/Card";
 
 interface EmployeeSelectionStepProps {
   employees: { id: string; nameId: string; employeeCode: string }[];
@@ -34,9 +40,7 @@ export function EmployeeSelectionStep({
                 onChange={() => onToggleEmployee(emp.id)}
                 className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
-              <span className="text-sm font-medium">
-                {emp.employeeCode}
-              </span>
+              <span className="text-sm font-medium">{emp.employeeCode}</span>
               <span className="text-sm text-gray-500">{emp.nameId}</span>
             </label>
           ))}

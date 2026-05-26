@@ -45,7 +45,9 @@ const createMockObjectStore = (name: string) => {
       return {
         name: indexName,
         getAll: vi.fn((query: unknown) => {
-          const all = Array.from(store.values()) as Array<Record<string, unknown>>;
+          const all = Array.from(store.values()) as Array<
+            Record<string, unknown>
+          >;
           const result = all.filter(
             (item) => (item as Record<string, unknown>)[indexName] === query,
           );
@@ -128,11 +130,15 @@ const mockIndexedDB = {
       source: null,
       transaction: null,
       readyState: "done",
-      get onupgradeneeded() { return onupgradeneeded; },
+      get onupgradeneeded() {
+        return onupgradeneeded;
+      },
       set onupgradeneeded(fn) {
         onupgradeneeded = fn;
       },
-      get onsuccess() { return onsuccess; },
+      get onsuccess() {
+        return onsuccess;
+      },
       set onsuccess(fn) {
         onsuccess = fn;
         // Fire onsuccess immediately after assignment (simulates async open completion)
@@ -142,7 +148,9 @@ const mockIndexedDB = {
           });
         }
       },
-      get onerror() { return onerror; },
+      get onerror() {
+        return onerror;
+      },
       set onerror(fn) {
         onerror = fn;
       },
@@ -171,7 +179,9 @@ beforeEach(() => {
     writable: true,
     configurable: true,
     value: {
-      register: vi.fn().mockResolvedValue({ scope: "/" } as ServiceWorkerRegistration),
+      register: vi
+        .fn()
+        .mockResolvedValue({ scope: "/" } as ServiceWorkerRegistration),
     },
   });
 
@@ -218,7 +228,10 @@ describe("cacheDataOffline", () => {
   it("should mark stored data with synced flag and collection metadata", async () => {
     await cacheDataOffline("companies", [{ id: "c1", name: "Acme" }]);
 
-    const record = mockStores["offline_data"].get("companies_c1") as Record<string, unknown>;
+    const record = mockStores["offline_data"].get("companies_c1") as Record<
+      string,
+      unknown
+    >;
     expect(record.synced).toBe(true);
     expect(record.collection).toBe("companies");
     expect(record.documentId).toBe("c1");
@@ -271,7 +284,9 @@ describe("queueAction", () => {
     expect(stored).toBeDefined();
     expect(stored.size).toBe(1);
 
-    const records = Array.from(stored.values()) as Array<Record<string, unknown>>;
+    const records = Array.from(stored.values()) as Array<
+      Record<string, unknown>
+    >;
     expect(records[0].type).toBe("create");
     expect(records[0].collection).toBe("employees");
     expect(records[0].status).toBe("pending");
@@ -287,7 +302,9 @@ describe("queueAction", () => {
       data: { name: "Updated" },
     });
 
-    const records = Array.from(mockStores["action_queue"].values()) as Array<Record<string, unknown>>;
+    const records = Array.from(mockStores["action_queue"].values()) as Array<
+      Record<string, unknown>
+    >;
     expect(records[0].type).toBe("update");
   });
 
@@ -298,7 +315,9 @@ describe("queueAction", () => {
       documentId: "e1",
     });
 
-    const records = Array.from(mockStores["action_queue"].values()) as Array<Record<string, unknown>>;
+    const records = Array.from(mockStores["action_queue"].values()) as Array<
+      Record<string, unknown>
+    >;
     expect(records[0].type).toBe("delete");
   });
 });
@@ -381,8 +400,14 @@ describe("setupOfflineListeners", () => {
 
     setupOfflineListeners(onOffline, onOnline);
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith("offline", expect.any(Function));
-    expect(addEventListenerSpy).toHaveBeenCalledWith("online", expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      "offline",
+      expect.any(Function),
+    );
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      "online",
+      expect.any(Function),
+    );
   });
 
   it("should call onOffline when offline event fires", () => {
@@ -450,7 +475,9 @@ describe("registerServiceWorker", () => {
   it("should register the service worker when supported", async () => {
     const registration = await registerServiceWorker();
     expect(registration).toEqual({ scope: "/" });
-    expect(navigator.serviceWorker.register).toHaveBeenCalledWith("/service-worker.js");
+    expect(navigator.serviceWorker.register).toHaveBeenCalledWith(
+      "/service-worker.js",
+    );
   });
 
   it("should return null when service worker is not supported", async () => {

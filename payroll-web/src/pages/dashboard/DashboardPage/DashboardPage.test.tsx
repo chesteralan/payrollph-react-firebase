@@ -10,14 +10,20 @@ beforeEach(() => {
 });
 
 describe("DashboardPage", () => {
-  it("renders without crashing and shows dashboard content", { timeout: 15000 }, async () => {
-    addMockDocs("employees", [
-      { id: "1", companyId: "test-company", isActive: true },
-    ]);
-    addMockDocs("payroll", []);
-    addMockDocs("companies", []);
-    renderWithProviders(<DashboardPage />);
-    // Wait for loading to complete and dashboard to appear
-    expect(await screen.findByRole("heading", { name: /dashboard/i })).toBeInTheDocument();
-  });
+  it(
+    "renders without crashing and shows dashboard content",
+    { timeout: 15000 },
+    async () => {
+      addMockDocs("employees", [
+        { id: "1", companyId: "test-company", isActive: true },
+      ]);
+      addMockDocs("payroll", []);
+      addMockDocs("companies", []);
+      renderWithProviders(<DashboardPage />);
+      // Wait for loading to complete and dashboard to appear
+      expect(
+        await screen.findByRole("heading", { name: /dashboard/i }),
+      ).toBeInTheDocument();
+    },
+  );
 });

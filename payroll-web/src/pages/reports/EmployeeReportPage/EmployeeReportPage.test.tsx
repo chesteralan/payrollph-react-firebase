@@ -10,8 +10,6 @@ beforeEach(() => {
 describe("EmployeeReportPage", () => {
   it("renders without crashing and shows the heading", () => {
     renderWithProviders(<EmployeeReportPage />);
-    expect(
-      screen.getByText("Employee Master List Report"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Employee Master List Report")).toBeInTheDocument();
   });
 });

@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFirestoreMocks, addMockDocs, clearMockDocs } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  addMockDocs,
+  clearMockDocs,
+} from "../__mocks__/firebase";
 
 // Extend base mocks with writeBatch and doc that supports .id / .update()
 vi.mock("firebase/firestore", () => ({
@@ -73,7 +77,10 @@ describe("estimateBackupSize", () => {
 
   it("should estimate size as 2KB per document", async () => {
     addMockDocs("companies", [{ id: "1", name: "A" }]);
-    addMockDocs("employees", [{ id: "1", name: "B" }, { id: "2", name: "C" }]);
+    addMockDocs("employees", [
+      { id: "1", name: "B" },
+      { id: "2", name: "C" },
+    ]);
 
     const result = await estimateBackupSize();
 
@@ -122,7 +129,10 @@ describe("createBackupRecord", () => {
 
   it("should record document count from estimateBackupSize", async () => {
     addMockDocs("companies", [{ id: "1", name: "A" }]);
-    addMockDocs("employees", [{ id: "1", name: "B" }, { id: "2", name: "C" }]);
+    addMockDocs("employees", [
+      { id: "1", name: "B" },
+      { id: "2", name: "C" },
+    ]);
 
     const record = await createBackupRecord(mockUser);
 
@@ -204,7 +214,9 @@ describe("getBackupHistory", () => {
 
   it("should handle Firestore errors gracefully", async () => {
     // Mock getDocs to throw
-    vi.mocked(getDocs).mockRejectedValueOnce(new Error("Firestore unavailable"));
+    vi.mocked(getDocs).mockRejectedValueOnce(
+      new Error("Firestore unavailable"),
+    );
 
     const history = await getBackupHistory();
 
@@ -221,7 +233,11 @@ describe("updateBackupStatus", () => {
 
   it("should set the backup URL when provided", async () => {
     await expect(
-      updateBackupStatus("backup-1", "completed", "https://storage.example.com/backup-1"),
+      updateBackupStatus(
+        "backup-1",
+        "completed",
+        "https://storage.example.com/backup-1",
+      ),
     ).resolves.toBeUndefined();
   });
 

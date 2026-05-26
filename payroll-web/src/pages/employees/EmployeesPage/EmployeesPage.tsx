@@ -17,12 +17,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { Pagination } from "@/components/ui/Pagination";
@@ -94,7 +89,7 @@ export function EmployeesPage() {
         where("companyId", "==", currentCompanyId),
       ),
     );
-     
+
     const all = snap.docs.map((d) => ({
       id: d.id,
       ...d.data(),

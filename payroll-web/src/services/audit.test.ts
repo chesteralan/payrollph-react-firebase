@@ -45,7 +45,8 @@ describe("logAudit", () => {
     });
 
     expect(addDoc).toHaveBeenCalledTimes(1);
-    const [collectionPath, data] = (addDoc as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [collectionPath, data] = (addDoc as ReturnType<typeof vi.fn>).mock
+      .calls[0];
     expect(collectionPath).toBe("system_audit");
     expect(data).toMatchObject({
       userId: "user-1",
@@ -214,10 +215,42 @@ describe("fetchAuditLogs", () => {
 describe("getAuditStats", () => {
   it("should return aggregated counts by action type", async () => {
     addMockDocs("system_audit", [
-      { id: "1", userId: "user-1", userName: "A", action: "create", module: "employees", description: "c", timestamp: new Date() },
-      { id: "2", userId: "user-1", userName: "A", action: "create", module: "employees", description: "c", timestamp: new Date() },
-      { id: "3", userId: "user-1", userName: "A", action: "update", module: "employees", description: "u", timestamp: new Date() },
-      { id: "4", userId: "user-1", userName: "A", action: "delete", module: "employees", description: "d", timestamp: new Date() },
+      {
+        id: "1",
+        userId: "user-1",
+        userName: "A",
+        action: "create",
+        module: "employees",
+        description: "c",
+        timestamp: new Date(),
+      },
+      {
+        id: "2",
+        userId: "user-1",
+        userName: "A",
+        action: "create",
+        module: "employees",
+        description: "c",
+        timestamp: new Date(),
+      },
+      {
+        id: "3",
+        userId: "user-1",
+        userName: "A",
+        action: "update",
+        module: "employees",
+        description: "u",
+        timestamp: new Date(),
+      },
+      {
+        id: "4",
+        userId: "user-1",
+        userName: "A",
+        action: "delete",
+        module: "employees",
+        description: "d",
+        timestamp: new Date(),
+      },
     ]);
 
     const stats = await getAuditStats();
@@ -235,8 +268,24 @@ describe("getAuditStats", () => {
 
   it("should filter by module when provided", async () => {
     addMockDocs("system_audit", [
-      { id: "1", userId: "user-1", userName: "A", action: "create", module: "employees", description: "c", timestamp: new Date() },
-      { id: "2", userId: "user-1", userName: "A", action: "create", module: "auth", description: "c", timestamp: new Date() },
+      {
+        id: "1",
+        userId: "user-1",
+        userName: "A",
+        action: "create",
+        module: "employees",
+        description: "c",
+        timestamp: new Date(),
+      },
+      {
+        id: "2",
+        userId: "user-1",
+        userName: "A",
+        action: "create",
+        module: "auth",
+        description: "c",
+        timestamp: new Date(),
+      },
     ]);
 
     const stats = await getAuditStats("auth");
@@ -274,7 +323,14 @@ describe("auditCreate", () => {
   });
 
   it("should use custom description when provided", async () => {
-    await auditCreate(mockUser, "employees", "emp-1", "employee", "Custom desc", { source: "import" });
+    await auditCreate(
+      mockUser,
+      "employees",
+      "emp-1",
+      "employee",
+      "Custom desc",
+      { source: "import" },
+    );
 
     const [, data] = (addDoc as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(data.description).toBe("Custom desc");
@@ -284,7 +340,14 @@ describe("auditCreate", () => {
 
 describe("auditUpdate", () => {
   it("should call logAudit with update action and previous/new values", async () => {
-    await auditUpdate(mockUser, "employees", "emp-1", "employee", { name: "Old" }, { name: "New" });
+    await auditUpdate(
+      mockUser,
+      "employees",
+      "emp-1",
+      "employee",
+      { name: "Old" },
+      { name: "New" },
+    );
 
     expect(addDoc).toHaveBeenCalledWith(
       "system_audit",
@@ -377,7 +440,13 @@ describe("auditPermissionDenied", () => {
 
 describe("auditBulkOperation", () => {
   it("should call logAudit with bulk_update action", async () => {
-    await auditBulkOperation(mockUser, "employees", "bulk_update", 5, "employee");
+    await auditBulkOperation(
+      mockUser,
+      "employees",
+      "bulk_update",
+      5,
+      "employee",
+    );
 
     const [, data] = (addDoc as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(data.action).toBe("bulk_update");
@@ -388,7 +457,13 @@ describe("auditBulkOperation", () => {
   });
 
   it("should call logAudit with bulk_delete action", async () => {
-    await auditBulkOperation(mockUser, "employees", "bulk_delete", 3, "timesheet");
+    await auditBulkOperation(
+      mockUser,
+      "employees",
+      "bulk_delete",
+      3,
+      "timesheet",
+    );
 
     const [, data] = (addDoc as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(data.action).toBe("bulk_delete");

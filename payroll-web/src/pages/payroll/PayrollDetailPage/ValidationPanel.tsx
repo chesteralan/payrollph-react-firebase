@@ -7,7 +7,7 @@ interface ValidationPanelProps {
   onClose: () => void;
 }
 
-export function ValidationPanel({ errors, onClose }: ValidationPanelProps) {
+export function ValidationPanel({ errors }: ValidationPanelProps) {
   const hasErrors = errors.some((e) => e.severity === "error");
 
   return (
@@ -45,7 +45,9 @@ export function ValidationPanel({ errors, onClose }: ValidationPanelProps) {
                   {err.message}
                 </span>
                 {err.nameId && (
-                  <span className="text-xs text-gray-500 ml-2">({err.nameId})</span>
+                  <span className="text-xs text-gray-500 ml-2">
+                    ({err.nameId})
+                  </span>
                 )}
               </div>
             </div>

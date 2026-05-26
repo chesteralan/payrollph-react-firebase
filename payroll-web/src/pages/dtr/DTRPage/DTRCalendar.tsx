@@ -1,24 +1,30 @@
-import { Calendar as CalendarIcon, Clock, Timer, AlertCircle, X, Check, Plus, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { Input } from '@/components/ui/Input';
-import type { DTREntry, LeaveApplication, LeaveBalance } from '../../types/dtr';
-import { dateStr, dayStatus } from './DTRComputation';
+import {
+  Calendar as CalendarIcon,
+  Clock,
+  Timer,
+  AlertCircle,
+  X,
+  Check,
+  Plus,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
+import { dateStr, dayStatus } from "./DTRComputation";
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const STATUS_COLORS: Record<string, string> = {
-  complete: 'bg-green-100 text-green-700 border-green-200',
-  partial: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  absent: 'bg-red-100 text-red-700 border-red-200',
-  none: 'bg-white text-gray-400 border-gray-200 hover:border-gray-300',
+  complete: "bg-green-100 text-green-700 border-green-200",
+  partial: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  absent: "bg-red-100 text-red-700 border-red-200",
+  none: "bg-white text-gray-400 border-gray-200 hover:border-gray-300",
 };
 
 const LEAVE_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
+  pending: "bg-yellow-100 text-yellow-800",
+  approved: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
 };
 
 interface DTRCalendarProps {
@@ -63,11 +69,6 @@ export function DTRCalendar({
   onRejectLeave,
   canEdit: canEditPerm,
 }: DTRCalendarProps) {
-  const MONTH_NAMES = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
-
   return (
     <>
       {/* Stats Cards */}
@@ -145,7 +146,12 @@ export function DTRCalendar({
               <div key={`empty-${i}`} />
             ))}
             {Array.from({ length: dim }, (_, i) => i + 1).map((day) => {
-              const status = dayStatus(day, selectedYear, selectedMonth, entryMap);
+              const status = dayStatus(
+                day,
+                selectedYear,
+                selectedMonth,
+                entryMap,
+              );
               const entry = entryMap.get(
                 dateStr(selectedYear, selectedMonth, day),
               );
@@ -157,7 +163,7 @@ export function DTRCalendar({
                 <button
                   key={day}
                   onClick={() => onDayClick(day)}
-                  className={`relative border rounded-lg p-2 text-left transition-colors ${STATUS_COLORS[status]} ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                  className={`relative border rounded-lg p-2 text-left transition-colors ${STATUS_COLORS[status]} ${isToday ? "ring-2 ring-blue-500" : ""}`}
                 >
                   <span className="text-sm font-medium">{day}</span>
                   {entry && (
@@ -210,21 +216,17 @@ export function DTRCalendar({
                   </p>
                 )}
                 {leaveBalances.map((bal) => {
-                  const benefit = benefits.find(
-                    (b) => b.id === bal.benefitId,
-                  );
+                  const benefit = benefits.find((b) => b.id === bal.benefitId);
                   return (
                     <div key={bal.id} className="p-3 border rounded-lg">
                       <p className="text-sm font-medium">
-                        {benefit?.name || 'Leave'}
+                        {benefit?.name || "Leave"}
                       </p>
                       <div className="flex justify-between mt-2 text-xs">
                         <span className="text-gray-500">
                           Allowance: {bal.totalAllowance}
                         </span>
-                        <span className="text-gray-500">
-                          Used: {bal.used}
-                        </span>
+                        <span className="text-gray-500">Used: {bal.used}</span>
                       </div>
                       <div className="mt-1">
                         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -251,9 +253,7 @@ export function DTRCalendar({
               </h3>
               <div className="space-y-2">
                 {leaveApplications.length === 0 && (
-                  <p className="text-sm text-gray-500">
-                    No leave applications
-                  </p>
+                  <p className="text-sm text-gray-500">No leave applications</p>
                 )}
                 {leaveApplications
                   .sort(
@@ -275,37 +275,34 @@ export function DTRCalendar({
                           </span>
                           <span className="text-sm font-medium">
                             {benefits.find((b) => b.id === app.benefitId)
-                              ?.name || 'Leave'}
+                              ?.name || "Leave"}
                           </span>
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
                           {app.startDate} to {app.endDate} ({app.days} days)
                         </p>
                         {app.reason && (
-                          <p className="text-xs text-gray-500">
-                            {app.reason}
-                          </p>
+                          <p className="text-xs text-gray-500">{app.reason}</p>
                         )}
                       </div>
-                      {canEditPerm &&
-                        app.status === 'pending' && (
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onApproveLeave(app)}
-                            >
-                              <Check className="w-4 h-4 text-green-600" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onRejectLeave(app)}
-                            >
-                              <X className="w-4 h-4 text-red-600" />
-                            </Button>
-                          </div>
-                        )}
+                      {canEditPerm && app.status === "pending" && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onApproveLeave(app)}
+                          >
+                            <Check className="w-4 h-4 text-green-600" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onRejectLeave(app)}
+                          >
+                            <X className="w-4 h-4 text-red-600" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
               </div>

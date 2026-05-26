@@ -87,7 +87,9 @@ export function LoginPage() {
             type="password"
             label="Password"
             value={form.password}
-            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, password: e.target.value }))
+            }
             placeholder="••••••••"
             required
           />

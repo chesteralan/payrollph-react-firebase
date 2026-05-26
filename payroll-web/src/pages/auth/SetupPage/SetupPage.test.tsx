@@ -21,8 +21,12 @@ describe("SetupPage", () => {
 
   it("renders form when setup is needed", async () => {
     renderWithProviders(<SetupPage />);
-    expect(await screen.findByRole("heading", { name: /initial setup/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /initial setup/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/create admin user/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /complete setup/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /complete setup/i }),
+    ).toBeInTheDocument();
   });
 });

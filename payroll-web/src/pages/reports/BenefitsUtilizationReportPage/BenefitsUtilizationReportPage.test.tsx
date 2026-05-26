@@ -10,8 +10,6 @@ beforeEach(() => {
 describe("BenefitsUtilizationReportPage", () => {
   it("renders without crashing", () => {
     renderWithProviders(<BenefitsUtilizationReportPage />);
-    expect(
-      screen.getByText("Benefits Utilization Report"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Benefits Utilization Report")).toBeInTheDocument();
   });
 });

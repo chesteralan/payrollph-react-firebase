@@ -15,7 +15,11 @@ beforeEach(() => {
 describe("LoginPage", () => {
   it("renders without crashing", async () => {
     renderWithProviders(<LoginPage />);
-    expect(await screen.findByRole("heading", { name: /smb payroll/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /smb payroll/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /sign in/i }),
+    ).toBeInTheDocument();
   });
 });

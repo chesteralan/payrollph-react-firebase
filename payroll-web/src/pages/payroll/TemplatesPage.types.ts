@@ -39,7 +39,12 @@ export interface PrintFormat {
   companyId: string;
   name: string;
   description?: string;
-  outputType: "register" | "payslip" | "transmittal" | "journal" | "denomination";
+  outputType:
+    | "register"
+    | "payslip"
+    | "transmittal"
+    | "journal"
+    | "denomination";
   paperSize: "A4" | "Letter" | "Legal";
   orientation: "portrait" | "landscape";
   fontSize: "xs" | "sm" | "md" | "lg";

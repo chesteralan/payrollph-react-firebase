@@ -14,7 +14,9 @@ describe("EmployeesPage", () => {
     addMockDocs("employees", []);
     addMockDocs("groups", []);
     renderWithProviders(<EmployeesPage />);
-    expect(screen.getByRole("heading", { name: /employees/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /employees/i }),
+    ).toBeInTheDocument();
     // The SearchBar is rendered
     expect(screen.getByRole("search")).toBeInTheDocument();
   });

@@ -13,7 +13,9 @@ describe("AlertBanner", () => {
   };
 
   it("should display the alert title", () => {
-    const { container } = render(<AlertBanner alert={baseAlert} onDismiss={vi.fn()} />);
+    const { container } = render(
+      <AlertBanner alert={baseAlert} onDismiss={vi.fn()} />,
+    );
     expect(screen.getByText("Information")).toBeInTheDocument();
   });
 
@@ -25,9 +27,15 @@ describe("AlertBanner", () => {
   });
 
   it("should render with info variant styling", () => {
-    const { container } = render(<AlertBanner alert={baseAlert} onDismiss={vi.fn()} />);
+    const { container } = render(
+      <AlertBanner alert={baseAlert} onDismiss={vi.fn()} />,
+    );
     const outerDiv = container.firstChild as HTMLElement;
-    expect(outerDiv).toHaveClass("bg-blue-50", "border-blue-200", "text-blue-800");
+    expect(outerDiv).toHaveClass(
+      "bg-blue-50",
+      "border-blue-200",
+      "text-blue-800",
+    );
   });
 
   it("should render with warning variant styling", () => {
@@ -36,9 +44,15 @@ describe("AlertBanner", () => {
       type: "warning",
       title: "Warning",
     };
-    const { container } = render(<AlertBanner alert={warningAlert} onDismiss={vi.fn()} />);
+    const { container } = render(
+      <AlertBanner alert={warningAlert} onDismiss={vi.fn()} />,
+    );
     const outerDiv = container.firstChild as HTMLElement;
-    expect(outerDiv).toHaveClass("bg-yellow-50", "border-yellow-200", "text-yellow-800");
+    expect(outerDiv).toHaveClass(
+      "bg-yellow-50",
+      "border-yellow-200",
+      "text-yellow-800",
+    );
   });
 
   it("should render with error variant styling", () => {
@@ -47,7 +61,9 @@ describe("AlertBanner", () => {
       type: "error",
       title: "Error",
     };
-    const { container } = render(<AlertBanner alert={errorAlert} onDismiss={vi.fn()} />);
+    const { container } = render(
+      <AlertBanner alert={errorAlert} onDismiss={vi.fn()} />,
+    );
     const outerDiv = container.firstChild as HTMLElement;
     expect(outerDiv).toHaveClass("bg-red-50", "border-red-200", "text-red-800");
   });
@@ -58,9 +74,15 @@ describe("AlertBanner", () => {
       type: "success",
       title: "Success",
     };
-    const { container } = render(<AlertBanner alert={successAlert} onDismiss={vi.fn()} />);
+    const { container } = render(
+      <AlertBanner alert={successAlert} onDismiss={vi.fn()} />,
+    );
     const outerDiv = container.firstChild as HTMLElement;
-    expect(outerDiv).toHaveClass("bg-green-50", "border-green-200", "text-green-800");
+    expect(outerDiv).toHaveClass(
+      "bg-green-50",
+      "border-green-200",
+      "text-green-800",
+    );
   });
 
   it("should call onDismiss when dismiss button is clicked", () => {
@@ -76,9 +98,7 @@ describe("AlertBanner", () => {
       type: "warning",
     };
     render(<AlertBanner alert={warningAlert} onDismiss={vi.fn()} />);
-    expect(
-      screen.getByLabelText("Dismiss warning alert"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Dismiss warning alert")).toBeInTheDocument();
   });
 
   it("should render info icon for info type", () => {
@@ -118,9 +138,7 @@ describe("AlertBanner", () => {
       ...baseAlert,
       expiresAt: new Date("2025-12-31"),
     };
-    render(
-      <AlertBanner alert={alertWithExpiry} onDismiss={vi.fn()} />,
-    );
+    render(<AlertBanner alert={alertWithExpiry} onDismiss={vi.fn()} />);
     expect(screen.getByText("Information")).toBeInTheDocument();
   });
 });

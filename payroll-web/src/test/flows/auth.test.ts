@@ -1,18 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-} from "../../__mocks__/firebase";
+import { addMockDocs, clearMockDocs } from "../../__mocks__/firebase";
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import {
-  getDoc,
-  getDocs,
-  addDoc,
-} from "firebase/firestore";
+import { getDoc, getDocs, addDoc } from "firebase/firestore";
 import { checkSetupNeeded } from "../../services/setup";
 import {
   auditLogin,

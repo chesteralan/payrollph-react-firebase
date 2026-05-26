@@ -17,9 +17,7 @@ describe("SearchBar", () => {
   });
 
   it("should render with custom placeholder", () => {
-    render(
-      <SearchBar value="" onChange={vi.fn()} placeholder="Find..." />,
-    );
+    render(<SearchBar value="" onChange={vi.fn()} placeholder="Find..." />);
     expect(screen.getByPlaceholderText("Find...")).toBeInTheDocument();
   });
 

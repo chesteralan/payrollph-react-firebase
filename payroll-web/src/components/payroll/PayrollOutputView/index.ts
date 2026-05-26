@@ -1,1 +1,1 @@
-export * from './PayrollOutputView';
+export * from "./PayrollOutputView";

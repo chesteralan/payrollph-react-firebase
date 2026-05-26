@@ -343,7 +343,7 @@ export function EmployeeProfilePage() {
       addToast({
         type: "error",
         title: "Upload failed",
-        message: (error instanceof Error ? error.message : String(error)),
+        message: error instanceof Error ? error.message : String(error),
       });
       setUploading(false);
     }
@@ -365,7 +365,7 @@ export function EmployeeProfilePage() {
       addToast({
         type: "error",
         title: "Delete failed",
-        message: (error instanceof Error ? error.message : String(error)),
+        message: error instanceof Error ? error.message : String(error),
       });
     }
   };

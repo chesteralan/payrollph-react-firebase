@@ -34,10 +34,18 @@ export interface OutputViewProps {
   rows: ProcessingRow[];
   earningData: Map<string, Map<string, number>>;
   deductionData: Map<string, Map<string, number>>;
-  benefitData: Map<string, Map<string, { employeeShare: number; employerShare: number }>>;
+  benefitData: Map<
+    string,
+    Map<string, { employeeShare: number; employerShare: number }>
+  >;
   earningsList: { id: string; name: string }[];
   deductionsList: { id: string; name: string }[];
   benefitsList: { id: string; name: string }[];
 }
 
-export type OutputMode = "register" | "payslip" | "transmittal" | "journal" | "denomination";
+export type OutputMode =
+  | "register"
+  | "payslip"
+  | "transmittal"
+  | "journal"
+  | "denomination";

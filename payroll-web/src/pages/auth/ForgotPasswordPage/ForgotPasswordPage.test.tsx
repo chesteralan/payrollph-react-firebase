@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { ForgotPasswordPage } from "./ForgotPasswordPage";
-import { renderWithProviders, createMockAuthContextValue } from "@/test/page-test-utils";
+import {
+  renderWithProviders,
+  createMockAuthContextValue,
+} from "@/test/page-test-utils";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -10,8 +13,12 @@ beforeEach(() => {
 describe("ForgotPasswordPage", () => {
   it("renders without crashing", () => {
     renderWithProviders(<ForgotPasswordPage />);
-    expect(screen.getByRole("heading", { name: /reset password/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send reset link/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /reset password/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /send reset link/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows success message after submitting email", async () => {

@@ -72,7 +72,6 @@ export function CompanySettingsPage() {
     }
   };
 
-   
   useEffect(() => {
     const loadCompanies = async () => {
       await fetchCompanies();

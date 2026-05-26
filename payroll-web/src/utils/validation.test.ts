@@ -280,10 +280,22 @@ describe("validation utils", () => {
     }
 
     it("should pass with valid data", () => {
-      const data: TestData = { name: "John", email: "john@example.com", age: 25 };
+      const data: TestData = {
+        name: "John",
+        email: "john@example.com",
+        age: 25,
+      };
       const result = validate(data, [
-        { field: "name", validate: rules.required().validate, message: rules.required().message },
-        { field: "email", validate: rules.email().validate, message: rules.email().message },
+        {
+          field: "name",
+          validate: rules.required().validate,
+          message: rules.required().message,
+        },
+        {
+          field: "email",
+          validate: rules.email().validate,
+          message: rules.email().message,
+        },
       ]);
       expect(result.isValid).toBe(true);
       expect(Object.keys(result.errors)).toHaveLength(0);
@@ -292,8 +304,16 @@ describe("validation utils", () => {
     it("should fail with invalid data", () => {
       const data: TestData = { name: "", email: "invalid", age: 25 };
       const result = validate(data, [
-        { field: "name", validate: rules.required().validate, message: rules.required().message },
-        { field: "email", validate: rules.email().validate, message: rules.email().message },
+        {
+          field: "name",
+          validate: rules.required().validate,
+          message: rules.required().message,
+        },
+        {
+          field: "email",
+          validate: rules.email().validate,
+          message: rules.email().message,
+        },
       ]);
       expect(result.isValid).toBe(false);
       expect(result.errors.name).toBeDefined();
@@ -303,7 +323,11 @@ describe("validation utils", () => {
     it("should report correct error messages", () => {
       const data: TestData = { name: "", email: "john@example.com", age: 25 };
       const result = validate(data, [
-        { field: "name", validate: rules.required().validate, message: "Name is required" },
+        {
+          field: "name",
+          validate: rules.required().validate,
+          message: "Name is required",
+        },
       ]);
       expect(result.errors.name).toBe("Name is required");
     });
@@ -311,8 +335,16 @@ describe("validation utils", () => {
     it("should handle multiple fields with same validator", () => {
       const data = { field1: "", field2: "" };
       const result = validate(data, [
-        { field: "field1", validate: rules.required().validate, message: "Required" },
-        { field: "field2", validate: rules.required().validate, message: "Required" },
+        {
+          field: "field1",
+          validate: rules.required().validate,
+          message: "Required",
+        },
+        {
+          field: "field2",
+          validate: rules.required().validate,
+          message: "Required",
+        },
       ]);
       expect(result.isValid).toBe(false);
       expect(Object.keys(result.errors)).toHaveLength(2);

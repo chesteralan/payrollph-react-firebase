@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFirestoreMocks, addMockDocs, clearMockDocs } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  addMockDocs,
+  clearMockDocs,
+} from "../__mocks__/firebase";
 
 // Extend base mocks with setDoc which addIpRestriction and logIpAccess need
 vi.mock("firebase/firestore", () => ({
@@ -18,13 +22,7 @@ import {
   logIpAccess,
   validateIpOnLogin,
 } from "./ipRestriction";
-import {
-  getDocs,
-  setDoc,
-  updateDoc,
-  where,
-  query,
-} from "firebase/firestore";
+import { getDocs, setDoc, updateDoc, where, query } from "firebase/firestore";
 import type { UserAccount } from "../types";
 
 const mockUser: UserAccount = {
@@ -81,7 +79,15 @@ describe("fetchIpRestrictions", () => {
 
   it("should query by companyId", async () => {
     addMockDocs("ip_restrictions", [
-      { id: "r1", companyId: "company-1", type: "whitelist", ipAddress: "192.168.1.1", isActive: true, createdAt: new Date(), createdBy: "user-1" },
+      {
+        id: "r1",
+        companyId: "company-1",
+        type: "whitelist",
+        ipAddress: "192.168.1.1",
+        isActive: true,
+        createdAt: new Date(),
+        createdBy: "user-1",
+      },
     ]);
 
     await fetchIpRestrictions("company-1");
@@ -161,18 +167,17 @@ describe("removeIpRestriction", () => {
   it("should deactivate the restriction using updateDoc", async () => {
     await removeIpRestriction("restriction-1");
 
-    expect(updateDoc).toHaveBeenCalledWith(
-      "ip_restrictions/restriction-1",
-      { isActive: false },
-    );
+    expect(updateDoc).toHaveBeenCalledWith("ip_restrictions/restriction-1", {
+      isActive: false,
+    });
   });
 
   it("should throw when updateDoc fails", async () => {
     vi.mocked(updateDoc).mockRejectedValueOnce(new Error("Not found"));
 
-    await expect(
-      removeIpRestriction("nonexistent"),
-    ).rejects.toThrow("Not found");
+    await expect(removeIpRestriction("nonexistent")).rejects.toThrow(
+      "Not found",
+    );
   });
 });
 
@@ -540,7 +545,13 @@ describe("logIpAccess", () => {
   });
 
   it("should include all required fields", async () => {
-    await logIpAccess("user-1", "192.168.1.1", false, "Blacklisted IP", "/admin");
+    await logIpAccess(
+      "user-1",
+      "192.168.1.1",
+      false,
+      "Blacklisted IP",
+      "/admin",
+    );
 
     const [, data] = (setDoc as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(data.userId).toBe("user-1");

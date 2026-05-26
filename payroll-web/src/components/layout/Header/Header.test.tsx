@@ -69,9 +69,7 @@ describe("Header", () => {
 
     it("renders the hamburger menu button for mobile", () => {
       renderHeader();
-      expect(
-        screen.getByLabelText("Open sidebar menu"),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText("Open sidebar menu")).toBeInTheDocument();
     });
 
     it("calls onMenuClick when hamburger is clicked", async () => {

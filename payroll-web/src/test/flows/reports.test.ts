@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-} from "../../__mocks__/firebase";
+import { addMockDocs, clearMockDocs } from "../../__mocks__/firebase";
 import { addDoc, getDocs, getDoc, where, query } from "firebase/firestore";
 import { getAll } from "../../services/firestore";
 import { generateReportData } from "../../services/reportGenerator";
@@ -54,9 +51,27 @@ describe("Reports Flow — Summary → CSV Export → Verify Totals", () => {
 
     it("should aggregate payroll totals from employee data", async () => {
       addMockDocs("payroll_employees", [
-        { id: "pe-1", payrollId: "pr-1", basicSalary: 25000, grossPay: 27000, netPay: 21000 },
-        { id: "pe-2", payrollId: "pr-1", basicSalary: 30000, grossPay: 33000, netPay: 25000 },
-        { id: "pe-3", payrollId: "pr-1", basicSalary: 18000, grossPay: 19500, netPay: 15000 },
+        {
+          id: "pe-1",
+          payrollId: "pr-1",
+          basicSalary: 25000,
+          grossPay: 27000,
+          netPay: 21000,
+        },
+        {
+          id: "pe-2",
+          payrollId: "pr-1",
+          basicSalary: 30000,
+          grossPay: 33000,
+          netPay: 25000,
+        },
+        {
+          id: "pe-3",
+          payrollId: "pr-1",
+          basicSalary: 18000,
+          grossPay: 19500,
+          netPay: 15000,
+        },
       ]);
 
       const all = await getAll<PayrollEmployee>("payroll_employees", [
@@ -141,15 +156,28 @@ describe("Reports Flow — Summary → CSV Export → Verify Totals", () => {
   describe("Employee report", () => {
     it("should filter to active employees using application logic", async () => {
       addMockDocs("employees", [
-        { id: "emp-1", employeeCode: "EMP001", isActive: true, nameId: "name-1" },
-        { id: "emp-2", employeeCode: "EMP002", isActive: true, nameId: "name-2" },
-        { id: "emp-3", employeeCode: "EMP003", isActive: false, nameId: "name-3" },
+        {
+          id: "emp-1",
+          employeeCode: "EMP001",
+          isActive: true,
+          nameId: "name-1",
+        },
+        {
+          id: "emp-2",
+          employeeCode: "EMP002",
+          isActive: true,
+          nameId: "name-2",
+        },
+        {
+          id: "emp-3",
+          employeeCode: "EMP003",
+          isActive: false,
+          nameId: "name-3",
+        },
       ]);
 
       // Build query with isActive filter
-      await getAll("employees", [
-        { field: "isActive", op: "==", value: true },
-      ]);
+      await getAll("employees", [{ field: "isActive", op: "==", value: true }]);
       expect(where).toHaveBeenCalledWith("isActive", "==", true);
 
       // Apply filtering in application layer for verification
@@ -159,10 +187,9 @@ describe("Reports Flow — Summary → CSV Export → Verify Totals", () => {
       );
 
       expect(active).toHaveLength(2);
-      expect(active.map((e: Record<string, unknown>) => e.employeeCode)).toEqual([
-        "EMP001",
-        "EMP002",
-      ]);
+      expect(
+        active.map((e: Record<string, unknown>) => e.employeeCode),
+      ).toEqual(["EMP001", "EMP002"]);
     });
 
     it("should aggregate employees by department", () => {
@@ -284,9 +311,7 @@ describe("Reports Flow — Summary → CSV Export → Verify Totals", () => {
 
       // Gross - Deductions - Employee Benefits = Net
       expect(
-        run.totalGrossPay -
-          run.totalDeductions -
-          run.totalEmployeeBenefits,
+        run.totalGrossPay - run.totalDeductions - run.totalEmployeeBenefits,
       ).toBe(run.totalNetPay);
     });
 
@@ -324,8 +349,7 @@ describe("Reports Flow — Summary → CSV Export → Verify Totals", () => {
     it("should compute 13th month pay (pro-rated)", () => {
       const basicSalary = 25000;
       const monthsWorked = 12;
-      const thirteenthMonthPay =
-        (basicSalary * monthsWorked) / 12;
+      const thirteenthMonthPay = (basicSalary * monthsWorked) / 12;
 
       expect(thirteenthMonthPay).toBe(25000);
     });

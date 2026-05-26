@@ -1,7 +1,13 @@
-import { Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/Card';
+import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/Card";
 
 interface ReviewStepProps {
   formData: {
@@ -45,9 +51,9 @@ export function ReviewStep({
           <div>
             <span className="text-gray-500">Period:</span>
             <p className="font-medium">
-              {new Date(0, formData.month - 1).toLocaleString('default', {
-                month: 'long',
-              })}{' '}
+              {new Date(0, formData.month - 1).toLocaleString("default", {
+                month: "long",
+              })}{" "}
               {formData.year}
             </p>
           </div>
@@ -55,8 +61,8 @@ export function ReviewStep({
             <div>
               <span className="text-gray-500">Template:</span>
               <p className="font-medium">
-                {templates.find((t) => t.id === formData.templateId)
-                  ?.name || 'None'}
+                {templates.find((t) => t.id === formData.templateId)?.name ||
+                  "None"}
               </p>
             </div>
           )}

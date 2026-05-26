@@ -42,7 +42,7 @@ export interface EmployeeStatus {
 export interface Term {
   id: string;
   name: string;
-  type: 'monthly' | 'semi-monthly' | 'weekly' | 'bi-weekly';
+  type: "monthly" | "semi-monthly" | "weekly" | "bi-weekly";
   daysPerPeriod?: number;
   isActive?: boolean;
   [key: string]: unknown;

@@ -3,7 +3,10 @@ import { renderHook } from "@testing-library/react";
 import React from "react";
 import { useToast } from "./useToast";
 import { ToastContext } from "../components/ui/Toast/toast-context";
-import type { ToastContextType, Toast } from "../components/ui/Toast/toast-context";
+import type {
+  ToastContextType,
+  Toast,
+} from "../components/ui/Toast/toast-context";
 
 function createWrapper(contextValue: ToastContextType) {
   return function Wrapper({ children }: { children: React.ReactNode }) {

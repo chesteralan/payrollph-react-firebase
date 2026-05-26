@@ -5,7 +5,11 @@ import { useCompany } from "@/hooks/useCompany";
 import type { Employee, Payroll, PayrollEmployee } from "../../types";
 import { exportToXlsx } from "@/utils/exportUtils";
 
-import type { ReportField, ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
+import type {
+  ReportField,
+  ReportFilter,
+  SavedReport,
+} from "./CustomReportBuilderPage.types";
 
 const AVAILABLE_FIELDS: ReportField[] = [
   // Employee fields

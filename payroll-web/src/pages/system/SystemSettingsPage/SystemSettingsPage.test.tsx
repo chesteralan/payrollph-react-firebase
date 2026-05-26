@@ -28,6 +28,8 @@ describe("SystemSettingsPage", () => {
       },
     ]);
     renderWithProviders(<SystemSettingsPage />);
-    expect(await screen.findByRole("heading", { name: /system settings/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /system settings/i }),
+    ).toBeInTheDocument();
   });
 });

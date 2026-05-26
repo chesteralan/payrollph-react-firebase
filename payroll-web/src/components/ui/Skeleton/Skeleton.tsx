@@ -1,6 +1,11 @@
 import { clsx } from "clsx";
 
-import type { SkeletonProps, CardSkeletonProps, TableSkeletonProps, PageSkeletonProps } from "./Skeleton/Skeleton.types";
+import type {
+  SkeletonProps,
+  CardSkeletonProps,
+  TableSkeletonProps,
+  PageSkeletonProps,
+} from "./Skeleton/Skeleton.types";
 
 export function Skeleton({
   className,
@@ -69,10 +74,7 @@ export function CardSkeleton({
   );
 }
 
-export function TableSkeleton({
-  rows = 5,
-  cols = 4,
-}: TableSkeletonProps) {
+export function TableSkeleton({ rows = 5, cols = 4 }: TableSkeletonProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">

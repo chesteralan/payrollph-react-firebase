@@ -3,7 +3,10 @@ import { MemoryRouter } from "react-router-dom";
 import { render, type RenderResult } from "@testing-library/react";
 import { vi } from "vitest";
 import { AuthContext, type AuthContextType } from "@/context/auth";
-import { ToastContext, type ToastContextType } from "@/components/ui/Toast/toast-context";
+import {
+  ToastContext,
+  type ToastContextType,
+} from "@/components/ui/Toast/toast-context";
 import { CompanyContext, type CompanyContextType } from "@/context/company";
 
 export function createMockAuthContextValue(
@@ -14,7 +17,12 @@ export function createMockAuthContextValue(
     user: { id: "test-user", email: "test@test.com", displayName: "Test User" },
     restrictions: [],
     userCompanies: [],
-    settings: { theme: "light", itemsPerPage: 25, locale: "en-US", defaultCompanyId: "" },
+    settings: {
+      theme: "light",
+      itemsPerPage: 25,
+      locale: "en-US",
+      defaultCompanyId: "",
+    },
     currentCompanyId: "test-company",
     loading: false,
     sessionExpiring: false,

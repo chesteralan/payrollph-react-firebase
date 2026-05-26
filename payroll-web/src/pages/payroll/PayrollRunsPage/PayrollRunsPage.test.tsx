@@ -15,7 +15,9 @@ describe("PayrollRunsPage", () => {
 
   it("renders the search input and filter", () => {
     renderWithProviders(<PayrollRunsPage />);
-    expect(screen.getByPlaceholderText("Search payrolls...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search payrolls..."),
+    ).toBeInTheDocument();
     expect(screen.getByText("All Status")).toBeInTheDocument();
   });
 

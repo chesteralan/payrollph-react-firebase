@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { formatDate, formatTime, formatDateTime, formatDateRange, parseDate } from "./dateFormat";
+import {
+  formatDate,
+  formatTime,
+  formatDateTime,
+  formatDateRange,
+  parseDate,
+} from "./dateFormat";
 
 describe("dateFormat utils", () => {
   describe("formatDate", () => {
@@ -139,19 +145,28 @@ describe("dateFormat utils", () => {
   describe("formatDateTime", () => {
     it("should combine date and time with default format", () => {
       const d = new Date(2024, 6, 15, 14, 30, 0);
-      const result = formatDateTime(d, { dateFormat: "MM/DD/YYYY", timeFormat: "12h" });
+      const result = formatDateTime(d, {
+        dateFormat: "MM/DD/YYYY",
+        timeFormat: "12h",
+      });
       expect(result).toBe("07/15/2024 2:30 PM");
     });
 
     it("should format with 24h time", () => {
       const d = new Date(2024, 6, 15, 14, 30, 0);
-      const result = formatDateTime(d, { dateFormat: "YYYY-MM-DD", timeFormat: "24h" });
+      const result = formatDateTime(d, {
+        dateFormat: "YYYY-MM-DD",
+        timeFormat: "24h",
+      });
       expect(result).toBe("2024-07-15 14:30");
     });
 
     it("should format with DD-MMM-YYYY", () => {
       const d = new Date(2024, 6, 15, 9, 0, 0);
-      const result = formatDateTime(d, { dateFormat: "DD-MMM-YYYY", timeFormat: "12h" });
+      const result = formatDateTime(d, {
+        dateFormat: "DD-MMM-YYYY",
+        timeFormat: "12h",
+      });
       expect(result).toBe("15-Jul-2024 9:00 AM");
     });
   });
@@ -179,7 +194,10 @@ describe("dateFormat utils", () => {
 
     it("should handle single-day range", () => {
       const d = new Date(2024, 6, 15);
-      const result = formatDateRange(d, d, { dateFormat: "YYYY-MM-DD", timeFormat: "24h" });
+      const result = formatDateRange(d, d, {
+        dateFormat: "YYYY-MM-DD",
+        timeFormat: "24h",
+      });
       expect(result).toBe("2024-07-15 - 2024-07-15");
     });
   });

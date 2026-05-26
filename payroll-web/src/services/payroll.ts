@@ -183,7 +183,10 @@ export async function savePayrollBenefit(
   }
 }
 
-export function computeGrossPay(salaryAmount: number, earnings: number[]): number {
+export function computeGrossPay(
+  salaryAmount: number,
+  earnings: number[],
+): number {
   return salaryAmount + earnings.reduce((sum, v) => sum + v, 0);
 }
 

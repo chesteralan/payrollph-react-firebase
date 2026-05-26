@@ -13,7 +13,11 @@ describe("CompaniesPage", () => {
   it("renders without crashing", () => {
     addMockDocs("companies", []);
     renderWithProviders(<CompaniesPage />);
-    expect(screen.getByRole("heading", { name: /companies/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /add company/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /companies/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /add company/i }),
+    ).toBeInTheDocument();
   });
 });

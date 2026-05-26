@@ -73,7 +73,8 @@ describe("encryption utils", () => {
     });
 
     it("should handle data with special characters", async () => {
-      const original = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?`~你好日本語";
+      const original =
+        "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?`~你好日本語";
       const encrypted = await encrypt(original, testPassphrase);
       const decrypted = await decrypt(encrypted, testPassphrase);
       expect(decrypted).toBe(original);
@@ -130,8 +131,16 @@ describe("encryption utils", () => {
         tin: "123-456-789-000",
       };
 
-      const encrypted = await encryptSensitiveFields(employee, ["sss", "tin"], testPassphrase);
-      const decrypted = await decryptSensitiveFields(encrypted, ["sss", "tin"], testPassphrase);
+      const encrypted = await encryptSensitiveFields(
+        employee,
+        ["sss", "tin"],
+        testPassphrase,
+      );
+      const decrypted = await decryptSensitiveFields(
+        encrypted,
+        ["sss", "tin"],
+        testPassphrase,
+      );
 
       expect(decrypted.name).toBe("Juan Dela Cruz");
       expect(decrypted.sss).toBe("12-3456789-0");
@@ -146,7 +155,11 @@ describe("encryption utils", () => {
 
     it("should skip non-string values", async () => {
       const obj = { name: "Test", age: 30, active: true };
-      const result = await encryptSensitiveFields(obj, ["name", "age", "active"], testPassphrase);
+      const result = await encryptSensitiveFields(
+        obj,
+        ["name", "age", "active"],
+        testPassphrase,
+      );
       expect(result.name).not.toBe("Test");
       expect(result.age).toBe(30); // number, not encrypted
       expect(result.active).toBe(true); // boolean, not encrypted
@@ -158,7 +171,11 @@ describe("encryption utils", () => {
         sss: await encrypt("12-3456789-0", testPassphrase),
       };
       // Try to decrypt with wrong passphrase
-      const result = await decryptSensitiveFields(obj, ["sss"], "wrong-passphrase");
+      const result = await decryptSensitiveFields(
+        obj,
+        ["sss"],
+        "wrong-passphrase",
+      );
       expect(result.sss).toBe(""); // returns empty on failure
     });
   });

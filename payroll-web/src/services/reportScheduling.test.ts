@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFirestoreMocks, addMockDocs, clearMockDocs } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  addMockDocs,
+  clearMockDocs,
+} from "../__mocks__/firebase";
 
 // Mock dependencies: email and reportGenerator (both are relative imports)
 vi.mock("./email", () => ({
@@ -28,7 +32,13 @@ import {
   calculateNextRun,
   processDueReports,
 } from "./reportScheduling";
-import { addDoc, getDocs, updateDoc, deleteDoc, where } from "firebase/firestore";
+import {
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  where,
+} from "firebase/firestore";
 import { sendEmail } from "./email";
 import { generateReportData } from "./reportGenerator";
 
@@ -189,9 +199,7 @@ describe("getScheduledReports", () => {
   });
 
   it("should query by companyId", async () => {
-    addMockDocs("scheduled_reports", [
-      baseReport({ id: "r1" }),
-    ]);
+    addMockDocs("scheduled_reports", [baseReport({ id: "r1" })]);
 
     await getScheduledReports("company-1");
 
@@ -329,7 +337,9 @@ describe("processDueReports", () => {
       }),
     ]);
 
-    vi.mocked(generateReportData).mockRejectedValueOnce(new Error("Data generation failed"));
+    vi.mocked(generateReportData).mockRejectedValueOnce(
+      new Error("Data generation failed"),
+    );
 
     await processDueReports();
 

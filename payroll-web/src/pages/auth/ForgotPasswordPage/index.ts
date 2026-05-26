@@ -1,1 +1,1 @@
-export * from './ForgotPasswordPage';
+export * from "./ForgotPasswordPage";

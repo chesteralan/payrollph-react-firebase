@@ -1,12 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
   Printer,
   FileSpreadsheet,
@@ -15,8 +10,12 @@ import {
   Columns,
 } from "lucide-react";
 
-
-import type { ProcessingRow, CompanyInfo, OutputViewProps, OutputMode } from "./PayrollOutputView.types";
+import type {
+  ProcessingRow,
+  CompanyInfo,
+  OutputViewProps,
+  OutputMode,
+} from "./PayrollOutputView.types";
 
 // PrintHeader and PrintFooter must be declared outside the main component to avoid lint errors
 interface PrintHeaderProps {
@@ -64,9 +63,14 @@ interface RegisterModeProps {
   filteredRows: ProcessingRow[];
   earningData: Map<string, Map<string, number>>;
   deductionData: Map<string, Map<string, number>>;
-  benefitData: Map<string, Map<string, { employeeShare: number; employerShare: number }>>;
+  benefitData: Map<
+    string,
+    Map<string, { employeeShare: number; employerShare: number }>
+  >;
   visibleColumns: Record<string, boolean>;
-  setVisibleColumns: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setVisibleColumns: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
   showColumns: boolean;
   setShowColumns: React.Dispatch<React.SetStateAction<boolean>>;
   showFilters: boolean;
@@ -145,7 +149,9 @@ function PayrollRegisterMode({
             <div className="absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 z-10 w-72">
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-500">Group</label>
+                  <label className="text-xs font-medium text-gray-500">
+                    Group
+                  </label>
                   <select
                     className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
                     value={filterGroup}
@@ -153,12 +159,16 @@ function PayrollRegisterMode({
                   >
                     <option value="">All Groups</option>
                     {groups.map((g) => (
-                      <option key={g} value={g}>{g}</option>
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500">Position</label>
+                  <label className="text-xs font-medium text-gray-500">
+                    Position
+                  </label>
                   <select
                     className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
                     value={filterPosition}
@@ -166,12 +176,16 @@ function PayrollRegisterMode({
                   >
                     <option value="">All Positions</option>
                     {positions.map((p) => (
-                      <option key={p} value={p}>{p}</option>
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500">Area</label>
+                  <label className="text-xs font-medium text-gray-500">
+                    Area
+                  </label>
                   <select
                     className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
                     value={filterArea}
@@ -179,7 +193,9 @@ function PayrollRegisterMode({
                   >
                     <option value="">All Areas</option>
                     {areas.map((a) => (
-                      <option key={a} value={a}>{a}</option>
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -259,7 +275,11 @@ function PayrollRegisterMode({
           <CardTitle>Payroll Register</CardTitle>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
-          <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+          <PrintHeader
+            company={company}
+            payroll={payroll}
+            monthName={monthName}
+          />
           <table className="w-full print:text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -267,34 +287,54 @@ function PayrollRegisterMode({
                   Employee
                 </th>
                 {visibleColumns.daysWorked && (
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Days
+                  </th>
                 )}
                 {visibleColumns.absences && (
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Absences</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Absences
+                  </th>
                 )}
                 {visibleColumns.late && (
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Late</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Late
+                  </th>
                 )}
                 {visibleColumns.overtime && (
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">OT</th>
+                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    OT
+                  </th>
                 )}
                 {visibleColumns.basic && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Basic</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Basic
+                  </th>
                 )}
                 {visibleColumns.earnings && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Earnings</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Earnings
+                  </th>
                 )}
                 {visibleColumns.gross && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Gross</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Gross
+                  </th>
                 )}
                 {visibleColumns.deductions && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deductions</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Deductions
+                  </th>
                 )}
                 {visibleColumns.benefits && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Benefits (EE)</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Benefits (EE)
+                  </th>
                 )}
                 {visibleColumns.net && (
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Net Pay
+                  </th>
                 )}
               </tr>
             </thead>
@@ -314,40 +354,132 @@ function PayrollRegisterMode({
                 return (
                   <tr key={row.nameId} className="hover:bg-gray-50">
                     <td className="px-4 py-2 sticky left-0 bg-white">
-                      <div className="text-sm font-medium text-gray-900">{row.employeeCode}</div>
-                      <div className="text-xs text-gray-500">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {row.employeeCode}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {row.lastName}
+                        {row.firstName ? `, ${row.firstName}` : ""}
+                      </div>
                     </td>
-                    {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{row.daysWorked}</td>}
-                    {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{row.absences}</td>}
-                    {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{row.lateHours}</td>}
-                    {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{row.overtimeHours}</td>}
-                    {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(row.salaryAmount)}</td>}
-                    {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(earnings)}</td>}
-                    {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm font-medium">{formatCurrency(gross)}</td>}
-                    {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(deductions)}</td>}
-                    {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(benefits)}</td>}
-                    {visibleColumns.net && <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">{formatCurrency(net)}</td>}
+                    {visibleColumns.daysWorked && (
+                      <td className="px-4 py-2 text-center text-sm">
+                        {row.daysWorked}
+                      </td>
+                    )}
+                    {visibleColumns.absences && (
+                      <td className="px-4 py-2 text-center text-sm">
+                        {row.absences}
+                      </td>
+                    )}
+                    {visibleColumns.late && (
+                      <td className="px-4 py-2 text-center text-sm">
+                        {row.lateHours}
+                      </td>
+                    )}
+                    {visibleColumns.overtime && (
+                      <td className="px-4 py-2 text-center text-sm">
+                        {row.overtimeHours}
+                      </td>
+                    )}
+                    {visibleColumns.basic && (
+                      <td className="px-4 py-2 text-right text-sm">
+                        {formatCurrency(row.salaryAmount)}
+                      </td>
+                    )}
+                    {visibleColumns.earnings && (
+                      <td className="px-4 py-2 text-right text-sm text-green-600">
+                        {formatCurrency(earnings)}
+                      </td>
+                    )}
+                    {visibleColumns.gross && (
+                      <td className="px-4 py-2 text-right text-sm font-medium">
+                        {formatCurrency(gross)}
+                      </td>
+                    )}
+                    {visibleColumns.deductions && (
+                      <td className="px-4 py-2 text-right text-sm text-red-600">
+                        {formatCurrency(deductions)}
+                      </td>
+                    )}
+                    {visibleColumns.benefits && (
+                      <td className="px-4 py-2 text-right text-sm">
+                        {formatCurrency(benefits)}
+                      </td>
+                    )}
+                    {visibleColumns.net && (
+                      <td className="px-4 py-2 text-right text-sm font-bold text-gray-900">
+                        {formatCurrency(net)}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
               {filteredRows.length > 0 && (
                 <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                  <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">Total ({filteredRows.length} employees)</td>
-                  {visibleColumns.daysWorked && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.daysWorked, 0)}</td>}
-                  {visibleColumns.absences && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.absences, 0)}</td>}
-                  {visibleColumns.late && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.lateHours, 0)}</td>}
-                  {visibleColumns.overtime && <td className="px-4 py-2 text-center text-sm">{filteredRows.reduce((s, r) => s + r.overtimeHours, 0)}</td>}
-                  {visibleColumns.basic && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBasic)}</td>}
-                  {visibleColumns.earnings && <td className="px-4 py-2 text-right text-sm text-green-600">{formatCurrency(totals.totalEarnings)}</td>}
-                  {visibleColumns.gross && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalGross)}</td>}
-                  {visibleColumns.deductions && <td className="px-4 py-2 text-right text-sm text-red-600">{formatCurrency(totals.totalDeductions)}</td>}
-                  {visibleColumns.benefits && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>}
-                  {visibleColumns.net && <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>}
+                  <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">
+                    Total ({filteredRows.length} employees)
+                  </td>
+                  {visibleColumns.daysWorked && (
+                    <td className="px-4 py-2 text-center text-sm">
+                      {filteredRows.reduce((s, r) => s + r.daysWorked, 0)}
+                    </td>
+                  )}
+                  {visibleColumns.absences && (
+                    <td className="px-4 py-2 text-center text-sm">
+                      {filteredRows.reduce((s, r) => s + r.absences, 0)}
+                    </td>
+                  )}
+                  {visibleColumns.late && (
+                    <td className="px-4 py-2 text-center text-sm">
+                      {filteredRows.reduce((s, r) => s + r.lateHours, 0)}
+                    </td>
+                  )}
+                  {visibleColumns.overtime && (
+                    <td className="px-4 py-2 text-center text-sm">
+                      {filteredRows.reduce((s, r) => s + r.overtimeHours, 0)}
+                    </td>
+                  )}
+                  {visibleColumns.basic && (
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(totals.totalBasic)}
+                    </td>
+                  )}
+                  {visibleColumns.earnings && (
+                    <td className="px-4 py-2 text-right text-sm text-green-600">
+                      {formatCurrency(totals.totalEarnings)}
+                    </td>
+                  )}
+                  {visibleColumns.gross && (
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(totals.totalGross)}
+                    </td>
+                  )}
+                  {visibleColumns.deductions && (
+                    <td className="px-4 py-2 text-right text-sm text-red-600">
+                      {formatCurrency(totals.totalDeductions)}
+                    </td>
+                  )}
+                  {visibleColumns.benefits && (
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(totals.totalBenefitsEE)}
+                    </td>
+                  )}
+                  {visibleColumns.net && (
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(totals.totalNet)}
+                    </td>
+                  )}
                 </tr>
               )}
               {filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">No employees match the selected filters.</td>
+                  <td
+                    colSpan={10}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    No employees match the selected filters.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -364,9 +496,15 @@ interface PayslipModeProps {
   filteredRows: ProcessingRow[];
   selectedEmployee: string | null;
   setSelectedEmployee: React.Dispatch<React.SetStateAction<string | null>>;
-  getEmployeeEarnings: (row: ProcessingRow) => { name: string; amount: number }[];
-  getEmployeeDeductions: (row: ProcessingRow) => { name: string; amount: number }[];
-  getEmployeeBenefits: (row: ProcessingRow) => { name: string; employeeShare: number; employerShare: number }[];
+  getEmployeeEarnings: (
+    row: ProcessingRow,
+  ) => { name: string; amount: number }[];
+  getEmployeeDeductions: (
+    row: ProcessingRow,
+  ) => { name: string; amount: number }[];
+  getEmployeeBenefits: (
+    row: ProcessingRow,
+  ) => { name: string; employeeShare: number; employerShare: number }[];
   getEmployeeNet: (row: ProcessingRow) => number;
   payroll: { name: string; month: number; year: number };
   monthName: string;
@@ -388,10 +526,7 @@ function PayslipMode({
     <div className="space-y-4">
       <div className="flex gap-2">
         {selectedEmployee && (
-          <Button
-            variant="secondary"
-            onClick={() => setSelectedEmployee(null)}
-          >
+          <Button variant="secondary" onClick={() => setSelectedEmployee(null)}>
             Back to All Payslips
           </Button>
         )}
@@ -469,10 +604,7 @@ function PayslipMode({
               const earnings = getEmployeeEarnings(row);
               const deductions = getEmployeeDeductions(row);
               const benefits = getEmployeeBenefits(row);
-              const totalEarnings = earnings.reduce(
-                (s, e) => s + e.amount,
-                0,
-              );
+              const totalEarnings = earnings.reduce((s, e) => s + e.amount, 0);
               const totalDeductions = deductions.reduce(
                 (s, d) => s + d.amount,
                 0,
@@ -495,9 +627,7 @@ function PayslipMode({
                         </p>
                       </div>
                       <div className="text-right text-sm">
-                        <div className="font-medium">
-                          {row.employeeCode}
-                        </div>
+                        <div className="font-medium">{row.employeeCode}</div>
                         <div>
                           {row.lastName}
                           {row.firstName ? `, ${row.firstName}` : ""}
@@ -529,9 +659,7 @@ function PayslipMode({
                         <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
                           <span>Total Earnings</span>
                           <span>
-                            {formatCurrency(
-                              row.salaryAmount + totalEarnings,
-                            )}
+                            {formatCurrency(row.salaryAmount + totalEarnings)}
                           </span>
                         </div>
                       </div>
@@ -563,9 +691,7 @@ function PayslipMode({
                         <div className="flex justify-between text-sm font-semibold pt-2 border-t border-gray-200">
                           <span>Total Deductions</span>
                           <span>
-                            {formatCurrency(
-                              totalDeductions + totalBenefitsEE,
-                            )}
+                            {formatCurrency(totalDeductions + totalBenefitsEE)}
                           </span>
                         </div>
                       </div>
@@ -644,34 +770,59 @@ function TransmittalMode({
         </p>
       </CardHeader>
       <CardContent className="p-0">
-        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <PrintHeader
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">#</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee ID</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee Name</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                #
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Employee ID
+              </th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Employee Name
+              </th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Net Pay
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {rows.map((row, index) => (
               <tr key={row.nameId} className="hover:bg-gray-50">
                 <td className="px-4 py-2 text-sm text-gray-500">{index + 1}</td>
-                <td className="px-4 py-2 text-sm font-medium">{row.employeeCode}</td>
-                <td className="px-4 py-2 text-sm">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</td>
-                <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(getEmployeeNet(row))}</td>
+                <td className="px-4 py-2 text-sm font-medium">
+                  {row.employeeCode}
+                </td>
+                <td className="px-4 py-2 text-sm">
+                  {row.lastName}
+                  {row.firstName ? `, ${row.firstName}` : ""}
+                </td>
+                <td className="px-4 py-2 text-right text-sm font-semibold">
+                  {formatCurrency(getEmployeeNet(row))}
+                </td>
               </tr>
             ))}
             {rows.length > 0 && (
               <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                <td className="px-4 py-2" colSpan={3}>Total ({rows.length} employees)</td>
-                <td className="px-4 py-2 text-right">{formatCurrency(totals.totalNet)}</td>
+                <td className="px-4 py-2" colSpan={3}>
+                  Total ({rows.length} employees)
+                </td>
+                <td className="px-4 py-2 text-right">
+                  {formatCurrency(totals.totalNet)}
+                </td>
               </tr>
             )}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">No employees in this payroll.</td>
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                  No employees in this payroll.
+                </td>
               </tr>
             )}
           </tbody>
@@ -709,58 +860,104 @@ function JournalMode({
         </p>
       </CardHeader>
       <CardContent className="p-0">
-        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <PrintHeader
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Account</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Debit</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Credit</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Account
+              </th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Debit
+              </th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Credit
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Salaries & Wages Expense</td>
-              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalBasic)}</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Salaries & Wages Expense
+              </td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">
+                {formatCurrency(totals.totalBasic)}
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Earnings Expense</td>
-              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalEarnings)}</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Earnings Expense
+              </td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">
+                {formatCurrency(totals.totalEarnings)}
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Employer Benefits Expense</td>
-              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalBenefitsER)}</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Employer Benefits Expense
+              </td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">
+                {formatCurrency(totals.totalBenefitsER)}
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Withholding Tax Payable</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Withholding Tax Payable
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
-              <td className="px-4 py-2 text-right text-sm">{formatCurrency(0.0)}</td>
+              <td className="px-4 py-2 text-right text-sm">
+                {formatCurrency(0.0)}
+              </td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Employee Benefits Payable</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Employee Benefits Payable
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
-              <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalBenefitsEE)}</td>
+              <td className="px-4 py-2 text-right text-sm">
+                {formatCurrency(totals.totalBenefitsEE)}
+              </td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Other Deductions Payable</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Other Deductions Payable
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
-              <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalDeductions)}</td>
+              <td className="px-4 py-2 text-right text-sm">
+                {formatCurrency(totals.totalDeductions)}
+              </td>
             </tr>
             <tr className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm font-medium">Salaries & Wages Payable</td>
+              <td className="px-4 py-2 text-sm font-medium">
+                Salaries & Wages Payable
+              </td>
               <td className="px-4 py-2 text-right text-sm">-</td>
-              <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(totals.totalNet)}</td>
+              <td className="px-4 py-2 text-right text-sm font-semibold">
+                {formatCurrency(totals.totalNet)}
+              </td>
             </tr>
             <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
               <td className="px-4 py-2 text-sm">Total</td>
               <td className="px-4 py-2 text-right text-sm">
-                {formatCurrency(totals.totalBasic + totals.totalEarnings + totals.totalBenefitsER)}
+                {formatCurrency(
+                  totals.totalBasic +
+                    totals.totalEarnings +
+                    totals.totalBenefitsER,
+                )}
               </td>
               <td className="px-4 py-2 text-right text-sm">
-                {formatCurrency(totals.totalBenefitsEE + totals.totalDeductions + totals.totalNet)}
+                {formatCurrency(
+                  totals.totalBenefitsEE +
+                    totals.totalDeductions +
+                    totals.totalNet,
+                )}
               </td>
             </tr>
           </tbody>
@@ -790,12 +987,14 @@ function DenominationMode({
     <Card>
       <CardHeader>
         <CardTitle>Cash Denomination Breakdown</CardTitle>
-        <p className="text-sm text-gray-500 mt-1">
-          Cash payout preparation
-        </p>
+        <p className="text-sm text-gray-500 mt-1">Cash payout preparation</p>
       </CardHeader>
       <CardContent>
-        <PrintHeader company={company} payroll={payroll} monthName={monthName} />
+        <PrintHeader
+          company={company}
+          payroll={payroll}
+          monthName={monthName}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <h3 className="text-sm font-semibold text-gray-500 uppercase mb-4">
@@ -804,28 +1003,45 @@ function DenominationMode({
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Denomination</th>
-                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Amount</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    Denomination
+                  </th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    Quantity
+                  </th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    Amount
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {[1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25, 0.1, 0.05].map((denom) => {
-                  const count = Math.floor(totals.totalNet / denom);
-                  return (
-                    <tr key={denom} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm font-medium">
-                        ₱{denom >= 1 ? denom.toLocaleString() : denom.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-2 text-right text-sm">{count}</td>
-                      <td className="px-4 py-2 text-right text-sm">{formatCurrency(count * denom)}</td>
-                    </tr>
-                  );
-                })}
+                {[1000, 500, 200, 100, 50, 20, 10, 5, 1, 0.25, 0.1, 0.05].map(
+                  (denom) => {
+                    const count = Math.floor(totals.totalNet / denom);
+                    return (
+                      <tr key={denom} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 text-sm font-medium">
+                          ₱
+                          {denom >= 1
+                            ? denom.toLocaleString()
+                            : denom.toFixed(2)}
+                        </td>
+                        <td className="px-4 py-2 text-right text-sm">
+                          {count}
+                        </td>
+                        <td className="px-4 py-2 text-right text-sm">
+                          {formatCurrency(count * denom)}
+                        </td>
+                      </tr>
+                    );
+                  },
+                )}
                 <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
                   <td className="px-4 py-2 text-sm">Total</td>
                   <td className="px-4 py-2 text-right text-sm"></td>
-                  <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>
+                  <td className="px-4 py-2 text-right text-sm">
+                    {formatCurrency(totals.totalNet)}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -837,8 +1053,12 @@ function DenominationMode({
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Employee</th>
-                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    Employee
+                  </th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">
+                    Net Pay
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -846,15 +1066,22 @@ function DenominationMode({
                   <tr key={row.nameId} className="hover:bg-gray-50">
                     <td className="px-4 py-2 text-sm">
                       <div className="font-medium">{row.employeeCode}</div>
-                      <div className="text-xs text-gray-500">{row.lastName}{row.firstName ? `, ${row.firstName}` : ""}</div>
+                      <div className="text-xs text-gray-500">
+                        {row.lastName}
+                        {row.firstName ? `, ${row.firstName}` : ""}
+                      </div>
                     </td>
-                    <td className="px-4 py-2 text-right text-sm font-semibold">{formatCurrency(getEmployeeNet(row))}</td>
+                    <td className="px-4 py-2 text-right text-sm font-semibold">
+                      {formatCurrency(getEmployeeNet(row))}
+                    </td>
                   </tr>
                 ))}
                 {rows.length > 0 && (
                   <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
                     <td className="px-4 py-2 text-sm">Total</td>
-                    <td className="px-4 py-2 text-right text-sm">{formatCurrency(totals.totalNet)}</td>
+                    <td className="px-4 py-2 text-right text-sm">
+                      {formatCurrency(totals.totalNet)}
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -927,8 +1154,6 @@ export function PayrollOutputView({
   const monthName = new Date(0, payroll.month - 1).toLocaleString("default", {
     month: "long",
   });
-
-
 
   const getEmployeeEarnings = (row: ProcessingRow) => {
     const empEarnings = earningData.get(row.nameId) || new Map();

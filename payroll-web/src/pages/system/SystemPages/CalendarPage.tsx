@@ -10,12 +10,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -30,8 +25,18 @@ import {
 import type { CalendarEvent } from "./SystemPages.types";
 
 const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const typeColors: Record<string, string> = {
@@ -76,7 +81,9 @@ export function CalendarPage() {
           const d = new Date(e.date);
           return d.getFullYear() === selectedYear;
         })
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        ),
     );
     setLoading(false);
   }, [selectedYear]);

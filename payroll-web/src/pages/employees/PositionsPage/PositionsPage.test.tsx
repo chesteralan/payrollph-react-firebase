@@ -13,7 +13,11 @@ describe("PositionsPage", () => {
   it("renders without crashing", () => {
     addMockDocs("employee_positions", []);
     renderWithProviders(<PositionsPage />);
-    expect(screen.getByRole("heading", { name: /positions/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Search positions...")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /positions/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search positions..."),
+    ).toBeInTheDocument();
   });
 });

@@ -10,8 +10,14 @@ beforeEach(() => {
 describe("ChangePasswordPage", () => {
   it("renders without crashing", () => {
     renderWithProviders(<ChangePasswordPage />);
-    expect(screen.getByRole("heading", { name: /change password/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /change password/i })).toBeInTheDocument();
-    expect(screen.getByText(/update your account password/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /change password/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /change password/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/update your account password/i),
+    ).toBeInTheDocument();
   });
 });

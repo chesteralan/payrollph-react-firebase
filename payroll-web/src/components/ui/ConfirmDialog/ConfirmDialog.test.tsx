@@ -7,9 +7,7 @@ describe("ConfirmDialog", () => {
     title: "Confirm Deletion",
     message: "Are you sure you want to delete this item?",
     onConfirm: vi.fn(),
-    children: (open: () => void) => (
-      <button onClick={open}>Open Dialog</button>
-    ),
+    children: (open: () => void) => <button onClick={open}>Open Dialog</button>,
   };
 
   beforeEach(() => {
@@ -42,11 +40,7 @@ describe("ConfirmDialog", () => {
 
   it("should show custom button text when provided", () => {
     render(
-      <ConfirmDialog
-        {...defaultProps}
-        confirmText="Yes"
-        cancelText="No"
-      />,
+      <ConfirmDialog {...defaultProps} confirmText="Yes" cancelText="No" />,
     );
     fireEvent.click(screen.getByText("Open Dialog"));
 

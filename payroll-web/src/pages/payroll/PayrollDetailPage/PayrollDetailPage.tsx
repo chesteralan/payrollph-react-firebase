@@ -16,22 +16,9 @@ import { db } from "@/config/firebase";
 import { useToast } from "@/hooks/useToast";
 import { EditableCell } from "@/components/ui/EditableCell";
 import { PayrollOutputView } from "@/components/payroll/PayrollOutputView";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import {
-  ArrowLeft,
-  Lock,
-  Unlock,
-  Save,
-  AlertCircle,
-  AlertTriangle,
-  Send,
-} from "lucide-react";
+import { ArrowLeft, Lock, Unlock, Save, Send } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
 import { calculateWorkingDaysSync } from "@/utils/calendarUtils";
 import type {
@@ -135,10 +122,20 @@ export function PayrollDetailPage() {
         ? await getDocs(
             query(
               collection(db, "calendar"),
-              where("companyId", "==", (payrollSnap.data() as Record<string, unknown>)?.companyId || "global"),
+              where(
+                "companyId",
+                "==",
+                (payrollSnap.data() as Record<string, unknown>)?.companyId ||
+                  "global",
+              ),
             ),
           )
-        : await getDocs(query(collection(db, "calendar"), where("companyId", "==", "global")));
+        : await getDocs(
+            query(
+              collection(db, "calendar"),
+              where("companyId", "==", "global"),
+            ),
+          );
 
       if (payrollSnap.exists()) {
         const payrollData = {
@@ -811,13 +808,26 @@ export function PayrollDetailPage() {
       </div>
 
       {showValidation && validationErrors.length > 0 && (
-        <ValidationPanel errors={validationErrors} onClose={() => setShowValidation(false)} />
+        <ValidationPanel
+          errors={validationErrors}
+          onClose={() => setShowValidation(false)}
+        />
       )}
 
-      <StageSelector stages={STAGES} activeStage={activeStage} onStageChange={setActiveStage} />
+      <StageSelector
+        stages={STAGES}
+        activeStage={activeStage}
+        onStageChange={setActiveStage}
+      />
 
       {activeStage === "dtr" && (
-        <DTRStage rows={rows} startDate={startDate} endDate={endDate} updateRow={updateRow} onManageDTR={() => navigate("/dtr")} />
+        <DTRStage
+          rows={rows}
+          startDate={startDate}
+          endDate={endDate}
+          updateRow={updateRow}
+          onManageDTR={() => navigate("/dtr")}
+        />
       )}
 
       {activeStage === "salaries" && (

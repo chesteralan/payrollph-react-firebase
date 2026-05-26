@@ -12,12 +12,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
   Plus,
@@ -54,7 +49,9 @@ export function CompaniesPage() {
     payrollPeriods: [] as import("./CompaniesPage.types").PayrollPeriod[],
   });
 
-  const [columnGroup, setColumnGroup] = useState<import("./CompaniesPage.types").CompanyColumnGroup>({
+  const [columnGroup, setColumnGroup] = useState<
+    import("./CompaniesPage.types").CompanyColumnGroup
+  >({
     dtr: true,
     salaries: true,
     earnings: true,
@@ -71,7 +68,6 @@ export function CompaniesPage() {
     setLoading(false);
   };
 
-   
   useEffect(() => {
     const loadCompanies = async () => {
       await fetchCompanies();

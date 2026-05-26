@@ -13,39 +13,26 @@ import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Clock,
-  Timer,
-  AlertCircle,
-  Trash2,
-  X,
-  Check,
-  Plus,
-  Filter,
-  Download,
-  Upload,
-  BarChart3,
-  Table,
-} from "lucide-react";
-import type {
-  Employee,
-  NameRecord,
-} from "../../types/employee";
+import { Trash2, X, Download, Upload, BarChart3 } from "lucide-react";
+import type { Employee, NameRecord } from "../../types/employee";
 import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
-import type { DTRPageDayForm, DTRPageLeaveForm, DTRPageBenefit, DTRPageViewMode } from "./DTRPage.types";
-import { calcHours, dateStr, daysInMonth, firstDayOfMonth, useDTRStats, dayStatus } from "./DTRComputation";
+import type {
+  DTRPageDayForm,
+  DTRPageLeaveForm,
+  DTRPageBenefit,
+  DTRPageViewMode,
+} from "./DTRPage.types";
+import {
+  calcHours,
+  dateStr,
+  daysInMonth,
+  firstDayOfMonth,
+  useDTRStats,
+} from "./DTRComputation";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { DTRCalendar } from "./DTRCalendar";
 
@@ -63,7 +50,6 @@ const MONTH_NAMES = [
   "November",
   "December",
 ];
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export function DTRPage() {
   const { canView, canEdit, canDelete } = usePermissions();
@@ -191,7 +177,7 @@ export function DTRPage() {
     );
   }, [selectedEmployeeId, selectedYear]);
 
-   
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchEmployees();
   }, [fetchEmployees]);
@@ -201,7 +187,14 @@ export function DTRPage() {
       fetchDTRData();
       fetchLeaveData();
     }
-  }, [selectedEmployeeId, selectedMonth, selectedYear, fetchDTRData, fetchLeaveData]);
+  }, [
+    selectedEmployeeId,
+    selectedMonth,
+    selectedYear,
+    fetchDTRData,
+    fetchLeaveData,
+  ]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const fetchAllMonthEntries = useCallback(async () => {
     const start = dateStr(selectedYear, selectedMonth, 1);
@@ -231,9 +224,11 @@ export function DTRPage() {
     setAllMonthEntries(allEntries);
   }, [selectedYear, selectedMonth, employees]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (viewMode === "summary" && employees.length > 0) fetchAllMonthEntries();
   }, [viewMode, selectedMonth, selectedYear, employees, fetchAllMonthEntries]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredMonthEntries = useMemo(() => {
     if (dtrSearchQuery === "") return allMonthEntries;

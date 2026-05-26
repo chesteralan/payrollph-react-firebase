@@ -1,13 +1,13 @@
-import { useMemo } from 'react';
-import type { DTREntry } from '../../types/dtr';
+import { useMemo } from "react";
+import type { DTREntry } from "../../types/dtr";
 
 /**
  * Calculate hours worked from time in/out strings
  */
 export function calcHours(timeIn: string, timeOut: string): number {
   if (!timeIn || !timeOut) return 0;
-  const [h1, m1] = timeIn.split(':').map(Number);
-  const [h2, m2] = timeOut.split(':').map(Number);
+  const [h1, m1] = timeIn.split(":").map(Number);
+  const [h2, m2] = timeOut.split(":").map(Number);
   const diff = h2 * 60 + m2 - (h1 * 60 + m1);
   return diff > 0 ? Math.round((diff / 60) * 100) / 100 : 0;
 }
@@ -16,7 +16,7 @@ export function calcHours(timeIn: string, timeOut: string): number {
  * Build a YYYY-MM-DD date string from components
  */
 export function dateStr(year: number, month: number, day: number): string {
-  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
 /**
@@ -70,12 +70,12 @@ export function dayStatus(
   selectedYear: number,
   selectedMonth: number,
   entryMap: Map<string, DTREntry>,
-): 'none' | 'absent' | 'complete' | 'partial' {
+): "none" | "absent" | "complete" | "partial" {
   const ds = dateStr(selectedYear, selectedMonth, day);
   const entry = entryMap.get(ds);
-  if (!entry) return 'none';
-  if (entry.absenceType) return 'absent';
-  if (entry.timeIn && entry.timeOut) return 'complete';
-  if (entry.timeIn || entry.timeOut) return 'partial';
-  return 'none';
+  if (!entry) return "none";
+  if (entry.absenceType) return "absent";
+  if (entry.timeIn && entry.timeOut) return "complete";
+  if (entry.timeIn || entry.timeOut) return "partial";
+  return "none";
 }

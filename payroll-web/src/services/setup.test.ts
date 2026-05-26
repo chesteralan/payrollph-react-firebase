@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFirestoreMocks, addMockDocs, clearMockDocs, createAuthMocks, getMockDocs } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  addMockDocs,
+  clearMockDocs,
+  createAuthMocks,
+  getMockDocs,
+} from "../__mocks__/firebase";
 
 // Mock firebase/firestore with setDoc support and getDocs returning snapshots with .empty
 vi.mock("firebase/firestore", () => ({
@@ -27,18 +33,17 @@ vi.mock("firebase/firestore", () => ({
 // Mock firebase/auth with createUserWithEmailAndPassword
 vi.mock("firebase/auth", () => ({
   ...createAuthMocks(),
-  createUserWithEmailAndPassword: vi.fn(async (_auth: unknown, _email: string, _password: string) => ({
-    user: {
-      uid: "mock-uid-12345",
-      email: "admin@example.com",
-    },
-  })),
+  createUserWithEmailAndPassword: vi.fn(
+    async (_auth: unknown, _email: string, _password: string) => ({
+      user: {
+        uid: "mock-uid-12345",
+        email: "admin@example.com",
+      },
+    }),
+  ),
 }));
 
-import {
-  setupAdminUser,
-  checkSetupNeeded,
-} from "./setup";
+import { setupAdminUser, checkSetupNeeded } from "./setup";
 import { setDoc, getDocs } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
@@ -121,8 +126,11 @@ describe("setupAdminUser", () => {
     await setupAdminUser(setupParams);
 
     // Count the number of setDoc calls for user_restrictions
-    const restrictionCalls = (setDoc as ReturnType<typeof vi.fn>).mock.calls.filter(
-      (call: [string]) => typeof call[0] === "string" && call[0].startsWith("user_restrictions/"),
+    const restrictionCalls = (
+      setDoc as ReturnType<typeof vi.fn>
+    ).mock.calls.filter(
+      (call: [string]) =>
+        typeof call[0] === "string" && call[0].startsWith("user_restrictions/"),
     );
 
     // There should be multiple restriction documents created
@@ -150,7 +158,9 @@ describe("setupAdminUser", () => {
       new Error("auth/email-already-in-use"),
     );
 
-    await expect(setupAdminUser(setupParams)).rejects.toThrow("auth/email-already-in-use");
+    await expect(setupAdminUser(setupParams)).rejects.toThrow(
+      "auth/email-already-in-use",
+    );
   });
 });
 
@@ -179,7 +189,9 @@ describe("checkSetupNeeded", () => {
   it("should call getDocs on user_accounts collection", async () => {
     await checkSetupNeeded();
 
-    expect(getDocs).toHaveBeenCalledWith(expect.stringContaining("user_accounts"));
+    expect(getDocs).toHaveBeenCalledWith(
+      expect.stringContaining("user_accounts"),
+    );
   });
 
   it("should handle Firestore errors gracefully", async () => {

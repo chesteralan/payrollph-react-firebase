@@ -1,1 +1,1 @@
-export * from './CompanySettingsPage';
+export * from "./CompanySettingsPage";

@@ -1,1 +1,1 @@
-export * from './EarningsDeductionsReportPage';
+export * from "./EarningsDeductionsReportPage";

@@ -1,1 +1,1 @@
-export * from './TrashPage';
+export * from "./TrashPage";

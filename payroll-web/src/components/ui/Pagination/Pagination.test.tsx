@@ -101,7 +101,9 @@ describe("Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Showing 1 to 10 of 50 results/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Showing 1 to 10 of 50 results/),
+    ).toBeInTheDocument();
   });
 
   it("should adjust showing range on second page", () => {
@@ -114,7 +116,9 @@ describe("Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Showing 11 to 20 of 50 results/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Showing 11 to 20 of 50 results/),
+    ).toBeInTheDocument();
   });
 
   it("should cap showing range on last partial page", () => {
@@ -127,7 +131,9 @@ describe("Pagination", () => {
         onPageChange={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Showing 41 to 45 of 45 results/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Showing 41 to 45 of 45 results/),
+    ).toBeInTheDocument();
   });
 
   it("should not display results text when totalItems is not provided", () => {

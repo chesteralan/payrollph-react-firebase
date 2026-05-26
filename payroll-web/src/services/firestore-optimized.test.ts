@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-  getMockDocs,
-} from "../__mocks__/firebase";
+import { addMockDocs, clearMockDocs, getMockDocs } from "../__mocks__/firebase";
 import {
   cache,
   optimizedQuery,
@@ -13,7 +9,16 @@ import {
   optimizedDelete,
   QueryOptimizer,
 } from "./firestore-optimized";
-import { getDocs, getDoc, addDoc, updateDoc, deleteDoc, where, orderBy, limit } from "firebase/firestore";
+import {
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 
 beforeEach(() => {
   clearMockDocs();
@@ -90,7 +95,9 @@ describe("optimizedQuery", () => {
       { id: "2", name: "Bob" },
     ]);
 
-    const results = await optimizedQuery<{ id: string; name: string }>("employees");
+    const results = await optimizedQuery<{ id: string; name: string }>(
+      "employees",
+    );
 
     expect(results).toHaveLength(2);
     expect(getDocs).toHaveBeenCalledOnce();
@@ -145,9 +152,14 @@ describe("optimizedQuery", () => {
 
 describe("optimizedGetById", () => {
   it("should return the document when found", async () => {
-    addMockDocs("employees/emp1", [{ id: "emp1", name: "Alice", isActive: true }]);
+    addMockDocs("employees/emp1", [
+      { id: "emp1", name: "Alice", isActive: true },
+    ]);
 
-    const result = await optimizedGetById<{ id: string; name: string }>("employees", "emp1");
+    const result = await optimizedGetById<{ id: string; name: string }>(
+      "employees",
+      "emp1",
+    );
 
     expect(result).toEqual({ id: "emp1", name: "Alice", isActive: true });
     expect(getDoc).toHaveBeenCalledWith("employees/emp1");
@@ -255,7 +267,10 @@ describe("optimizedDelete", () => {
 describe("QueryOptimizer", () => {
   describe("withCompanyAndStatus", () => {
     it("should create two where constraints for company and status", () => {
-      const constraints = QueryOptimizer.withCompanyAndStatus("company-1", true);
+      const constraints = QueryOptimizer.withCompanyAndStatus(
+        "company-1",
+        true,
+      );
 
       expect(constraints).toHaveLength(2);
       expect(where).toHaveBeenCalledWith("companyId", "==", "company-1");
@@ -270,7 +285,10 @@ describe("QueryOptimizer", () => {
     });
 
     it("should support isActive=false", () => {
-      const constraints = QueryOptimizer.withCompanyAndStatus("company-1", false);
+      const constraints = QueryOptimizer.withCompanyAndStatus(
+        "company-1",
+        false,
+      );
 
       expect(constraints).toHaveLength(2);
       expect(where).toHaveBeenCalledWith("isActive", "==", false);
@@ -293,7 +311,11 @@ describe("QueryOptimizer", () => {
 
     it("should create end date constraint only", () => {
       const endDate = new Date("2024-12-31");
-      const constraints = QueryOptimizer.withDateRange("createdAt", undefined, endDate);
+      const constraints = QueryOptimizer.withDateRange(
+        "createdAt",
+        undefined,
+        endDate,
+      );
 
       expect(constraints).toHaveLength(1);
       expect(where).toHaveBeenCalledWith("createdAt", "<=", endDate);
@@ -302,7 +324,11 @@ describe("QueryOptimizer", () => {
     it("should create both start and end date constraints", () => {
       const startDate = new Date("2024-01-01");
       const endDate = new Date("2024-12-31");
-      const constraints = QueryOptimizer.withDateRange("createdAt", startDate, endDate);
+      const constraints = QueryOptimizer.withDateRange(
+        "createdAt",
+        startDate,
+        endDate,
+      );
 
       expect(constraints).toHaveLength(2);
       expect(where).toHaveBeenCalledWith("createdAt", ">=", startDate);
@@ -311,7 +337,10 @@ describe("QueryOptimizer", () => {
 
     it("should work with any field name", () => {
       const startDate = new Date("2025-06-01");
-      const constraints = QueryOptimizer.withDateRange("payPeriodStart", startDate);
+      const constraints = QueryOptimizer.withDateRange(
+        "payPeriodStart",
+        startDate,
+      );
 
       expect(constraints).toHaveLength(1);
       expect(where).toHaveBeenCalledWith("payPeriodStart", ">=", startDate);
@@ -356,10 +385,10 @@ describe("QueryOptimizer", () => {
       addMockDocs("employees/emp1", [{ id: "emp1", name: "Alice" }]);
       addMockDocs("employees/emp2", [{ id: "emp2", name: "Bob" }]);
 
-      const results = await QueryOptimizer.batchFetchByIds<{ id: string; name: string }>(
-        "employees",
-        ["emp1", "emp2"],
-      );
+      const results = await QueryOptimizer.batchFetchByIds<{
+        id: string;
+        name: string;
+      }>("employees", ["emp1", "emp2"]);
 
       expect(results).toHaveLength(2);
       expect(results).toEqual(
@@ -390,10 +419,10 @@ describe("QueryOptimizer", () => {
         addMockDocs(`companies/${id}`, [{ id, name: `Doc ${id}` }]);
       }
 
-      const results = await QueryOptimizer.batchFetchByIds<{ id: string; name: string }>(
-        "companies",
-        ids,
-      );
+      const results = await QueryOptimizer.batchFetchByIds<{
+        id: string;
+        name: string;
+      }>("companies", ids);
 
       // All docs should be found
       expect(results).toHaveLength(35);
@@ -403,10 +432,10 @@ describe("QueryOptimizer", () => {
       addMockDocs("employees/emp1", [{ id: "emp1", name: "Alice" }]);
       // emp2 is not seeded — should be missing
 
-      const results = await QueryOptimizer.batchFetchByIds<{ id: string; name: string }>(
-        "employees",
-        ["emp1", "emp2"],
-      );
+      const results = await QueryOptimizer.batchFetchByIds<{
+        id: string;
+        name: string;
+      }>("employees", ["emp1", "emp2"]);
 
       expect(results).toHaveLength(1);
       expect(results[0]).toEqual({ id: "emp1", name: "Alice" });

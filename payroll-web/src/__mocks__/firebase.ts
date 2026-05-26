@@ -51,7 +51,9 @@ export const createFirestoreMocks = () => {
   );
   const getDoc = vi.fn(async (docPath: string) => {
     const doc = mockDocs.get(docPath)?.[0];
-    return doc ? mockDoc(doc) : { exists: () => false, data: () => null, id: docPath };
+    return doc
+      ? mockDoc(doc)
+      : { exists: () => false, data: () => null, id: docPath };
   });
   const getDocs = vi.fn(async (collectionPath: string) => {
     return mockSnapshot(collectionPath);
@@ -86,10 +88,12 @@ export const createFirestoreMocks = () => {
 
 export const createAuthMocks = () => {
   const currentUser = null;
-  const onAuthStateChanged = vi.fn((_auth: unknown, cb: (user: unknown) => void) => {
-    cb(null);
-    return () => {};
-  });
+  const onAuthStateChanged = vi.fn(
+    (_auth: unknown, cb: (user: unknown) => void) => {
+      cb(null);
+      return () => {};
+    },
+  );
   const signInWithEmailAndPassword = vi.fn();
   const signOut = vi.fn(async () => {});
   const sendPasswordResetEmail = vi.fn();
@@ -125,5 +129,12 @@ export const createStorageMocks = () => {
   const uploadBytes = vi.fn(async () => ({ ref: {}, metadata: {} }));
   const deleteObject = vi.fn(async () => {});
 
-  return { ref, listAll, getMetadata, getDownloadURL, uploadBytes, deleteObject };
+  return {
+    ref,
+    listAll,
+    getMetadata,
+    getDownloadURL,
+    uploadBytes,
+    deleteObject,
+  };
 };

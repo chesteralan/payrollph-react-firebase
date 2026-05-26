@@ -1,7 +1,12 @@
 import { expect, afterEach, beforeAll, afterAll, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import * as matchers from "@testing-library/jest-dom/matchers";
-import { createFirestoreMocks, createAuthMocks, createStorageMocks, clearMockDocs } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  createAuthMocks,
+  createStorageMocks,
+  clearMockDocs,
+} from "../__mocks__/firebase";
 
 expect.extend(matchers);
 
@@ -61,7 +66,8 @@ class MockIntersectionObserver implements IntersectionObserver {
   }
   unobserve() {}
 }
-global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+global.IntersectionObserver =
+  MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
 class MockResizeObserver implements ResizeObserver {
   constructor() {

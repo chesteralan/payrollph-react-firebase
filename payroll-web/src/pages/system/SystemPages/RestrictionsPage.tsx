@@ -1,8 +1,5 @@
 import { usePermissions } from "@/hooks/usePermissions";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 
 export function RestrictionsPage() {
   const { canView } = usePermissions();

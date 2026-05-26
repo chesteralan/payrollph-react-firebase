@@ -11,12 +11,7 @@ import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
   Plus,
@@ -48,7 +43,6 @@ export function AreasPage() {
     setLoading(false);
   };
 
-   
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchAreas();

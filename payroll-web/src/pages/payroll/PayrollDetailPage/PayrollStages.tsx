@@ -1,12 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EditableCell } from "@/components/ui/EditableCell";
-import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import type { ProcessingRow } from "../PayrollDetailPage.types";
 
 interface StageSelectorProps {
@@ -15,7 +9,11 @@ interface StageSelectorProps {
   onStageChange: (stage: string) => void;
 }
 
-export function StageSelector({ stages, activeStage, onStageChange }: StageSelectorProps) {
+export function StageSelector({
+  stages,
+  activeStage,
+  onStageChange,
+}: StageSelectorProps) {
   return (
     <div className="flex gap-1 border-b border-gray-200 overflow-x-auto">
       {stages.map((stage) => (
@@ -39,11 +37,21 @@ interface DTRStageProps {
   rows: ProcessingRow[];
   startDate: string | null;
   endDate: string | null;
-  updateRow: (nameId: string, field: keyof ProcessingRow, value: number) => void;
+  updateRow: (
+    nameId: string,
+    field: keyof ProcessingRow,
+    value: number,
+  ) => void;
   onManageDTR: () => void;
 }
 
-export function DTRStage({ rows, startDate, endDate, updateRow, onManageDTR }: DTRStageProps) {
+export function DTRStage({
+  rows,
+  startDate,
+  endDate,
+  updateRow,
+  onManageDTR,
+}: DTRStageProps) {
   return (
     <Card>
       <CardHeader>
@@ -65,38 +73,79 @@ export function DTRStage({ rows, startDate, endDate, updateRow, onManageDTR }: D
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Employee</th>
-              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Days Worked</th>
-              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Absences</th>
-              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Late (hrs)</th>
-              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">Overtime (hrs)</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Employee
+              </th>
+              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Days Worked
+              </th>
+              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Absences
+              </th>
+              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Late (hrs)
+              </th>
+              <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
+                Overtime (hrs)
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {rows.map((row) => (
               <tr key={row.nameId} className="hover:bg-gray-50">
                 <td className="px-4 py-2">
-                  <div className="text-sm font-medium text-gray-900">{row.employeeCode}</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {row.employeeCode}
+                  </div>
                   <div className="text-xs text-gray-500">{row.lastName}</div>
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <EditableCell value={row.daysWorked} onChange={(v) => updateRow(row.nameId, "daysWorked", Number(v))} type="number" className="text-center" />
+                  <EditableCell
+                    value={row.daysWorked}
+                    onChange={(v) =>
+                      updateRow(row.nameId, "daysWorked", Number(v))
+                    }
+                    type="number"
+                    className="text-center"
+                  />
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <EditableCell value={row.absences} onChange={(v) => updateRow(row.nameId, "absences", Number(v))} type="number" className="text-center" />
+                  <EditableCell
+                    value={row.absences}
+                    onChange={(v) =>
+                      updateRow(row.nameId, "absences", Number(v))
+                    }
+                    type="number"
+                    className="text-center"
+                  />
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <EditableCell value={row.lateHours} onChange={(v) => updateRow(row.nameId, "lateHours", Number(v))} type="number" className="text-center" />
+                  <EditableCell
+                    value={row.lateHours}
+                    onChange={(v) =>
+                      updateRow(row.nameId, "lateHours", Number(v))
+                    }
+                    type="number"
+                    className="text-center"
+                  />
                 </td>
                 <td className="px-4 py-2 text-center">
-                  <EditableCell value={row.overtimeHours} onChange={(v) => updateRow(row.nameId, "overtimeHours", Number(v))} type="number" className="text-center" />
+                  <EditableCell
+                    value={row.overtimeHours}
+                    onChange={(v) =>
+                      updateRow(row.nameId, "overtimeHours", Number(v))
+                    }
+                    type="number"
+                    className="text-center"
+                  />
                 </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                  No employees in this payroll. Go to the wizard to add employees.
+                  No employees in this payroll. Go to the wizard to add
+                  employees.
                 </td>
               </tr>
             )}

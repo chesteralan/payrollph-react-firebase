@@ -277,8 +277,12 @@ describe("sendPasswordResetEmail", () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const callArg = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(callArg.subject).toBe("Reset Your Password");
-    expect(callArg.htmlBody).toContain("https://app.example.com/reset/token123");
-    expect(callArg.textBody).toContain("https://app.example.com/reset/token123");
+    expect(callArg.htmlBody).toContain(
+      "https://app.example.com/reset/token123",
+    );
+    expect(callArg.textBody).toContain(
+      "https://app.example.com/reset/token123",
+    );
   });
 
   it("should include the reset link prominently", async () => {

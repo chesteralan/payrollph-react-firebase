@@ -1,1 +1,1 @@
-export * from './PrintFormatsPage';
+export * from "./PrintFormatsPage";

@@ -1,16 +1,14 @@
-import type { UserSettingsForm, UserSettingsPasswordForm } from "./UserSettingsPage.types";
+import type {
+  UserSettingsForm,
+  UserSettingsPasswordForm,
+} from "./UserSettingsPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ArrowLeft, Save, Lock, Palette } from "lucide-react";
 import { getAvailableCurrencies } from "@/utils/currency";
 import { localeLabels } from "@/i18n";
@@ -24,7 +22,8 @@ export function UserSettingsPage() {
     theme: (settings?.theme as "light" | "dark") || "light",
     itemsPerPage: settings?.itemsPerPage || 25,
     defaultCompanyId: settings?.defaultCompanyId || "",
-    currency: (settings as { currency?: string } | undefined)?.currency || "PHP",
+    currency:
+      (settings as { currency?: string } | undefined)?.currency || "PHP",
     locale: settings?.locale || "en-US",
   });
   const [passwordForm, setPasswordForm] = useState<UserSettingsPasswordForm>({

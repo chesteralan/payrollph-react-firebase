@@ -1,8 +1,20 @@
-import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/Card';
-import type { PayrollGroup, EmployeeGroup, EmployeePosition, EmployeeArea, EmployeeStatus } from './PayrollWizardPage.types';
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/Card";
+import type {
+  PayrollGroup,
+  EmployeeGroup,
+  EmployeePosition,
+  EmployeeArea,
+  EmployeeStatus,
+} from "./PayrollWizardPage.types";
 
 interface GroupsStepProps {
   groups: PayrollGroup[];
@@ -31,16 +43,16 @@ function GroupForm({
     statuses: EmployeeStatus[];
   };
 }) {
-  const [groupId, setGroupId] = useState('');
-  const [positionId, setPositionId] = useState('');
-  const [areaId, setAreaId] = useState('');
-  const [statusId, setStatusId] = useState('');
+  const [groupId, setGroupId] = useState("");
+  const [positionId, setPositionId] = useState("");
+  const [areaId, setAreaId] = useState("");
+  const [statusId, setStatusId] = useState("");
 
   const handleAdd = () => {
     if (groupId || positionId || areaId || statusId) {
       onAdd({
-        id: '',
-        payrollId: '',
+        id: "",
+        payrollId: "",
         groupId,
         positionId,
         areaId,
@@ -48,10 +60,10 @@ function GroupForm({
         order: 0,
         page: 1,
       });
-      setGroupId('');
-      setPositionId('');
-      setAreaId('');
-      setStatusId('');
+      setGroupId("");
+      setPositionId("");
+      setAreaId("");
+      setStatusId("");
     }
   };
 
@@ -138,9 +150,8 @@ export function GroupsStep({
               className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
             >
               <span className="text-sm">
-                Group: {g.groupId || 'All'} | Position:{' '}
-                {g.positionId || 'All'} | Area: {g.areaId || 'All'} |
-                Status: {g.statusId || 'All'}
+                Group: {g.groupId || "All"} | Position: {g.positionId || "All"}{" "}
+                | Area: {g.areaId || "All"} | Status: {g.statusId || "All"}
               </span>
               <Button
                 variant="ghost"

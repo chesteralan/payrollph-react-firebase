@@ -1,7 +1,13 @@
-import { Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 
 interface InclusiveDatesStepProps {
   errors: Record<string, string>;
@@ -32,9 +38,7 @@ export function InclusiveDatesStep({
         <CardTitle>Inclusive Dates</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {errors.dates && (
-          <p className="text-sm text-red-600">{errors.dates}</p>
-        )}
+        {errors.dates && <p className="text-sm text-red-600">{errors.dates}</p>}
         <div className="flex gap-2">
           <Input
             id="date"

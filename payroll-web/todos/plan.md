@@ -109,6 +109,7 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 ## 🔍 Phase 8: Page Smoke Tests (20+ files)
 
 ### Auth (P1 — 3 tests each)
+
 - [ ] **8.1** `LoginPage.test.tsx` — renders, form submit, error state
 - [ ] **8.2** `ForgotPasswordPage.test.tsx` — renders, form submit, error state
 - [ ] **8.3** `ChangePasswordPage.test.tsx` — renders, form submit, error state
@@ -116,6 +117,7 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 - [ ] **8.5** `SetupPage.test.tsx` — renders, form submit, error state
 
 ### Employees (P2 — 2 tests each)
+
 - [ ] **8.6** `EmployeesPage.test.tsx`
 - [ ] **8.7** `GroupsPage.test.tsx`
 - [ ] **8.8** `PositionsPage.test.tsx`
@@ -123,11 +125,13 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 - [ ] **8.10** `CalendarPage.test.tsx`
 
 ### Payroll (P1 — 3 tests each)
+
 - [ ] **8.11** `PayrollRunsPage.test.tsx`
 - [ ] **8.12** `TemplatesPage.test.tsx`
 - [ ] **8.13** `PrintFormatsPage.test.tsx`
 
 ### Reports (P2 — 1 test each)
+
 - [ ] **8.14** `PayrollSummaryPage.test.tsx`
 - [ ] **8.15** `EmployeeReportPage.test.tsx`
 - [ ] **8.16** `EarningsDeductionsReportPage.test.tsx`
@@ -138,6 +142,7 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 - [ ] **8.21** `CustomReportBuilderPage.test.tsx`
 
 ### System (P2 — 2 tests each)
+
 - [ ] **8.22** `CompaniesPage.test.tsx`
 - [ ] **8.23** `CompanySettingsPage.test.tsx`
 - [ ] **8.24** `SystemSettingsPage.test.tsx`
@@ -145,6 +150,7 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 - [ ] **8.26** `HealthCheckPage.test.tsx`
 
 ### Company Select / Dashboard
+
 - [ ] **8.27** `CompanySelectPage.test.tsx`
 - [ ] **8.28** `DashboardPage.test.tsx`
 
@@ -181,13 +187,13 @@ Sources: `.agents/plan/` (Refactor Backlog, QA Test Plan, Modernization Roadmap,
 
 ## ✅ Current Status
 
-| Metric | Value |
-|---|---|
+| Metric          | Value                  |
+| --------------- | ---------------------- |
 | **REFACTOR.md** | 17 / 60 items complete |
-| **Test files** | 6 existing, ~50 needed |
-| **Lint** | 0 errors, 2 warnings |
-| **Type-check** | pass |
-| **Build** | pass |
+| **Test files**  | 6 existing, ~50 needed |
+| **Lint**        | 0 errors, 2 warnings   |
+| **Type-check**  | pass                   |
+| **Build**       | pass                   |
 
 ---
 

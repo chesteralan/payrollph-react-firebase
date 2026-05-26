@@ -5,7 +5,13 @@ import CustomReportBuilderPage from "./CustomReportBuilderPage";
 vi.mock("@/hooks/useCompany", () => ({
   useCompany: () => ({
     companies: [],
-    selectedCompany: { id: "test-company", name: "Test Company", isActive: true, createdAt: new Date(), updatedAt: new Date() },
+    selectedCompany: {
+      id: "test-company",
+      name: "Test Company",
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
     selectCompany: vi.fn(),
     loading: false,
   }),

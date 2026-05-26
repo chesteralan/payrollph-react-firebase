@@ -1,19 +1,19 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { DTRPage } from './DTRPage';
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import { DTRPage } from "./DTRPage";
 
 // Mock the firebase config
-vi.mock('@/config/firebase', () => ({
+vi.mock("@/config/firebase", () => ({
   db: {},
 }));
 
 // Mock hooks
-vi.mock('@/hooks/useToast', () => ({
+vi.mock("@/hooks/useToast", () => ({
   useToast: () => ({ addToast: vi.fn() }),
 }));
 
-vi.mock('@/hooks/usePermissions', () => ({
+vi.mock("@/hooks/usePermissions", () => ({
   usePermissions: () => ({
     canView: () => true,
     canEdit: () => true,
@@ -21,13 +21,13 @@ vi.mock('@/hooks/usePermissions', () => ({
   }),
 }));
 
-describe('DTRPage', () => {
-  it('renders the DTR page heading', () => {
+describe("DTRPage", () => {
+  it("renders the DTR page heading", () => {
     render(
       <BrowserRouter>
         <DTRPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
-    expect(screen.getByText('Daily Time Record')).toBeTruthy();
+    expect(screen.getByText("Daily Time Record")).toBeTruthy();
   });
 });

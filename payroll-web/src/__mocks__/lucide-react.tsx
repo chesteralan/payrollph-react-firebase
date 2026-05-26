@@ -1,7 +1,13 @@
 import { type ReactNode } from "react";
 
 function createIcon(name: string) {
-  return function MockIcon({ className, "aria-hidden": ariaHidden }: { className?: string; "aria-hidden"?: boolean }) {
+  return function MockIcon({
+    className,
+    "aria-hidden": ariaHidden,
+  }: {
+    className?: string;
+    "aria-hidden"?: boolean;
+  }) {
     return (
       <svg
         data-testid={`lucide-${name.toLowerCase()}`}

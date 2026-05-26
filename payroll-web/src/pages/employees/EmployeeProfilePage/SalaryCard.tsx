@@ -82,8 +82,7 @@ export function SalaryCard({
           </div>
           {salary && (
             <div className="mt-4 text-sm text-gray-500">
-              Effective:{" "}
-              {new Date(salary.effectiveDate).toLocaleDateString()}
+              Effective: {new Date(salary.effectiveDate).toLocaleDateString()}
             </div>
           )}
           <div className="flex justify-end mt-4">

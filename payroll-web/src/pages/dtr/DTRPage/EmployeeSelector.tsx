@@ -1,11 +1,27 @@
-import { ChevronLeft, ChevronRight, Filter, Calendar, Table } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
-import type { DTRPageViewMode } from './DTRPage.types';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Calendar,
+  Table,
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import type { DTRPageViewMode } from "./DTRPage.types";
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 interface EmployeeSelectorProps {
@@ -81,15 +97,15 @@ export function EmployeeSelector({
           </select>
           <div className="flex border rounded-md overflow-hidden">
             <button
-              onClick={() => onViewModeChange('calendar')}
-              className={`px-3 py-1.5 text-sm flex items-center gap-1 ${viewMode === 'calendar' ? 'bg-primary-600 text-white' : 'bg-white text-gray-600'}`}
+              onClick={() => onViewModeChange("calendar")}
+              className={`px-3 py-1.5 text-sm flex items-center gap-1 ${viewMode === "calendar" ? "bg-primary-600 text-white" : "bg-white text-gray-600"}`}
             >
               <Calendar className="w-3 h-3" />
               Calendar
             </button>
             <button
-              onClick={() => onViewModeChange('summary')}
-              className={`px-3 py-1.5 text-sm flex items-center gap-1 ${viewMode === 'summary' ? 'bg-primary-600 text-white' : 'bg-white text-gray-600'}`}
+              onClick={() => onViewModeChange("summary")}
+              className={`px-3 py-1.5 text-sm flex items-center gap-1 ${viewMode === "summary" ? "bg-primary-600 text-white" : "bg-white text-gray-600"}`}
             >
               <Table className="w-3 h-3" />
               Summary

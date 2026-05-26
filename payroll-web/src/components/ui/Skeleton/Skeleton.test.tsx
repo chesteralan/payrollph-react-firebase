@@ -45,9 +45,7 @@ describe("Skeleton", () => {
   });
 
   it("should apply custom className", () => {
-    const { container } = render(
-      <Skeleton className="custom-class" />,
-    );
+    const { container } = render(<Skeleton className="custom-class" />);
     const skeleton = container.firstChild as HTMLElement;
     expect(skeleton).toHaveClass("custom-class");
   });
@@ -61,9 +59,7 @@ describe("Skeleton", () => {
   });
 
   it("should accept custom width and height", () => {
-    const { container } = render(
-      <Skeleton width="200px" height="50px" />,
-    );
+    const { container } = render(<Skeleton width="200px" height="50px" />);
     const skeleton = container.firstChild as HTMLElement;
     expect(skeleton.style.width).toBe("200px");
     expect(skeleton.style.height).toBe("50px");
@@ -111,9 +107,7 @@ describe("CardSkeleton", () => {
   });
 
   it("should apply custom className", () => {
-    const { container } = render(
-      <CardSkeleton className="custom-card" />,
-    );
+    const { container } = render(<CardSkeleton className="custom-card" />);
     expect(container.firstChild as HTMLElement).toHaveClass("custom-card");
   });
 });
@@ -165,7 +159,9 @@ describe("PageSkeleton", () => {
 
   it("should render header area with two skeleton elements", () => {
     const { container } = render(<PageSkeleton sections={1} />);
-    const headerRow = container.querySelector(".flex.items-center.justify-between");
+    const headerRow = container.querySelector(
+      ".flex.items-center.justify-between",
+    );
     expect(headerRow).toBeInTheDocument();
     expect(headerRow!.children.length).toBe(2);
   });

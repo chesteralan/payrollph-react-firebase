@@ -49,7 +49,13 @@ vi.mock("@/components/ui/Button", () => ({
 
 // Mock Card components
 vi.mock("@/components/ui/Card", () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <div data-testid="card" className={className}>
       {children}
     </div>
@@ -60,7 +66,13 @@ vi.mock("@/components/ui/Card", () => ({
   CardTitle: ({ children }: { children: React.ReactNode }) => (
     <h3 data-testid="card-title">{children}</h3>
   ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <div data-testid="card-content" className={className}>
       {children}
     </div>
@@ -138,9 +150,7 @@ describe("PrintFooter", () => {
 
   it("renders a date string", () => {
     render(<PrintFooter company={undefined} />);
-    expect(
-      screen.getByText(new Date().toLocaleDateString()),
-    ).toBeTruthy();
+    expect(screen.getByText(new Date().toLocaleDateString())).toBeTruthy();
   });
 });
 
@@ -398,8 +408,6 @@ describe("PayslipMode", () => {
 
   it("shows 'No employees' when rows are empty", () => {
     render(<PayslipMode {...defaultProps} rows={[]} filteredRows={[]} />);
-    expect(
-      screen.getByText("No employees in this payroll."),
-    ).toBeTruthy();
+    expect(screen.getByText("No employees in this payroll.")).toBeTruthy();
   });
 });

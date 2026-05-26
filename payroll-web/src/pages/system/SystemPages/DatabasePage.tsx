@@ -10,22 +10,12 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
-import {
-  Download,
-  Save,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { Download, Save, CheckCircle, AlertTriangle } from "lucide-react";
 import { COLLECTIONS } from "./SystemPages.constants";
 
 export function DatabasePage() {

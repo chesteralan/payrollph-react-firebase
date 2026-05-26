@@ -1,12 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "./Card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./Card";
 
 describe("Card", () => {
   it("should render children", () => {
@@ -21,9 +15,7 @@ describe("Card", () => {
   });
 
   it("should apply custom className", () => {
-    const { container } = render(
-      <Card className="custom-card">Content</Card>,
-    );
+    const { container } = render(<Card className="custom-card">Content</Card>);
     const card = container.firstChild as HTMLElement;
     expect(card).toHaveClass("custom-card");
   });
@@ -146,12 +138,7 @@ describe("CardFooter", () => {
   it("should render with footer styling", () => {
     const { container } = render(<CardFooter>Footer</CardFooter>);
     const footer = container.firstChild as HTMLElement;
-    expect(footer).toHaveClass(
-      "px-6",
-      "py-4",
-      "border-t",
-      "bg-gray-50",
-    );
+    expect(footer).toHaveClass("px-6", "py-4", "border-t", "bg-gray-50");
   });
 
   it("should apply custom className", () => {

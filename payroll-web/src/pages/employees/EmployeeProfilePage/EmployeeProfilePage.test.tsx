@@ -61,10 +61,7 @@ describe("EmployeeProfilePage", () => {
     render(
       <MemoryRouter initialEntries={["/employees/test-id"]}>
         <Routes>
-          <Route
-            path="/employees/:id"
-            element={<EmployeeProfilePage />}
-          />
+          <Route path="/employees/:id" element={<EmployeeProfilePage />} />
         </Routes>
       </MemoryRouter>,
     );
@@ -75,10 +72,7 @@ describe("EmployeeProfilePage", () => {
     render(
       <MemoryRouter initialEntries={["/employees/test-id"]}>
         <Routes>
-          <Route
-            path="/employees/:id"
-            element={<EmployeeProfilePage />}
-          />
+          <Route path="/employees/:id" element={<EmployeeProfilePage />} />
         </Routes>
       </MemoryRouter>,
     );

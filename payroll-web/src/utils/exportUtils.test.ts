@@ -62,7 +62,9 @@ describe("exportUtils column definitions", () => {
     });
 
     it("should include Taxable flag", () => {
-      expect(earningExportColumns.some((c) => c.key === "isTaxable")).toBe(true);
+      expect(earningExportColumns.some((c) => c.key === "isTaxable")).toBe(
+        true,
+      );
     });
   });
 
@@ -122,9 +124,7 @@ describe("exportToCSV", () => {
   });
 
   it("should handle null/undefined values", () => {
-    const data = [
-      { id: 1, name: null, email: undefined },
-    ];
+    const data = [{ id: 1, name: null, email: undefined }];
     const columns = [
       { header: "ID", key: "id" },
       { header: "Name", key: "name" },
@@ -161,9 +161,7 @@ describe("exportToCSV", () => {
   });
 
   it("should handle numeric values correctly", () => {
-    const data = [
-      { id: 1, salary: 50000.5, rate: 0.1 },
-    ];
+    const data = [{ id: 1, salary: 50000.5, rate: 0.1 }];
     const columns = [
       { header: "ID", key: "id" },
       { header: "Salary", key: "salary" },
@@ -192,9 +190,7 @@ describe("exportToJson", () => {
   });
 
   it("should handle complex nested objects", () => {
-    const data = [
-      { id: 1, meta: { department: "Engineering", role: "Dev" } },
-    ];
+    const data = [{ id: 1, meta: { department: "Engineering", role: "Dev" } }];
     expect(() => exportToJson(data, "complex")).not.toThrow();
   });
 

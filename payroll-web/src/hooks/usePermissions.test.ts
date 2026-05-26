@@ -87,18 +87,14 @@ describe("checkPermission (pure function)", () => {
   });
 
   it("returns false when restriction exists but requested permission is false", () => {
-    const restrictions = [
-      makeEntry("payroll", "payroll", { canView: false }),
-    ];
+    const restrictions = [makeEntry("payroll", "payroll", { canView: false })];
     expect(checkPermission(restrictions, "payroll", "payroll", "view")).toBe(
       false,
     );
   });
 
   it("returns true for view permission when canView is true", () => {
-    const restrictions = [
-      makeEntry("payroll", "payroll", { canView: true }),
-    ];
+    const restrictions = [makeEntry("payroll", "payroll", { canView: true })];
     expect(checkPermission(restrictions, "payroll", "payroll", "view")).toBe(
       true,
     );
@@ -108,27 +104,23 @@ describe("checkPermission (pure function)", () => {
     const restrictions = [
       makeEntry("employees", "employees", { canAdd: true }),
     ];
-    expect(
-      checkPermission(restrictions, "employees", "employees", "add"),
-    ).toBe(true);
+    expect(checkPermission(restrictions, "employees", "employees", "add")).toBe(
+      true,
+    );
   });
 
   it("returns true for edit permission when canEdit is true", () => {
-    const restrictions = [
-      makeEntry("reports", "audit", { canEdit: true }),
-    ];
-    expect(
-      checkPermission(restrictions, "reports", "audit", "edit"),
-    ).toBe(true);
+    const restrictions = [makeEntry("reports", "audit", { canEdit: true })];
+    expect(checkPermission(restrictions, "reports", "audit", "edit")).toBe(
+      true,
+    );
   });
 
   it("returns true for delete permission when canDelete is true", () => {
-    const restrictions = [
-      makeEntry("system", "users", { canDelete: true }),
-    ];
-    expect(
-      checkPermission(restrictions, "system", "users", "delete"),
-    ).toBe(true);
+    const restrictions = [makeEntry("system", "users", { canDelete: true })];
+    expect(checkPermission(restrictions, "system", "users", "delete")).toBe(
+      true,
+    );
   });
 
   it("distinguishes between different actions on the same restriction", () => {
@@ -149,27 +141,23 @@ describe("checkPermission (pure function)", () => {
     expect(checkPermission(restrictions, "payroll", "payroll", "edit")).toBe(
       true,
     );
-    expect(
-      checkPermission(restrictions, "payroll", "payroll", "delete"),
-    ).toBe(false);
+    expect(checkPermission(restrictions, "payroll", "payroll", "delete")).toBe(
+      false,
+    );
   });
 
   it("does not match on different departments with same section", () => {
-    const restrictions = [
-      makeEntry("payroll", "employees", { canView: true }),
-    ];
+    const restrictions = [makeEntry("payroll", "employees", { canView: true })];
     expect(
       checkPermission(restrictions, "employees", "employees", "view"),
     ).toBe(false);
   });
 
   it("does not match on same department with different section", () => {
-    const restrictions = [
-      makeEntry("payroll", "payroll", { canView: true }),
-    ];
-    expect(
-      checkPermission(restrictions, "payroll", "templates", "view"),
-    ).toBe(false);
+    const restrictions = [makeEntry("payroll", "payroll", { canView: true })];
+    expect(checkPermission(restrictions, "payroll", "templates", "view")).toBe(
+      false,
+    );
   });
 
   it("handles multiple restrictions and finds the right one", () => {
@@ -180,11 +168,19 @@ describe("checkPermission (pure function)", () => {
       makeEntry("reports", "audit", { canView: true, canAdd: true }),
     ];
 
-    expect(checkPermission(restrictions, "employees", "employees", "delete")).toBe(true);
-    expect(checkPermission(restrictions, "employees", "employees", "edit")).toBe(false);
-    expect(checkPermission(restrictions, "system", "users", "view")).toBe(false);
+    expect(
+      checkPermission(restrictions, "employees", "employees", "delete"),
+    ).toBe(true);
+    expect(
+      checkPermission(restrictions, "employees", "employees", "edit"),
+    ).toBe(false);
+    expect(checkPermission(restrictions, "system", "users", "view")).toBe(
+      false,
+    );
     expect(checkPermission(restrictions, "reports", "audit", "add")).toBe(true);
-    expect(checkPermission(restrictions, "payroll", "templates", "view")).toBe(false);
+    expect(checkPermission(restrictions, "payroll", "templates", "view")).toBe(
+      false,
+    );
   });
 });
 
@@ -194,7 +190,13 @@ describe("usePermissions", () => {
     vi.clearAllMocks();
   });
 
-  function setupHook(hasPermissionImpl?: (department: Department, section: Section, action: "view" | "add" | "edit" | "delete") => boolean) {
+  function setupHook(
+    hasPermissionImpl?: (
+      department: Department,
+      section: Section,
+      action: "view" | "add" | "edit" | "delete",
+    ) => boolean,
+  ) {
     const mockHasPermission = hasPermissionImpl ?? vi.fn(() => true);
     vi.spyOn(useAuthModule, "useAuth").mockReturnValue({
       hasPermission: mockHasPermission,
@@ -226,11 +228,7 @@ describe("usePermissions", () => {
     const { result } = setupHook(hasPermission);
 
     const canAdd = result.current.canAdd("employees", "employees");
-    expect(hasPermission).toHaveBeenCalledWith(
-      "employees",
-      "employees",
-      "add",
-    );
+    expect(hasPermission).toHaveBeenCalledWith("employees", "employees", "add");
     expect(canAdd).toBe(false);
   });
 

@@ -4,12 +4,7 @@ import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileSpreadsheet, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import type {
@@ -20,7 +15,10 @@ import type {
   EmployeeGroup,
 } from "../../types";
 
-import type { BenefitSummary, BenefitEmployeeDetail } from "./BenefitsUtilizationReportPage.types";
+import type {
+  BenefitSummary,
+  BenefitEmployeeDetail,
+} from "./BenefitsUtilizationReportPage.types";
 
 export function BenefitsUtilizationReportPage() {
   const { currentCompanyId } = useAuth();

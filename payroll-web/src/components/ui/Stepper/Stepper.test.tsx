@@ -31,7 +31,9 @@ describe("Stepper", () => {
 
   it("should mark completed steps with check icon", () => {
     render(<Stepper steps={defaultSteps} />);
-    const completedLabel = screen.getByLabelText("Step 1: Personal Info (completed)");
+    const completedLabel = screen.getByLabelText(
+      "Step 1: Personal Info (completed)",
+    );
     expect(completedLabel).toBeInTheDocument();
     expect(completedLabel).toContainHTML("svg");
   });
@@ -69,7 +71,9 @@ describe("Stepper", () => {
   it("should render connectors between steps", () => {
     const { container } = render(<Stepper steps={defaultSteps} />);
     // The connector divs have class "flex-1 h-0.5 mx-4"
-    const connectors = container.querySelectorAll('[class*="h-0"][class*="mx-4"]');
+    const connectors = container.querySelectorAll(
+      '[class*="h-0"][class*="mx-4"]',
+    );
     expect(connectors.length).toBe(3); // 4 steps → 3 connectors
   });
 
@@ -100,13 +104,13 @@ describe("Stepper", () => {
   });
 
   it("should handle a single step", () => {
-    const singleStep = [
-      { label: "Only Step", completed: false, active: true },
-    ];
+    const singleStep = [{ label: "Only Step", completed: false, active: true }];
     const { container } = render(<Stepper steps={singleStep} />);
     expect(screen.getByText("Only Step")).toBeInTheDocument();
     // No connectors when only one step
-    const connectors = container.querySelectorAll('[class*="h-0"][class*="mx-4"]');
+    const connectors = container.querySelectorAll(
+      '[class*="h-0"][class*="mx-4"]',
+    );
     expect(connectors.length).toBe(0);
   });
 });

@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import { CompanySettingsPage } from "./CompanySettingsPage";
-import { renderWithProviders, createMockCompanyContextValue } from "@/test/page-test-utils";
+import {
+  renderWithProviders,
+  createMockCompanyContextValue,
+} from "@/test/page-test-utils";
 import { addMockDocs, clearMockDocs } from "../../../__mocks__/firebase";
 
 beforeEach(() => {
@@ -25,10 +28,18 @@ describe("CompanySettingsPage", () => {
     ]);
 
     const companyValue = createMockCompanyContextValue({
-      selectedCompany: { id: "company-1", name: "Test Company", isActive: true, createdAt: new Date(), updatedAt: new Date() },
+      selectedCompany: {
+        id: "company-1",
+        name: "Test Company",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     });
 
     renderWithProviders(<CompanySettingsPage />, { companyValue });
-    expect(await screen.findByRole("heading", { name: /company settings/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /company settings/i }),
+    ).toBeInTheDocument();
   });
 });

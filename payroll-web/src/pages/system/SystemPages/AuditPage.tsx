@@ -1,27 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-} from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
-import {
-  Download,
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
-} from "lucide-react";
+import { Download, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import * as XLSX from "xlsx";
 import type { AuditEntry } from "@/services/audit";
 

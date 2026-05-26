@@ -241,13 +241,28 @@ describe("useUndoManager", () => {
 
     // Push three actions
     act(() => {
-      result.current.push({ type: "a1", description: "A1", undo: undo1, redo: redo1 });
+      result.current.push({
+        type: "a1",
+        description: "A1",
+        undo: undo1,
+        redo: redo1,
+      });
     });
     act(() => {
-      result.current.push({ type: "a2", description: "A2", undo: undo2, redo: redo2 });
+      result.current.push({
+        type: "a2",
+        description: "A2",
+        undo: undo2,
+        redo: redo2,
+      });
     });
     act(() => {
-      result.current.push({ type: "a3", description: "A3", undo: undo3, redo: redo3 });
+      result.current.push({
+        type: "a3",
+        description: "A3",
+        undo: undo3,
+        redo: redo3,
+      });
     });
     expect(result.current.currentIndex).toBe(2);
 
@@ -261,7 +276,12 @@ describe("useUndoManager", () => {
     const undo4 = vi.fn();
     const redo4 = vi.fn();
     act(() => {
-      result.current.push({ type: "a4", description: "A4", undo: undo4, redo: redo4 });
+      result.current.push({
+        type: "a4",
+        description: "A4",
+        undo: undo4,
+        redo: redo4,
+      });
     });
 
     expect(result.current.history).toHaveLength(3);

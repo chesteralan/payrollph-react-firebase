@@ -17,6 +17,8 @@ describe("TrashPage", () => {
     addMockDocs("payrolls", []);
     addMockDocs("templates", []);
     renderWithProviders(<TrashPage />);
-    expect(await screen.findByRole("heading", { name: /trash/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /trash/i }),
+    ).toBeInTheDocument();
   });
 });

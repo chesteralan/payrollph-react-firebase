@@ -70,18 +70,14 @@ describe("EmptyState", () => {
 
   it("should render action button when action prop is provided", () => {
     const actionButton = <button>Create New</button>;
-    render(
-      <EmptyState title="No Data" action={actionButton} />,
-    );
+    render(<EmptyState title="No Data" action={actionButton} />);
     expect(screen.getByText("Create New")).toBeInTheDocument();
   });
 
   it("should call action handler when action button is clicked", () => {
     const handleClick = vi.fn();
     const actionButton = <button onClick={handleClick}>Create New</button>;
-    render(
-      <EmptyState title="No Data" action={actionButton} />,
-    );
+    render(<EmptyState title="No Data" action={actionButton} />);
     fireEvent.click(screen.getByText("Create New"));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -95,13 +91,7 @@ describe("EmptyState", () => {
 
   it("should use provided icon when icon prop is given", () => {
     const CustomIcon = () => <svg data-testid="custom-icon" />;
-    render(
-      <EmptyState
-        title="Custom"
-        type="data"
-        icon={<CustomIcon />}
-      />,
-    );
+    render(<EmptyState title="Custom" type="data" icon={<CustomIcon />} />);
     // When icon prop is provided, it takes precedence over type-based icon
     // The default FileText icon is NOT rendered when icon prop is given
     expect(screen.queryByTestId("lucide-filetext")).not.toBeInTheDocument();

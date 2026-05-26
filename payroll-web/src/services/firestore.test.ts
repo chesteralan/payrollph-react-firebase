@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  addMockDocs,
-  clearMockDocs,
-  getMockDocs,
-} from "../__mocks__/firebase";
+import { addMockDocs, clearMockDocs, getMockDocs } from "../__mocks__/firebase";
 import { getById, getAll, create, update, remove } from "./firestore";
 import {
   getDoc,
@@ -38,10 +34,11 @@ describe("getById", () => {
       { id: "doc1", name: "Test Company", isActive: true },
     ]);
 
-    const result = await getById<{ id: string; name: string; isActive: boolean }>(
-      "companies",
-      "doc1",
-    );
+    const result = await getById<{
+      id: string;
+      name: string;
+      isActive: boolean;
+    }>("companies", "doc1");
 
     expect(result).toEqual({
       id: "doc1",
@@ -153,7 +150,9 @@ describe("getAll", () => {
   });
 
   it("should apply multiple filters", async () => {
-    addMockDocs("employees", [{ id: "1", name: "Alice", isActive: true, department: "Engineering" }]);
+    addMockDocs("employees", [
+      { id: "1", name: "Alice", isActive: true, department: "Engineering" },
+    ]);
 
     await getAll("employees", [
       { field: "isActive", op: "==", value: true },
@@ -180,10 +179,13 @@ describe("create", () => {
   it("should call addDoc with the correct collection path", async () => {
     await create("employees", { name: "Alice", isActive: true });
 
-    expect(addDoc).toHaveBeenCalledWith("employees", expect.objectContaining({
-      name: "Alice",
-      isActive: true,
-    }));
+    expect(addDoc).toHaveBeenCalledWith(
+      "employees",
+      expect.objectContaining({
+        name: "Alice",
+        isActive: true,
+      }),
+    );
   });
 
   it("should add serverTimestamp for createdAt and updatedAt", async () => {

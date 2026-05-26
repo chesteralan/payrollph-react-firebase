@@ -3,7 +3,13 @@ export interface DTRPageDayForm {
   timeOut: string;
   overtimeHours: number;
   lateHours: number;
-  absenceType: 'absent' | 'late' | 'undertime' | 'sick' | 'vacation' | undefined;
+  absenceType:
+    | "absent"
+    | "late"
+    | "undertime"
+    | "sick"
+    | "vacation"
+    | undefined;
   absenceReason: string;
   notes: string;
 }
@@ -20,4 +26,4 @@ export interface DTRPageBenefit {
   name: string;
 }
 
-export type DTRPageViewMode = 'calendar' | 'summary';
+export type DTRPageViewMode = "calendar" | "summary";

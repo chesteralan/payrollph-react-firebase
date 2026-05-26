@@ -8,14 +8,14 @@ import {
   query,
   limit,
 } from "firebase/firestore";
-import { ref, listAll, getMetadata, type StorageReference } from "firebase/storage";
-import { db, storage } from "@/config/firebase";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+  ref,
+  listAll,
+  getMetadata,
+  type StorageReference,
+} from "firebase/storage";
+import { db, storage } from "@/config/firebase";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
@@ -31,7 +31,10 @@ import {
   Clock,
 } from "lucide-react";
 
-import type { HealthCheckResult, CollectionHealth } from "./HealthCheckPage.types";
+import type {
+  HealthCheckResult,
+  CollectionHealth,
+} from "./HealthCheckPage.types";
 
 const MAJOR_COLLECTIONS = [
   "names",
@@ -254,21 +257,21 @@ export function HealthCheckPage() {
         health: healthData,
       };
     } catch (error) {
-       
       const healthData = {
         accessible: false,
         fileCount: 0,
         totalSize: 0,
-        error: (error instanceof Error ? error.message : String(error)),
+        error: error instanceof Error ? error.message : String(error),
       };
       return {
         result: {
           name: "Storage Bucket",
           status: "warning",
           message: "Unable to access storage",
-           
+
           details:
-            (error instanceof Error ? error.message : String(error)) || "Check storage rules or configuration",
+            (error instanceof Error ? error.message : String(error)) ||
+            "Check storage rules or configuration",
         },
         health: healthData,
       };
@@ -292,13 +295,16 @@ export function HealthCheckPage() {
         health: healthData,
       };
     } catch (error) {
-      const healthData = { userCount: 0, error: error instanceof Error ? error.message : String(error) };
+      const healthData = {
+        userCount: 0,
+        error: error instanceof Error ? error.message : String(error),
+      };
       return {
         result: {
           name: "Auth / Users",
           status: "warning",
           message: "Unable to fetch user count",
-           
+
           details:
             (error instanceof Error ? error.message : String(error)) ||
             "Check Firestore rules for user_accounts",

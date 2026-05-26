@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { useKeyboardShortcuts, useGlobalShortcuts } from "./useKeyboardShortcuts";
+import {
+  useKeyboardShortcuts,
+  useGlobalShortcuts,
+} from "./useKeyboardShortcuts";
 
 interface Shortcut {
   key: string;
@@ -11,7 +14,9 @@ interface Shortcut {
   preventDefault?: boolean;
 }
 
-function createKeyboardEvent(overrides: Partial<KeyboardEvent> = {}): KeyboardEvent {
+function createKeyboardEvent(
+  overrides: Partial<KeyboardEvent> = {},
+): KeyboardEvent {
   return new KeyboardEvent("keydown", {
     key: "a",
     ctrlKey: false,
@@ -124,9 +129,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("should not call preventDefault when preventDefault is false", () => {
     const action = vi.fn();
-    const shortcuts: Shortcut[] = [
-      { key: "a", action, preventDefault: false },
-    ];
+    const shortcuts: Shortcut[] = [{ key: "a", action, preventDefault: false }];
 
     renderHook(() => useKeyboardShortcuts(shortcuts));
 
@@ -139,9 +142,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("should call preventDefault when preventDefault is true", () => {
     const action = vi.fn();
-    const shortcuts: Shortcut[] = [
-      { key: "a", action, preventDefault: true },
-    ];
+    const shortcuts: Shortcut[] = [{ key: "a", action, preventDefault: true }];
 
     renderHook(() => useKeyboardShortcuts(shortcuts));
 

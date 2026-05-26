@@ -13,7 +13,9 @@ describe("EmployeeGroupsPage", () => {
   it("renders without crashing", () => {
     addMockDocs("employee_groups", []);
     renderWithProviders(<EmployeeGroupsPage />);
-    expect(screen.getByRole("heading", { name: /employee groups/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /employee groups/i }),
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search groups...")).toBeInTheDocument();
   });
 });

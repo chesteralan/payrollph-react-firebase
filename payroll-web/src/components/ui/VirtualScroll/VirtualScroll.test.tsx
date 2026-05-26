@@ -19,9 +19,7 @@ describe("VirtualScroll", () => {
     rowHeight: 50,
     containerHeight: 200,
     getKey: (item: TestItem) => String(item.id),
-    renderRow: (item: TestItem) => (
-      <div>{item.text}</div>
-    ),
+    renderRow: (item: TestItem) => <div>{item.text}</div>,
   };
 
   it("should render visible items within viewport", () => {
@@ -65,9 +63,7 @@ describe("VirtualScroll", () => {
     const renderRow = (item: TestItem) => (
       <div data-testid={`custom-row-${item.id}`}>{item.text.toUpperCase()}</div>
     );
-    render(
-      <VirtualScroll {...defaultProps} renderRow={renderRow} />,
-    );
+    render(<VirtualScroll {...defaultProps} renderRow={renderRow} />);
     expect(screen.getByTestId("custom-row-0")).toBeInTheDocument();
     expect(screen.getByText("ITEM 0")).toBeInTheDocument();
   });
@@ -85,19 +81,12 @@ describe("VirtualScroll", () => {
   });
 
   it("should handle single item", () => {
-    render(
-      <VirtualScroll
-        {...defaultProps}
-        items={generateItems(1)}
-      />,
-    );
+    render(<VirtualScroll {...defaultProps} items={generateItems(1)} />);
     expect(screen.getByText("Item 0")).toBeInTheDocument();
   });
 
   it("should set container height correctly", () => {
-    const { container } = render(
-      <VirtualScroll {...defaultProps} />,
-    );
+    const { container } = render(<VirtualScroll {...defaultProps} />);
     const scrollContainer = container.firstChild as HTMLElement;
     expect(scrollContainer.style.height).toBe("200px");
   });

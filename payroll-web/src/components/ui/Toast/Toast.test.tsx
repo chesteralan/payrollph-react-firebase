@@ -7,7 +7,12 @@ import { useToast } from "@/hooks/useToast";
 function ToastTester({
   addConfig,
 }: {
-  addConfig?: { type: "success" | "error" | "info" | "warning"; title: string; message?: string; duration?: number };
+  addConfig?: {
+    type: "success" | "error" | "info" | "warning";
+    title: string;
+    message?: string;
+    duration?: number;
+  };
 }) {
   const { toasts, addToast } = useToast();
   return (
@@ -15,7 +20,11 @@ function ToastTester({
       <button
         onClick={() =>
           addToast(
-            addConfig || { type: "info", title: "Test Toast", message: "Test message" },
+            addConfig || {
+              type: "info",
+              title: "Test Toast",
+              message: "Test message",
+            },
           )
         }
       >
@@ -142,7 +151,11 @@ describe("ToastProvider", () => {
     render(
       <ToastProvider>
         <ToastTester
-          addConfig={{ type: "error", title: "Error Toast", message: "Error occurred" }}
+          addConfig={{
+            type: "error",
+            title: "Error Toast",
+            message: "Error occurred",
+          }}
         />
       </ToastProvider>,
     );
@@ -175,9 +188,7 @@ describe("ToastProvider", () => {
   it("should render toast without message", () => {
     render(
       <ToastProvider>
-        <ToastTester
-          addConfig={{ type: "info", title: "No Message Toast" }}
-        />
+        <ToastTester addConfig={{ type: "info", title: "No Message Toast" }} />
       </ToastProvider>,
     );
 

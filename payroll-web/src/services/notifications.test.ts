@@ -27,7 +27,8 @@ vi.mock("firebase/firestore", () => ({
   }),
   getDoc: vi.fn(async (docPath: string | { id: string }) => {
     const { getMockDocs: fetchDocs } = await import("../__mocks__/firebase");
-    const path = typeof docPath === "object" ? (docPath as { id: string }).id : docPath;
+    const path =
+      typeof docPath === "object" ? (docPath as { id: string }).id : docPath;
     const docs = fetchDocs(path);
     const docData = docs?.[0];
     if (docData) {
@@ -194,7 +195,9 @@ describe("getNotifications", () => {
   });
 
   it("should include archived notifications when includeArchived is true", async () => {
-    const notifications = await getNotifications("user-1", { includeArchived: true });
+    const notifications = await getNotifications("user-1", {
+      includeArchived: true,
+    });
     expect(notifications.some((n) => n.isArchived)).toBe(true);
   });
 
@@ -392,7 +395,12 @@ describe("submitApproval", () => {
       },
     ]);
 
-    await submitApproval("workflow-reject", "approver-1", "rejected", "Not approved");
+    await submitApproval(
+      "workflow-reject",
+      "approver-1",
+      "rejected",
+      "Not approved",
+    );
 
     expect(updateDoc).toHaveBeenCalledWith(
       expect.objectContaining({ id: "approval_works/workflow-reject" }),
@@ -450,7 +458,10 @@ describe("getPendingApprovalsCount", () => {
 
 describe("NotificationTemplates", () => {
   it("payrollReady should return correct template", () => {
-    const template = NotificationTemplates.payrollReady("June Payroll", "pay-1");
+    const template = NotificationTemplates.payrollReady(
+      "June Payroll",
+      "pay-1",
+    );
 
     expect(template.type).toBe("payroll_ready");
     expect(template.priority).toBe("high");
@@ -471,14 +482,22 @@ describe("NotificationTemplates", () => {
   });
 
   it("deadlineReminder should return urgent priority when daysLeft is 1", () => {
-    const template = NotificationTemplates.deadlineReminder("Payroll", "June", 1);
+    const template = NotificationTemplates.deadlineReminder(
+      "Payroll",
+      "June",
+      1,
+    );
 
     expect(template.priority).toBe("urgent");
     expect(template.message).toContain("due in 1 day");
   });
 
   it("deadlineReminder should return medium priority when daysLeft is greater than 1", () => {
-    const template = NotificationTemplates.deadlineReminder("Payroll", "June", 3);
+    const template = NotificationTemplates.deadlineReminder(
+      "Payroll",
+      "June",
+      3,
+    );
 
     expect(template.priority).toBe("medium");
     expect(template.message).toContain("due in 3 day");

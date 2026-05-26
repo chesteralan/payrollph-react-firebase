@@ -66,9 +66,7 @@ describe("NetworkStatusBanner", () => {
     });
 
     render(<NetworkStatusBanner />);
-    expect(
-      screen.getByLabelText("Dismiss offline notice"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Dismiss offline notice")).toBeInTheDocument();
   });
 
   it("should dismiss the banner when dismiss is clicked", () => {

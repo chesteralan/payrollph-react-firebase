@@ -28,7 +28,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "New Year's Day",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-01", "2024-01-05", holidays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-01",
+      "2024-01-05",
+      holidays,
+    );
     expect(result.totalWorkingDays).toBe(4); // 5 weekdays - 1 holiday
     expect(result.holidaysSubtracted).toBe(1);
   });
@@ -52,7 +56,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "Special Working Day 2",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-06", "2024-01-07", specialWorkdays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-06",
+      "2024-01-07",
+      specialWorkdays,
+    );
     expect(result.totalWorkingDays).toBe(2);
     expect(result.specialWorkdaysAdded).toBe(2);
   });
@@ -68,7 +76,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "Extra Workday",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-03", "2024-01-03", workday);
+    const result = calculateWorkingDaysSync(
+      "2024-01-03",
+      "2024-01-03",
+      workday,
+    );
     expect(result.totalWorkingDays).toBe(1);
     expect(result.specialWorkdaysAdded).toBe(0); // Already a weekday
   });
@@ -84,7 +96,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "Weekend Holiday",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-06", "2024-01-07", holidays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-06",
+      "2024-01-07",
+      holidays,
+    );
     expect(result.totalWorkingDays).toBe(0);
     expect(result.holidaysSubtracted).toBe(0); // Weekend holiday doesn't subtract
   });
@@ -128,7 +144,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "Special Non-Working Day",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-01", "2024-01-05", specials);
+    const result = calculateWorkingDaysSync(
+      "2024-01-01",
+      "2024-01-05",
+      specials,
+    );
     expect(result.totalWorkingDays).toBe(4); // 5 weekdays - 1 special non-working
     expect(result.holidaysSubtracted).toBe(1);
   });
@@ -144,7 +164,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "New Year's Day",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-01", "2024-01-15", holidays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-01",
+      "2024-01-15",
+      holidays,
+    );
     // Weekdays: Jan 1-5 (Mon-Fri), Jan 8-12 (Mon-Fri), Jan 15 (Mon) = 11
     // Minus 1 holiday = 10
     expect(result.totalWorkingDays).toBe(10);
@@ -196,7 +220,11 @@ describe("calculateWorkingDaysSync", () => {
         name: "New Year's Day",
       },
     ];
-    const result = calculateWorkingDaysSync("2024-01-01", "2024-01-05", holidays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-01",
+      "2024-01-05",
+      holidays,
+    );
     expect(result.totalWorkingDays).toBe(4);
     expect(result.holidaysSubtracted).toBe(1);
   });
@@ -219,7 +247,11 @@ describe("calculateWorkingDaysSync", () => {
       },
     ];
     // Only looking at Jan, so Independence Day should be filtered out
-    const result = calculateWorkingDaysSync("2024-01-01", "2024-01-31", holidays);
+    const result = calculateWorkingDaysSync(
+      "2024-01-01",
+      "2024-01-31",
+      holidays,
+    );
     expect(result.holidaysSubtracted).toBe(1); // Only New Year
   });
 });

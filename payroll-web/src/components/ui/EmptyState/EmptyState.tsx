@@ -1,4 +1,3 @@
-
 import type { EmptyStateProps } from "./EmptyState/EmptyState.types";
 import {
   FileText,

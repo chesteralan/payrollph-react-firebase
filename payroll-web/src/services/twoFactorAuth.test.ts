@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createFirestoreMocks, addMockDocs, clearMockDocs, createAuthMocks } from "../__mocks__/firebase";
+import {
+  createFirestoreMocks,
+  addMockDocs,
+  clearMockDocs,
+  createAuthMocks,
+} from "../__mocks__/firebase";
 
 // Mock firebase/firestore with setDoc + getDoc support
 vi.mock("firebase/firestore", () => ({
