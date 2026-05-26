@@ -69,7 +69,24 @@ export function CompanySettingsPage() {
     const ref = doc(db, "company_settings", companyId);
     const snap = await getDoc(ref);
     if (snap.exists()) {
-      setSettings({ id: snap.id, ...snap.data() } as CompanySettings);
+      const data = snap.data();
+      setSettings({
+        id: snap.id,
+        companyId: data.companyId || companyId,
+        general: { ...defaultSettings.general, ...data.general },
+        payrollOptions: {
+          ...defaultSettings.payrollOptions,
+          ...data.payrollOptions,
+        },
+        displayOptions: {
+          ...defaultSettings.displayOptions,
+          ...data.displayOptions,
+        },
+        notifications: {
+          ...defaultSettings.notifications,
+          ...data.notifications,
+        },
+      });
     } else {
       setSettings({ companyId, ...defaultSettings });
     }

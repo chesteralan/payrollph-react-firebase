@@ -11,7 +11,6 @@ import {
   orderBy,
   limit,
   query,
-  serverTimestamp,
 } from "firebase/firestore";
 
 beforeEach(() => {
@@ -194,8 +193,8 @@ describe("create", () => {
     expect(addDoc).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       }),
     );
   });
@@ -211,7 +210,7 @@ describe("update", () => {
       "companies/doc1",
       expect.objectContaining({
         name: "New Name",
-        updatedAt: serverTimestamp(),
+        updatedAt: expect.any(Date),
       }),
     );
   });
@@ -224,7 +223,7 @@ describe("update", () => {
     expect(updateDoc).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        updatedAt: serverTimestamp(),
+        updatedAt: expect.any(Date),
       }),
     );
   });
