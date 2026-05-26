@@ -1,0 +1,12 @@
+{
+  "projectName": "payroll-web",
+  "projectDescription": "SMB Payroll is a web-based payroll management system for small-to-medium businesses. It handles employee management, time tracking, payroll computation, government remittance reporting, and payslip generation.",
+  "frontendFramework": "React + Vite",
+  "backend": "Firebase",
+  "database": "Firestore",
+  "authProvider": "Firebase Auth",
+  "stateManagement": "Zustand",
+  "testingFramework": "Vitest",
+  "packageManager": "yarn",
+  "aiAgent": "generic"
+}

@@ -1,93 +1,256 @@
-import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../config/firebase'
-import type {
-  PayrollEmployee,
-  Employee,
-  EmployeeSalary,
-} from '../types'
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../config/firebase";
+import type { PayrollEmployee, Employee, EmployeeSalary } from "../types";
 
-export async function fetchPayrollEmployees(payrollId: string): Promise<PayrollEmployee[]> {
-  const snap = await getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', payrollId)))
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as PayrollEmployee[]
+export async function fetchPayrollEmployees(
+  payrollId: string,
+): Promise<PayrollEmployee[]> {
+  const snap = await getDocs(
+    query(
+      collection(db, "payroll_employees"),
+      where("payrollId", "==", payrollId),
+    ),
+  );
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as PayrollEmployee[];
 }
 
-export async function fetchEmployeeDetails(nameIds: string[]): Promise<Map<string, Employee>> {
-  const map = new Map<string, Employee>()
+export async function fetchEmployeeDetails(
+  nameIds: string[],
+): Promise<Map<string, Employee>> {
+  const map = new Map<string, Employee>();
   for (const nameId of nameIds) {
-    const snap = await getDocs(query(collection(db, 'employees'), where('nameId', '==', nameId)))
+    const snap = await getDocs(
+      query(collection(db, "employees"), where("nameId", "==", nameId)),
+    );
     if (!snap.empty) {
-      const emp = snap.docs[0]
-      map.set(nameId, { id: emp.id, ...emp.data() } as Employee)
+      const emp = snap.docs[0];
+      map.set(nameId, { id: emp.id, ...emp.data() } as Employee);
     }
   }
-  return map
+  return map;
 }
 
-export async function fetchEmployeeSalaries(employeeIds: string[]): Promise<Map<string, EmployeeSalary>> {
-  const map = new Map<string, EmployeeSalary>()
+export async function fetchEmployeeSalaries(
+  employeeIds: string[],
+): Promise<Map<string, EmployeeSalary>> {
+  const map = new Map<string, EmployeeSalary>();
   for (const empId of employeeIds) {
-    const snap = await getDocs(query(collection(db, 'employee_salaries'), where('employeeId', '==', empId), where('isPrimary', '==', true), where('isActive', '==', true)))
+    const snap = await getDocs(
+      query(
+        collection(db, "employee_salaries"),
+        where("employeeId", "==", empId),
+        where("isPrimary", "==", true),
+        where("isActive", "==", true),
+      ),
+    );
     if (!snap.empty) {
-      const sal = snap.docs[0]
-      map.set(empId, { id: sal.id, ...sal.data() } as EmployeeSalary)
+      const sal = snap.docs[0];
+      map.set(empId, { id: sal.id, ...sal.data() } as EmployeeSalary);
     }
   }
-  return map
+  return map;
 }
 
-export async function fetchListItems<T>(collectionName: string, isActive = true): Promise<T[]> {
+export async function fetchListItems<T>(
+  collectionName: string,
+  isActive = true,
+): Promise<T[]> {
   const q = isActive
-    ? query(collection(db, collectionName), where('isActive', '==', true))
-    : collection(db, collectionName)
-  const snap = await getDocs(q)
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as T[]
+    ? query(collection(db, collectionName), where("isActive", "==", true))
+    : collection(db, collectionName);
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as T[];
 }
 
-export async function updatePayrollDTR(payrollId: string, nameId: string, data: { daysWorked: number; absences: number; lateHours: number; overtimeHours: number }): Promise<void> {
-  const snap = await getDocs(query(collection(db, 'payroll_employees'), where('payrollId', '==', payrollId), where('nameId', '==', nameId)))
+export async function updatePayrollDTR(
+  payrollId: string,
+  nameId: string,
+  data: {
+    daysWorked: number;
+    absences: number;
+    lateHours: number;
+    overtimeHours: number;
+  },
+): Promise<void> {
+  const snap = await getDocs(
+    query(
+      collection(db, "payroll_employees"),
+      where("payrollId", "==", payrollId),
+      where("nameId", "==", nameId),
+    ),
+  );
   if (!snap.empty) {
-    await updateDoc(doc(db, 'payroll_employees', snap.docs[0].id), data)
+    await updateDoc(doc(db, "payroll_employees", snap.docs[0].id), data);
   }
 }
 
-export async function savePayrollEarning(payrollId: string, nameId: string, earningId: string, amount: number): Promise<void> {
-  const snap = await getDocs(query(collection(db, 'payroll_employees_earnings'), where('payrollId', '==', payrollId), where('nameId', '==', nameId), where('earningId', '==', earningId)))
+export async function savePayrollEarning(
+  payrollId: string,
+  nameId: string,
+  earningId: string,
+  amount: number,
+): Promise<void> {
+  const snap = await getDocs(
+    query(
+      collection(db, "payroll_employees_earnings"),
+      where("payrollId", "==", payrollId),
+      where("nameId", "==", nameId),
+      where("earningId", "==", earningId),
+    ),
+  );
   if (!snap.empty) {
-    await updateDoc(doc(db, 'payroll_employees_earnings', snap.docs[0].id), { amount })
+    await updateDoc(doc(db, "payroll_employees_earnings", snap.docs[0].id), {
+      amount,
+    });
   } else {
-    await addDoc(collection(db, 'payroll_employees_earnings'), { payrollId, nameId, earningId, amount, createdAt: serverTimestamp() })
+    await addDoc(collection(db, "payroll_employees_earnings"), {
+      payrollId,
+      nameId,
+      earningId,
+      amount,
+      createdAt: serverTimestamp(),
+    });
   }
 }
 
-export async function savePayrollDeduction(payrollId: string, nameId: string, deductionId: string, amount: number): Promise<void> {
-  const snap = await getDocs(query(collection(db, 'payroll_employees_deductions'), where('payrollId', '==', payrollId), where('nameId', '==', nameId), where('deductionId', '==', deductionId)))
+export async function savePayrollDeduction(
+  payrollId: string,
+  nameId: string,
+  deductionId: string,
+  amount: number,
+): Promise<void> {
+  const snap = await getDocs(
+    query(
+      collection(db, "payroll_employees_deductions"),
+      where("payrollId", "==", payrollId),
+      where("nameId", "==", nameId),
+      where("deductionId", "==", deductionId),
+    ),
+  );
   if (!snap.empty) {
-    await updateDoc(doc(db, 'payroll_employees_deductions', snap.docs[0].id), { amount })
+    await updateDoc(doc(db, "payroll_employees_deductions", snap.docs[0].id), {
+      amount,
+    });
   } else {
-    await addDoc(collection(db, 'payroll_employees_deductions'), { payrollId, nameId, deductionId, amount, createdAt: serverTimestamp() })
+    await addDoc(collection(db, "payroll_employees_deductions"), {
+      payrollId,
+      nameId,
+      deductionId,
+      amount,
+      createdAt: serverTimestamp(),
+    });
   }
 }
 
-export async function savePayrollBenefit(payrollId: string, nameId: string, benefitId: string, employeeShare: number, employerShare: number): Promise<void> {
-  const snap = await getDocs(query(collection(db, 'payroll_employees_benefits'), where('payrollId', '==', payrollId), where('nameId', '==', nameId), where('benefitId', '==', benefitId)))
+export async function savePayrollBenefit(
+  payrollId: string,
+  nameId: string,
+  benefitId: string,
+  employeeShare: number,
+  employerShare: number,
+): Promise<void> {
+  const snap = await getDocs(
+    query(
+      collection(db, "payroll_employees_benefits"),
+      where("payrollId", "==", payrollId),
+      where("nameId", "==", nameId),
+      where("benefitId", "==", benefitId),
+    ),
+  );
   if (!snap.empty) {
-    await updateDoc(doc(db, 'payroll_employees_benefits', snap.docs[0].id), { employeeShare, employerShare })
+    await updateDoc(doc(db, "payroll_employees_benefits", snap.docs[0].id), {
+      employeeShare,
+      employerShare,
+    });
   } else {
-    await addDoc(collection(db, 'payroll_employees_benefits'), { payrollId, nameId, benefitId, employeeShare, employerShare, createdAt: serverTimestamp() })
+    await addDoc(collection(db, "payroll_employees_benefits"), {
+      payrollId,
+      nameId,
+      benefitId,
+      employeeShare,
+      employerShare,
+      createdAt: serverTimestamp(),
+    });
   }
+}
+
+export function computeGrossPay(
+  salaryAmount: number,
+  earnings: number[],
+): number {
+  return salaryAmount + earnings.reduce((sum, v) => sum + v, 0);
+}
+
+export function computeNetPay(
+  grossPay: number,
+  deductions: number[],
+  benefitShares: number[],
+): number {
+  const totalDeductions = deductions.reduce((sum, v) => sum + v, 0);
+  const totalBenefits = benefitShares.reduce((sum, v) => sum + v, 0);
+  return grossPay - totalDeductions - totalBenefits;
+}
+
+export function sumEarnings(earningMap: Map<string, number>): number {
+  return Array.from(earningMap.values()).reduce((s, v) => s + v, 0);
+}
+
+export function sumDeductions(deductionMap: Map<string, number>): number {
+  return Array.from(deductionMap.values()).reduce((s, v) => s + v, 0);
+}
+
+export function sumBenefits(
+  benefitMap: Map<string, { employeeShare: number }>,
+): number {
+  return Array.from(benefitMap.values()).reduce(
+    (s, v) => s + v.employeeShare,
+    0,
+  );
+}
+
+export function computeOvertimePay(
+  hourlyRate: number,
+  overtimeHours: number,
+  multiplier = 1.5,
+): number {
+  return hourlyRate * multiplier * overtimeHours;
+}
+
+export function computeHourlyRate(
+  monthlySalary: number,
+  workDaysPerMonth = 22,
+  hoursPerDay = 8,
+): number {
+  return monthlySalary / (workDaysPerMonth * hoursPerDay);
+}
+
+export function computeDailyRate(
+  monthlySalary: number,
+  workDaysPerMonth = 22,
+): number {
+  return monthlySalary / workDaysPerMonth;
 }
 
 export interface PayrollProcessingRow {
-  nameId: string
-  employeeCode: string
-  daysWorked: number
-  absences: number
-  lateHours: number
-  overtimeHours: number
-  basicSalary: number
-  grossPay: number
-  netPay: number
-  earnings: Map<string, number>
-  deductions: Map<string, number>
-  benefits: Map<string, { employeeShare: number; employerShare: number }>
+  nameId: string;
+  employeeCode: string;
+  daysWorked: number;
+  absences: number;
+  lateHours: number;
+  overtimeHours: number;
+  basicSalary: number;
+  grossPay: number;
+  netPay: number;
+  earnings: Map<string, number>;
+  deductions: Map<string, number>;
+  benefits: Map<string, { employeeShare: number; employerShare: number }>;
 }

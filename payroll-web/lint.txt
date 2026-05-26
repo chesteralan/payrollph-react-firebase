@@ -1,0 +1,31 @@
+yarn run v1.22.22
+$ eslint .
+
+/Volumes/ACASIS BIWIN 1TB/WORK/Projects/payroll-react-firebase/payroll-web/src/pages/dtr/DTRPage/DTRPage.tsx
+  146:9  warning  The 'fetchEmployees' function makes the dependencies of useEffect Hook (at line 229) change on every render. Move it inside the useEffect callback. Alternatively, wrap the definition of 'fetchEmployees' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Volumes/ACASIS BIWIN 1TB/WORK/Projects/payroll-react-firebase/payroll-web/src/pages/employees/EmployeeProfilePage/EmployeeProfilePage.types.ts
+   2:3  error  'Employee' is defined but never used          @typescript-eslint/no-unused-vars
+   3:3  error  'EmployeeContact' is defined but never used   @typescript-eslint/no-unused-vars
+   4:3  error  'EmployeeProfile' is defined but never used   @typescript-eslint/no-unused-vars
+   5:3  error  'EmployeeSalary' is defined but never used    @typescript-eslint/no-unused-vars
+   6:3  error  'EmployeeDocument' is defined but never used  @typescript-eslint/no-unused-vars
+   7:3  error  'DocumentCategory' is defined but never used  @typescript-eslint/no-unused-vars
+  10:6  error  'ProfileTab' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Volumes/ACASIS BIWIN 1TB/WORK/Projects/payroll-react-firebase/payroll-web/src/pages/system/CompanySettingsPage/CompanySettingsPage.tsx
+  81:6  warning  React Hook useEffect has a missing dependency: 'fetchCompanies'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Volumes/ACASIS BIWIN 1TB/WORK/Projects/payroll-react-firebase/payroll-web/src/pages/system/HealthCheckPage/HealthCheckPage.tsx
+  298:7  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Volumes/ACASIS BIWIN 1TB/WORK/Projects/payroll-react-firebase/payroll-web/src/pages/system/SystemPages/SystemPages.tsx
+    55:3  error    'CalendarEntry' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+   126:6  warning  React Hook useEffect has a missing dependency: 'fetchEvents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  2198:6  warning  React Hook useEffect has a missing dependency: 'fetchLogs'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  2568:6  warning  React Hook useEffect has a missing dependency: 'fetchStats'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+
+✖ 14 problems (8 errors, 6 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

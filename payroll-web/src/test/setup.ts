@@ -1,31 +1,46 @@
-import { expect, afterEach } from 'vitest'
-import { cleanup } from '@testing-library/react'
-import * as matchers from '@testing-library/jest-dom/matchers'
+import { expect, afterEach, beforeAll, afterAll, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import * as matchers from "@testing-library/jest-dom/matchers";
+import {
+  createFirestoreMocks,
+  createAuthMocks,
+  createStorageMocks,
+  clearMockDocs,
+} from "../__mocks__/firebase";
 
-// Extend Vitest's expect with Testing Library matchers
-expect.extend(matchers)
+expect.extend(matchers);
 
-// Cleanup after each test
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+  clearMockDocs();
+});
 
-// Mock Firebase modules
-vi.mock('../config/firebase', () => ({
+vi.mock("../config/firebase", () => ({
   auth: {
     currentUser: null,
-    onAuthStateChanged: vi.fn(),
+    onAuthStateChanged: vi.fn((_auth, cb) => {
+      cb(null);
+      return () => {};
+    }),
     signOut: vi.fn(),
   },
   db: {},
   storage: {},
+  getCSRFToken: vi.fn(async () => "mock-csrf-token"),
   default: {},
-}))
+}));
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+vi.mock("firebase/firestore", () => createFirestoreMocks());
+
+vi.mock("firebase/auth", () => createAuthMocks());
+
+vi.mock("firebase/storage", () => createStorageMocks());
+
+vi.mock("lucide-react", () => import("../__mocks__/lucide-react"));
+
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -35,39 +50,48 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
-// Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() { return [] }
-  unobserve() {}
-}
-
-// Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-}
-
-// Suppress console errors during tests
-const originalError = console.error
-beforeAll(() => {
-  console.error = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is no longer supported')
-    ) {
-      return
-    }
-    originalError.call(console, ...args)
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = "0px";
+  readonly thresholds: ReadonlyArray<number> = [0];
+  constructor() {
+    // Mock — no real observer needed
   }
-})
+  disconnect() {}
+  observe() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+  unobserve() {}
+}
+global.IntersectionObserver =
+  MockIntersectionObserver as unknown as typeof IntersectionObserver;
+
+class MockResizeObserver implements ResizeObserver {
+  constructor() {
+    // Mock — no real observer needed
+  }
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args: unknown[]) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: ReactDOM.render is no longer supported")
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
 
 afterAll(() => {
-  console.error = originalError
-})
+  console.error = originalError;
+});
