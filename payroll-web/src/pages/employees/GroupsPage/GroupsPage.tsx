@@ -46,7 +46,7 @@ export function EmployeeGroupsPage() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchGroups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 

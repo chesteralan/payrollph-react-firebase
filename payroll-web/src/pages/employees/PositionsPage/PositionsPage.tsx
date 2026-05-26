@@ -46,7 +46,7 @@ export function PositionsPage() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchPositions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 

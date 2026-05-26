@@ -170,13 +170,13 @@ export function TemplatesPage() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchTemplates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchLookups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 

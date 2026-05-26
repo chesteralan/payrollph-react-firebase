@@ -23,7 +23,7 @@ interface PrintHeaderProps {
   payroll: { name: string; month: number; year: number };
   monthName: string;
 }
-function PrintHeader({ company, payroll, monthName }: PrintHeaderProps) {
+export function PrintHeader({ company, payroll, monthName }: PrintHeaderProps) {
   return (
     <div className="hidden print:block mb-4 pb-2 border-b border-gray-200">
       <div className="text-center">
@@ -40,7 +40,7 @@ function PrintHeader({ company, payroll, monthName }: PrintHeaderProps) {
 interface PrintFooterProps {
   company?: CompanyInfo;
 }
-function PrintFooter({ company }: PrintFooterProps) {
+export function PrintFooter({ company }: PrintFooterProps) {
   return (
     <div className="hidden print:block mt-6 pt-2 border-t border-gray-200 text-xs text-gray-600">
       <div className="flex justify-between">
@@ -51,7 +51,8 @@ function PrintFooter({ company }: PrintFooterProps) {
   );
 }
 
-function formatCurrency(value: number): string {
+// eslint-disable-next-line react-refresh/only-export-components
+export function formatCurrency(value: number): string {
   return value.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -100,7 +101,7 @@ interface RegisterModeProps {
   monthName: string;
 }
 
-function PayrollRegisterMode({
+export function PayrollRegisterMode({
   rows,
   filteredRows,
   earningData,
@@ -510,7 +511,7 @@ interface PayslipModeProps {
   monthName: string;
 }
 
-function PayslipMode({
+export function PayslipMode({
   rows,
   filteredRows,
   selectedEmployee,
@@ -746,7 +747,7 @@ function PayslipMode({
   );
 }
 
-function TransmittalMode({
+export function TransmittalMode({
   rows,
   getEmployeeNet,
   totals,
@@ -833,7 +834,7 @@ function TransmittalMode({
   );
 }
 
-function JournalMode({
+export function JournalMode({
   totals,
   company,
   payroll,
@@ -968,7 +969,7 @@ function JournalMode({
   );
 }
 
-function DenominationMode({
+export function DenominationMode({
   rows,
   totals,
   getEmployeeNet,

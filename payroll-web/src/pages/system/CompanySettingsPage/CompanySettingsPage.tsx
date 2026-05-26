@@ -56,9 +56,12 @@ export function CompanySettingsPage() {
       snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[]
     ).filter((c) => c.isActive && !c.isDeleted);
     setCompanies(list);
-    if (list.length > 0 && !selectedCompanyId) {
-      setSelectedCompanyId(list[0].id);
-    }
+    setSelectedCompanyId((prev) => {
+      if (!prev && list.length > 0) {
+        return list[0].id;
+      }
+      return prev;
+    });
     setLoading(false);
   }, []);
 

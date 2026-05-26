@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   collection,
   getDocs,
@@ -67,7 +67,7 @@ export function TermsPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors: Record<string, string> = {};
     const newWarnings: string[] = [];
 
@@ -124,13 +124,13 @@ export function TermsPage() {
     setErrors(newErrors);
     setWarnings(newWarnings);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData, terms, editingId]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (showForm) validateForm();
-    /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
-  }, [formData, showForm]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [formData, showForm, validateForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -61,7 +61,7 @@ export function EarningsPage() {
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 

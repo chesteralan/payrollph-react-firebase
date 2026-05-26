@@ -193,13 +193,13 @@ export function EmployeeProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (id) loadData();
   }, [id]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (id) loadData();
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [id, loadData]);
 
   const handleSaveProfile = async () => {
     if (!id || !employee) return;
