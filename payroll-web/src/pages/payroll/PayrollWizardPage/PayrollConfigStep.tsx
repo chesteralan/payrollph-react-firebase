@@ -57,8 +57,8 @@ export function PayrollConfigStep({
             label="Payroll Name"
             value={formData.name}
             onChange={(e) => {
-              setFormData((prev: any) => ({ ...prev, name: e.target.value }));
-              setErrors((prev: any) => ({ ...prev, name: "" }));
+              setFormData((prev) => ({ ...prev, name: e.target.value }));
+              setErrors((prev) => ({ ...prev, name: "" }));
             }}
             placeholder="e.g., January 2026 Payroll"
           />
@@ -74,7 +74,7 @@ export function PayrollConfigStep({
             <select
               value={formData.month}
               onChange={(e) =>
-                setFormData((prev: any) => ({
+                setFormData((prev) => ({
                   ...prev,
                   month: parseInt(e.target.value),
                 }))
@@ -97,11 +97,11 @@ export function PayrollConfigStep({
               type="number"
               value={formData.year}
               onChange={(e) => {
-                setFormData((prev: any) => ({
+                setFormData((prev) => ({
                   ...prev,
                   year: parseInt(e.target.value),
                 }));
-                setErrors((prev: any) => ({ ...prev, year: "" }));
+                setErrors((prev) => ({ ...prev, year: "" }));
               }}
             />
             {errors.year && (
@@ -117,7 +117,7 @@ export function PayrollConfigStep({
             <select
               value={formData.templateId}
               onChange={(e) =>
-                setFormData((prev: any) => ({
+                setFormData((prev) => ({
                   ...prev,
                   templateId: e.target.value,
                 }))

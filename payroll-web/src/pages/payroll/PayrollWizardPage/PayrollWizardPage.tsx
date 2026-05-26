@@ -16,7 +16,7 @@ import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Stepper } from "@/components/ui/Stepper";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type {
   PayrollGroup,
