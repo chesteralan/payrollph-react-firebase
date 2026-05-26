@@ -9,7 +9,6 @@ import {
   where,
   query,
   collection,
-  serverTimestamp,
 } from "firebase/firestore";
 import {
   getById,
@@ -68,8 +67,8 @@ describe("Employee Flow — Create → Update → List → View Profile", () => 
       expect(addDoc).toHaveBeenCalledWith(
         "employees",
         expect.objectContaining({
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
         }),
       );
     });
@@ -135,7 +134,7 @@ describe("Employee Flow — Create → Update → List → View Profile", () => 
         "employees/emp-1",
         expect.objectContaining({
           statusId: "status-inactive",
-          updatedAt: serverTimestamp(),
+          updatedAt: expect.any(Date),
         }),
       );
     });
