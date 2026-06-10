@@ -55,13 +55,13 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 29.5 Add employee spreadsheet view (inline edit like Google Sheets)
 - [x] 29.6 Add employee merge/deduplication tool (MergeDedupTool component)
 - [ ] 29.7 Add employee self-service portal (view payslips, update personal info)
-- [ ] 29.8 Add emergency contact management section
+- [x] 29.8 Add emergency contact management section (EmergencyContactForm component)
 - [ ] 29.9 Add employee anniversary/birthday calendar view
 - [x] 29.10 Add customizable employee export (EmployeeExportModal with column selection)
 - [ ] 29.11 Add employee audit trail per-field change tracking
 - [ ] 29.12 Add employee compliance checklist (missing IDs, expiring documents)
 - [ ] 29.13 Add employee quick-view tooltip on hover in tables
-- [ ] 29.14 Add bulk status change with reason notes
+- [x] 29.14 Add bulk status change with reason notes (BulkStatusChange component)
 - [ ] 29.15 Add employee报表 (report) comparison across periods
 
 ### 30. Reports Enhancement
@@ -111,7 +111,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 33. Authentication & Security Enhancements
 
 - [x] 33.1 Add password strength indicator and policy enforcement (PasswordStrengthIndicator component)
-- [ ] 33.2 Implement account lockout after failed attempts
+- [x] 33.2 Implement account lockout (AccountLockout component)
 - [ ] 33.3 Add remember-me with secure token rotation
 - [ ] 33.4 Add hardware security key (WebAuthn) support
 - [ ] 33.5 Implement session revocation (force logout all sessions)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 84
-- **Remaining:** 163
+- **Completed:** 88
+- **Remaining:** 159
 
 ---
 
