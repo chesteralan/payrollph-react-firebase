@@ -41,7 +41,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 28.6 Add payroll deadline countdown widgets (DeadlineCountdown component)
 - [ ] 28.7 Add employee headcount trend chart
 - [x] 28.8 Add quick-search bar on dashboard (DashboardSearchBar component)
-- [ ] 28.9 Add role-based dashboard views (admin vs operator)
+- [x] 28.9 Add role-based dashboard views (useRoleBasedView hook)
 - [ ] 28.10 Add dashboard data export (PDF snapshot)
 - [x] 28.11 Add key metrics cards (MetricCard component with change indicators)
 - [ ] 28.12 Add real-time notification feed on dashboard
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 32
-- **Remaining:** 215
+- **Completed:** 35
+- **Remaining:** 212
 
 ---
 
