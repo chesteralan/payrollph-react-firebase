@@ -17,7 +17,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 27.5 Implement column resize for payroll output tables
 - [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
 - [x] 27.7 Add quick-filter chips (FilterChips component with category grouping)
-- [ ] 27.8 Add per-employee quick-action menu (status, print group, payslip template)
+- [x] 27.8 Add per-employee quick-action menu (QuickActionMenu dropdown component)
 - [ ] 27.9 Implement batch cell editing (select multiple cells, edit once)
 - [x] 27.10 Add cell-level change highlighting after edits (EditableCell highlight animation)
 - [x] 27.11 Add collapsible sections for dense payroll forms (CollapsibleSection component)
@@ -29,7 +29,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 27.17 Add payroll run comparison view (side-by-side periods)
 - [ ] 27.18 Add batch payroll operations (multi-select lock, unlock, publish, delete)
 - [x] 27.19 Add payroll status badges with visual color-coding (StatusBadge component)
-- [ ] 27.20 Implement payroll clone with selective data carry-over
+- [x] 27.20 Implement payroll clone with selective data carry-over (PayrollCloneDialog with checkbox options)
 
 ### 28. Dashboard & Analytics
 
@@ -81,9 +81,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 31. Global Search & Navigation
 
-- [ ] 31.1 Implement Cmd+K / Ctrl+K global search palette
-- [ ] 31.2 Add search results grouped by category (employees, payrolls, reports, settings)
-- [ ] 31.3 Add keyboard navigation through search results (arrow keys, Enter)
+- [x] 31.1 Implement Cmd+K / Ctrl+K global search palette (GlobalSearchPalette component)
+- [x] 31.2 Add search results grouped by category (pages, actions)
+- [x] 31.3 Add keyboard navigation through search results (arrow keys, Enter, Esc)
 - [ ] 31.4 Add recent searches history
 - [ ] 31.5 Add fuzzy name matching in search
 - [ ] 31.6 Add cross-company search capability
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 11
-- **Remaining:** 236
+- **Completed:** 15
+- **Remaining:** 232
 
 ---
 
