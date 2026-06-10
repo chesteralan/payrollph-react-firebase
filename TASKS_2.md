@@ -56,7 +56,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 29.6 Add employee merge/deduplication tool (MergeDedupTool component)
 - [ ] 29.7 Add employee self-service portal (view payslips, update personal info)
 - [x] 29.8 Add emergency contact management section (EmergencyContactForm component)
-- [ ] 29.9 Add employee anniversary/birthday calendar view
+- [x] 29.9 Add employee anniversary/birthday calendar view (BirthdayCalendarView component)
 - [x] 29.10 Add customizable employee export (EmployeeExportModal with column selection)
 - [ ] 29.11 Add employee audit trail per-field change tracking
 - [ ] 29.12 Add employee compliance checklist (missing IDs, expiring documents)
