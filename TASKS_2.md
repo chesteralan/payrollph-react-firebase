@@ -15,7 +15,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 27.3 Add persistent totals row pinned at bottom of payroll tables (TotalsRow component)
 - [x] 27.4 Add unsaved-changes indicator and confirm-leave dialog (useUnsavedChanges hook + ConfirmLeaveDialog)
 - [x] 27.5 Implement column resize for payroll output tables (ResizableColumn component)
-- [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
+- [x] 27.6 Implement column reorder (ColumnReorder component with HTML5 Drag-and-Drop)
 - [x] 27.7 Add quick-filter chips (FilterChips component with category grouping)
 - [x] 27.8 Add per-employee quick-action menu (QuickActionMenu dropdown component)
 - [x] 27.9 Implement batch cell editing (BatchEditDialog component)
