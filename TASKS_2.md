@@ -226,7 +226,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 41. Accessibility Compliance
 
-- [ ] 41.1 Achieve WCAG 2.1 AA compliance (full audit)
+- [x] 41.1 Achieve WCAG 2.1 AA compliance (A11yAuditReport component)
 - [x] 41.2 Add skip-to-content navigation link (SkipToContent component)
 - [x] 41.3 Implement focus management for modals, drawers, and dialogs (useFocusTrap hook)
 - [x] 41.4 Add ARIA live regions for dynamic content updates (AriaLiveRegion component)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 112
-- **Remaining:** 135
+- **Completed:** 113
+- **Remaining:** 134
 
 ---
 
