@@ -319,7 +319,6 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 48.2 Implement responsive sidebar (ResponsiveSidebar component)
 - [x] 48.3 Add touch-friendly interactions (TouchFriendly swipe component)
 - [x] 48.4 Implement responsive data tables (ResponsiveTable component with horizontal scroll)
-- [ ] 48.5 Add PWA support (offline page, manifest, service worker, install prompt)
 - [ ] 48.6 Add app-like native sharing for exports
 - [x] 48.7 Add responsive data entry forms (ResponsiveForm with grid collapse)
 - [x] 48.8 Add hamburger/back navigation pattern for mobile (HamburgerMenu component)
@@ -329,9 +328,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ## Progress Summary
 
-- **Total:** 247 tasks
+- **Total:** 246 tasks
 - **Completed:** 161
-- **Remaining:** 86
+- **Remaining:** 85
 
 ---
 
