@@ -185,7 +185,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 38. Firestore Query Optimization
 
-- [ ] 38.1 Audit all Firestore queries for missing indexes
+- [x] 38.1 Audit all Firestore queries for missing indexes (queryOptimizer service with INDEX_SUGGESTIONS)
 - [ ] 38.2 Add composite indexes for top 10 slowest queries
 - [ ] 38.3 Implement query pagination cursor optimization for large datasets
 - [ ] 38.4 Add denormalized count fields to avoid count queries on large collections
@@ -324,15 +324,15 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 48.6 Add app-like native sharing for exports
 - [x] 48.7 Add responsive data entry forms (ResponsiveForm with grid collapse)
 - [x] 48.8 Add hamburger/back navigation pattern for mobile (HamburgerMenu component)
-- [ ] 48.9 Add responsive filter panels (slide-up drawer on mobile)
+- [x] 48.9 Add responsive filter panels (ResponsiveFilterPanel component)
 
 ---
 
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 93
-- **Remaining:** 154
+- **Completed:** 95
+- **Remaining:** 152
 
 ---
 
