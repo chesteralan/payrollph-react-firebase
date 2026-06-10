@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
-import { collection, query, getDocs, limit, orderBy } from "firebase/firestore";
+import { collection, query, getDocs, limit } from "firebase/firestore";
 import { db } from "@/config/firebase";
 
 export function useGovernmentReportGenerator() {
   const [generating, setGenerating] = useState(false);
 
-  const generateBIR2316 = useCallback(async (year: number, employeeId?: string) => {
+  const generateBIR2316 = useCallback(async () => {
     setGenerating(true);
     try {
       const q = query(collection(db, "payroll"), limit(100));
