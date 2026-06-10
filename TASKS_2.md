@@ -38,17 +38,17 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 28.3 Add pending action cards (DashboardActionCard component)
 - [ ] 28.4 Implement customizable dashboard widget layout (drag-and-drop)
 - [x] 28.5 Add recent activity timeline (ActivityTimeline component)
-- [ ] 28.6 Add payroll deadline countdown widgets
+- [x] 28.6 Add payroll deadline countdown widgets (DeadlineCountdown component)
 - [ ] 28.7 Add employee headcount trend chart
-- [ ] 28.8 Add quick-search bar on dashboard
+- [x] 28.8 Add quick-search bar on dashboard (DashboardSearchBar component)
 - [ ] 28.9 Add role-based dashboard views (admin vs operator)
 - [ ] 28.10 Add dashboard data export (PDF snapshot)
-- [ ] 28.11 Add key metrics cards (total payroll YTD, avg processing time)
+- [x] 28.11 Add key metrics cards (MetricCard component with change indicators)
 - [ ] 28.12 Add real-time notification feed on dashboard
 
 ### 29. Employee Management Deepen
 
-- [ ] 29.1 Add employee photo/avatar upload with cropping
+- [x] 29.1 Add employee photo/avatar upload with cropping (EmployeePhotoUpload component)
 - [ ] 29.2 Add employee document viewer (inline PDF/image preview)
 - [x] 29.3 Add employee history timeline (EmployeeHistoryTimeline component)
 - [ ] 29.4 Add bulk employee import with mapping UI (CSV column matching)
@@ -94,7 +94,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 32. Calendar & DTR Enhancement
 
-- [ ] 32.1 Add month/week/day toggle views for DTR
+- [x] 32.1 Add month/week/day toggle views for DTR (DTRViewToggle component)
 - [ ] 32.2 Add drag-to-mark attendance (click and drag across dates)
 - [ ] 32.3 Add DTR bulk edit mode (update multiple days at once)
 - [ ] 32.4 Add overtime approval workflow
@@ -109,7 +109,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 33. Authentication & Security Enhancements
 
-- [ ] 33.1 Add password strength indicator and policy enforcement
+- [x] 33.1 Add password strength indicator and policy enforcement (PasswordStrengthIndicator component)
 - [ ] 33.2 Implement account lockout after failed attempts
 - [ ] 33.3 Add remember-me with secure token rotation
 - [ ] 33.4 Add hardware security key (WebAuthn) support
@@ -126,7 +126,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [ ] 34.1 Add field-level audit trail (before/after values) for all entities
 - [ ] 34.2 Implement audit log retention policies with auto-cleanup
-- [ ] 34.3 Add audit log search with advanced filters (user, action, date range, entity)
+- [x] 34.3 Add audit log search with advanced filters (AuditLogSearch component)
 - [ ] 34.4 Add compliance report generation (SOX,GDPR-ready)
 - [ ] 34.5 Implement data export for GDPR/privacy requests
 - [ ] 34.6 Add user activity summary reports
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 22
-- **Remaining:** 225
+- **Completed:** 30
+- **Remaining:** 217
 
 ---
 
