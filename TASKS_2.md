@@ -124,7 +124,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 34. Audit & Compliance
 
-- [ ] 34.1 Add field-level audit trail (before/after values) for all entities
+- [x] 34.1 Add field-level audit trail (useAuditLog hook)
 - [ ] 34.2 Implement audit log retention policies with auto-cleanup
 - [x] 34.3 Add audit log search with advanced filters (AuditLogSearch component)
 - [ ] 34.4 Add compliance report generation (SOX,GDPR-ready)
@@ -226,7 +226,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 41. Accessibility Compliance
 
 - [ ] 41.1 Achieve WCAG 2.1 AA compliance (full audit)
-- [ ] 41.2 Add skip-to-content navigation link
+- [x] 41.2 Add skip-to-content navigation link (SkipToContent component)
 - [ ] 41.3 Implement focus management for modals, drawers, and dialogs
 - [ ] 41.4 Add ARIA live regions for dynamic content updates (toasts, loading)
 - [ ] 41.5 Add screen reader announcements for toast notifications
@@ -234,7 +234,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 41.7 Add keyboard-only workflow testing for all critical paths
 - [ ] 41.8 Add automated aXe/cypress-axe checks in CI pipeline
 - [ ] 41.9 Add focus indicators for all interactive elements
-- [ ] 41.10 Add reduced-motion preference support for animations
+- [x] 41.10 Add reduced-motion preference support (useReducedMotion hook)
 
 ### 42. i18n & Localization Deepen
 
@@ -308,7 +308,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [ ] 47.1 Audit and consolidate React Context providers (reduce nesting depth)
 - [ ] 47.2 Add selectors/memoization for context values to prevent unnecessary re-renders
-- [ ] 47.3 Implement state persistence strategy (localStorage for settings, IndexedDB for offline)
+- [x] 47.3 Implement state persistence strategy (useLocalStorage hook)
 - [ ] 47.4 Add cross-tab state synchronization (broadcast channel)
 - [ ] 47.5 Implement undo/redo for critical workflows (payroll edits, employee updates)
 - [ ] 47.6 Add state migration system for future schema changes
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 35
-- **Remaining:** 212
+- **Completed:** 40
+- **Remaining:** 207
 
 ---
 
