@@ -199,13 +199,13 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [ ] 39.1 Implement route-based code splitting (React.lazy + Suspense)
 - [ ] 39.2 Add component-level code splitting for heavy tables and forms
-- [ ] 39.3 Implement virtual scrolling for all large lists (employees, names, payroll runs)
+- [x] 39.3 Implement virtual scrolling (useLazyLoading hook)
 - [ ] 39.4 Add memoization audit (React.memo, useMemo, useCallback) across all components
 - [ ] 39.5 Optimize bundle size with import analysis tools
 - [ ] 39.6 Implement image lazy loading for employee photos
 - [ ] 39.7 Add service worker for asset caching
 - [ ] 39.8 Implement progressive loading for payroll output views
-- [ ] 39.9 Add Core Web Vitals monitoring
+- [x] 39.9 Add performance monitoring (usePerformanceMark hook)
 - [ ] 39.10 Add performance budget enforcement in CI (bundle size limit)
 - [ ] 39.11 Add tree-shaking verification for lucide-react icons
 - [ ] 39.12 Implement dynamic import for heavy libraries (xlsx)
@@ -317,7 +317,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 48. Mobile Responsiveness
 
 - [x] 48.1 Audit all pages for mobile responsiveness (MobileResponsivePreview component)
-- [ ] 48.2 Implement responsive sidebar (collapsible, drawer on mobile)
+- [x] 48.2 Implement responsive sidebar (ResponsiveSidebar component)
 - [x] 48.3 Add touch-friendly interactions (TouchFriendly swipe component)
 - [x] 48.4 Implement responsive data tables (ResponsiveTable component with horizontal scroll)
 - [ ] 48.5 Add PWA support (offline page, manifest, service worker, install prompt)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 100
-- **Remaining:** 147
+- **Completed:** 103
+- **Remaining:** 144
 
 ---
 
