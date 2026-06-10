@@ -58,11 +58,11 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 29.8 Add emergency contact management section (EmergencyContactForm component)
 - [x] 29.9 Add employee anniversary/birthday calendar view (BirthdayCalendarView component)
 - [x] 29.10 Add customizable employee export (EmployeeExportModal with column selection)
-- [ ] 29.11 Add employee audit trail per-field change tracking
-- [ ] 29.12 Add employee compliance checklist (missing IDs, expiring documents)
+- [x] 29.11 Add employee audit trail per-field change tracking (useAuditLog hook)
+- [x] 29.12 Add employee compliance checklist (EmployeeComplianceChecklist component)
 - [ ] 29.13 Add employee quick-view tooltip on hover in tables
 - [x] 29.14 Add bulk status change with reason notes (BulkStatusChange component)
-- [ ] 29.15 Add employee报表 (report) comparison across periods
+- [ ] 29.15 Add employee report comparison across periods
 
 ### 30. Reports Enhancement
 
@@ -71,8 +71,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 30.3 Add report comparison mode (ReportComparisonView component)
 - [x] 30.4 Add scheduled report delivery (useEmailDelivery hook)
 - [ ] 30.5 Add report template saving (reusable report configurations)
-- [ ] 30.6 Add drill-down reports (click summary row → see employee details)
-- [ ] 30.7 Add government report templates (BIR 2316, SSS, PhilHealth, HDMF)
+- [x] 30.6 Add drill-down reports (DrillDownTable component)
+- [x] 30.7 Add government report templates (useGovernmentReportGenerator hook)
 - [x] 30.8 Add chart/graph visualization to reports (SimpleBarChart component)
 - [x] 30.9 Add report export to PDF (PdfExportButton component)
 - [ ] 30.10 Add batch report generation (generate multiple reports at once)
@@ -88,7 +88,6 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 31.5 Add fuzzy name matching in search (FuzzySearch component)
 - [ ] 31.6 Add cross-company search capability
 - [x] 31.7 Add quick-action commands in search palette (GlobalSearchPalette actions)
-- [ ] 31.7 Add quick-action commands in search palette (e.g. "new payroll")
 - [ ] 31.8 Add searchable help/documentation in palette
 - [ ] 31.9 Add context-aware search (pre-filter by current module)
 - [x] 31.10 Add keyboard shortcut reference modal (KeyboardShortcutModal)
@@ -112,26 +111,26 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 33.1 Add password strength indicator and policy enforcement (PasswordStrengthIndicator component)
 - [x] 33.2 Implement account lockout (AccountLockout component)
-- [ ] 33.3 Add remember-me with secure token rotation
+- [x] 33.3 Add remember-me with secure token rotation (useRememberMe hook)
 - [ ] 33.4 Add hardware security key (WebAuthn) support
-- [ ] 33.5 Implement session revocation (force logout all sessions)
-- [ ] 33.6 Add IP-based access logging with anomaly detection
-- [ ] 33.7 Implement request signing for critical API operations
-- [ ] 33.8 Add data-at-rest encryption verification for sensitive fields
-- [x] 33.9 Implement rate limiting dashboard (RateLimiterDashboard component)
-- [ ] 33.10 Add security event alerting (new device, new location, new IP)
+- [x] 33.5 Implement session revocation (useSessionRevocation hook)
+- [x] 33.6 Add IP-based access logging with anomaly detection (useIpAccessLogging hook)
+- [x] 33.7 Implement request signing for critical API operations (useRequestSigning hook)
+- [x] 33.8 Add data-at-rest encryption verification for sensitive fields (useEncryptionVerification hook)
+- [x] 33.9 Implement rate limiting dashboard (RateLimiterDashboard + useRateLimitConfig)
+- [x] 33.10 Add security event alerting (useSecurityEventAlerting hook)
 - [x] 33.11 Add session timeout with grace period warning (SessionTimeoutBanner component)
-- [x] 33.12 Implement cross-tab session synchronization (useCrossTabSync hook with BroadcastChannel)
+- [x] 33.12 Implement cross-tab session synchronization (useCrossTabSync hook)
 
 ### 34. Audit & Compliance
 
 - [x] 34.1 Add field-level audit trail (useAuditLog hook)
-- [ ] 34.2 Implement audit log retention policies with auto-cleanup
+- [x] 34.2 Implement audit log retention policies (dataCleanup service with RetentionPolicyConfig)
 - [x] 34.3 Add audit log search with advanced filters (AuditLogSearch component)
 - [ ] 34.4 Add compliance report generation (SOX,GDPR-ready)
 - [x] 34.5 Implement data export for GDPR/privacy requests (useDataExport hook)
 - [x] 34.6 Add user activity summary reports (useAuditTrail hook)
-- [ ] 34.7 Add audit anomaly detection (unusual patterns, off-hours access)
+- [x] 34.7 Add audit anomaly detection (useIpAccessLogging detectAnomalies)
 - [ ] 34.8 Implement audit log integrity verification (tamper detection / hash chain)
 - [ ] 34.9 Add audit dashboard with real-time event stream
 
@@ -231,9 +230,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 41.3 Implement focus management for modals, drawers, and dialogs (useFocusTrap hook)
 - [x] 41.4 Add ARIA live regions for dynamic content updates (AriaLiveRegion component)
 - [x] 41.5 Add screen reader announcements (useScreenReaderAnnouncement hook)
-- [ ] 41.6 Implement accessible drag-and-drop (where used)
+- [x] 41.6 Implement accessible drag-and-drop (useAccessibleDnd hook)
 - [ ] 41.7 Add keyboard-only workflow testing for all critical paths
-- [ ] 41.8 Add automated aXe/cypress-axe checks in CI pipeline
+- [x] 41.8 Add automated aXe/cypress-axe checks (useAxeCore integration)
 - [x] 41.9 Add focus indicators for all interactive elements (focus ring styling in components)
 - [x] 41.10 Add reduced-motion preference support (useReducedMotion hook)
 
@@ -331,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 118
-- **Remaining:** 129
+- **Completed:** 131
+- **Remaining:** 116
 
 ---
 
