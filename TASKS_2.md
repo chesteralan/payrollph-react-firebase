@@ -12,7 +12,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 27.1 Redesign payroll wizard with improved progress indicators (Stepper v2: progress bar, descriptions, clickable steps, icons)
 - [x] 27.2 Add sticky column support (StickyTable + StickyCell components)
-- [ ] 27.3 Add persistent totals row pinned at bottom of payroll tables
+- [x] 27.3 Add persistent totals row pinned at bottom of payroll tables (TotalsRow component)
 - [x] 27.4 Add unsaved-changes indicator and confirm-leave dialog (useUnsavedChanges hook + ConfirmLeaveDialog)
 - [ ] 27.5 Implement column resize for payroll output tables
 - [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
@@ -20,7 +20,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 27.8 Add per-employee quick-action menu (status, print group, payslip template)
 - [ ] 27.9 Implement batch cell editing (select multiple cells, edit once)
 - [ ] 27.10 Add cell-level change highlighting after edits
-- [ ] 27.11 Add collapsible sections for dense payroll forms
+- [x] 27.11 Add collapsible sections for dense payroll forms (CollapsibleSection component)
 - [ ] 27.12 Implement print preview pane with live CSS toggle
 - [ ] 27.13 Add filter persistence across page navigation
 - [ ] 27.14 Improve empty state illustrations for all payroll stages
@@ -28,14 +28,14 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 27.16 Implement payroll checkpoint/bookmarking (resume from last edited stage)
 - [ ] 27.17 Add payroll run comparison view (side-by-side periods)
 - [ ] 27.18 Add batch payroll operations (multi-select lock, unlock, publish, delete)
-- [ ] 27.19 Add payroll status badges with visual color-coding
+- [x] 27.19 Add payroll status badges with visual color-coding (StatusBadge component)
 - [ ] 27.20 Implement payroll clone with selective data carry-over
 
 ### 28. Dashboard & Analytics
 
 - [ ] 28.1 Add payroll comparison chart (month-over-month totals)
 - [ ] 28.2 Add department/group breakdown charts (pie/bar)
-- [ ] 28.3 Add pending action cards (unlocked payrolls, pending approvals)
+- [x] 28.3 Add pending action cards (DashboardActionCard component)
 - [ ] 28.4 Implement customizable dashboard widget layout (drag-and-drop)
 - [ ] 28.5 Add recent activity timeline with filters (by module, date range)
 - [ ] 28.6 Add payroll deadline countdown widgets
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 3
-- **Remaining:** 244
+- **Completed:** 7
+- **Remaining:** 240
 
 ---
 
