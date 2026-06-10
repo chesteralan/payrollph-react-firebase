@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { Calendar, Download } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 interface PayrollPeriodTimelineProps {
   periods: { id: string; label: string; start: Date; end: Date; status: string }[];
