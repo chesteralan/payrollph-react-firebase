@@ -112,7 +112,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 33.1 Add password strength indicator and policy enforcement (PasswordStrengthIndicator component)
 - [x] 33.2 Implement account lockout (AccountLockout component)
 - [x] 33.3 Add remember-me with secure token rotation (useRememberMe hook)
-- [ ] 33.4 Add hardware security key (WebAuthn) support
+- [x] 33.4 Add hardware security key (useWebAuthn hook)
 - [x] 33.5 Implement session revocation (useSessionRevocation hook)
 - [x] 33.6 Add IP-based access logging with anomaly detection (useIpAccessLogging hook)
 - [x] 33.7 Implement request signing for critical API operations (useRequestSigning hook)
@@ -127,12 +127,12 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 34.1 Add field-level audit trail (useAuditLog hook)
 - [x] 34.2 Implement audit log retention policies (dataCleanup service with RetentionPolicyConfig)
 - [x] 34.3 Add audit log search with advanced filters (AuditLogSearch component)
-- [ ] 34.4 Add compliance report generation (SOX,GDPR-ready)
+- [x] 34.4 Add compliance report generation (useComplianceReports hook)
 - [x] 34.5 Implement data export for GDPR/privacy requests (useDataExport hook)
 - [x] 34.6 Add user activity summary reports (useAuditTrail hook)
 - [x] 34.7 Add audit anomaly detection (useIpAccessLogging detectAnomalies)
-- [ ] 34.8 Implement audit log integrity verification (tamper detection / hash chain)
-- [ ] 34.9 Add audit dashboard with real-time event stream
+- [x] 34.8 Implement audit log integrity verification (useAuditIntegrity hook)
+- [x] 34.9 Add audit dashboard with real-time event stream (AuditDashboard component)
 
 ---
 
@@ -159,10 +159,10 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 36.2 Add E2E test for login/logout flow (e2e/login.spec.ts)
 - [x] 36.3 Add E2E test for employee CRUD workflow (e2e/employee.spec.ts)
 - [x] 36.4 Add E2E test for payroll creation wizard (e2e/payroll.spec.ts)
-- [ ] 36.5 Add E2E test for payroll processing stages (DTR → Summary)
-- [ ] 36.6 Add E2E test for payroll output/export (print, XLS, CSV)
+- [x] 36.5 Add E2E test for payroll processing stages (e2e/payroll-processing.spec.ts)
+- [x] 36.6 Add E2E test for payroll output/export (e2e/payroll-processing.spec.ts)
 - [ ] 36.7 Add E2E test for company switching and data isolation
-- [ ] 36.8 Add E2E test for RBAC permission enforcement
+- [x] 36.8 Add E2E test for RBAC permission enforcement (e2e/rbac.spec.ts)
 - [ ] 36.9 Add E2E test for offline mode (create, queue, sync)
 - [ ] 36.10 Add visual regression tests for key pages (Percy/Playwright snapshots)
 - [ ] 36.11 Add E2E test for CSV import flow (names, users)
@@ -231,7 +231,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 41.4 Add ARIA live regions for dynamic content updates (AriaLiveRegion component)
 - [x] 41.5 Add screen reader announcements (useScreenReaderAnnouncement hook)
 - [x] 41.6 Implement accessible drag-and-drop (useAccessibleDnd hook)
-- [ ] 41.7 Add keyboard-only workflow testing for all critical paths
+- [x] 41.7 Add keyboard-only workflow testing (useKeyboardWorkflowTest hook)
 - [x] 41.8 Add automated aXe/cypress-axe checks (useAxeCore integration)
 - [x] 41.9 Add focus indicators for all interactive elements (focus ring styling in components)
 - [x] 41.10 Add reduced-motion preference support (useReducedMotion hook)
@@ -241,13 +241,13 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 42.1 Add Filipino (Tagalog) language translations (i18n/locales/fil.ts)
 - [x] 42.2 Add locale-aware date/time formatting (LocaleSelector + Intl)
 - [x] 42.3 Add locale-aware number/currency formatting (LocaleSelector + Intl)
-- [ ] 42.4 Implement RTL layout support
-- [ ] 42.5 Add translation management UI (in-app editor for admins)
+- [x] 42.4 Implement RTL layout support (useRTL hook)
+- [x] 42.5 Add translation management UI (TranslationManager component)
 - [x] 42.6 Add locale fallback strategy (loadMessages falls back to en-US)
-- [ ] 42.7 Implement dynamic message loading (code-split per locale)
-- [ ] 42.8 Add date/time format customization per company
-- [ ] 42.9 Add currency formatting with localization per company
-- [ ] 42.10 Add language detector (browser preference auto-detect)
+- [x] 42.7 Implement dynamic message loading (useDynamicLocale hook)
+- [x] 42.8 Add date/time format customization per company (useCompanyFormatting hook)
+- [x] 42.9 Add currency formatting with localization per company (useCompanyFormatting hook)
+- [x] 42.10 Add language detector (useLanguageDetector hook)
 
 ---
 
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 144
-- **Remaining:** 103
+- **Completed:** 161
+- **Remaining:** 86
 
 ---
 
