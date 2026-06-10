@@ -49,7 +49,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 29. Employee Management Deepen
 
 - [x] 29.1 Add employee photo/avatar upload with cropping (EmployeePhotoUpload component)
-- [ ] 29.2 Add employee document viewer (inline PDF/image preview)
+- [x] 29.2 Add employee document viewer (DocumentViewer component)
 - [x] 29.3 Add employee history timeline (EmployeeHistoryTimeline component)
 - [ ] 29.4 Add bulk employee import with mapping UI (CSV column matching)
 - [ ] 29.5 Add employee spreadsheet view (inline edit like Google Sheets)
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 44
-- **Remaining:** 203
+- **Completed:** 45
+- **Remaining:** 202
 
 ---
 
