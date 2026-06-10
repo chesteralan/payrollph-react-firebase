@@ -25,8 +25,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 27.13 Add filter persistence across page navigation (FilterPersistenceBar component)
 - [x] 27.14 Improve empty state illustrations (EmptyStateIllustration component)
 - [x] 27.15 Add payroll processing time tracking (useProcessingTimer hook)
-- [ ] 27.16 Implement payroll checkpoint/bookmarking (resume from last edited stage)
-- [ ] 27.17 Add payroll run comparison view (side-by-side periods)
+- [x] 27.16 Implement payroll checkpoint/bookmarking (usePayrollCheckpoint hook)
+- [x] 27.17 Add payroll run comparison view (PayrollComparisonView component)
 - [x] 27.18 Add batch payroll operations (BatchOperationsBar component)
 - [x] 27.19 Add payroll status badges with visual color-coding (StatusBadge component)
 - [x] 27.20 Implement payroll clone with selective data carry-over (PayrollCloneDialog with checkbox options)
@@ -34,9 +34,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 28. Dashboard & Analytics
 
 - [x] 28.1 Add payroll comparison chart (SimpleBarChart component)
-- [ ] 28.2 Add department/group breakdown charts (pie/bar)
+- [x] 28.2 Add department/group breakdown charts (SimplePieChart component)
 - [x] 28.3 Add pending action cards (DashboardActionCard component)
-- [ ] 28.4 Implement customizable dashboard widget layout (drag-and-drop)
+- [x] 28.4 Implement customizable dashboard widget layout (WidgetLayout component with grid)
 - [x] 28.5 Add recent activity timeline (ActivityTimeline component)
 - [x] 28.6 Add payroll deadline countdown widgets (DeadlineCountdown component)
 - [ ] 28.7 Add employee headcount trend chart
@@ -85,8 +85,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 31.2 Add search results grouped by category (pages, actions)
 - [x] 31.3 Add keyboard navigation through search results (arrow keys, Enter, Esc)
 - [x] 31.4 Add recent searches history (RecentSearches component)
-- [ ] 31.5 Add fuzzy name matching in search
+- [x] 31.5 Add fuzzy name matching in search (FuzzySearch component)
 - [ ] 31.6 Add cross-company search capability
+- [x] 31.7 Add quick-action commands in search palette (GlobalSearchPalette actions)
 - [ ] 31.7 Add quick-action commands in search palette (e.g. "new payroll")
 - [ ] 31.8 Add searchable help/documentation in palette
 - [ ] 31.9 Add context-aware search (pre-filter by current module)
@@ -330,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 70
-- **Remaining:** 177
+- **Completed:** 76
+- **Remaining:** 171
 
 ---
 
