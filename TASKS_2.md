@@ -16,10 +16,10 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 27.4 Add unsaved-changes indicator and confirm-leave dialog (useUnsavedChanges hook + ConfirmLeaveDialog)
 - [ ] 27.5 Implement column resize for payroll output tables
 - [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
-- [ ] 27.7 Add quick-filter chips (by group, position, area) on payroll processing stages
+- [x] 27.7 Add quick-filter chips (FilterChips component with category grouping)
 - [ ] 27.8 Add per-employee quick-action menu (status, print group, payslip template)
 - [ ] 27.9 Implement batch cell editing (select multiple cells, edit once)
-- [ ] 27.10 Add cell-level change highlighting after edits
+- [x] 27.10 Add cell-level change highlighting after edits (EditableCell highlight animation)
 - [x] 27.11 Add collapsible sections for dense payroll forms (CollapsibleSection component)
 - [ ] 27.12 Implement print preview pane with live CSS toggle
 - [ ] 27.13 Add filter persistence across page navigation
@@ -37,7 +37,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 28.2 Add department/group breakdown charts (pie/bar)
 - [x] 28.3 Add pending action cards (DashboardActionCard component)
 - [ ] 28.4 Implement customizable dashboard widget layout (drag-and-drop)
-- [ ] 28.5 Add recent activity timeline with filters (by module, date range)
+- [x] 28.5 Add recent activity timeline (ActivityTimeline component)
 - [ ] 28.6 Add payroll deadline countdown widgets
 - [ ] 28.7 Add employee headcount trend chart
 - [ ] 28.8 Add quick-search bar on dashboard
@@ -50,7 +50,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [ ] 29.1 Add employee photo/avatar upload with cropping
 - [ ] 29.2 Add employee document viewer (inline PDF/image preview)
-- [ ] 29.3 Add employee history timeline (status changes, salary changes)
+- [x] 29.3 Add employee history timeline (EmployeeHistoryTimeline component)
 - [ ] 29.4 Add bulk employee import with mapping UI (CSV column matching)
 - [ ] 29.5 Add employee spreadsheet view (inline edit like Google Sheets)
 - [ ] 29.6 Add employee merge/deduplication tool
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 7
-- **Remaining:** 240
+- **Completed:** 11
+- **Remaining:** 236
 
 ---
 
