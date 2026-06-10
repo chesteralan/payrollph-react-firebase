@@ -90,7 +90,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 31.7 Add quick-action commands in search palette (e.g. "new payroll")
 - [ ] 31.8 Add searchable help/documentation in palette
 - [ ] 31.9 Add context-aware search (pre-filter by current module)
-- [ ] 31.10 Add keyboard shortcut reference modal (press ?)
+- [x] 31.10 Add keyboard shortcut reference modal (KeyboardShortcutModal)
 
 ### 32. Calendar & DTR Enhancement
 
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 41
-- **Remaining:** 206
+- **Completed:** 42
+- **Remaining:** 205
 
 ---
 
