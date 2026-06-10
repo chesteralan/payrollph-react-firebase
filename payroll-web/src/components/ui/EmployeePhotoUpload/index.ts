@@ -1,0 +1,1 @@
+export { EmployeePhotoUpload } from "./EmployeePhotoUpload";

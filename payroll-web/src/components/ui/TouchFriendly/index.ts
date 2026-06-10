@@ -1,0 +1,1 @@
+export { TouchFriendly } from "./TouchFriendly";
