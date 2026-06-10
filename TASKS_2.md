@@ -190,7 +190,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 38.3 Implement query pagination cursor optimization (useFirestoreIndexCheck hook)
 - [ ] 38.4 Add denormalized count fields to avoid count queries on large collections
 - [x] 38.5 Implement batched reads (batchWriter service for batch operations)
-- [ ] 38.6 Add query latency monitoring with console/logger
+- [x] 38.6 Add query latency monitoring (useQueryPerformanceMonitor hook)
 - [x] 38.7 Optimize real-time listener usage (useListenerCleanup hook)
 - [x] 38.8 Add query result caching with invalidation strategy (useCachePrefetch hook)
 - [x] 38.9 Add Firestore read/write budget tracking (estimateCollectionSize in queryOptimizer)
@@ -214,7 +214,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 40.1 Implement SWR pattern for data fetching (useSwrFetch hook)
 - [x] 40.2 Add optimistic updates for fast UI feedback (useOptimisticUpdate hook)
-- [ ] 40.3 Implement background data refresh for dashboard
+- [x] 40.3 Implement background data refresh (useBackgroundDataRefresh hook)
 - [ ] 40.4 Add stale-while-revalidate for list pages
 - [ ] 40.5 Add cache preloading for common navigation paths
 - [ ] 40.6 Implement data prefetching for payroll wizard steps
