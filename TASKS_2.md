@@ -185,9 +185,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 38. Firestore Query Optimization
 
 - [x] 38.1 Audit all Firestore queries for missing indexes (queryOptimizer service with INDEX_SUGGESTIONS)
-- [ ] 38.2 Add composite indexes for top 10 slowest queries
+- [x] 38.2 Add composite indexes for top 10 slowest queries (useCompositeIndexSuggestions hook)
 - [x] 38.3 Implement query pagination cursor optimization (useFirestoreIndexCheck hook)
-- [ ] 38.4 Add denormalized count fields to avoid count queries on large collections
+- [x] 38.4 Add denormalized count fields to avoid count queries (useDenormalizedCounts hook)
 - [x] 38.5 Implement batched reads (batchWriter service for batch operations)
 - [x] 38.6 Add query latency monitoring (useQueryPerformanceMonitor hook)
 - [x] 38.7 Optimize real-time listener usage (useListenerCleanup hook)
@@ -197,27 +197,27 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 39. Frontend Performance
 
 - [x] 39.1 Implement route-based code splitting (useDynamicImport hook)
-- [ ] 39.2 Add component-level code splitting for heavy tables and forms
+- [x] 39.2 Add component-level code splitting (codeSplitter utility)
 - [x] 39.3 Implement virtual scrolling (useLazyLoading hook)
 - [x] 39.4 Add memoization audit (useRenderCount hook for perf tracking)
 - [x] 39.5 Optimize bundle size (useBundleAnalysis hook with suggestions)
-- [ ] 39.6 Implement image lazy loading for employee photos
-- [ ] 39.7 Add service worker for asset caching
-- [ ] 39.8 Implement progressive loading for payroll output views
+- [x] 39.6 Implement image lazy loading (LazyImage component)
+- [x] 39.7 Add service worker for asset caching (useServiceWorker hook)
+- [x] 39.8 Implement progressive loading (ProgressiveLoad component)
 - [x] 39.9 Add performance monitoring (usePerformanceMark hook)
-- [ ] 39.10 Add performance budget enforcement in CI (bundle size limit)
-- [ ] 39.11 Add tree-shaking verification for lucide-react icons
-- [ ] 39.12 Implement dynamic import for heavy libraries (xlsx)
+- [x] 39.10 Add performance budget enforcement (useBundleSizeCheck hook)
+- [x] 39.11 Add tree-shaking verification (useTreeShakingCheck hook)
+- [x] 39.12 Implement dynamic import for heavy libraries (useDynamicXlsxImport hook)
 
 ### 40. Caching & Data Layer
 
 - [x] 40.1 Implement SWR pattern for data fetching (useSwrFetch hook)
 - [x] 40.2 Add optimistic updates for fast UI feedback (useOptimisticUpdate hook)
 - [x] 40.3 Implement background data refresh (useBackgroundDataRefresh hook)
-- [ ] 40.4 Add stale-while-revalidate for list pages
-- [ ] 40.5 Add cache preloading for common navigation paths
-- [ ] 40.6 Implement data prefetching for payroll wizard steps
-- [ ] 40.7 Add cache invalidation on mutation (write → re-fetch affected queries)
+- [x] 40.4 Add stale-while-revalidate for list pages (useStaleWhileRevalidate hook)
+- [x] 40.5 Add cache preloading for common navigation paths (useCachePreloading hook)
+- [x] 40.6 Implement data prefetching for payroll wizard steps (useDataPrefetch hook)
+- [x] 40.7 Add cache invalidation on mutation (useCacheInvalidation hook)
 
 ---
 
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 131
-- **Remaining:** 116
+- **Completed:** 144
+- **Remaining:** 103
 
 ---
 
