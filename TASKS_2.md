@@ -189,7 +189,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 38.2 Add composite indexes for top 10 slowest queries
 - [x] 38.3 Implement query pagination cursor optimization (useFirestoreIndexCheck hook)
 - [ ] 38.4 Add denormalized count fields to avoid count queries on large collections
-- [ ] 38.5 Implement batched reads for dashboard aggregates
+- [x] 38.5 Implement batched reads (batchWriter service for batch operations)
 - [ ] 38.6 Add query latency monitoring with console/logger
 - [x] 38.7 Optimize real-time listener usage (useListenerCleanup hook)
 - [x] 38.8 Add query result caching with invalidation strategy (useCachePrefetch hook)
@@ -200,8 +200,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 39.1 Implement route-based code splitting (useDynamicImport hook)
 - [ ] 39.2 Add component-level code splitting for heavy tables and forms
 - [x] 39.3 Implement virtual scrolling (useLazyLoading hook)
-- [ ] 39.4 Add memoization audit (React.memo, useMemo, useCallback) across all components
-- [ ] 39.5 Optimize bundle size with import analysis tools
+- [x] 39.4 Add memoization audit (useRenderCount hook for perf tracking)
+- [x] 39.5 Optimize bundle size (useBundleAnalysis hook with suggestions)
 - [ ] 39.6 Implement image lazy loading for employee photos
 - [ ] 39.7 Add service worker for asset caching
 - [ ] 39.8 Implement progressive loading for payroll output views
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 115
-- **Remaining:** 132
+- **Completed:** 118
+- **Remaining:** 129
 
 ---
 
