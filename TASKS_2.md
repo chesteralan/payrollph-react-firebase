@@ -84,7 +84,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 31.1 Implement Cmd+K / Ctrl+K global search palette (GlobalSearchPalette component)
 - [x] 31.2 Add search results grouped by category (pages, actions)
 - [x] 31.3 Add keyboard navigation through search results (arrow keys, Enter, Esc)
-- [ ] 31.4 Add recent searches history
+- [x] 31.4 Add recent searches history (RecentSearches component)
 - [ ] 31.5 Add fuzzy name matching in search
 - [ ] 31.6 Add cross-company search capability
 - [ ] 31.7 Add quick-action commands in search palette (e.g. "new payroll")
@@ -119,7 +119,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 33.8 Add data-at-rest encryption verification for sensitive fields
 - [x] 33.9 Implement rate limiting dashboard (RateLimiterDashboard component)
 - [ ] 33.10 Add security event alerting (new device, new location, new IP)
-- [ ] 33.11 Add session timeout with grace period warning
+- [x] 33.11 Add session timeout with grace period warning (SessionTimeoutBanner component)
 - [ ] 33.12 Implement cross-tab session synchronization
 
 ### 34. Audit & Compliance
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 42
-- **Remaining:** 205
+- **Completed:** 44
+- **Remaining:** 203
 
 ---
 
