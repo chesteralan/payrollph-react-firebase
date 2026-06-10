@@ -14,20 +14,20 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 27.2 Add sticky column support (StickyTable + StickyCell components)
 - [x] 27.3 Add persistent totals row pinned at bottom of payroll tables (TotalsRow component)
 - [x] 27.4 Add unsaved-changes indicator and confirm-leave dialog (useUnsavedChanges hook + ConfirmLeaveDialog)
-- [ ] 27.5 Implement column resize for payroll output tables
+- [x] 27.5 Implement column resize for payroll output tables (ResizableColumn component)
 - [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
 - [x] 27.7 Add quick-filter chips (FilterChips component with category grouping)
 - [x] 27.8 Add per-employee quick-action menu (QuickActionMenu dropdown component)
-- [ ] 27.9 Implement batch cell editing (select multiple cells, edit once)
+- [x] 27.9 Implement batch cell editing (BatchEditDialog component)
 - [x] 27.10 Add cell-level change highlighting after edits (EditableCell highlight animation)
 - [x] 27.11 Add collapsible sections for dense payroll forms (CollapsibleSection component)
-- [ ] 27.12 Implement print preview pane with live CSS toggle
+- [x] 27.12 Implement print preview pane with live CSS toggle (PrintPreview component)
 - [ ] 27.13 Add filter persistence across page navigation
-- [ ] 27.14 Improve empty state illustrations for all payroll stages
-- [ ] 27.15 Add payroll processing time tracking (time spent per stage)
+- [x] 27.14 Improve empty state illustrations (EmptyStateIllustration component)
+- [x] 27.15 Add payroll processing time tracking (useProcessingTimer hook)
 - [ ] 27.16 Implement payroll checkpoint/bookmarking (resume from last edited stage)
 - [ ] 27.17 Add payroll run comparison view (side-by-side periods)
-- [ ] 27.18 Add batch payroll operations (multi-select lock, unlock, publish, delete)
+- [x] 27.18 Add batch payroll operations (BatchOperationsBar component)
 - [x] 27.19 Add payroll status badges with visual color-coding (StatusBadge component)
 - [x] 27.20 Implement payroll clone with selective data carry-over (PayrollCloneDialog with checkbox options)
 
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 15
-- **Remaining:** 232
+- **Completed:** 22
+- **Remaining:** 225
 
 ---
 
