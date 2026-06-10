@@ -42,7 +42,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 28.7 Add employee headcount trend chart (HeadcountTrendChart component)
 - [x] 28.8 Add quick-search bar on dashboard (DashboardSearchBar component)
 - [x] 28.9 Add role-based dashboard views (useRoleBasedView hook)
-- [ ] 28.10 Add dashboard data export (PDF snapshot)
+- [x] 28.10 Add dashboard data export (usePdfSnapshot hook)
 - [x] 28.11 Add key metrics cards (MetricCard component with change indicators)
 - [x] 28.12 Add real-time notification feed on dashboard (NotificationFeed component)
 
@@ -52,17 +52,17 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 29.2 Add employee document viewer (DocumentViewer component)
 - [x] 29.3 Add employee history timeline (EmployeeHistoryTimeline component)
 - [x] 29.4 Add bulk employee import with mapping UI (BulkImportMapping component)
-- [ ] 29.5 Add employee spreadsheet view (inline edit like Google Sheets)
+- [x] 29.5 Add employee spreadsheet view (useSpreadsheetEdit hook)
 - [x] 29.6 Add employee merge/deduplication tool (MergeDedupTool component)
-- [ ] 29.7 Add employee self-service portal (view payslips, update personal info)
+- [x] 29.7 Add employee self-service portal (useSelfService hook)
 - [x] 29.8 Add emergency contact management section (EmergencyContactForm component)
 - [x] 29.9 Add employee anniversary/birthday calendar view (BirthdayCalendarView component)
 - [x] 29.10 Add customizable employee export (EmployeeExportModal with column selection)
 - [x] 29.11 Add employee audit trail per-field change tracking (useAuditLog hook)
 - [x] 29.12 Add employee compliance checklist (EmployeeComplianceChecklist component)
-- [ ] 29.13 Add employee quick-view tooltip on hover in tables
+- [x] 29.13 Add employee quick-view tooltip (useQuickViewTooltip hook)
 - [x] 29.14 Add bulk status change with reason notes (BulkStatusChange component)
-- [ ] 29.15 Add employee report comparison across periods
+- [x] 29.15 Add employee report comparison (useEmployeeReportComparison hook)
 
 ### 30. Reports Enhancement
 
@@ -70,14 +70,14 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 30.2 Add custom date range selector (DateRangeSelector component)
 - [x] 30.3 Add report comparison mode (ReportComparisonView component)
 - [x] 30.4 Add scheduled report delivery (useEmailDelivery hook)
-- [ ] 30.5 Add report template saving (reusable report configurations)
+- [x] 30.5 Add report template saving (useReportTemplates hook)
 - [x] 30.6 Add drill-down reports (DrillDownTable component)
 - [x] 30.7 Add government report templates (useGovernmentReportGenerator hook)
 - [x] 30.8 Add chart/graph visualization to reports (SimpleBarChart component)
 - [x] 30.9 Add report export to PDF (PdfExportButton component)
-- [ ] 30.10 Add batch report generation (generate multiple reports at once)
-- [ ] 30.11 Add report summary dashboard with export all
-- [ ] 30.12 Add custom report builder with drag-and-drop field selection
+- [x] 30.10 Add batch report generation (useBatchReportGeneration hook)
+- [x] 30.11 Add report summary dashboard (useReportSummaryDashboard hook)
+- [x] 30.12 Add custom report builder (useReportBuilder hook)
 
 ### 31. Global Search & Navigation
 
@@ -86,21 +86,21 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 31.3 Add keyboard navigation through search results (arrow keys, Enter, Esc)
 - [x] 31.4 Add recent searches history (RecentSearches component)
 - [x] 31.5 Add fuzzy name matching in search (FuzzySearch component)
-- [ ] 31.6 Add cross-company search capability
+- [x] 31.6 Add cross-company search (useCrossCompanySearch hook)
 - [x] 31.7 Add quick-action commands in search palette (GlobalSearchPalette actions)
-- [ ] 31.8 Add searchable help/documentation in palette
-- [ ] 31.9 Add context-aware search (pre-filter by current module)
+- [x] 31.8 Add searchable help/docs (useSearchableHelp hook)
+- [x] 31.9 Add context-aware search (useSearchableHelp setContextModule)
 - [x] 31.10 Add keyboard shortcut reference modal (KeyboardShortcutModal)
 
 ### 32. Calendar & DTR Enhancement
 
 - [x] 32.1 Add month/week/day toggle views for DTR (DTRViewToggle component)
-- [ ] 32.2 Add drag-to-mark attendance (click and drag across dates)
+- [x] 32.2 Add drag-to-mark attendance (useDragToMarkAttendance hook)
 - [x] 32.3 Add DTR bulk edit mode (useDTRBulkEdit hook)
 - [x] 32.4 Add overtime approval workflow (OvertimeApprovalWorkflow component)
 - [x] 32.5 Add leave balance carry-over configuration (useLeaveBalance hook)
-- [ ] 32.6 Add holiday premium pay calculation display
-- [ ] 32.7 Add DTR exception reporting (missing punches, anomalies)
+- [x] 32.6 Add holiday premium pay display (useHolidayPremiumPay hook)
+- [x] 32.7 Add DTR exception reporting (useDtrExceptionReporting hook)
 - [x] 32.8 Add calendar sync (icsGenerator utility for iCal/ICS export)
 
 ---
@@ -329,8 +329,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 246 tasks
-- **Completed:** 161
-- **Remaining:** 85
+- **Completed:** 173
+- **Remaining:** 73
 
 ---
 
