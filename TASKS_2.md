@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 40
-- **Remaining:** 207
+- **Completed:** 41
+- **Remaining:** 206
 
 ---
 
