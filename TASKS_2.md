@@ -191,8 +191,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 38.4 Add denormalized count fields to avoid count queries on large collections
 - [ ] 38.5 Implement batched reads for dashboard aggregates
 - [ ] 38.6 Add query latency monitoring with console/logger
-- [ ] 38.7 Optimize real-time listener usage (cleanup unused listeners on unmount)
-- [ ] 38.8 Add query result caching with invalidation strategy
+- [x] 38.7 Optimize real-time listener usage (useListenerCleanup hook)
+- [x] 38.8 Add query result caching with invalidation strategy (useCachePrefetch hook)
 - [x] 38.9 Add Firestore read/write budget tracking (estimateCollectionSize in queryOptimizer)
 
 ### 39. Frontend Performance
@@ -213,7 +213,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 40. Caching & Data Layer
 
 - [x] 40.1 Implement SWR pattern for data fetching (useSwrFetch hook)
-- [ ] 40.2 Add optimistic updates for fast UI feedback (edit, toggle status)
+- [x] 40.2 Add optimistic updates for fast UI feedback (useOptimisticUpdate hook)
 - [ ] 40.3 Implement background data refresh for dashboard
 - [ ] 40.4 Add stale-while-revalidate for list pages
 - [ ] 40.5 Add cache preloading for common navigation paths
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 109
-- **Remaining:** 138
+- **Completed:** 112
+- **Remaining:** 135
 
 ---
 
