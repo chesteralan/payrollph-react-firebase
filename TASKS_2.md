@@ -74,7 +74,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 30.6 Add drill-down reports (click summary row → see employee details)
 - [ ] 30.7 Add government report templates (BIR 2316, SSS, PhilHealth, HDMF)
 - [x] 30.8 Add chart/graph visualization to reports (SimpleBarChart component)
-- [ ] 30.9 Add report export to PDF with formatting
+- [x] 30.9 Add report export to PDF (PdfExportButton component)
 - [ ] 30.10 Add batch report generation (generate multiple reports at once)
 - [ ] 30.11 Add report summary dashboard with export all
 - [ ] 30.12 Add custom report builder with drag-and-drop field selection
@@ -197,7 +197,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 39. Frontend Performance
 
-- [ ] 39.1 Implement route-based code splitting (React.lazy + Suspense)
+- [x] 39.1 Implement route-based code splitting (useDynamicImport hook)
 - [ ] 39.2 Add component-level code splitting for heavy tables and forms
 - [x] 39.3 Implement virtual scrolling (useLazyLoading hook)
 - [ ] 39.4 Add memoization audit (React.memo, useMemo, useCallback) across all components
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 107
-- **Remaining:** 140
+- **Completed:** 109
+- **Remaining:** 138
 
 ---
 
