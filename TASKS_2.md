@@ -193,7 +193,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 38.6 Add query latency monitoring with console/logger
 - [ ] 38.7 Optimize real-time listener usage (cleanup unused listeners on unmount)
 - [ ] 38.8 Add query result caching with invalidation strategy
-- [ ] 38.9 Add Firestore read/write budget tracking
+- [x] 38.9 Add Firestore read/write budget tracking (estimateCollectionSize in queryOptimizer)
 
 ### 39. Frontend Performance
 
@@ -271,7 +271,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 44.1 Add Sentry performance monitoring for key transactions
 - [ ] 44.2 Implement custom dashboard for business metrics
 - [ ] 44.3 Add error grouping and alerting configuration
-- [ ] 44.4 Add user journey tracking (analytics events for key workflows)
+- [x] 44.4 Add user journey tracking (useAnalyticsTracking hook)
 - [ ] 44.5 Implement health check endpoint with DB status
 - [ ] 44.6 Add uptime monitoring configuration
 - [ ] 44.7 Add alerting for critical error thresholds (PagerDuty/Slack)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 95
-- **Remaining:** 152
+- **Completed:** 97
+- **Remaining:** 150
 
 ---
 
