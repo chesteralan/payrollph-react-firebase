@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Stepper } from "./Stepper";
+import { Settings } from "lucide-react";
 
 describe("Stepper", () => {
   const defaultSteps = [
@@ -112,5 +113,77 @@ describe("Stepper", () => {
       '[class*="h-0"][class*="mx-4"]',
     );
     expect(connectors.length).toBe(0);
+  });
+});
+
+describe("Stepper new features", () => {
+  it("should show progress bar with correct percentage", () => {
+    const steps = [
+      { label: "A", completed: true, active: false },
+      { label: "B", completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} />);
+    expect(screen.getByText("50%")).toBeInTheDocument();
+  });
+
+  it("should show 100% when all steps completed", () => {
+    const steps = [
+      { label: "A", completed: true, active: false },
+      { label: "B", completed: true, active: false },
+    ];
+    render(<Stepper steps={steps} />);
+    expect(screen.getByText("100%")).toBeInTheDocument();
+  });
+
+  it("should render step descriptions when provided", () => {
+    const steps = [
+      { label: "Config", description: "Basic settings", completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} />);
+    expect(screen.getByText("Basic settings")).toBeInTheDocument();
+  });
+
+  it("should call onStepClick when clicking a completed step", () => {
+    const onStepClick = vi.fn();
+    const steps = [
+      { label: "Step 1", completed: true, active: false },
+      { label: "Step 2", completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} onStepClick={onStepClick} />);
+    const completedBtn = screen.getByLabelText("Step 1: Step 1 (completed)");
+    fireEvent.click(completedBtn);
+    expect(onStepClick).toHaveBeenCalledWith(0);
+  });
+
+  it("should not call onStepClick when clicking an active step", () => {
+    const onStepClick = vi.fn();
+    const steps = [
+      { label: "Step 1", completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} onStepClick={onStepClick} />);
+    const activeBtn = screen.getByLabelText("Step 1: Step 1");
+    fireEvent.click(activeBtn);
+    expect(onStepClick).not.toHaveBeenCalled();
+  });
+
+  it("should render custom icon when provided", () => {
+    const steps = [
+      { label: "Settings", icon: Settings, completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} />);
+    const svg = document.querySelector("svg");
+    expect(svg).toBeInTheDocument();
+  });
+
+  it("should have progressbar role with correct values", () => {
+    const steps = [
+      { label: "A", completed: true, active: false },
+      { label: "B", completed: false, active: true },
+    ];
+    render(<Stepper steps={steps} />);
+    const bar = screen.getByRole("progressbar");
+    expect(bar).toHaveAttribute("aria-valuenow", "50");
+    expect(bar).toHaveAttribute("aria-valuemin", "0");
+    expect(bar).toHaveAttribute("aria-valuemax", "100");
   });
 });

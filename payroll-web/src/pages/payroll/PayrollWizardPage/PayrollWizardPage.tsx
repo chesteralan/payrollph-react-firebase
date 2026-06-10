@@ -34,11 +34,11 @@ import { EmployeeSelectionStep } from "./EmployeeSelectionStep";
 import { ReviewStep } from "./ReviewStep";
 
 const STEPS = [
-  "Config",
-  "Inclusive Dates",
-  "Groups",
-  "Employees",
-  "Review & Generate",
+  { label: "Config", description: "Name, month, template & terms" },
+  { label: "Inclusive Dates", description: "Payroll period dates" },
+  { label: "Groups", description: "Group employees & print order" },
+  { label: "Employees", description: "Select payroll employees" },
+  { label: "Review & Generate", description: "Review and create payroll" },
 ];
 
 export function PayrollWizardPage() {
@@ -402,8 +402,9 @@ export function PayrollWizardPage() {
     );
   };
 
-  const steps = STEPS.map((label, i) => ({
-    label,
+  const steps = STEPS.map((s, i) => ({
+    label: s.label,
+    description: s.description,
     completed: i < step,
     active: i === step,
   }));
@@ -426,7 +427,7 @@ export function PayrollWizardPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <Stepper steps={steps} />
+          <Stepper steps={steps} onStepClick={(i) => i < step && setStep(i)} />
         </CardContent>
       </Card>
 

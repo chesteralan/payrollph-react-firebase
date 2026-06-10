@@ -10,10 +10,10 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 27. Payroll UX Enhancements
 
-- [ ] 27.1 Redesign payroll wizard with improved progress indicators
-- [ ] 27.2 Add sticky column support (name column frozen on scroll) for all payroll tables
+- [x] 27.1 Redesign payroll wizard with improved progress indicators (Stepper v2: progress bar, descriptions, clickable steps, icons)
+- [x] 27.2 Add sticky column support (StickyTable + StickyCell components)
 - [ ] 27.3 Add persistent totals row pinned at bottom of payroll tables
-- [ ] 27.4 Add unsaved-changes indicator and confirm-leave dialog on payroll processing stages
+- [x] 27.4 Add unsaved-changes indicator and confirm-leave dialog (useUnsavedChanges hook + ConfirmLeaveDialog)
 - [ ] 27.5 Implement column resize for payroll output tables
 - [ ] 27.6 Implement column reorder (drag-and-drop) for payroll output tables
 - [ ] 27.7 Add quick-filter chips (by group, position, area) on payroll processing stages
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 0
-- **Remaining:** 247
+- **Completed:** 3
+- **Remaining:** 244
 
 ---
 
