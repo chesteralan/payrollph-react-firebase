@@ -57,7 +57,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 29.7 Add employee self-service portal (view payslips, update personal info)
 - [ ] 29.8 Add emergency contact management section
 - [ ] 29.9 Add employee anniversary/birthday calendar view
-- [ ] 29.10 Add customizable employee export (select columns to include)
+- [x] 29.10 Add customizable employee export (EmployeeExportModal with column selection)
 - [ ] 29.11 Add employee audit trail per-field change tracking
 - [ ] 29.12 Add employee compliance checklist (missing IDs, expiring documents)
 - [ ] 29.13 Add employee quick-view tooltip on hover in tables
@@ -117,7 +117,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 33.6 Add IP-based access logging with anomaly detection
 - [ ] 33.7 Implement request signing for critical API operations
 - [ ] 33.8 Add data-at-rest encryption verification for sensitive fields
-- [ ] 33.9 Implement rate limiting dashboard (view/configure limits)
+- [x] 33.9 Implement rate limiting dashboard (RateLimiterDashboard component)
 - [ ] 33.10 Add security event alerting (new device, new location, new IP)
 - [ ] 33.11 Add session timeout with grace period warning
 - [ ] 33.12 Implement cross-tab session synchronization
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 30
-- **Remaining:** 217
+- **Completed:** 32
+- **Remaining:** 215
 
 ---
 
