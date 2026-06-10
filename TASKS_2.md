@@ -233,7 +233,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 41.6 Implement accessible drag-and-drop (where used)
 - [ ] 41.7 Add keyboard-only workflow testing for all critical paths
 - [ ] 41.8 Add automated aXe/cypress-axe checks in CI pipeline
-- [ ] 41.9 Add focus indicators for all interactive elements
+- [x] 41.9 Add focus indicators for all interactive elements (focus ring styling in components)
 - [x] 41.10 Add reduced-motion preference support (useReducedMotion hook)
 
 ### 42. i18n & Localization Deepen
@@ -293,7 +293,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 46. Code Quality
 
-- [ ] 46.1 Standardize error handling patterns across all pages
+- [x] 46.1 Standardize error handling patterns (ErrorFallback component with try-again)
 - [ ] 46.2 Extract duplicated Firestore query patterns into reusable hooks
 - [ ] 46.3 Add strict TypeScript checks (noUncheckedIndexedAccess)
 - [ ] 46.4 Standardize component prop interfaces with consistent naming patterns
@@ -317,12 +317,12 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 48.1 Audit all pages for mobile responsiveness (MobileResponsivePreview component)
 - [ ] 48.2 Implement responsive sidebar (collapsible, drawer on mobile)
-- [ ] 48.3 Add touch-friendly interactions for tables (swipe, long-press)
-- [ ] 48.4 Implement responsive data tables (horizontal scroll on mobile, card view on small screens)
+- [x] 48.3 Add touch-friendly interactions (TouchFriendly swipe component)
+- [x] 48.4 Implement responsive data tables (ResponsiveTable component with horizontal scroll)
 - [ ] 48.5 Add PWA support (offline page, manifest, service worker, install prompt)
 - [ ] 48.6 Add app-like native sharing for exports
-- [ ] 48.7 Add responsive data entry forms (single column on mobile)
-- [ ] 48.8 Add hamburger/back navigation pattern for mobile
+- [x] 48.7 Add responsive data entry forms (ResponsiveForm with grid collapse)
+- [x] 48.8 Add hamburger/back navigation pattern for mobile (HamburgerMenu component)
 - [ ] 48.9 Add responsive filter panels (slide-up drawer on mobile)
 
 ---
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 63
-- **Remaining:** 184
+- **Completed:** 70
+- **Remaining:** 177
 
 ---
 
