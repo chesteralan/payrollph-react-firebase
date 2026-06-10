@@ -51,9 +51,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 29.1 Add employee photo/avatar upload with cropping (EmployeePhotoUpload component)
 - [x] 29.2 Add employee document viewer (DocumentViewer component)
 - [x] 29.3 Add employee history timeline (EmployeeHistoryTimeline component)
-- [ ] 29.4 Add bulk employee import with mapping UI (CSV column matching)
+- [x] 29.4 Add bulk employee import with mapping UI (BulkImportMapping component)
 - [ ] 29.5 Add employee spreadsheet view (inline edit like Google Sheets)
-- [ ] 29.6 Add employee merge/deduplication tool
+- [x] 29.6 Add employee merge/deduplication tool (MergeDedupTool component)
 - [ ] 29.7 Add employee self-service portal (view payslips, update personal info)
 - [ ] 29.8 Add emergency contact management section
 - [ ] 29.9 Add employee anniversary/birthday calendar view
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 81
-- **Remaining:** 166
+- **Completed:** 84
+- **Remaining:** 163
 
 ---
 
