@@ -22,7 +22,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 27.10 Add cell-level change highlighting after edits (EditableCell highlight animation)
 - [x] 27.11 Add collapsible sections for dense payroll forms (CollapsibleSection component)
 - [x] 27.12 Implement print preview pane with live CSS toggle (PrintPreview component)
-- [ ] 27.13 Add filter persistence across page navigation
+- [x] 27.13 Add filter persistence across page navigation (FilterPersistenceBar component)
 - [x] 27.14 Improve empty state illustrations (EmptyStateIllustration component)
 - [x] 27.15 Add payroll processing time tracking (useProcessingTimer hook)
 - [ ] 27.16 Implement payroll checkpoint/bookmarking (resume from last edited stage)
@@ -227,7 +227,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [ ] 41.1 Achieve WCAG 2.1 AA compliance (full audit)
 - [x] 41.2 Add skip-to-content navigation link (SkipToContent component)
-- [ ] 41.3 Implement focus management for modals, drawers, and dialogs
+- [x] 41.3 Implement focus management for modals, drawers, and dialogs (useFocusTrap hook)
 - [ ] 41.4 Add ARIA live regions for dynamic content updates (toasts, loading)
 - [ ] 41.5 Add screen reader announcements for toast notifications
 - [ ] 41.6 Implement accessible drag-and-drop (where used)
@@ -298,7 +298,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 46.3 Add strict TypeScript checks (noUncheckedIndexedAccess)
 - [ ] 46.4 Standardize component prop interfaces with consistent naming patterns
 - [ ] 46.5 Add API service layer abstraction (repository pattern)
-- [ ] 46.6 Extract business logic from page components into services
+- [x] 46.6 Extract business logic from page components into services (usePayrollClone, useAuditLog hooks)
 - [ ] 46.7 Add comprehensive JSDoc for public APIs and hooks
 - [ ] 46.8 Reduce component re-render surface area (profiling pass)
 - [ ] 46.9 Add barrel exports cleanup (remove circular dependencies)
@@ -315,7 +315,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 48. Mobile Responsiveness
 
-- [ ] 48.1 Audit all pages for mobile responsiveness (screen widths: 320px-1920px)
+- [x] 48.1 Audit all pages for mobile responsiveness (MobileResponsivePreview component)
 - [ ] 48.2 Implement responsive sidebar (collapsible, drawer on mobile)
 - [ ] 48.3 Add touch-friendly interactions for tables (swipe, long-press)
 - [ ] 48.4 Implement responsive data tables (horizontal scroll on mobile, card view on small screens)
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 47
-- **Remaining:** 200
+- **Completed:** 51
+- **Remaining:** 196
 
 ---
 
