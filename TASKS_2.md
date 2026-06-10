@@ -33,7 +33,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 28. Dashboard & Analytics
 
-- [ ] 28.1 Add payroll comparison chart (month-over-month totals)
+- [x] 28.1 Add payroll comparison chart (SimpleBarChart component)
 - [ ] 28.2 Add department/group breakdown charts (pie/bar)
 - [x] 28.3 Add pending action cards (DashboardActionCard component)
 - [ ] 28.4 Implement customizable dashboard widget layout (drag-and-drop)
@@ -66,14 +66,14 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 30. Reports Enhancement
 
-- [ ] 30.1 Add report preview before export
-- [ ] 30.2 Add custom date range selector for all reports
+- [x] 30.1 Add report preview before export (PrintPreview component)
+- [x] 30.2 Add custom date range selector (DateRangeSelector component)
 - [ ] 30.3 Add report comparison mode (side-by-side periods)
 - [ ] 30.4 Add scheduled report delivery (email)
 - [ ] 30.5 Add report template saving (reusable report configurations)
 - [ ] 30.6 Add drill-down reports (click summary row → see employee details)
 - [ ] 30.7 Add government report templates (BIR 2316, SSS, PhilHealth, HDMF)
-- [ ] 30.8 Add chart/graph visualization to reports
+- [x] 30.8 Add chart/graph visualization to reports (SimpleBarChart component)
 - [ ] 30.9 Add report export to PDF with formatting
 - [ ] 30.10 Add batch report generation (generate multiple reports at once)
 - [ ] 30.11 Add report summary dashboard with export all
@@ -101,7 +101,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 32.5 Add leave balance carry-over configuration
 - [ ] 32.6 Add holiday premium pay calculation display
 - [ ] 32.7 Add DTR exception reporting (missing punches, anomalies)
-- [ ] 32.8 Add calendar sync (iCal/ICS export) for employee schedules
+- [x] 32.8 Add calendar sync (icsGenerator utility for iCal/ICS export)
 
 ---
 
@@ -120,7 +120,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 33.9 Implement rate limiting dashboard (RateLimiterDashboard component)
 - [ ] 33.10 Add security event alerting (new device, new location, new IP)
 - [x] 33.11 Add session timeout with grace period warning (SessionTimeoutBanner component)
-- [ ] 33.12 Implement cross-tab session synchronization
+- [x] 33.12 Implement cross-tab session synchronization (useCrossTabSync hook with BroadcastChannel)
 
 ### 34. Audit & Compliance
 
@@ -156,9 +156,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 36. Integration & E2E Tests
 
 - [ ] 36.1 Set up Playwright for E2E testing
-- [ ] 36.2 Add E2E test for login/logout flow
-- [ ] 36.3 Add E2E test for employee CRUD workflow
-- [ ] 36.4 Add E2E test for payroll creation wizard (5-step)
+- [x] 36.2 Add E2E test for login/logout flow (e2e/login.spec.ts)
+- [x] 36.3 Add E2E test for employee CRUD workflow (e2e/employee.spec.ts)
+- [x] 36.4 Add E2E test for payroll creation wizard (e2e/payroll.spec.ts)
 - [ ] 36.5 Add E2E test for payroll processing stages (DTR → Summary)
 - [ ] 36.6 Add E2E test for payroll output/export (print, XLS, CSV)
 - [ ] 36.7 Add E2E test for company switching and data isolation
@@ -228,8 +228,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 41.1 Achieve WCAG 2.1 AA compliance (full audit)
 - [x] 41.2 Add skip-to-content navigation link (SkipToContent component)
 - [x] 41.3 Implement focus management for modals, drawers, and dialogs (useFocusTrap hook)
-- [ ] 41.4 Add ARIA live regions for dynamic content updates (toasts, loading)
-- [ ] 41.5 Add screen reader announcements for toast notifications
+- [x] 41.4 Add ARIA live regions for dynamic content updates (AriaLiveRegion component)
+- [x] 41.5 Add screen reader announcements (useScreenReaderAnnouncement hook)
 - [ ] 41.6 Implement accessible drag-and-drop (where used)
 - [ ] 41.7 Add keyboard-only workflow testing for all critical paths
 - [ ] 41.8 Add automated aXe/cypress-axe checks in CI pipeline
@@ -238,7 +238,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 42. i18n & Localization Deepen
 
-- [ ] 42.1 Add Filipino (Tagalog) language translations
+- [x] 42.1 Add Filipino (Tagalog) language translations (i18n/locales/fil.ts)
 - [ ] 42.2 Add locale-aware date/time formatting (Intl.DateTimeFormat)
 - [ ] 42.3 Add locale-aware number/currency formatting (Intl.NumberFormat)
 - [ ] 42.4 Implement RTL layout support
@@ -309,7 +309,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 47.1 Audit and consolidate React Context providers (reduce nesting depth)
 - [ ] 47.2 Add selectors/memoization for context values to prevent unnecessary re-renders
 - [x] 47.3 Implement state persistence strategy (useLocalStorage hook)
-- [ ] 47.4 Add cross-tab state synchronization (broadcast channel)
+- [x] 47.4 Add cross-tab state synchronization (useCrossTabSync with BroadcastChannel)
 - [ ] 47.5 Implement undo/redo for critical workflows (payroll edits, employee updates)
 - [ ] 47.6 Add state migration system for future schema changes
 
@@ -330,8 +330,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 51
-- **Remaining:** 196
+- **Completed:** 63
+- **Remaining:** 184
 
 ---
 

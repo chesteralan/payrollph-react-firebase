@@ -19,7 +19,7 @@ export interface LocaleMessages {
 const allMessages: Record<Locale, () => Promise<LocaleMessages>> = {
   "en-US": () => import("./locales/en").then((m) => m.en),
   "en-PH": () => import("./locales/en").then((m) => m.en),
-  "fil-PH": () => import("./locales/en").then((m) => m.en),
+  "fil-PH": () => import("./locales/fil").then((m) => m.fil),
 };
 
 export async function loadMessages(locale: Locale): Promise<LocaleMessages> {
