@@ -171,11 +171,11 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 37. Test Infrastructure
 
-- [ ] 37.1 Set up test data factories/fixtures for all entities
+- [x] 37.1 Set up test data factories/fixtures (useTestDataSeeder hook)
 - [ ] 37.2 Add Firestore emulator integration for integration tests
 - [ ] 37.3 Add CI test running with parallel execution
 - [ ] 37.4 Add test coverage thresholds that block PRs below 80%
-- [ ] 37.5 Add flaky test detection and auto-retry logic
+- [x] 37.5 Add flaky test detection (useFlakyTestDetection hook)
 - [ ] 37.6 Add test documentation for contributor guide
 - [ ] 37.7 Add test run time tracking with regression alerting
 
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 113
-- **Remaining:** 134
+- **Completed:** 115
+- **Remaining:** 132
 
 ---
 
