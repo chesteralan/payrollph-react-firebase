@@ -69,7 +69,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 30.1 Add report preview before export (PrintPreview component)
 - [x] 30.2 Add custom date range selector (DateRangeSelector component)
 - [x] 30.3 Add report comparison mode (ReportComparisonView component)
-- [ ] 30.4 Add scheduled report delivery (email)
+- [x] 30.4 Add scheduled report delivery (useEmailDelivery hook)
 - [ ] 30.5 Add report template saving (reusable report configurations)
 - [ ] 30.6 Add drill-down reports (click summary row → see employee details)
 - [ ] 30.7 Add government report templates (BIR 2316, SSS, PhilHealth, HDMF)
@@ -212,7 +212,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 40. Caching & Data Layer
 
-- [ ] 40.1 Implement SWR pattern for data fetching (stale-while-revalidate)
+- [x] 40.1 Implement SWR pattern for data fetching (useSwrFetch hook)
 - [ ] 40.2 Add optimistic updates for fast UI feedback (edit, toggle status)
 - [ ] 40.3 Implement background data refresh for dashboard
 - [ ] 40.4 Add stale-while-revalidate for list pages
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 105
-- **Remaining:** 142
+- **Completed:** 107
+- **Remaining:** 140
 
 ---
 
