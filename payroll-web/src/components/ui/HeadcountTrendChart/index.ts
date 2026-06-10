@@ -1,0 +1,1 @@
+export { HeadcountTrendChart } from "./HeadcountTrendChart";

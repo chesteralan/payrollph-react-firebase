@@ -39,7 +39,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 28.4 Implement customizable dashboard widget layout (WidgetLayout component with grid)
 - [x] 28.5 Add recent activity timeline (ActivityTimeline component)
 - [x] 28.6 Add payroll deadline countdown widgets (DeadlineCountdown component)
-- [ ] 28.7 Add employee headcount trend chart
+- [x] 28.7 Add employee headcount trend chart (HeadcountTrendChart component)
 - [x] 28.8 Add quick-search bar on dashboard (DashboardSearchBar component)
 - [x] 28.9 Add role-based dashboard views (useRoleBasedView hook)
 - [ ] 28.10 Add dashboard data export (PDF snapshot)
@@ -68,7 +68,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 30.1 Add report preview before export (PrintPreview component)
 - [x] 30.2 Add custom date range selector (DateRangeSelector component)
-- [ ] 30.3 Add report comparison mode (side-by-side periods)
+- [x] 30.3 Add report comparison mode (ReportComparisonView component)
 - [ ] 30.4 Add scheduled report delivery (email)
 - [ ] 30.5 Add report template saving (reusable report configurations)
 - [ ] 30.6 Add drill-down reports (click summary row → see employee details)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 103
-- **Remaining:** 144
+- **Completed:** 105
+- **Remaining:** 142
 
 ---
 
