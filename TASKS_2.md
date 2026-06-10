@@ -44,7 +44,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 28.9 Add role-based dashboard views (useRoleBasedView hook)
 - [ ] 28.10 Add dashboard data export (PDF snapshot)
 - [x] 28.11 Add key metrics cards (MetricCard component with change indicators)
-- [ ] 28.12 Add real-time notification feed on dashboard
+- [x] 28.12 Add real-time notification feed on dashboard (NotificationFeed component)
 
 ### 29. Employee Management Deepen
 
@@ -129,8 +129,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 34.2 Implement audit log retention policies with auto-cleanup
 - [x] 34.3 Add audit log search with advanced filters (AuditLogSearch component)
 - [ ] 34.4 Add compliance report generation (SOX,GDPR-ready)
-- [ ] 34.5 Implement data export for GDPR/privacy requests
-- [ ] 34.6 Add user activity summary reports
+- [x] 34.5 Implement data export for GDPR/privacy requests (useDataExport hook)
+- [x] 34.6 Add user activity summary reports (useAuditTrail hook)
 - [ ] 34.7 Add audit anomaly detection (unusual patterns, off-hours access)
 - [ ] 34.8 Implement audit log integrity verification (tamper detection / hash chain)
 - [ ] 34.9 Add audit dashboard with real-time event stream
@@ -244,7 +244,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 42.3 Add locale-aware number/currency formatting (Intl.NumberFormat)
 - [ ] 42.4 Implement RTL layout support
 - [ ] 42.5 Add translation management UI (in-app editor for admins)
-- [ ] 42.6 Add locale fallback strategy (locale → en cascade)
+- [x] 42.6 Add locale fallback strategy (loadMessages falls back to en-US)
 - [ ] 42.7 Implement dynamic message loading (code-split per locale)
 - [ ] 42.8 Add date/time format customization per company
 - [ ] 42.9 Add currency formatting with localization per company
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 76
-- **Remaining:** 171
+- **Completed:** 81
+- **Remaining:** 166
 
 ---
 
