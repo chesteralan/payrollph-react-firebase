@@ -97,9 +97,9 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 - [x] 32.1 Add month/week/day toggle views for DTR (DTRViewToggle component)
 - [ ] 32.2 Add drag-to-mark attendance (click and drag across dates)
-- [ ] 32.3 Add DTR bulk edit mode (update multiple days at once)
-- [ ] 32.4 Add overtime approval workflow
-- [ ] 32.5 Add leave balance carry-over configuration
+- [x] 32.3 Add DTR bulk edit mode (useDTRBulkEdit hook)
+- [x] 32.4 Add overtime approval workflow (OvertimeApprovalWorkflow component)
+- [x] 32.5 Add leave balance carry-over configuration (useLeaveBalance hook)
 - [ ] 32.6 Add holiday premium pay calculation display
 - [ ] 32.7 Add DTR exception reporting (missing punches, anomalies)
 - [x] 32.8 Add calendar sync (icsGenerator utility for iCal/ICS export)
@@ -240,8 +240,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 42. i18n & Localization Deepen
 
 - [x] 42.1 Add Filipino (Tagalog) language translations (i18n/locales/fil.ts)
-- [ ] 42.2 Add locale-aware date/time formatting (Intl.DateTimeFormat)
-- [ ] 42.3 Add locale-aware number/currency formatting (Intl.NumberFormat)
+- [x] 42.2 Add locale-aware date/time formatting (LocaleSelector + Intl)
+- [x] 42.3 Add locale-aware number/currency formatting (LocaleSelector + Intl)
 - [ ] 42.4 Implement RTL layout support
 - [ ] 42.5 Add translation management UI (in-app editor for admins)
 - [x] 42.6 Add locale fallback strategy (loadMessages falls back to en-US)
@@ -331,8 +331,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 247 tasks
-- **Completed:** 88
-- **Remaining:** 159
+- **Completed:** 93
+- **Remaining:** 154
 
 ---
 
