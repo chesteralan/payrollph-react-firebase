@@ -18,7 +18,12 @@
     "deploy:all": "yarn build && firebase deploy",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "backup:create": "firebase firestore:backups create",
-    "backup:list": "firebase firestore:backups list"
+    "backup:list": "firebase firestore:backups list",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yaml}": ["prettier --write"]
   },
   "dependencies": {
     "@sentry/react": "^10.52.0",
@@ -52,7 +57,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "husky": "^9.1.0",
     "jsdom": "^29.1.1",
+    "lint-staged": "^15.5.0",
     "prettier": "^3.8.3",
     "tailwindcss": "^4.2.4",
     "typescript": "~6.0.2",

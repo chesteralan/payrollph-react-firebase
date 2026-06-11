@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useDebounce, useThrottle } from "./useDebounce";
 
 describe("useDebounce", () => {
   beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
   it("should delay execution", () => {
     const fn = vi.fn();
@@ -26,6 +27,7 @@ describe("useDebounce", () => {
 
 describe("useThrottle", () => {
   beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
 
   it("should limit calls", () => {
     const fn = vi.fn();

@@ -28,3 +28,9 @@ coverage/
 *.lcov
 .coverage
 .nyc_output/
+
+# Husky generated files
+.husky/_/
+
+# Yarn state
+.yarn/install-state.gz

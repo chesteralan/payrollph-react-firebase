@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useActivityMonitor } from "./useActivityMonitor";
 import type { UserActivity } from "./useActivityMonitor";
@@ -7,6 +7,10 @@ describe("useActivityMonitor", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("should initialize with empty activities", () => {

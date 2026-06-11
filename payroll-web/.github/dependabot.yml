@@ -1,0 +1,22 @@
+# Dependabot configuration for daily npm version updates
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+      timezone: "Asia/Manila"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "developer-team"
+    assignees:
+      - "developer-team"
+    labels:
+      - "dependencies"
+      - "automerge"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"

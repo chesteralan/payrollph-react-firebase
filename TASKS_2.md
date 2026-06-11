@@ -140,18 +140,18 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 35. Unit Test Expansion
 
-- [ ] 35.1 Achieve 80%+ coverage on utility functions (formatting, validation, sanitization)
-- [ ] 35.2 Achieve 80%+ coverage on custom hooks (usePermissions, useTableSort, useNetworkStatus)
-- [ ] 35.3 Achieve 80%+ coverage on context providers (AuthContext, CompanyContext)
-- [ ] 35.4 Add tests for all Firestore service functions (offline, audit, cache)
-- [ ] 35.5 Add tests for payroll calculation logic
-- [ ] 35.6 Add tests for RBAC permission functions
-- [ ] 35.7 Add tests for data transformation/formatting utilities
-- [ ] 35.8 Add tests for offline/IndexedDB service
-- [ ] 35.9 Add tests for i18n translation functions
-- [ ] 35.10 Add tests for validation/sanitization functions
-- [ ] 35.11 Add tests for all export utility functions (XLS, CSV)
-- [ ] 35.12 Add test coverage reporting to CI pipeline with thresholds
+- [x] 35.1 Achieve 80%+ coverage on utility functions (formatting, validation, sanitization)
+- [x] 35.2 Achieve 80%+ coverage on custom hooks (usePermissions, useTableSort, useNetworkStatus)
+- [x] 35.3 Achieve 80%+ coverage on context providers (AuthContext, CompanyContext)
+- [x] 35.4 Add tests for all Firestore service functions (offline, audit, cache)
+- [x] 35.5 Add tests for payroll calculation logic
+- [x] 35.6 Add tests for RBAC permission functions
+- [x] 35.7 Add tests for data transformation/formatting utilities
+- [x] 35.8 Add tests for offline/IndexedDB service
+- [x] 35.9 Add tests for i18n translation functions
+- [x] 35.10 Add tests for validation/sanitization functions
+- [x] 35.11 Add tests for all export utility functions (XLS, CSV)
+- [x] 35.12 Add test coverage reporting to CI pipeline with thresholds
 
 ### 36. Integration & E2E Tests
 
@@ -255,15 +255,15 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 43. CI/CD Pipeline Hardening
 
-- [ ] 43.1 Add lint-staged for pre-commit hooks
-- [ ] 43.2 Add type-check gate in CI pipeline (tsc --noEmit)
-- [ ] 43.3 Add test coverage thresholds in CI (block if below 80%)
-- [ ] 43.4 Add build size comparison in PR comments (bundlewatch)
-- [ ] 43.5 Add automated deployment to staging on PR merge
-- [ ] 43.6 Add production deployment with approval gate
-- [ ] 43.7 Add environment variable validation in CI
-- [ ] 43.8 Add security scan (npm audit, Snyk) in CI
-- [ ] 43.9 Add dependency update automation (Renovate/Dependabot)
+- [x] 43.1 Add lint-staged for pre-commit hooks
+- [x] 43.2 Add type-check gate in CI pipeline (tsc --noEmit)
+- [x] 43.3 Add test coverage thresholds in CI (block if below 80%)
+- [x] 43.4 Add build size comparison in PR comments (bundlewatch)
+- [x] 43.5 Add automated deployment to staging on PR merge
+- [x] 43.6 Add production deployment with approval gate
+- [x] 43.7 Add environment variable validation in CI
+- [x] 43.8 Add security scan (npm audit, Snyk) in CI
+- [x] 43.9 Add dependency update automation (Renovate/Dependabot)
 
 ### 44. Monitoring & Observability
 
@@ -329,8 +329,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 246 tasks
-- **Completed:** 173
-- **Remaining:** 73
+- **Completed:** 194
+- **Remaining:** 52
 
 ---
 
