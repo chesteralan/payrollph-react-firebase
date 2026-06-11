@@ -1,298 +1,389 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useUndoManager } from "./useUndoManager";
 
+// Helper to advance past the default debounce window (500ms)
+function pastDebounce() {
+  vi.advanceTimersByTime(600);
+}
+
 describe("useUndoManager", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
-  it("should initialize with empty history", () => {
-    const { result } = renderHook(() => useUndoManager());
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    expect(result.current.history).toEqual([]);
-    expect(result.current.currentIndex).toBe(-1);
+  it("should initialize with the given state and no history", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Initial" }),
+    );
+
+    expect(result.current.state).toEqual({ id: "1", name: "Initial" });
+    expect(result.current.past).toEqual([]);
+    expect(result.current.future).toEqual([]);
     expect(result.current.canUndo).toBe(false);
     expect(result.current.canRedo).toBe(false);
   });
 
-  it("should push an action to history", () => {
-    const undo = vi.fn();
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+  it("should push a state snapshot and allow undo", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Initial" }),
+    );
 
     act(() => {
-      result.current.push({
-        type: "edit",
-        description: "Edit employee name",
-        undo,
-        redo,
-      });
+      result.current.pushState({ id: "1", name: "Updated" });
     });
 
-    expect(result.current.history).toHaveLength(1);
-    expect(result.current.currentIndex).toBe(0);
-    expect(result.current.history[0].type).toBe("edit");
-    expect(result.current.history[0].description).toBe("Edit employee name");
+    expect(result.current.state).toEqual({ id: "1", name: "Updated" });
+    expect(result.current.past).toHaveLength(1);
+    expect(result.current.past[0]).toEqual({ id: "1", name: "Initial" });
     expect(result.current.canUndo).toBe(true);
     expect(result.current.canRedo).toBe(false);
-  });
-
-  it("should assign a unique id and timestamp to each action", () => {
-    const { result } = renderHook(() => useUndoManager());
-
-    act(() => {
-      result.current.push({
-        type: "create",
-        description: "Create employee",
-        undo: vi.fn(),
-        redo: vi.fn(),
-      });
-    });
-
-    const action = result.current.history[0];
-    expect(action.id).toMatch(/^undo-/);
-    expect(action.timestamp).toBeInstanceOf(Date);
-  });
-
-  it("should undo an action and decrement currentIndex", () => {
-    const undo = vi.fn();
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
-
-    act(() => {
-      result.current.push({
-        type: "edit",
-        description: "Edit employee",
-        undo,
-        redo,
-      });
-    });
 
     act(() => {
       result.current.undo();
     });
 
-    expect(undo).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(-1);
+    expect(result.current.state).toEqual({ id: "1", name: "Initial" });
     expect(result.current.canUndo).toBe(false);
     expect(result.current.canRedo).toBe(true);
   });
 
-  it("should redo an action and increment currentIndex", () => {
-    const undo = vi.fn();
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+  it("should redo after undo", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Initial" }),
+    );
 
     act(() => {
-      result.current.push({
-        type: "edit",
-        description: "Edit employee",
-        undo,
-        redo,
-      });
+      result.current.pushState({ id: "1", name: "Updated" });
     });
-
     act(() => {
       result.current.undo();
     });
-    expect(result.current.currentIndex).toBe(-1);
+
+    expect(result.current.state).toEqual({ id: "1", name: "Initial" });
 
     act(() => {
       result.current.redo();
     });
 
-    expect(redo).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(0);
+    expect(result.current.state).toEqual({ id: "1", name: "Updated" });
     expect(result.current.canUndo).toBe(true);
     expect(result.current.canRedo).toBe(false);
   });
 
-  it("should handle multiple undo/redo cycles", () => {
-    const undo1 = vi.fn();
-    const redo1 = vi.fn();
-    const undo2 = vi.fn();
-    const redo2 = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+  it("should handle multiple pushState and undo cycles", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }),
+    );
 
+    // Push with debounce gap between each so they're separate undo steps
     act(() => {
-      result.current.push({
-        type: "action1",
-        description: "First action",
-        undo: undo1,
-        redo: redo1,
-      });
+      result.current.pushState({ id: "1", name: "B" });
     });
+    act(() => pastDebounce());
     act(() => {
-      result.current.push({
-        type: "action2",
-        description: "Second action",
-        undo: undo2,
-        redo: redo2,
-      });
+      result.current.pushState({ id: "1", name: "C" });
+    });
+    act(() => pastDebounce());
+    act(() => {
+      result.current.pushState({ id: "1", name: "D" });
     });
 
-    expect(result.current.currentIndex).toBe(1);
+    expect(result.current.state).toEqual({ id: "1", name: "D" });
+    expect(result.current.past).toHaveLength(3);
+
+    // Undo twice
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.state).toEqual({ id: "1", name: "C" });
 
     act(() => {
       result.current.undo();
     });
-    expect(undo2).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(0);
+    expect(result.current.state).toEqual({ id: "1", name: "B" });
 
-    act(() => {
-      result.current.undo();
-    });
-    expect(undo1).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(-1);
-
+    // Redo once
     act(() => {
       result.current.redo();
     });
-    expect(redo1).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(0);
+    expect(result.current.state).toEqual({ id: "1", name: "C" });
 
-    act(() => {
-      result.current.redo();
-    });
-    expect(redo2).toHaveBeenCalledTimes(1);
-    expect(result.current.currentIndex).toBe(1);
+    expect(result.current.canUndo).toBe(true);
+    expect(result.current.canRedo).toBe(true);
   });
 
   it("should not undo when at the beginning of history", () => {
-    const undo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Start" }),
+    );
 
     act(() => {
       result.current.undo();
     });
 
-    expect(undo).not.toHaveBeenCalled();
+    expect(result.current.state).toEqual({ id: "1", name: "Start" });
     expect(result.current.canUndo).toBe(false);
   });
 
   it("should not redo when at the end of history", () => {
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Start" }),
+    );
+
+    act(() => {
+      result.current.pushState({ id: "1", name: "B" });
+    });
+    act(() => pastDebounce());
+    act(() => {
+      result.current.undo();
+    });
+
+    expect(result.current.canRedo).toBe(true);
 
     act(() => {
       result.current.redo();
     });
-
-    expect(redo).not.toHaveBeenCalled();
     expect(result.current.canRedo).toBe(false);
   });
 
-  it("should clear history and reset index", () => {
-    const { result } = renderHook(() => useUndoManager());
+  it("should clear history and reset to the given initial state", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Start" }),
+    );
 
     act(() => {
-      result.current.push({
-        type: "edit",
-        description: "Edit employee",
-        undo: vi.fn(),
-        redo: vi.fn(),
-      });
+      result.current.pushState({ id: "1", name: "B" });
     });
-
-    expect(result.current.history).toHaveLength(1);
+    act(() => pastDebounce());
+    act(() => {
+      result.current.pushState({ id: "1", name: "C" });
+    });
+    expect(result.current.past).toHaveLength(2);
 
     act(() => {
-      result.current.clear();
+      result.current.clear({ id: "2", name: "Fresh" });
     });
 
-    expect(result.current.history).toEqual([]);
-    expect(result.current.currentIndex).toBe(-1);
+    expect(result.current.state).toEqual({ id: "2", name: "Fresh" });
+    expect(result.current.past).toEqual([]);
+    expect(result.current.future).toEqual([]);
     expect(result.current.canUndo).toBe(false);
     expect(result.current.canRedo).toBe(false);
   });
 
   it("should respect maxHistory limit", () => {
     const maxHistory = 3;
-    const { result } = renderHook(() => useUndoManager(maxHistory));
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, maxHistory, 100),
+    );
 
-    // Push 5 items with individual act() calls so state updates flush between each
-    for (let i = 0; i < 5; i++) {
+    // Push 4 items with debounce gap between each
+    for (const name of ["B", "C", "D", "E"]) {
       act(() => {
-        result.current.push({
-          type: `action-${i}`,
-          description: `Action ${i}`,
-          undo: vi.fn(),
-          redo: vi.fn(),
-        });
+        result.current.pushState({ id: "1", name });
       });
+      act(() => vi.advanceTimersByTime(200));
     }
 
-    expect(result.current.history).toHaveLength(maxHistory);
-    expect(result.current.history[0].type).toBe("action-2");
-    expect(result.current.history[1].type).toBe("action-3");
-    expect(result.current.history[2].type).toBe("action-4");
-    expect(result.current.currentIndex).toBe(2);
+    expect(result.current.past.length).toBeLessThanOrEqual(maxHistory);
+    expect(result.current.state.name).toBe("E");
   });
 
   it("should truncate future history on new push after undo", () => {
-    const undo1 = vi.fn();
-    const redo1 = vi.fn();
-    const undo2 = vi.fn();
-    const redo2 = vi.fn();
-    const undo3 = vi.fn();
-    const redo3 = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, 50, 100),
+    );
 
-    // Push three actions
     act(() => {
-      result.current.push({
-        type: "a1",
-        description: "A1",
-        undo: undo1,
-        redo: redo1,
-      });
+      result.current.pushState({ id: "1", name: "B" });
     });
+    act(() => vi.advanceTimersByTime(200));
     act(() => {
-      result.current.push({
-        type: "a2",
-        description: "A2",
-        undo: undo2,
-        redo: redo2,
-      });
+      result.current.pushState({ id: "1", name: "C" });
     });
-    act(() => {
-      result.current.push({
-        type: "a3",
-        description: "A3",
-        undo: undo3,
-        redo: redo3,
-      });
-    });
-    expect(result.current.currentIndex).toBe(2);
+    act(() => vi.advanceTimersByTime(200));
 
-    // Undo once (back to a2)
+    // Go back to B
     act(() => {
       result.current.undo();
     });
-    expect(result.current.currentIndex).toBe(1);
+    expect(result.current.state.name).toBe("B");
 
-    // Push new action — future (a3) should be truncated
-    const undo4 = vi.fn();
-    const redo4 = vi.fn();
+    // Push new state D — future (C) should be truncated
     act(() => {
-      result.current.push({
-        type: "a4",
-        description: "A4",
-        undo: undo4,
-        redo: redo4,
-      });
+      result.current.pushState({ id: "1", name: "D" });
     });
 
-    expect(result.current.history).toHaveLength(3);
-    expect(result.current.history[0].type).toBe("a1");
-    expect(result.current.history[1].type).toBe("a2");
-    expect(result.current.history[2].type).toBe("a4");
-    expect(result.current.currentIndex).toBe(2);
+    expect(result.current.state.name).toBe("D");
+    expect(result.current.future).toEqual([]);
+    expect(result.current.past.map((s: { name: string }) => s.name)).toEqual([
+      "A",
+      "B",
+    ]);
   });
 
-  it("should handle empty history gracefully on undo/redo", () => {
-    const { result } = renderHook(() => useUndoManager());
+  it("should group rapid changes into a single undo step", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, 50, 500),
+    );
+
+    // Rapid pushes within the 500ms debounce window
+    act(() => {
+      result.current.pushState({ id: "1", name: "B" });
+    });
+    act(() => {
+      result.current.pushState({ id: "1", name: "C" });
+    });
+    act(() => {
+      result.current.pushState({ id: "1", name: "D" });
+    });
+
+    // All grouped: past should only have the initial state (A)
+    expect(result.current.past).toHaveLength(1);
+    expect(result.current.past[0].name).toBe("A");
+    expect(result.current.state.name).toBe("D");
+
+    // Single undo should go all the way back to A
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.state.name).toBe("A");
+    expect(result.current.canUndo).toBe(false);
+  });
+
+  it("should not group after the debounce timer expires", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, 50, 300),
+    );
+
+    act(() => {
+      result.current.pushState({ id: "1", name: "B" });
+    });
+
+    // Wait for debounce to expire
+    act(() => vi.advanceTimersByTime(400));
+
+    act(() => {
+      result.current.pushState({ id: "1", name: "C" });
+    });
+
+    // Two separate undo steps
+    expect(result.current.past).toHaveLength(2);
+    expect(result.current.past.map((s: { name: string }) => s.name)).toEqual([
+      "A",
+      "B",
+    ]);
+    expect(result.current.state.name).toBe("C");
+  });
+
+  it("should support generic type inference", () => {
+    interface CustomState {
+      value: number;
+      label: string;
+    }
+
+    const { result } = renderHook(() =>
+      useUndoManager<CustomState>({ value: 0, label: "zero" }),
+    );
+
+    act(() => {
+      result.current.pushState({ value: 1, label: "one" });
+    });
+
+    expect(result.current.state.value).toBe(1);
+    expect(result.current.state.label).toBe("one");
+    expect(result.current.past[0].value).toBe(0);
+
+    act(() => {
+      result.current.undo();
+    });
+
+    expect(result.current.state.value).toBe(0);
+    expect(result.current.state.label).toBe("zero");
+  });
+
+  it("should handle undo correctly after grouped pushes then a separated push", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, 50, 500),
+    );
+
+    // Group 1: rapid pushes B, C
+    act(() => {
+      result.current.pushState({ id: "1", name: "B" });
+    });
+    act(() => {
+      result.current.pushState({ id: "1", name: "C" });
+    });
+
+    // Wait for debounce
+    act(() => vi.advanceTimersByTime(600));
+
+    // Group 2: rapid pushes D, E
+    act(() => {
+      result.current.pushState({ id: "1", name: "D" });
+    });
+    act(() => {
+      result.current.pushState({ id: "1", name: "E" });
+    });
+
+    // Past should have A and C (state before each group)
+    expect(result.current.past).toHaveLength(2);
+    expect(result.current.past[0].name).toBe("A");
+    expect(result.current.past[1].name).toBe("C");
+    expect(result.current.state.name).toBe("E");
+
+    // Undo once: should go back to C (state before group 2 started)
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.state.name).toBe("C");
+
+    // Undo again: should go back to A (state before group 1 started)
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.state.name).toBe("A");
+    expect(result.current.canUndo).toBe(false);
+  });
+
+  it("should cancel grouping on undo", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }, 50, 500),
+    );
+
+    // Start a group
+    act(() => {
+      result.current.pushState({ id: "1", name: "B" });
+    });
+    act(() => {
+      result.current.pushState({ id: "1", name: "C" });
+    });
+
+    // Undo — this should cancel the group
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.state.name).toBe("A");
+
+    // Next push should be a fresh history entry, not grouped
+    act(() => {
+      result.current.pushState({ id: "1", name: "D" });
+    });
+
+    expect(result.current.past).toHaveLength(1);
+    expect(result.current.past[0].name).toBe("A");
+    expect(result.current.state.name).toBe("D");
+  });
+
+  it("should handle empty history gracefully", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "Start" }),
+    );
 
     expect(result.current.canUndo).toBe(false);
     expect(result.current.canRedo).toBe(false);
@@ -304,73 +395,49 @@ describe("useUndoManager", () => {
       result.current.redo();
     });
 
-    expect(result.current.currentIndex).toBe(-1);
+    expect(result.current.state).toEqual({ id: "1", name: "Start" });
   });
 
-  it("should use default maxHistory of 20", () => {
-    const { result } = renderHook(() => useUndoManager());
+  it("should use default maxHistory of 50", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }),
+    );
 
-    // Push 25 items with individual act() calls
+    // Push 25 items with debounce gap between each
     for (let i = 0; i < 25; i++) {
       act(() => {
-        result.current.push({
-          type: `action-${i}`,
-          description: `Action ${i}`,
-          undo: vi.fn(),
-          redo: vi.fn(),
-        });
+        result.current.pushState({ id: "1", name: `item-${i}` });
       });
+      act(() => pastDebounce());
     }
 
-    expect(result.current.history).toHaveLength(20);
-    expect(result.current.currentIndex).toBe(19);
+    expect(result.current.past).toHaveLength(25);
   });
 
-  it("should call undo with correct arguments", () => {
-    const undo = vi.fn();
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+  it("should preserve undo stack after undo → push → redo boundary", () => {
+    const { result } = renderHook(() =>
+      useUndoManager({ id: "1", name: "A" }),
+    );
 
     act(() => {
-      result.current.push({
-        type: "move",
-        description: "Move employee",
-        undo,
-        redo,
-      });
+      result.current.pushState({ id: "1", name: "B" });
     });
+    act(() => pastDebounce());
 
+    // Undo back to A, then push C — B should still be in past
     act(() => {
       result.current.undo();
     });
-
-    expect(undo).toHaveBeenCalledWith();
-    expect(undo).toHaveBeenCalledTimes(1);
-  });
-
-  it("should call redo with correct arguments", () => {
-    const undo = vi.fn();
-    const redo = vi.fn();
-    const { result } = renderHook(() => useUndoManager());
+    expect(result.current.state.name).toBe("A");
 
     act(() => {
-      result.current.push({
-        type: "move",
-        description: "Move employee",
-        undo,
-        redo,
-      });
+      result.current.pushState({ id: "1", name: "C" });
     });
 
-    act(() => {
-      result.current.undo();
-    });
-
-    act(() => {
-      result.current.redo();
-    });
-
-    expect(redo).toHaveBeenCalledWith();
-    expect(redo).toHaveBeenCalledTimes(1);
+    expect(result.current.past.map((s: { name: string }) => s.name)).toEqual([
+      "A",
+    ]);
+    expect(result.current.state.name).toBe("C");
+    expect(result.current.future).toEqual([]);
   });
 });

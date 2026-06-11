@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { CompanyContext } from "@/context/CompanyContext";
+import { CompanyContext } from "@/context/company";
 
 export function useCompany() {
   const context = useContext(CompanyContext);
@@ -8,3 +8,10 @@ export function useCompany() {
   }
   return context;
 }
+
+// Re-export selector hooks for convenience
+export {
+  useCurrentCompany,
+  useCompanies,
+  useCompanyLoading,
+} from "@/context/CompanyContext";

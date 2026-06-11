@@ -40,11 +40,10 @@ export function exportToXLS<T extends Record<string, unknown>>(
   XLSX.writeFile(wb, `${options.filename}${timestamp}.xlsx`);
 }
 
-export function exportToCSV<T extends Record<string, unknown>>(
+export function generateCSVBlob<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn[],
-  filename: string,
-) {
+): Blob {
   const headers = columns.map((c) => c.header);
   const rows = data.map((row) =>
     columns.map((col) => {
@@ -58,27 +57,46 @@ export function exportToCSV<T extends Record<string, unknown>>(
   );
 
   const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  return new Blob([csv], { type: "text/csv" });
+}
+
+export function exportToCSV<T extends Record<string, unknown>>(
+  data: T[],
+  columns: ExportColumn[],
+  filename: string,
+) {
+  const blob = generateCSVBlob(data, columns);
+  downloadBlob(blob, `${filename}.csv`);
+}
+
+/** Download a Blob by creating a temporary anchor element */
+export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${filename}.csv`;
+  a.download = filename;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Generate a JSON blob from data.
+ */
+export function generateJSONBlob<T extends Record<string, unknown>>(
+  data: T[],
+): Blob {
+  const json = JSON.stringify(data, null, 2);
+  return new Blob([json], { type: "application/json" });
 }
 
 export function exportToJson<T extends Record<string, unknown>>(
   data: T[],
   filename: string,
 ) {
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${filename}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const blob = generateJSONBlob(data);
+  downloadBlob(blob, `${filename}.json`);
 }
 
 export const employeeExportColumns: ExportColumn[] = [

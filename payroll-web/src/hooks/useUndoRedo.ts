@@ -1,40 +1,140 @@
-import { useState, useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { useUndoManager } from "@/hooks/useUndoManager";
+import { useToast } from "@/hooks/useToast";
+import type { UndoManager } from "@/hooks/useUndoManager";
 
-export function useUndoRedo<T>(initial: T) {
-  const [past, setPast] = useState<T[]>([]);
-  const [present, setPresent] = useState<T>(initial);
-  const [future, setFuture] = useState<T[]>([]);
+// ── Types ─────────────────────────────────────────────────────────────
 
-  const canUndo = past.length > 0;
-  const canRedo = future.length > 0;
+export interface PayrollData {
+  id: string;
+  name: string;
+  month: string;
+  year: number;
+  status: string;
+  [key: string]: unknown;
+}
 
-  const pushState = useCallback((newState: T) => {
-    setPast((prev) => [...prev.slice(-49), present]);
-    setPresent(newState);
-    setFuture([]);
-  }, [present]);
+export interface EmployeeData {
+  id: string;
+  name: string;
+  status: string;
+  department: string;
+  position: string;
+  [key: string]: unknown;
+}
+
+export interface PayrollUndoResult extends UndoManager<PayrollData> {
+  /** Push state with an optional description shown in the toast */
+  pushTracked: (snapshot: PayrollData, description?: string) => void;
+}
+
+export interface EmployeeUndoResult extends UndoManager<EmployeeData> {
+  /** Push state with an optional description shown in the toast */
+  pushTracked: (snapshot: EmployeeData, description?: string) => void;
+}
+
+// ── Payroll Undo Hook ─────────────────────────────────────────────────
+
+/**
+ * Hook for undo/redo support in payroll edit workflows.
+ * Integrates with the toast notification system to show feedback
+ * on undo/redo actions.
+ */
+export function usePayrollUndo(
+  initialData: PayrollData,
+  maxHistory = 50,
+): PayrollUndoResult {
+  const { addToast } = useToast();
+  const undoManager = useUndoManager(initialData, maxHistory);
+  const descriptionRef = useRef<string>("");
 
   const undo = useCallback(() => {
-    if (past.length === 0) return;
-    const previous = past[past.length - 1];
-    setPast((prev) => prev.slice(0, -1));
-    setFuture((prev) => [present, ...prev]);
-    setPresent(previous);
-  }, [past, present]);
+    if (!undoManager.canUndo) return;
+    undoManager.undo();
+    addToast({
+      type: "info",
+      title: "Undo",
+      message: "Payroll change undone",
+      duration: 3000,
+    });
+  }, [undoManager, addToast]);
 
   const redo = useCallback(() => {
-    if (future.length === 0) return;
-    const next = future[0];
-    setFuture((prev) => prev.slice(1));
-    setPast((prev) => [...prev, present]);
-    setPresent(next);
-  }, [future, present]);
+    if (!undoManager.canRedo) return;
+    undoManager.redo();
+    addToast({
+      type: "info",
+      title: "Redo",
+      message: "Payroll change reapplied",
+      duration: 3000,
+    });
+  }, [undoManager, addToast]);
 
-  const reset = useCallback((newState: T) => {
-    setPast([]);
-    setPresent(newState);
-    setFuture([]);
-  }, []);
+  const pushTracked = useCallback(
+    (snapshot: PayrollData, description?: string) => {
+      descriptionRef.current = description || "Payroll updated";
+      undoManager.pushState(snapshot);
+    },
+    [undoManager],
+  );
 
-  return { state: present, pushState, undo, redo, reset, canUndo, canRedo };
+  return {
+    ...undoManager,
+    undo,
+    redo,
+    pushTracked,
+  };
+}
+
+// ── Employee Undo Hook ────────────────────────────────────────────────
+
+/**
+ * Hook for undo/redo support in employee edit workflows.
+ * Integrates with the toast notification system to show feedback
+ * on undo/redo actions.
+ */
+export function useEmployeeUndo(
+  initialData: EmployeeData,
+  maxHistory = 50,
+): EmployeeUndoResult {
+  const { addToast } = useToast();
+  const undoManager = useUndoManager(initialData, maxHistory);
+  const descriptionRef = useRef<string>("");
+
+  const undo = useCallback(() => {
+    if (!undoManager.canUndo) return;
+    undoManager.undo();
+    addToast({
+      type: "info",
+      title: "Undo",
+      message: "Employee change undone",
+      duration: 3000,
+    });
+  }, [undoManager, addToast]);
+
+  const redo = useCallback(() => {
+    if (!undoManager.canRedo) return;
+    undoManager.redo();
+    addToast({
+      type: "info",
+      title: "Redo",
+      message: "Employee change reapplied",
+      duration: 3000,
+    });
+  }, [undoManager, addToast]);
+
+  const pushTracked = useCallback(
+    (snapshot: EmployeeData, description?: string) => {
+      descriptionRef.current = description || "Employee updated";
+      undoManager.pushState(snapshot);
+    },
+    [undoManager],
+  );
+
+  return {
+    ...undoManager,
+    undo,
+    redo,
+    pushTracked,
+  };
 }

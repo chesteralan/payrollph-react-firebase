@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
-type CollectionName =
+export type CollectionName =
   | "companies"
   | "company_periods"
   | "company_options"

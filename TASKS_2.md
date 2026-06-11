@@ -294,10 +294,10 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ### 46. Code Quality
 
 - [x] 46.1 Standardize error handling patterns (ErrorFallback component with try-again)
-- [ ] 46.2 Extract duplicated Firestore query patterns into reusable hooks
+- [x] 46.2 Extract duplicated Firestore query patterns into reusable hooks
 - [ ] 46.3 Add strict TypeScript checks (noUncheckedIndexedAccess)
 - [ ] 46.4 Standardize component prop interfaces with consistent naming patterns
-- [ ] 46.5 Add API service layer abstraction (repository pattern)
+- [x] 46.5 Add API service layer abstraction (repository pattern)
 - [x] 46.6 Extract business logic from page components into services (usePayrollClone, useAuditLog hooks)
 - [ ] 46.7 Add comprehensive JSDoc for public APIs and hooks
 - [ ] 46.8 Reduce component re-render surface area (profiling pass)
@@ -306,11 +306,11 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 47. State Management
 
-- [ ] 47.1 Audit and consolidate React Context providers (reduce nesting depth)
-- [ ] 47.2 Add selectors/memoization for context values to prevent unnecessary re-renders
+- [x] 47.1 Audit and consolidate React Context providers (reduce nesting depth)
+- [x] 47.2 Add selectors/memoization for context values to prevent unnecessary re-renders
 - [x] 47.3 Implement state persistence strategy (useLocalStorage hook)
 - [x] 47.4 Add cross-tab state synchronization (useCrossTabSync with BroadcastChannel)
-- [ ] 47.5 Implement undo/redo for critical workflows (payroll edits, employee updates)
+- [x] 47.5 Implement undo/redo for critical workflows (payroll edits, employee updates)
 - [x] 47.6 Add state migration system for future schema changes (useStateMigration hook)
 
 ### 48. Mobile Responsiveness
@@ -319,7 +319,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [x] 48.2 Implement responsive sidebar (ResponsiveSidebar component)
 - [x] 48.3 Add touch-friendly interactions (TouchFriendly swipe component)
 - [x] 48.4 Implement responsive data tables (ResponsiveTable component with horizontal scroll)
-- [ ] 48.6 Add app-like native sharing for exports
+- [x] 48.6 Add app-like native sharing for exports
 - [x] 48.7 Add responsive data entry forms (ResponsiveForm with grid collapse)
 - [x] 48.8 Add hamburger/back navigation pattern for mobile (HamburgerMenu component)
 - [x] 48.9 Add responsive filter panels (ResponsiveFilterPanel component)
@@ -329,8 +329,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 246 tasks
-- **Completed:** 220
-- **Remaining:** 26
+- **Completed:** 226
+- **Remaining:** 20
 
 ---
 

@@ -1,80 +1,136 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
-interface UndoAction {
-  id: string;
-  type: string;
-  description: string;
-  undo: () => void;
-  redo: () => void;
-  timestamp: Date;
-}
-
-interface UndoManager {
-  history: UndoAction[];
-  currentIndex: number;
+/**
+ * Generic undo/redo manager that stores state snapshots.
+ *
+ * Features:
+ * - State snapshot history with configurable max depth (default 50)
+ * - Debounced grouping: rapid pushState calls within `debounceMs`
+ *   are grouped into a single undo step
+ * - Full TypeScript generics for type safety
+ * - Truncates future history on new push (standard undo behavior)
+ */
+export interface UndoManager<T> {
+  /** Current state (the present) */
+  state: T;
+  /** Past state snapshots (stack, most recent at end) */
+  past: T[];
+  /** Future state snapshots available for redo */
+  future: T[];
+  /** Whether undo is available */
   canUndo: boolean;
+  /** Whether redo is available */
   canRedo: boolean;
-  push: (action: Omit<UndoAction, "id" | "timestamp">) => void;
+  /** Push a new state snapshot (truncates future) */
+  pushState: (snapshot: T) => void;
+  /** Undo: restore the previous state snapshot */
   undo: () => void;
+  /** Redo: restore the next state snapshot */
   redo: () => void;
-  clear: () => void;
+  /** Clear history and reset to an initial state */
+  clear: (initial: T) => void;
 }
 
-export function useUndoManager(maxHistory = 20): UndoManager {
-  const [history, setHistory] = useState<UndoAction[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const idCounter = useRef(0);
+/**
+ * Creates a generic undo/redo manager that stores state snapshots.
+ *
+ * @param initial - The initial state
+ * @param maxHistory - Maximum number of past states to keep (default: 50)
+ * @param debounceMs - Time window in ms for grouping rapid changes (default: 500).
+ *   Uses wall-clock time (Date.now()) so it works correctly with fake timers in tests.
+ *
+ * @example
+ * ```ts
+ * const { state, pushState, undo, redo, canUndo, canRedo } = useUndoManager(initialFormData);
+ *
+ * // When form fields change:
+ * pushState(newFormData);
+ *
+ * // Handle keyboard shortcuts:
+ * <button onClick={undo} disabled={!canUndo}>Undo</button>
+ * <button onClick={redo} disabled={!canRedo}>Redo</button>
+ * ```
+ */
+export function useUndoManager<T>(
+  initial: T,
+  maxHistory = 50,
+  debounceMs = 500,
+): UndoManager<T> {
+  const [past, setPast] = useState<T[]>([]);
+  const [present, setPresent] = useState<T>(initial);
+  const [future, setFuture] = useState<T[]>([]);
 
-  const push = useCallback(
-    (action: Omit<UndoAction, "id" | "timestamp">) => {
-      idCounter.current++;
-      const newAction: UndoAction = {
-        ...action,
-        id: `undo-${idCounter.current}`,
-        timestamp: new Date(),
-      };
+  // Track the last push time using Date.now() so it works correctly
+  // with vitest fake timers (vi.advanceTimersByTime advances Date.now()).
+  const lastPushTimeRef = useRef(0);
 
-      setHistory((prev) => {
-        const truncated = prev.slice(0, currentIndex + 1);
-        const updated = [...truncated, newAction];
-        if (updated.length > maxHistory) {
-          return updated.slice(updated.length - maxHistory);
+  const canUndo = past.length > 0;
+  const canRedo = future.length > 0;
+
+  const pushState = useCallback(
+    (newState: T) => {
+      const now = Date.now();
+      const isGrouped = now - lastPushTimeRef.current < debounceMs;
+
+      setPast((prev) => {
+        if (isGrouped) {
+          // We're inside the debounce window — don't push a new past entry.
+          // This groups all rapid changes into a single undo step that
+          // restores the state *before* the group started.
+          return prev;
         }
-        return updated;
+        // Normal push: save current present into past
+        const updated = [...prev, present];
+        return updated.length > maxHistory
+          ? updated.slice(updated.length - maxHistory)
+          : updated;
       });
-      setCurrentIndex((prev) => {
-        const newIdx = Math.min(prev + 1, maxHistory - 1);
-        return newIdx;
-      });
+      setPresent(newState);
+      setFuture([]);
+
+      lastPushTimeRef.current = now;
     },
-    [currentIndex, maxHistory],
+    [present, maxHistory, debounceMs],
   );
 
   const undo = useCallback(() => {
-    if (currentIndex < 0 || history.length === 0) return;
-    const action = history[currentIndex];
-    action.undo();
-    setCurrentIndex((prev) => prev - 1);
-  }, [currentIndex, history]);
+    if (past.length === 0) return;
+
+    const previous = past[past.length - 1];
+    setPast((prev) => prev.slice(0, -1));
+    setFuture((prev) => [present, ...prev]);
+    setPresent(previous);
+
+    // Cancel any ongoing grouping so the next push starts a fresh group
+    lastPushTimeRef.current = 0;
+  }, [past, present]);
 
   const redo = useCallback(() => {
-    if (currentIndex >= history.length - 1) return;
-    const nextAction = history[currentIndex + 1];
-    nextAction.redo();
-    setCurrentIndex((prev) => prev + 1);
-  }, [currentIndex, history]);
+    if (future.length === 0) return;
 
-  const clear = useCallback(() => {
-    setHistory([]);
-    setCurrentIndex(-1);
+    const next = future[0];
+    setFuture((prev) => prev.slice(1));
+    setPast((prev) => [...prev, present]);
+    setPresent(next);
+
+    // Cancel any ongoing grouping
+    lastPushTimeRef.current = 0;
+  }, [future, present]);
+
+  const clear = useCallback((initialState: T) => {
+    setPast([]);
+    setPresent(initialState);
+    setFuture([]);
+    lastPushTimeRef.current = 0;
   }, []);
 
   return {
-    history,
-    currentIndex,
-    canUndo: currentIndex >= 0 && history.length > 0,
-    canRedo: currentIndex < history.length - 1,
-    push,
+    state: present,
+    past,
+    future,
+    canUndo,
+    canRedo,
+    pushState,
     undo,
     redo,
     clear,

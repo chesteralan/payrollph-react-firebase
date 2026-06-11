@@ -1,4 +1,13 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useSyncExternalStore,
+  createContext,
+  useContext,
+} from "react";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -36,6 +45,133 @@ import { AuthContext } from "@/context/auth";
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const ACTIVITY_EVENTS = ["mousedown", "keydown", "touchstart", "scroll"];
 
+// ──────────────────────────────────────────────
+// Minimal observable store for useSyncExternalStore
+// ──────────────────────────────────────────────
+class ValueStore<T> {
+  private value: T;
+  private listeners = new Set<() => void>();
+
+  constructor(initial: T) {
+    this.value = initial;
+  }
+
+  getSnapshot = (): T => this.value;
+
+  subscribe = (listener: () => void): (() => void) => {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  };
+
+  set = (newValue: T): void => {
+    if (!Object.is(this.value, newValue)) {
+      this.value = newValue;
+      this.listeners.forEach((l) => l());
+    }
+  };
+}
+
+// ──────────────────────────────────────────────
+// Store context for subscription-based selector hooks
+// ──────────────────────────────────────────────
+export interface AuthStores {
+  user: ValueStore<UserAccount | null>;
+  currentCompanyId: ValueStore<string | null>;
+  loading: ValueStore<boolean>;
+  restrictions: ValueStore<UserRestriction[]>;
+}
+
+export const AuthStoreContext = createContext<AuthStores | null>(null);
+
+// ──────────────────────────────────────────────
+// Selector hooks (useSyncExternalStore-based)
+// ──────────────────────────────────────────────
+function useStoreValue<T>(store: ValueStore<T>): T {
+  return useSyncExternalStore(store.subscribe, store.getSnapshot);
+}
+
+/**
+ * Returns only the currentCompanyId — component re-renders ONLY when
+ * this specific value changes, not when any other auth state changes.
+ */
+export function useCurrentCompanyId(): string | null {
+  const stores = useContext(AuthStoreContext);
+  if (!stores) {
+    throw new Error("useCurrentCompanyId must be used within AuthProvider");
+  }
+  return useStoreValue(stores.currentCompanyId);
+}
+
+/**
+ * Returns only the current user — component re-renders ONLY when
+ * the user object changes.
+ */
+export function useCurrentUser(): UserAccount | null {
+  const stores = useContext(AuthStoreContext);
+  if (!stores) {
+    throw new Error("useCurrentUser must be used within AuthProvider");
+  }
+  return useStoreValue(stores.user);
+}
+
+/**
+ * Returns only the loading state — component re-renders ONLY when
+ * loading status changes.
+ */
+export function useAuthLoading(): boolean {
+  const stores = useContext(AuthStoreContext);
+  if (!stores) {
+    throw new Error("useAuthLoading must be used within AuthProvider");
+  }
+  return useStoreValue(stores.loading);
+}
+
+/**
+ * Returns restrictions and a hasPermission checker — component re-renders
+ * ONLY when restrictions change.
+ */
+export function useUserPermissions(): {
+  restrictions: UserRestriction[];
+  hasPermission: (
+    department: Department,
+    section: Section,
+    action: "view" | "add" | "edit" | "delete",
+  ) => boolean;
+} {
+  const stores = useContext(AuthStoreContext);
+  if (!stores) {
+    throw new Error("useUserPermissions must be used within AuthProvider");
+  }
+  const restrictions = useStoreValue(stores.restrictions);
+
+  const hasPermission = useCallback(
+    (
+      department: Department,
+      section: Section,
+      action: "view" | "add" | "edit" | "delete",
+    ): boolean => {
+      const restriction = restrictions.find(
+        (r) => r.department === department && r.section === section,
+      );
+      if (!restriction) return false;
+      if (action === "view") return restriction.canView;
+      if (action === "add") return restriction.canAdd;
+      if (action === "edit") return restriction.canEdit;
+      if (action === "delete") return restriction.canDelete;
+      return false;
+    },
+    [restrictions],
+  );
+
+  return useMemo(
+    () => ({ restrictions, hasPermission }),
+    [restrictions, hasPermission],
+  );
+}
+
+// ──────────────────────────────────────────────
+// AuthProvider component
+// ──────────────────────────────────────────────
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<UserAccount | null>(null);
@@ -53,6 +189,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     null,
   );
   const lastActivityRef = useRef<number>(0);
+
+  // Initialize observable stores for selector hooks
+  const storesRef = useRef<AuthStores | null>(null);
+  if (!storesRef.current) {
+    storesRef.current = {
+      user: new ValueStore<UserAccount | null>(null),
+      currentCompanyId: new ValueStore<string | null>(null),
+      loading: new ValueStore<boolean>(true),
+      restrictions: new ValueStore<UserRestriction[]>([]),
+    };
+  }
+
+  // Sync observable stores when state changes
+  const stores = storesRef.current;
+  stores.user.set(user);
+  stores.currentCompanyId.set(currentCompanyId);
+  stores.loading.set(loading);
+  stores.restrictions.set(restrictions);
 
   const clearSessionTimers = useCallback(() => {
     if (idleTimerRef.current) {
@@ -258,27 +412,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo(
+    () => ({
+      firebaseUser,
+      user,
+      restrictions,
+      userCompanies,
+      settings,
+      currentCompanyId,
+      loading,
+      sessionExpiring,
+      login,
+      logout,
+      changePassword,
+      resetPassword,
+      setCurrentCompanyId,
+      hasPermission,
+      refreshSession,
+    }),
+    [
+      firebaseUser,
+      user,
+      restrictions,
+      userCompanies,
+      settings,
+      currentCompanyId,
+      loading,
+      sessionExpiring,
+      login,
+      logout,
+      changePassword,
+      resetPassword,
+      setCurrentCompanyId,
+      hasPermission,
+      refreshSession,
+    ],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        firebaseUser,
-        user,
-        restrictions,
-        userCompanies,
-        settings,
-        currentCompanyId,
-        loading,
-        sessionExpiring,
-        login,
-        logout,
-        changePassword,
-        resetPassword,
-        setCurrentCompanyId,
-        hasPermission,
-        refreshSession,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthStoreContext.Provider value={stores}>
+      <AuthContext.Provider value={contextValue}>
+        {children}
+      </AuthContext.Provider>
+    </AuthStoreContext.Provider>
   );
 }
