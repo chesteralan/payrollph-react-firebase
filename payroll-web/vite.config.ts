@@ -54,6 +54,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    pool: "forks",
     setupFiles: "./src/test/setup.ts",
     include: ["src/**/*.{test,spec}.{js,jsx,ts,tsx}"],
     exclude: ["node_modules", "dist", ".idea", "coverage"],
