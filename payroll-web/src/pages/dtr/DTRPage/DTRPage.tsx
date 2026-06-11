@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/Input";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Trash2, X, Download, Upload, BarChart3 } from "lucide-react";
-import type { Employee, NameRecord } from "../../types/employee";
-import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
+import type { Employee, NameRecord } from "@/types/employee";
+import type { DTREntry, LeaveApplication, LeaveBalance } from "@/types/dtr";
 import type {
   DTRPageDayForm,
   DTRPageLeaveForm,

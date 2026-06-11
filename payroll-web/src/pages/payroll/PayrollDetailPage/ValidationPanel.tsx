@@ -1,6 +1,6 @@
 import { AlertCircle, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import type { PayrollValidationError } from "../../types";
+import type { PayrollValidationError } from "@/types";
 
 interface ValidationPanelProps {
   errors: PayrollValidationError[];

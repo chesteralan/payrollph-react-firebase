@@ -23,7 +23,7 @@ export interface CompanyInfo {
   printFooter?: string;
 }
 
-export interface OutputViewProps {
+export interface PayrollOutputViewProps {
   payroll: {
     name: string;
     month: number;

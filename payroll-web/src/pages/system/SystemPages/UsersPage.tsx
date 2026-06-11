@@ -40,7 +40,7 @@ import type {
   UserRestriction,
   Department,
   Section,
-} from "../../types";
+} from "@/types";
 import { DEPARTMENTS } from "./SystemPages.constants";
 
 export function UsersPage() {

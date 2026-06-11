@@ -26,7 +26,7 @@ import type {
   PayrollEmployee,
   PayrollValidationError,
   Term,
-} from "../../types";
+} from "@/types";
 
 const STAGES = [
   "dtr",

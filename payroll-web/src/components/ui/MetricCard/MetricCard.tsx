@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { clsx } from "clsx";
 import { TrendingUp, type LucideIcon } from "lucide-react";
 
@@ -17,7 +18,7 @@ const variantStyles = {
   purple: "bg-purple-50 border-purple-200 text-purple-600",
 };
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   title,
   value,
   change,
@@ -73,4 +74,4 @@ export function MetricCard({
       )}
     </div>
   );
-}
+});

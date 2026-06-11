@@ -13,7 +13,7 @@ import type {
   PayrollEmployeeEarning,
   PayrollEmployeeDeduction,
   PayrollEmployeeBenefit,
-} from "../../types";
+} from "@/types";
 
 import type {
   EarningTypeSummary,

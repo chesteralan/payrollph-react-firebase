@@ -13,7 +13,7 @@ import {
 import type {
   ProcessingRow,
   CompanyInfo,
-  OutputViewProps,
+  PayrollOutputViewProps,
   OutputMode,
 } from "./PayrollOutputView.types";
 
@@ -1105,7 +1105,7 @@ export function PayrollOutputView({
   earningsList,
   deductionsList,
   benefitsList,
-}: OutputViewProps) {
+}: PayrollOutputViewProps) {
   const [activeMode, setActiveMode] = useState<OutputMode>("register");
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Settings, Calculator, Monitor, Bell } from "lucide-react";
-import type { Company } from "../../types";
+import type { Company } from "@/types";
 
 import type { CompanySettings } from "./CompanySettingsPage.types";
 

@@ -1,6 +1,5 @@
 export interface Employee {
   id: string;
-  employeeCode: string;
   employeeCode?: string;
   groupId?: string;
   positionId?: string;

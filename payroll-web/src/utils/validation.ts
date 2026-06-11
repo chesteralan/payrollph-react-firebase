@@ -11,6 +11,26 @@ export interface ValidationResult {
   errors: Record<string, string>;
 }
 
+/**
+ * Validate an object against an array of validation rules.
+ * Returns a result with all field-level error messages and an overall validity flag.
+ *
+ * @typeParam T - The data object type extending Record<string, unknown>
+ * @param data - The data object to validate
+ * @param rules - An array of ValidationRule objects, each specifying a field,
+ *   a validate function, and an error message
+ * @returns An object with:
+ *  - `isValid`: Whether the data passed all rules
+ *  - `errors`: A record of field -> error message for failed validations
+ *
+ * @example
+ * ```ts
+ * const result = validate(userData, [
+ *   { field: 'email', validate: (v) => /@/.test(String(v)), message: 'Invalid email' },
+ * ]);
+ * if (!result.isValid) setErrors(result.errors);
+ * ```
+ */
 export function validate<T extends Record<string, unknown>>(
   data: T,
   rules: ValidationRule<T>[],
@@ -30,18 +50,52 @@ export function validate<T extends Record<string, unknown>>(
   };
 }
 
+/**
+ * A collection of common validation rule factories.
+ * Each method returns a `{ validate, message }` object suitable for use with `validate()`.
+ *
+ * @example
+ * ```ts
+ * const rulesList = [
+ *   { field: 'name', ...rules.required() },
+ *   { field: 'email', ...rules.email() },
+ *   { field: 'age', ...rules.min(18) },
+ * ];
+ * const result = validate(formData, rulesList);
+ * ```
+ */
 export const rules = {
+  /**
+   * Validate that a value is not empty (not null, not undefined, trimmed string not empty).
+   *
+   * @param message - Custom error message (default: "This field is required")
+   * @returns A rule object with validate function and message
+   */
   required: (message = "This field is required") => ({
     validate: (value: unknown) =>
       value !== null && value !== undefined && String(value).trim() !== "",
     message,
   }),
 
+  /**
+   * Validate that a string value meets a minimum length requirement.
+   *
+   * @param min - The minimum number of characters required
+   * @param message - Custom error message
+   * @returns A rule object with validate function and message
+   */
   minLength: (min: number, message?: string) => ({
     validate: (value: unknown) => String(value || "").length >= min,
     message: message || `Must be at least ${min} characters`,
   }),
 
+  /**
+   * Validate that a string value does not exceed a maximum length.
+   *
+   * @param max - The maximum number of characters allowed
+   * @param message - Custom error message
+   * @returns A rule object with validate function and message
+   */
   maxLength: (max: number, message?: string) => ({
     validate: (value: unknown) => String(value || "").length <= max,
     message: message || `Must be at most ${max} characters`,

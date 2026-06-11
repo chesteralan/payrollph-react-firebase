@@ -23,7 +23,7 @@ import {
   ChevronsUpDown,
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import type { EmployeePosition } from "../../types";
+import type { EmployeePosition } from "@/types";
 
 export function PositionsPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

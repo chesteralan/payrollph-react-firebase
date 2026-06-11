@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { clsx } from "clsx";
 
 import type {
@@ -5,9 +6,9 @@ import type {
   CardSkeletonProps,
   TableSkeletonProps,
   PageSkeletonProps,
-} from "./Skeleton/Skeleton.types";
+} from "./Skeleton.types";
 
-export function Skeleton({
+export const Skeleton = memo(function Skeleton({
   className,
   variant = "text",
   width,
@@ -49,9 +50,9 @@ export function Skeleton({
   }
 
   return <div className={baseStyle} style={style} aria-hidden="true" />;
-}
+});
 
-export function CardSkeleton({
+export const CardSkeleton = memo(function CardSkeleton({
   lines = 3,
   showHeader = true,
   className,
@@ -72,9 +73,9 @@ export function CardSkeleton({
       <Skeleton lines={lines} />
     </div>
   );
-}
+});
 
-export function TableSkeleton({ rows = 5, cols = 4 }: TableSkeletonProps) {
+export const TableSkeleton = memo(function TableSkeleton({ rows = 5, cols = 4 }: TableSkeletonProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
@@ -97,9 +98,9 @@ export function TableSkeleton({ rows = 5, cols = 4 }: TableSkeletonProps) {
       </div>
     </div>
   );
-}
+});
 
-export function PageSkeleton({ sections = 3 }: PageSkeletonProps) {
+export const PageSkeleton = memo(function PageSkeleton({ sections = 3 }: PageSkeletonProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -111,4 +112,4 @@ export function PageSkeleton({ sections = 3 }: PageSkeletonProps) {
       ))}
     </div>
   );
-}
+});

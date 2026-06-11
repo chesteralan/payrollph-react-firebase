@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { clsx } from "clsx";
 import { AlertCircle, CheckCircle, Clock, XCircle, Lock, FileText } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -88,7 +89,7 @@ const statusConfig: Record<
   },
 };
 
-export function StatusBadge({
+export const StatusBadge = memo(function StatusBadge({
   status,
   size = "sm",
   showIcon = true,
@@ -116,4 +117,4 @@ export function StatusBadge({
       {config.label}
     </span>
   );
-}
+});

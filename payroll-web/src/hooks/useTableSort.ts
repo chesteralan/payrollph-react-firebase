@@ -7,6 +7,39 @@ export interface SortConfig<T> {
   direction: SortDirection;
 }
 
+/**
+ * Hook providing client-side sorting and filtering for tabular data.
+ * Supports multi-directional sort toggling (asc → desc → none) and
+ * a global text filter that searches across all object values.
+ *
+ * @typeParam T - The type of objects in the array (must be a plain object)
+ * @param items - The array of data items to sort and filter
+ * @param defaultSort - Optional key to sort by on first render (ascending)
+ * @returns An object containing:
+ *  - `items`: The sorted and filtered array (memoized)
+ *  - `sortConfig`: Current sort configuration `{ key, direction }` or `null`
+ *  - `filterText`: Current filter text
+ *  - `setFilterText(filter)`: Update the global filter
+ *  - `handleSort(key)`: Toggle sort on a column (asc → desc → none)
+ *
+ * @example
+ * ```tsx
+ * const { items, sortConfig, handleSort, filterText, setFilterText } =
+ *   useTableSort(employees, 'name');
+ *
+ * return (
+ *   <div>
+ *     <input value={filterText} onChange={e => setFilterText(e.target.value)} />
+ *     <table>
+ *       <thead>
+ *         <th onClick={() => handleSort('name')}>Name {sortConfig?.key === 'name' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}</th>
+ *       </thead>
+ *       {items.map(item => <tr>...</tr>)}
+ *     </table>
+ *   </div>
+ * );
+ * ```
+ */
 export function useTableSort<T extends object>(
   items: T[],
   defaultSort?: keyof T,

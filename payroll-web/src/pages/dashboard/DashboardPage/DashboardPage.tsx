@@ -25,6 +25,15 @@ import { Skeleton, TableSkeleton } from "@/components/ui/Skeleton";
 
 import type { DashboardStats } from "./DashboardPage.types";
 
+const getMonthName = (month: number) =>
+  new Date(0, month - 1).toLocaleString("default", { month: "long" });
+
+const statusColors: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-800",
+  locked: "bg-yellow-100 text-yellow-800",
+  published: "bg-green-100 text-green-800",
+};
+
 export function DashboardPage() {
   const { user, currentCompanyId } = useAuth();
   const navigate = useNavigate();
@@ -135,15 +144,6 @@ export function DashboardPage() {
       loadDashboard();
     }
   }, [currentCompanyId, loadDashboard]);
-
-  const getMonthName = (month: number) =>
-    new Date(0, month - 1).toLocaleString("default", { month: "long" });
-
-  const statusColors: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-800",
-    locked: "bg-yellow-100 text-yellow-800",
-    published: "bg-green-100 text-green-800",
-  };
 
   const statCards = [
     {

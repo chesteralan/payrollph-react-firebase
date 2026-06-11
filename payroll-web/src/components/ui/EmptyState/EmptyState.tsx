@@ -1,4 +1,5 @@
-import type { EmptyStateProps } from "./EmptyState/EmptyState.types";
+import { memo } from "react";
+import type { EmptyStateProps } from "./EmptyState.types";
 import {
   FileText,
   Users,
@@ -23,7 +24,7 @@ const iconMap = {
   error: <AlertCircle className="w-12 h-12 text-gray-300" />,
 };
 
-export function EmptyState({
+export const EmptyState = memo(function EmptyState({
   icon,
   type,
   title,
@@ -48,4 +49,4 @@ export function EmptyState({
       {action && <div className="mt-2">{action}</div>}
     </div>
   );
-}
+});

@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TableSkeleton } from "@/components/ui/Skeleton";
-import type { Employee, EmployeeGroup } from "../../types";
+import type { Employee, EmployeeGroup } from "@/types";
 
 export function EmployeesPage() {
   const { currentCompanyId } = useAuth();

@@ -1,6 +1,24 @@
 import { useAuth } from "./useAuth";
 import type { Department, Section } from "../types";
 
+/**
+ * Hook providing role-based permission helpers for the current user.
+ * Wraps the `hasPermission` function from AuthContext with shorthand methods.
+ *
+ * @returns An object containing:
+ *  - `can(department, section, action)` — Check arbitrary permission
+ *  - `canView(department, section)` — Shorthand for "view" action
+ *  - `canAdd(department, section)` — Shorthand for "add" action
+ *  - `canEdit(department, section)` — Shorthand for "edit" action
+ *  - `canDelete(department, section)` — Shorthand for "delete" action
+ *
+ * @example
+ * ```tsx
+ * const { canView, canEdit } = usePermissions();
+ * if (canView('payroll', 'reports')) return <ReportViewer />;
+ * if (canEdit('employees', 'profile')) return <EditButton />;
+ * ```
+ */
 export function usePermissions() {
   const { hasPermission } = useAuth();
 

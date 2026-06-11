@@ -1,3 +1,5 @@
+import { memo, useMemo } from "react";
+
 const MAX_VISIBLE_PAGES = 5;
 
 function getPageNumbers(currentPage: number, totalPages: number) {
@@ -29,7 +31,7 @@ interface PaginationProps {
   itemsPerPage?: number;
 }
 
-export function Pagination({
+export const Pagination = memo(function Pagination({
   currentPage,
   totalPages,
   onPageChange,
@@ -38,7 +40,10 @@ export function Pagination({
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const pageNumbers = getPageNumbers(currentPage, totalPages);
+  const pageNumbers = useMemo(
+    () => getPageNumbers(currentPage, totalPages),
+    [currentPage, totalPages],
+  );
 
   return (
     <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
@@ -96,4 +101,4 @@ export function Pagination({
       </nav>
     </div>
   );
-}
+});

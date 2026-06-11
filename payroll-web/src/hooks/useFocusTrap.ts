@@ -1,5 +1,24 @@
 import { useCallback, useState } from "react";
 
+/**
+ * Hook that traps keyboard focus within a container element (modals, dialogs, drawers).
+ * Cycles Tab and Shift+Tab between the first and last focusable elements.
+ *
+ * @param containerRef - A React ref to the container element that should trap focus
+ * @returns An object containing:
+ *  - `activate()` — Activate the focus trap and focus the first focusable element
+ *  - `deactivate()` — Deactivate the focus trap and remove the keydown listener
+ *  - `active` — Boolean indicating whether the trap is currently active
+ *
+ * @example
+ * ```tsx
+ * const modalRef = useRef<HTMLDivElement>(null);
+ * const { activate, deactivate, active } = useFocusTrap(modalRef);
+ *
+ * useEffect(() => { activate(); return () => deactivate(); }, []);
+ * return <div ref={modalRef} role="dialog">...</div>;
+ * ```
+ */
 export function useFocusTrap(containerRef: React.RefObject<HTMLElement | null>) {
   const [active, setActive] = useState(false);
 

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import type { DTREntry, LeaveApplication, LeaveBalance } from "../../types/dtr";
+import type { DTREntry, LeaveApplication, LeaveBalance } from "@/types/dtr";
 import { dateStr, dayStatus } from "./DTRComputation";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

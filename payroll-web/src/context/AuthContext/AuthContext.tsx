@@ -37,7 +37,7 @@ import type {
   UserSettings,
   Department,
   Section,
-} from "../types";
+} from "@/types";
 import type { Locale } from "@/i18n";
 import { setHtmlLang } from "@/i18n";
 import { AuthContext } from "@/context/auth";
@@ -356,61 +356,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [resetIdleTimer, clearSessionTimers]);
 
-  const login = async (
-    email: string,
-    password: string,
-    rememberMe: boolean = false,
-  ) => {
-    await setPersistence(
-      auth,
-      rememberMe ? browserLocalPersistence : browserSessionPersistence,
-    );
-    await signInWithEmailAndPassword(auth, email, password);
-  };
+  const login = useCallback(
+    async (email: string, password: string, rememberMe: boolean = false) => {
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence,
+      );
+      await signInWithEmailAndPassword(auth, email, password);
+    },
+    [],
+  );
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     clearSessionTimers();
     await signOut(auth);
-  };
+  }, [clearSessionTimers]);
 
-  const changePassword = async (
-    currentPassword: string,
-    newPassword: string,
-  ) => {
-    if (!firebaseUser || !firebaseUser.email)
-      throw new Error("No authenticated user");
-    const credential = EmailAuthProvider.credential(
-      firebaseUser.email,
-      currentPassword,
-    );
-    await reauthenticateWithCredential(firebaseUser, credential);
-    await updatePassword(firebaseUser, newPassword);
-  };
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      if (!firebaseUser || !firebaseUser.email)
+        throw new Error("No authenticated user");
+      const credential = EmailAuthProvider.credential(
+        firebaseUser.email,
+        currentPassword,
+      );
+      await reauthenticateWithCredential(firebaseUser, credential);
+      await updatePassword(firebaseUser, newPassword);
+    },
+    [firebaseUser],
+  );
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     await sendPasswordResetEmail(auth, email);
-  };
+  }, []);
 
-  const setCurrentCompanyId = (companyId: string) => {
-    setCurrentCompanyIdState(companyId);
-    resetIdleTimer();
-  };
+  const setCurrentCompanyId = useCallback(
+    (companyId: string) => {
+      setCurrentCompanyIdState(companyId);
+      resetIdleTimer();
+    },
+    [resetIdleTimer],
+  );
 
-  const hasPermission = (
-    department: Department,
-    section: Section,
-    action: "view" | "add" | "edit" | "delete",
-  ) => {
-    const restriction = restrictions.find(
-      (r) => r.department === department && r.section === section,
-    );
-    if (!restriction) return false;
-    if (action === "view") return restriction.canView;
-    if (action === "add") return restriction.canAdd;
-    if (action === "edit") return restriction.canEdit;
-    if (action === "delete") return restriction.canDelete;
-    return false;
-  };
+  const hasPermission = useCallback(
+    (
+      department: Department,
+      section: Section,
+      action: "view" | "add" | "edit" | "delete",
+    ) => {
+      const restriction = restrictions.find(
+        (r) => r.department === department && r.section === section,
+      );
+      if (!restriction) return false;
+      if (action === "view") return restriction.canView;
+      if (action === "add") return restriction.canAdd;
+      if (action === "edit") return restriction.canEdit;
+      if (action === "delete") return restriction.canDelete;
+      return false;
+    },
+    [restrictions],
+  );
 
   // Memoize context value to prevent unnecessary re-renders of consumers
   const contextValue = useMemo(

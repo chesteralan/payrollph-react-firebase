@@ -1,4 +1,4 @@
-import type { CalendarEntry } from "../../types";
+import type { CalendarEntry } from "@/types";
 
 export interface CalendarEvent extends CalendarEntry {
   isPaid?: boolean;

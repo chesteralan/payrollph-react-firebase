@@ -12,7 +12,7 @@ import type {
   PayrollEmployeeBenefit,
   PayrollEmployeeEarning,
   PayrollEmployee,
-} from "../../types";
+} from "@/types";
 
 import type { YearEndSummary, YearEndTotals } from "./YearEndReportPage.types";
 

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { DTREntry } from "../../types/dtr";
+import type { DTREntry } from "@/types/dtr";
 
 /**
  * Calculate hours worked from time in/out strings

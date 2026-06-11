@@ -5,7 +5,7 @@ export interface DTRPageDayForm {
   timeOut: string;
   overtimeHours: number;
   lateHours: number;
-  absenceType: DTREntry["absenceType"];
+  absenceType: "absent" | "late" | "undertime" | "sick" | "vacation" | undefined;
   absenceReason: string;
   notes: string;
 }
@@ -20,8 +20,7 @@ export interface DTRPageLeaveForm {
 export interface DTRPageBenefit {
   id: string;
   name: string;
+  [key: string]: unknown;
 }
 
-export type DTRPageViewMode = "calendar" | "summary";
-
-export type DTRPageProps = object;
+export type DTRPageViewMode = "month" | "week" | "day";

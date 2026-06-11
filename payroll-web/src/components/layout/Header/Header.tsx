@@ -11,9 +11,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import type { Company } from "../../types";
+import type { Company } from "@/types";
 
-import type { HeaderProps } from "./Header/Header.types";
+import type { HeaderProps } from "./Header.types";
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, currentCompanyId, setCurrentCompanyId, logout } = useAuth();

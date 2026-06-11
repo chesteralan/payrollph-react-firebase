@@ -12,7 +12,7 @@ export function useDynamicLocale(locale: string) {
 
     const loadLocale = async () => {
       try {
-        const mod = await import(`@/i18n/locales/${locale}.ts`);
+        const mod = await import(`@/i18n/locales/${locale}`);
         if (!cancelled) {
           setMessages(mod.default || mod[locale] || mod);
           setLoading(false);
@@ -20,7 +20,7 @@ export function useDynamicLocale(locale: string) {
       } catch {
         // Fallback to English
         try {
-          const mod = await import(`@/i18n/locales/en.ts`);
+          const mod = await import(`@/i18n/locales/en`);
           if (!cancelled) {
             setMessages(mod.default || mod.en);
             setLoading(false);

@@ -349,12 +349,12 @@ export function EmployeeProfilePage() {
     }
   };
 
-  const handleDeleteDocument = async (doc: EmployeeDocument) => {
+  const handleDeleteDocument = async (document: EmployeeDocument) => {
     try {
-      if (doc.storagePath) {
-        await deleteObject(ref(storage, doc.storagePath));
+      if (document.storagePath) {
+        await deleteObject(ref(storage, document.storagePath));
       }
-      await deleteDoc(doc(db, "employee_documents", doc.id));
+      await deleteDoc(doc(db, "employee_documents", document.id));
       addToast({
         type: "success",
         title: "Document deleted",

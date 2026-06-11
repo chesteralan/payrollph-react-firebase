@@ -1,4 +1,4 @@
-import type { Department, Section } from "../../types";
+import type { Department, Section } from "@/types";
 
 export const DEPARTMENTS: { key: Department; sections: Section[] }[] = [
   { key: "payroll", sections: ["payroll", "templates"] },

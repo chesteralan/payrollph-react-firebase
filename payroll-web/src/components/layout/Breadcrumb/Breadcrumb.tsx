@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
 import type { BreadcrumbItem } from "./Breadcrumb.types";
@@ -57,7 +58,7 @@ function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
   return breadcrumbs;
 }
 
-export function Breadcrumb() {
+export const Breadcrumb = memo(function Breadcrumb() {
   const location = useLocation();
   const breadcrumbs = getBreadcrumbs(location.pathname);
 
@@ -86,4 +87,4 @@ export function Breadcrumb() {
       ))}
     </nav>
   );
-}
+});

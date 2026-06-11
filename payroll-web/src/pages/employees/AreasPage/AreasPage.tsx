@@ -23,7 +23,7 @@ import {
   ChevronsUpDown,
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import type { EmployeeArea } from "../../types";
+import type { EmployeeArea } from "@/types";
 
 export function AreasPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

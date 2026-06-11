@@ -22,7 +22,7 @@ import type {
   EmployeePosition,
   EmployeeArea,
   EmployeeStatus,
-} from "../../types";
+} from "@/types";
 
 import type { EmployeeReportData } from "./EmployeeReportPage.types";
 

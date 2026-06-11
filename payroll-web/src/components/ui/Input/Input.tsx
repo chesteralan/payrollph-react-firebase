@@ -1,6 +1,6 @@
 import { forwardRef, useId } from "react";
 import { clsx } from "clsx";
-import type { InputProps } from "./Input/Input.types";
+import type { InputProps } from "./Input.types";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, id: externalId, ...props }, ref) => {

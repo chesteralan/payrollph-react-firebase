@@ -1,8 +1,8 @@
-import { Component } from "react";
+import { Component, type ErrorInfo } from "react";
 import type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
-} from "./ErrorBoundary/ErrorBoundary.types";
+} from "./ErrorBoundary.types";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 // ...existing code...

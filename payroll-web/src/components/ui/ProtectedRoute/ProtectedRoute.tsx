@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export const ProtectedRoute = memo(function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -20,4 +21,4 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
-}
+});

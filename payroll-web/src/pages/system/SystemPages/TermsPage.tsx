@@ -24,7 +24,7 @@ import {
   ChevronDown,
   ChevronsUpDown,
 } from "lucide-react";
-import type { Term } from "../../types";
+import type { Term } from "@/types";
 
 const typeLabels: Record<string, string> = {
   "semi-monthly": "Semi-monthly",

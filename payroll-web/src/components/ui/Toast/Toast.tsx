@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, memo, useRef } from "react";
 import { ToastContext, Toast, toastColors } from "./toast-context";
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -37,8 +37,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ toasts, addToast, removeToast }),
+    [toasts, addToast, removeToast],
+  );
+
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
       <div
         className="fixed top-4 right-4 z-50 space-y-2 max-w-sm"
@@ -53,7 +58,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ToastItem({
+const ToastItem = memo(function ToastItem({
   toast,
   onRemove,
 }: {
@@ -91,4 +96,4 @@ function ToastItem({
       </button>
     </div>
   );
-}
+});

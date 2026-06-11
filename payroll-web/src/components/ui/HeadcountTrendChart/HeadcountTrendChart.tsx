@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { Users } from "lucide-react";
 
-interface HeadcountTrendProps {
+interface HeadcountTrendChartProps {
   data: { month: string; count: number }[];
   className?: string;
 }
@@ -9,7 +9,7 @@ interface HeadcountTrendProps {
 export function HeadcountTrendChart({
   data,
   className,
-}: HeadcountTrendProps) {
+}: HeadcountTrendChartProps) {
   const max = Math.max(...data.map((d) => d.count), 1);
 
   return (

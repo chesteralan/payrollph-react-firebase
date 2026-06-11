@@ -1,5 +1,33 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
+/**
+ * Hook that enables keyboard navigation (Arrow Up/Down, Enter, Home, End, Escape)
+ * through a list of items. Useful for dropdowns, autocompletes, and listboxes.
+ *
+ * @typeParam T - The type of items in the list
+ * @param items - The array of selectable items
+ * @param onSelect - Callback fired when the user presses Enter on a selected item.
+ *   Receives the selected item and its index.
+ * @returns An object containing:
+ *  - `selectedIndex`: The index of the currently highlighted item (-1 for none)
+ *  - `setSelectedIndex(index)`: Manually set the selected index
+ *  - `handleKeyDown(e)`: Attach this to the container's `onKeyDown` handler
+ *  - `containerRef`: A ref to attach to the container element
+ *
+ * @example
+ * ```tsx
+ * const { selectedIndex, handleKeyDown, containerRef } =
+ *   useKeyboardNavigation(items, (item) => selectItem(item));
+ *
+ * return (
+ *   <div ref={containerRef} onKeyDown={handleKeyDown}>
+ *     {items.map((item, i) => (
+ *       <div key={i} aria-selected={i === selectedIndex}>{item.name}</div>
+ *     ))}
+ *   </div>
+ * );
+ * ```
+ */
 export function useKeyboardNavigation<T>(
   items: T[],
   onSelect: (item: T, index: number) => void,

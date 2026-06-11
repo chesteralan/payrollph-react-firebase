@@ -13,6 +13,25 @@ interface ExportOptions {
   sheetName?: string;
 }
 
+/**
+ * Export an array of data objects to an XLSX (Excel) file and trigger a download.
+ *
+ * @typeParam T - The data row type extending Record<string, unknown>
+ * @param data - The array of data records to export
+ * @param options - Export configuration:
+ *  - `filename`: Base filename (without extension or timestamp)
+ *  - `columns`: Column definitions `{ header, key, width? }[]`
+ *  - `includeTimestamp`: Whether to append the current date (default: true)
+ *  - `sheetName`: Excel sheet name (default: "Data", max 31 chars)
+ *
+ * @example
+ * ```ts
+ * exportToXLS(employees, {
+ *   filename: "employee-list",
+ *   columns: employeeExportColumns,
+ * });
+ * ```
+ */
 export function exportToXLS<T extends Record<string, unknown>>(
   data: T[],
   options: ExportOptions,
@@ -40,6 +59,20 @@ export function exportToXLS<T extends Record<string, unknown>>(
   XLSX.writeFile(wb, `${options.filename}${timestamp}.xlsx`);
 }
 
+/**
+ * Generate a CSV Blob from data and column definitions.
+ * Properly quotes fields containing commas, double-quotes, or newlines.
+ *
+ * @typeParam T - The data row type extending Record<string, unknown>
+ * @param data - The array of data records
+ * @param columns - Column definitions specifying header names and data keys
+ * @returns A Blob with MIME type "text/csv" containing the CSV data
+ *
+ * @example
+ * ```ts
+ * const blob = generateCSVBlob(employees, employeeExportColumns);
+ * ```
+ */
 export function generateCSVBlob<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn[],
@@ -60,6 +93,19 @@ export function generateCSVBlob<T extends Record<string, unknown>>(
   return new Blob([csv], { type: "text/csv" });
 }
 
+/**
+ * Export data to a CSV file and trigger a browser download.
+ *
+ * @typeParam T - The data row type extending Record<string, unknown>
+ * @param data - The array of data records
+ * @param columns - Column definitions specifying headers and keys
+ * @param filename - The output filename (without extension)
+ *
+ * @example
+ * ```ts
+ * exportToCSV(employees, employeeExportColumns, "employee-list");
+ * ```
+ */
 export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn[],
@@ -69,7 +115,18 @@ export function exportToCSV<T extends Record<string, unknown>>(
   downloadBlob(blob, `${filename}.csv`);
 }
 
-/** Download a Blob by creating a temporary anchor element */
+/**
+ * Trigger a browser file download from a Blob by creating a temporary anchor element.
+ * Cleans up the temporary URL and element after the download starts.
+ *
+ * @param blob - The Blob to download
+ * @param filename - The desired filename including extension
+ *
+ * @example
+ * ```ts
+ * downloadBlob(csvBlob, "report.csv");
+ * ```
+ */
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -82,7 +139,11 @@ export function downloadBlob(blob: Blob, filename: string): void {
 }
 
 /**
- * Generate a JSON blob from data.
+ * Generate a JSON Blob from data. The JSON is pretty-printed with 2-space indentation.
+ *
+ * @typeParam T - The data row type extending Record<string, unknown>
+ * @param data - The array of data records
+ * @returns A Blob with MIME type "application/json"
  */
 export function generateJSONBlob<T extends Record<string, unknown>>(
   data: T[],
@@ -91,6 +152,18 @@ export function generateJSONBlob<T extends Record<string, unknown>>(
   return new Blob([json], { type: "application/json" });
 }
 
+/**
+ * Export data to a JSON file and trigger a browser download.
+ *
+ * @typeParam T - The data row type extending Record<string, unknown>
+ * @param data - The array of data records
+ * @param filename - The output filename (without extension)
+ *
+ * @example
+ * ```ts
+ * exportToJson(employees, "employee-export");
+ * ```
+ */
 export function exportToJson<T extends Record<string, unknown>>(
   data: T[],
   filename: string,

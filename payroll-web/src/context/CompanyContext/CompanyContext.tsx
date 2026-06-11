@@ -2,11 +2,12 @@ import {
   useState,
   useRef,
   useMemo,
+  useCallback,
   useSyncExternalStore,
   createContext,
   useContext,
 } from "react";
-import type { Company } from "../types";
+import type { Company } from "@/types";
 import { CompanyContext } from "@/context/company";
 
 // ──────────────────────────────────────────────
@@ -113,9 +114,9 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
   stores.companies.set(companies);
   stores.loading.set(loading);
 
-  const selectCompany = (company: Company) => {
+  const selectCompany = useCallback((company: Company) => {
     setSelectedCompany(company);
-  };
+  }, []);
 
   // Memoize context value to prevent unnecessary re-renders of consumers
   const contextValue = useMemo(

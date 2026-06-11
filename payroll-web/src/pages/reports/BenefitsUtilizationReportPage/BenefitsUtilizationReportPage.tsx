@@ -13,7 +13,7 @@ import type {
   BenefitItem,
   PayrollEmployee,
   EmployeeGroup,
-} from "../../types";
+} from "@/types";
 
 import type {
   BenefitSummary,

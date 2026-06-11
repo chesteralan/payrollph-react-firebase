@@ -40,7 +40,7 @@ import type {
   EmployeePosition,
   EmployeeArea,
   EmployeeStatus,
-} from "../../types/employee";
+} from "@/types/employee";
 
 import type { NameRecord, CsvPreviewRow } from "./NamesListPage.types";
 

@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 
 export function usePdfSnapshot() {
   const contentRef = useRef<HTMLDivElement>(null);

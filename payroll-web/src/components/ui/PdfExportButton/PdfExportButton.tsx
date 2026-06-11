@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { Download } from "lucide-react";
 
-interface ExportButtonProps {
+interface PdfExportButtonProps {
   onExport: () => void;
   format?: "PDF" | "XLS" | "CSV";
   className?: string;
@@ -11,7 +11,7 @@ export function PdfExportButton({
   onExport,
   format = "PDF",
   className,
-}: ExportButtonProps) {
+}: PdfExportButtonProps) {
   return (
     <button
       type="button"
