@@ -6,7 +6,18 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
+  reporter: process.env.CI
+    ? [["html"], ["json", { outputFile: "playwright-report/test-results.json" }]]
+    : "html",
+
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixels: 100,
+      animations: "disabled",
+    },
+  },
+
+  snapshotDir: "./e2e/snapshots",
 
   use: {
     baseURL: "http://localhost:5173",

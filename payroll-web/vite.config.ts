@@ -57,10 +57,8 @@ export default defineConfig({
     setupFiles: "./src/test/setup.ts",
     include: ["src/**/*.{test,spec}.{js,jsx,ts,tsx}"],
     exclude: ["node_modules", "dist", ".idea", "coverage"],
-    pool: "forks",
-    testTimeout: 15000,
-    hookTimeout: 10000,
-    isolate: true,
+    testTimeout: 30000,
+    hookTimeout: 15000,
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],

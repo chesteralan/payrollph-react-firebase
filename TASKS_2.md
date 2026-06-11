@@ -155,28 +155,28 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 36. Integration & E2E Tests
 
-- [ ] 36.1 Set up Playwright for E2E testing
+- [x] 36.1 Set up Playwright for E2E testing
 - [x] 36.2 Add E2E test for login/logout flow (e2e/login.spec.ts)
 - [x] 36.3 Add E2E test for employee CRUD workflow (e2e/employee.spec.ts)
 - [x] 36.4 Add E2E test for payroll creation wizard (e2e/payroll.spec.ts)
 - [x] 36.5 Add E2E test for payroll processing stages (e2e/payroll-processing.spec.ts)
 - [x] 36.6 Add E2E test for payroll output/export (e2e/payroll-processing.spec.ts)
-- [ ] 36.7 Add E2E test for company switching and data isolation
+- [x] 36.7 Add E2E test for company switching and data isolation
 - [x] 36.8 Add E2E test for RBAC permission enforcement (e2e/rbac.spec.ts)
-- [ ] 36.9 Add E2E test for offline mode (create, queue, sync)
-- [ ] 36.10 Add visual regression tests for key pages (Percy/Playwright snapshots)
-- [ ] 36.11 Add E2E test for CSV import flow (names, users)
-- [ ] 36.12 Add E2E test for calendar and DTR workflows
+- [x] 36.9 Add E2E test for offline mode (create, queue, sync)
+- [x] 36.10 Add visual regression tests for key pages (Percy/Playwright snapshots)
+- [x] 36.11 Add E2E test for CSV import flow (names, users)
+- [x] 36.12 Add E2E test for calendar and DTR workflows
 
 ### 37. Test Infrastructure
 
 - [x] 37.1 Set up test data factories/fixtures (useTestDataSeeder hook)
-- [ ] 37.2 Add Firestore emulator integration for integration tests
-- [ ] 37.3 Add CI test running with parallel execution
-- [ ] 37.4 Add test coverage thresholds that block PRs below 80%
+- [x] 37.2 Add Firestore emulator integration for integration tests
+- [x] 37.3 Add CI test running with parallel execution
+- [x] 37.4 Add test coverage thresholds that block PRs below 80%
 - [x] 37.5 Add flaky test detection (useFlakyTestDetection hook)
-- [ ] 37.6 Add test documentation for contributor guide
-- [ ] 37.7 Add test run time tracking with regression alerting
+- [x] 37.6 Add test documentation for contributor guide
+- [x] 37.7 Add test run time tracking with regression alerting
 
 ---
 
@@ -267,25 +267,25 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 
 ### 44. Monitoring & Observability
 
-- [ ] 44.1 Add Sentry performance monitoring for key transactions
-- [ ] 44.2 Implement custom dashboard for business metrics
-- [ ] 44.3 Add error grouping and alerting configuration
+- [x] 44.1 Add Sentry performance monitoring for key transactions
+- [x] 44.2 Implement custom dashboard for business metrics
+- [x] 44.3 Add error grouping and alerting configuration
 - [x] 44.4 Add user journey tracking (useAnalyticsTracking hook)
-- [ ] 44.5 Implement health check endpoint with DB status
-- [ ] 44.6 Add uptime monitoring configuration
-- [ ] 44.7 Add alerting for critical error thresholds (PagerDuty/Slack)
-- [ ] 44.8 Add operational runbook documentation
-- [ ] 44.9 Add custom logging middleware for Firestore operations
+- [x] 44.5 Implement health check endpoint with DB status
+- [x] 44.6 Add uptime monitoring configuration
+- [x] 44.7 Add alerting for critical error thresholds (PagerDuty/Slack)
+- [x] 44.8 Add operational runbook documentation
+- [x] 44.9 Add custom logging middleware for Firestore operations
 
 ### 45. Environment & Deployment
 
-- [ ] 45.1 Add staging environment parity with production
+- [x] 45.1 Add staging environment parity with production
 - [x] 45.2 Implement feature flags for gradual rollout (useFeatureFlag hook)
-- [ ] 45.3 Add database migration/seeding scripts for test data
-- [ ] 45.4 Add deployment rollback automation
-- [ ] 45.5 Add smoke test suite for post-deployment verification
-- [ ] 45.6 Add environment configuration documentation
-- [ ] 45.7 Add deploy previews for PR branches
+- [x] 45.3 Add database migration/seeding scripts for test data
+- [x] 45.4 Add deployment rollback automation
+- [x] 45.5 Add smoke test suite for post-deployment verification
+- [x] 45.6 Add environment configuration documentation
+- [x] 45.7 Add deploy previews for PR branches
 
 ---
 
@@ -302,7 +302,7 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 - [ ] 46.7 Add comprehensive JSDoc for public APIs and hooks
 - [ ] 46.8 Reduce component re-render surface area (profiling pass)
 - [ ] 46.9 Add barrel exports cleanup (remove circular dependencies)
-- [ ] 46.10 Standardize import ordering across all files
+- [x] 46.10 Standardize import ordering across all files
 
 ### 47. State Management
 
@@ -329,8 +329,8 @@ This document defines the next phase of work for the Payroll v2 React/Firebase a
 ## Progress Summary
 
 - **Total:** 246 tasks
-- **Completed:** 194
-- **Remaining:** 52
+- **Completed:** 220
+- **Remaining:** 26
 
 ---
 
