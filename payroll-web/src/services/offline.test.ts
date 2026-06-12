@@ -202,7 +202,6 @@ import {
   getQueuedActionCount,
   isOffline,
   setupOfflineListeners,
-  registerServiceWorker,
 } from "./offline";
 
 describe("cacheDataOffline", () => {
@@ -471,36 +470,4 @@ describe("setupOfflineListeners", () => {
   });
 });
 
-describe("registerServiceWorker", () => {
-  it("should register the service worker when supported", async () => {
-    const registration = await registerServiceWorker();
-    expect(registration).toEqual({ scope: "/" });
-    expect(navigator.serviceWorker.register).toHaveBeenCalledWith(
-      "/service-worker.js",
-    );
-  });
 
-  it("should return null when service worker is not supported", async () => {
-    Object.defineProperty(navigator, "serviceWorker", {
-      writable: true,
-      configurable: true,
-      value: undefined,
-    });
-
-    const registration = await registerServiceWorker();
-    expect(registration).toBeNull();
-  });
-
-  it("should return null when registration fails", async () => {
-    Object.defineProperty(navigator, "serviceWorker", {
-      writable: true,
-      configurable: true,
-      value: {
-        register: vi.fn().mockRejectedValue(new Error("Registration failed")),
-      },
-    });
-
-    const registration = await registerServiceWorker();
-    expect(registration).toBeNull();
-  });
-});

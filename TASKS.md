@@ -54,17 +54,16 @@
 - [ ] 4.2 Add selectors/memoization for context values
 - [ ] 4.3 Implement undo/redo for critical workflows (payroll edits, employee updates)
 
-## 5. Features Remaining (4 tasks)
+## 5. Features Remaining (3 tasks)
 - [ ] 5.1 Add report template saving (reusable report configurations) — Reports
 - [ ] 5.2 Add employee quick-view tooltip on hover in tables — Employees
 - [ ] 5.3 Add cross-company search capability — Search
-- [ ] 5.4 Add app-like native sharing for exports — Mobile
 
 ---
 
-**Summary:** 44 tasks remaining
+**Summary:** 43 tasks remaining
 - Testing: 23
 - Deployment: 6
 - Code Quality: 8
 - State Management: 3
-- Features: 4
+- Features: 3
