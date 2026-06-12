@@ -823,7 +823,7 @@
   resolved "https://registry.yarnpkg.com/@oxc-project/types/-/types-0.133.0.tgz#2e282ef9e1d26e06b68ccd14b73f310a3b2cf7f8"
   integrity sha512-KzkdCd6Uxqnf6l3HOw1xfatAlUURA0g14cvBYFyJ5SaNOQbOUvBr9PKArcPcrNIeRsBdgcUzOGrhKveVpvOIGA==
 
-"@playwright/test@^1.59.1":
+"@playwright/test@^1.60.0":
   version "1.60.0"
   resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.60.0.tgz#e696c31427e8882851235cd556dc2490c3206d97"
   integrity sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==
@@ -1419,7 +1419,7 @@
   dependencies:
     "@rolldown/pluginutils" "^1.0.0"
 
-"@vitest/coverage-v8@^4.1.5":
+"@vitest/coverage-v8@^4.1.8":
   version "4.1.8"
   resolved "https://registry.yarnpkg.com/@vitest/coverage-v8/-/coverage-v8-4.1.8.tgz#6a5dd34552840a0ace0396d0e94c7459beb80d14"
   integrity sha512-lt3kovsyHwYe00wq4D1ti0Z974fWj4NLp6siqiyEufUpyFwK9Yhi7rBhac9JL5aA0zoMrJqc4vYPZRUnI7l7nw==
