@@ -43,8 +43,12 @@ jobs:
         run: node node_modules/.bin/eslint .
 
   test:
-    name: Test
+    name: Test (shard ${{ matrix.shard }}/${{ strategy.job-total }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,8 +57,14 @@ jobs:
           cache: "yarn"
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Run tests with coverage
-        run: node node_modules/vitest/vitest.mjs run --coverage --pool=forks
+      - name: Run tests with coverage (shard ${{ matrix.shard }})
+        run: node node_modules/vitest/vitest.mjs run --coverage --pool=forks --reporter=verbose
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.shard == 1 }}
+        with:
+          name: coverage-report
+          path: coverage/
 
   build:
     name: Build
@@ -69,3 +79,35 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build
         run: node node_modules/.bin/vite build
+
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build
+        run: node node_modules/.bin/vite build
+      - name: Check bundle size
+        run: npx bundlewatch
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: npm audit
+        run: yarn npm audit --recursive || true
+        continue-on-error: true
