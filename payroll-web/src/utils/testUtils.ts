@@ -20,7 +20,8 @@ export function groupTestsByFile(
     Record<string, { passed: number; failed: number; skipped: number }>
   >((acc, t) => {
     if (!acc[t.file]) acc[t.file] = { passed: 0, failed: 0, skipped: 0 };
-    acc[t.file][t.status]++;
+    const entry = acc[t.file]!;
+    entry[t.status]++;
     return acc;
   }, {});
 }

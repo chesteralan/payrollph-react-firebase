@@ -1,0 +1,19 @@
+{
+  "ci": {
+    "trackBranches": ["main", "develop", "feat/phase-2"]
+  },
+  "files": [
+    {
+      "path": "dist/assets/index-*.js",
+      "maxSize": "300kB"
+    },
+    {
+      "path": "dist/assets/index-*.css",
+      "maxSize": "50kB"
+    },
+    {
+      "path": "dist/assets/xlsx-*.js",
+      "maxSize": "300kB"
+    }
+  ]
+}
