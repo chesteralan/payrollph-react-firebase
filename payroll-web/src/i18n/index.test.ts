@@ -114,15 +114,15 @@ describe("i18n", () => {
       expect(document.documentElement.lang).toBe("en-US");
     });
 
-    it("should set to Filipino locale", () => {
-      setHtmlLang("fil-PH");
-      expect(document.documentElement.lang).toBe("fil-PH");
+    it("should set locale via setHtmlLang", () => {
+      setHtmlLang("en-PH");
+      expect(document.documentElement.lang).toBe("en-PH");
     });
 
     it("should override previous lang value", () => {
       setHtmlLang("en-US");
-      setHtmlLang("fil-PH");
-      expect(document.documentElement.lang).toBe("fil-PH");
+      setHtmlLang("en-PH");
+      expect(document.documentElement.lang).toBe("en-PH");
     });
   });
 
@@ -137,11 +137,6 @@ describe("i18n", () => {
     it("should load English messages for en-PH", async () => {
       const msgs = await loadMessages("en-PH");
       expect(msgs.common.save).toBe("Save");
-    });
-
-    it("should load Filipino messages for fil-PH", async () => {
-      const msgs = await loadMessages("fil-PH");
-      expect(msgs.common.save).toBe("I-save");
     });
 
     it("should fallback to en-US for unknown locale", async () => {

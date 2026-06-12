@@ -1,1 +1,0 @@
-export { NotificationFeed } from "./NotificationFeed";

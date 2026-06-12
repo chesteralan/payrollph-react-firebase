@@ -1,1 +1,0 @@
-export { FilterPersistenceBar } from "./FilterPersistenceBar";

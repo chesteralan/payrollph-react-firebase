@@ -1,1 +1,0 @@
-export { SimplePieChart } from "./SimplePieChart";

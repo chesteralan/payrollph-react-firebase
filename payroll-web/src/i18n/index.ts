@@ -1,7 +1,6 @@
 const locales = {
   "en-US": "English (US)",
   "en-PH": "English (Philippines)",
-  "fil-PH": "Filipino (Philippines)",
 } as const;
 
 export type Locale = keyof typeof locales;
@@ -19,7 +18,6 @@ export interface LocaleMessages {
 const allMessages: Record<Locale, () => Promise<LocaleMessages>> = {
   "en-US": () => import("./locales/en").then((m) => m.en),
   "en-PH": () => import("./locales/en").then((m) => m.en),
-  "fil-PH": () => import("./locales/fil").then((m) => m.fil),
 };
 
 export async function loadMessages(locale: Locale): Promise<LocaleMessages> {
