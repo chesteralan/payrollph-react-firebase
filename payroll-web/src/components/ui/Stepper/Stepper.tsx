@@ -95,7 +95,7 @@ export function Stepper({ steps, onStepClick }: StepperProps) {
                 <div
                   className={clsx(
                     "flex-1 h-0.5 mx-4 hidden sm:block",
-                    steps[i + 1].completed ? "bg-primary-600" : "bg-gray-200",
+                    steps[i + 1]!.completed ? "bg-primary-600" : "bg-gray-200",
                   )}
                   aria-hidden="true"
                 />

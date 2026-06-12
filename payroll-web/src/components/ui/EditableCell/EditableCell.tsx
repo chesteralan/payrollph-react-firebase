@@ -19,7 +19,7 @@ export const EditableCell = memo(function EditableCell({
   const [editing, setEditing] = useState(false);
   const [localValue, setLocalValue] = useState(String(value));
   const [highlight, setHighlight] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hasChanged =
     originalValue !== undefined && String(value) !== String(originalValue);

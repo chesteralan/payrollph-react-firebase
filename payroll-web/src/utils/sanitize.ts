@@ -151,8 +151,9 @@ export const sanitizeObject = <T extends Record<string, unknown>>(
 ): T => {
   const sanitized = { ...obj };
   for (const key in sanitizers) {
-    if (key in sanitized && sanitizers[key]) {
-      sanitized[key] = sanitizers[key]!(sanitized[key]) as T[keyof T];
+    const sanitizer = sanitizers[key as keyof typeof sanitizers];
+    if (key in sanitized && sanitizer) {
+      sanitized[key as keyof T] = sanitizer(sanitized[key as keyof T]) as T[keyof T];
     }
   }
   return sanitized;

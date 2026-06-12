@@ -49,7 +49,7 @@ export function VirtualScroll<T>({
     const result: { item: T; index: number; style: React.CSSProperties }[] = [];
     for (let i = visibleStartIndex; i < visibleEndIndex; i++) {
       result.push({
-        item: items[i],
+        item: items[i]!,
         index: i,
         style: {
           position: "absolute",

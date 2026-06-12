@@ -4,6 +4,15 @@
 - **Dead code cleanup**: Removed 97 unused hooks, 7 unused services, 3 unused utils, 70+ unused UI components, 10 unused E2E tests, CLI scripts, config files — 286 files total, 12,056 lines removed
 - **Fixed i18n**: Removed fil-PH locale reference that broke module resolution
 - **Fixed orphaned tests**: Removed codeSplitter.test.ts, fixed i18n test
+- **Fixed TypeScript errors**:
+  - `sanitize.ts` line 155 — fixed generic type constraint (keyof T vs Extract<keyof T, string>)
+  - `importUtils.ts` line 113 — fixed index type error from noUncheckedIndexedAccess
+  - `__mocks__/firebase.ts` — fixed implicit any returns on `exists`, `data`, `get` methods
+  - `Breadcrumb.tsx` — fixed possibly undefined array/object access
+- **Fixed code quality**: Removed `console.log` from `offline.ts` (2 calls), `reportScheduling.ts` (2 calls)
+- **Fixed unused variables**: `CompanyContext.tsx` — removed unused `setCompanies`, `setLoading`
+- **Confirmed `noUncheckedIndexedAccess` already enabled** in `tsconfig.app.json` — no action needed
+- **Fixed `AuthContext.tsx`** — optional chaining on `companiesData[0]?.companyId`
 
 ## Remaining
 
@@ -26,19 +35,20 @@
 - [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
 - [ ] Refactor `Sidebar.tsx` (479 lines) — extract nav items, user section
 
-### 3. TypeScript Fixes (build errors)
-- [ ] Fix `sanitize.ts` line 155 — generic type constraint
-- [ ] Fix `importUtils.ts` line 113 — index type error
-- [ ] Fix `firebase.ts` mock — implicit any returns
-- [ ] Fix `Breadcrumb.tsx` — possibly undefined object
+### 3. TypeScript Fixes (~373 remaining errors across codebase)
+- [ ] Fix large page TS errors: DashboardPage, PayrollDetailPage, PayrollRunsPage, PrintFormatsPage, TemplatesPage, NamesListPage, etc.
+- [ ] Fix service TS errors: payroll.ts, backup.ts, email.ts, notifications.ts, ipRestriction.ts, firestore-optimized.ts, repositories/index.ts, etc.
+- [ ] Fix utility TS errors: calendarUtils.ts, dateFormat.ts, currency.ts, encryption.ts, etc.
+- [ ] Fix report page TS errors: 13thMonth, YearEnd, Attendance, BenefitsUtilization
+- [ ] Fix CompanySettingsPage, CalendarPage, DatabasePage, TermsPage, UsersPage
+- [ ] Fix script TS errors: seed.ts
 
 ### 4. Code Quality
 - [ ] Split `AuthContext.tsx` — move hook to separate file (rule 10)
 - [ ] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
 - [ ] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (rule 6)
 - [ ] Add import/order ESLint rule (rule 8)
-- [ ] Add `noUncheckedIndexedAccess` to tsconfig (rule 3.2)
-- [ ] Remove `console.log` from 10+ source files (rule 7)
+- [ ] Remove remaining `console.log` from CLI scripts (deploy-previews.ts, smoke-test.ts, seed.ts) — these are CLI tools, can keep
 
 ### 5. Expand Test Coverage
 - [ ] Add tests for 8 untested services (offline, audit, cache, email, payroll, backup, notifications, setup)

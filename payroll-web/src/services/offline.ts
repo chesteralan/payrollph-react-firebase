@@ -265,12 +265,10 @@ export const setupOfflineListeners = (
   onOnline: () => void,
 ): (() => void) => {
   const handleOffline = () => {
-    console.log("App went offline");
     onOffline();
   };
 
   const handleOnline = () => {
-    console.log("App is back online");
     onOnline();
     syncQueuedActions();
   };

@@ -52,7 +52,10 @@ function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
   });
 
   if (breadcrumbs.length === 2) {
-    breadcrumbs[1].label = routeLabels[segments[0]] || segments[0];
+    const segment = segments[0];
+    if (segment) {
+      breadcrumbs[1]!.label = routeLabels[segment] || segment;
+    }
   }
 
   return breadcrumbs;

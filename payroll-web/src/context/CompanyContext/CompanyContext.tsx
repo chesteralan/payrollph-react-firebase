@@ -94,9 +94,9 @@ export function useCompanyLoading(): boolean {
 // CompanyProvider component
 // ──────────────────────────────────────────────
 export function CompanyProvider({ children }: { children: React.ReactNode }) {
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies] = useState<Company[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   // Initialize observable stores for selector hooks
   const storesRef = useRef<CompanyStores | null>(null);

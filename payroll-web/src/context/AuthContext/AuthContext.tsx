@@ -330,7 +330,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setCurrentCompanyIdState(
               settingsData?.defaultCompanyId ||
                 primary?.companyId ||
-                companiesData[0].companyId ||
+                companiesData[0]?.companyId ||
                 null,
             );
           }

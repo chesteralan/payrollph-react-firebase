@@ -67,6 +67,7 @@ export function parseCSV(text: string, delimiter?: string): string[][] {
 
 function detectDelimiter(text: string): string {
   const firstLine = text.split("\n")[0];
+  if (!firstLine) return ",";
   const counts = { ",": 0, "\t": 0, ";": 0, "|": 0 };
 
   for (const char of firstLine) {
@@ -98,21 +99,23 @@ export function csvToObjects<T extends Record<string, string>>(
     };
   }
 
-  const fileHeaders = headers || rows[0];
+  const fileHeaders: string[] = headers || rows[0] || [];
   const dataStart = headers ? 0 : 1;
   const result: T[] = [];
   const errors: ImportError[] = [];
 
   for (let i = dataStart; i < rows.length; i++) {
     const row = rows[i];
-    if (row.length === 0 || (row.length === 1 && row[0] === "")) continue;
+    if (!row || row.length === 0 || (row.length === 1 && row[0] === "")) continue;
 
-    const obj = {} as T;
+    const obj: Record<string, string> = {};
     for (let j = 0; j < fileHeaders.length; j++) {
-      const key = fileHeaders[j];
-      obj[key] = row[j] || "";
+      const key = fileHeaders[j] as string;
+      if (key) {
+        obj[key] = (row[j] as string) || "";
+      }
     }
-    result.push(obj);
+    result.push(obj as unknown as T);
   }
 
   return { headers: fileHeaders, rows: result, errors };
