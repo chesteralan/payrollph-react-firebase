@@ -1,1 +1,0 @@
-export { EmptyStateIllustration } from "./EmptyStateIllustration";

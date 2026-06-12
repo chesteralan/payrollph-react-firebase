@@ -1,69 +1,50 @@
 # PayrollPH — Remaining Tasks
 
-## 1. Testing (23 tasks)
+## ✅ Completed
+- **Dead code cleanup**: Removed 97 unused hooks, 7 unused services, 3 unused utils, 70+ unused UI components, 10 unused E2E tests, CLI scripts, config files — 286 files total, 12,056 lines removed
+- **Fixed i18n**: Removed fil-PH locale reference that broke module resolution
+- **Fixed orphaned tests**: Removed codeSplitter.test.ts, fixed i18n test
 
-### Unit Tests (12)
-- [ ] 1.1 Write tests for custom hooks (usePermissions, useTableSort, useNetworkStatus)
-- [ ] 1.2 Write tests for context providers (AuthContext, CompanyContext)
-- [ ] 1.3 Write tests for Firestore service functions (offline, audit, cache)
-- [ ] 1.4 Write tests for payroll calculation logic
-- [ ] 1.5 Write tests for RBAC permission functions
-- [ ] 1.6 Write tests for data transformation/formatting utilities
-- [ ] 1.7 Write tests for offline/IndexedDB service
-- [ ] 1.8 Write tests for i18n translation functions
-- [ ] 1.9 Write tests for validation/sanitization edge cases
-- [ ] 1.10 Write tests for export utility functions (XLS, CSV)
-- [ ] 1.11 Write tests for all custom hooks (useAuth, useCompany, useToast)
-- [ ] 1.12 Add test coverage reporting to CI pipeline with thresholds
+## Remaining
 
-### E2E Tests (6)
-- [ ] 1.13 Set up Playwright for E2E testing
-- [ ] 1.14 Add E2E test for company switching and data isolation
-- [ ] 1.15 Add E2E test for offline mode (create, queue, sync)
-- [ ] 1.16 Add visual regression tests for key pages (Playwright snapshots)
-- [ ] 1.17 Add E2E test for CSV import flow (names, users)
-- [ ] 1.18 Add E2E test for calendar and DTR workflows
+### 1. Fix Pipeline (5 failing tests — pre-existing)
+- [ ] Fix `reportScheduling.test.ts`
+- [ ] Fix `reports.test.ts` (flow test)
+- [ ] Fix `AppLayout.test.tsx`
+- [ ] Fix `Sidebar.test.tsx`
+- [ ] Fix `HealthCheckPage.test.tsx`
 
-### Test Infrastructure (5)
-- [ ] 1.19 Add Firestore emulator integration for integration tests
-- [ ] 1.20 Add CI test running with parallel execution
-- [ ] 1.21 Add test coverage thresholds that block PRs below 80%
-- [ ] 1.22 Add test documentation for contributor guide
-- [ ] 1.23 Add test run time tracking with regression alerting
+### 2. Refactor Large Components (34 files over 300 lines)
+- [ ] Refactor `PayrollDetailPage.tsx` (1,166 lines) — split into per-stage components
+- [ ] Refactor `UsersPage.tsx` (1,097 lines) — extract user form, table, filters
+- [ ] Refactor `DTRPage.tsx` (1,079 lines) — extract calendar, computation, time selector
+- [ ] Refactor `DatabasePage.tsx` (982 lines)
+- [ ] Refactor `EarningsDeductionsReportPage.tsx` (956 lines)
+- [ ] Refactor `NamesListPage.tsx` (954 lines)
+- [ ] Refactor `PrintFormatsPage.tsx` (844 lines)
+- [ ] Refactor remaining 27 page files over 300 lines
+- [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
+- [ ] Refactor `Sidebar.tsx` (479 lines) — extract nav items, user section
 
-## 2. Deployment & Operations (6 tasks)
-- [ ] 2.1 Add staging environment parity with production
-- [ ] 2.2 Add database migration/seeding scripts for test data
-- [ ] 2.3 Add deployment rollback automation
-- [ ] 2.4 Add smoke test suite for post-deployment verification
-- [ ] 2.5 Add environment configuration documentation
-- [ ] 2.6 Add deploy previews for PR branches
+### 3. TypeScript Fixes (build errors)
+- [ ] Fix `sanitize.ts` line 155 — generic type constraint
+- [ ] Fix `importUtils.ts` line 113 — index type error
+- [ ] Fix `firebase.ts` mock — implicit any returns
+- [ ] Fix `Breadcrumb.tsx` — possibly undefined object
 
-## 3. Code Quality & Architecture (8 tasks)
-- [ ] 3.1 Extract duplicated Firestore query patterns into reusable hooks
-- [ ] 3.2 Add strict TypeScript checks (noUncheckedIndexedAccess)
-- [ ] 3.3 Standardize component prop interfaces with consistent naming
-- [ ] 3.4 Add API service layer abstraction (repository pattern)
-- [ ] 3.5 Add comprehensive JSDoc for public APIs and hooks
-- [ ] 3.6 Reduce component re-render surface area (profiling pass)
-- [ ] 3.7 Clean up barrel exports (remove circular dependencies)
-- [ ] 3.8 Standardize import ordering across all files
+### 4. Code Quality
+- [ ] Split `AuthContext.tsx` — move hook to separate file (rule 10)
+- [ ] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
+- [ ] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (rule 6)
+- [ ] Add import/order ESLint rule (rule 8)
+- [ ] Add `noUncheckedIndexedAccess` to tsconfig (rule 3.2)
+- [ ] Remove `console.log` from 10+ source files (rule 7)
 
-## 4. State Management (3 tasks)
-- [ ] 4.1 Audit and consolidate React Context providers (reduce nesting)
-- [ ] 4.2 Add selectors/memoization for context values
-- [ ] 4.3 Implement undo/redo for critical workflows (payroll edits, employee updates)
+### 5. Expand Test Coverage
+- [ ] Add tests for 8 untested services (offline, audit, cache, email, payroll, backup, notifications, setup)
+- [ ] Raise test-to-source ratio from ~19% to 40%+
 
-## 5. Features Remaining (3 tasks)
-- [ ] 5.1 Add report template saving (reusable report configurations) — Reports
-- [ ] 5.2 Add employee quick-view tooltip on hover in tables — Employees
-- [ ] 5.3 Add cross-company search capability — Search
-
----
-
-**Summary:** 43 tasks remaining
-- Testing: 23
-- Deployment: 6
-- Code Quality: 8
-- State Management: 3
-- Features: 3
+### 6. Dependency Cleanup
+- [ ] Remove unused runtime deps: `@sentry/replay`, `@sentry/tracing`, `tailwind-merge`
+- [ ] Remove unused devDeps: `husky`
+- [ ] Add missing deps: `jspdf`, `html2canvas`, `@axe-core/react` (if needed)

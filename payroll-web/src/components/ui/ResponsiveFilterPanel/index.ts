@@ -1,1 +1,0 @@
-export { ResponsiveFilterPanel } from "./ResponsiveFilterPanel";
