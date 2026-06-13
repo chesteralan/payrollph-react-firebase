@@ -13,15 +13,17 @@
 - **Fixed unused variables**: `CompanyContext.tsx` — removed unused `setCompanies`, `setLoading`
 - **Confirmed `noUncheckedIndexedAccess` already enabled** in `tsconfig.app.json` — no action needed
 - **Fixed `AuthContext.tsx`** — optional chaining on `companiesData[0]?.companyId`
+- **Fixed pipeline tests**: Created `reportGenerator.ts` (needed by `reportScheduling.ts` app code + tests); Added 12 missing lucide-react icons to `__mocks__/lucide-react.ts` (`Server`, `HardDrive`, `LayoutDashboard`, `Layers`, `ListChecks`, `Banknote`, `ArrowDownToLine`, `ArrowUpFromLine`, `CopyPlus`, `UserCog`, `ShieldCheck`)
+- **Extracted `StatusIcon`**: Moved from inline inside `HealthCheckPage.tsx` to `StatusIcon.tsx` separate component file
 
 ## Remaining
 
 ### 1. Fix Pipeline (5 failing tests — pre-existing)
-- [ ] Fix `reportScheduling.test.ts`
-- [ ] Fix `reports.test.ts` (flow test)
-- [ ] Fix `AppLayout.test.tsx`
-- [ ] Fix `Sidebar.test.tsx`
-- [ ] Fix `HealthCheckPage.test.tsx`
+- [x] Fix `reportScheduling.test.ts` — created missing `reportGenerator.ts` module
+- [x] Fix `reports.test.ts` — created missing `reportGenerator.ts` module
+- [x] Fix `AppLayout.test.tsx` — added missing lucide-react mock exports (`LayoutDashboard`, `Layers`, `ListChecks`, `Banknote`, `ArrowDownToLine`, `ArrowUpFromLine`, `CopyPlus`, `UserCog`, `ShieldCheck`)
+- [x] Fix `Sidebar.test.tsx` — same lucide-react mocks as AppLayout
+- [x] Fix `HealthCheckPage.test.tsx` — added missing `Server`, `HardDrive` mock exports
 
 ### 2. Refactor Large Components (34 files over 300 lines)
 - [ ] Refactor `PayrollDetailPage.tsx` (1,166 lines) — split into per-stage components
@@ -44,9 +46,9 @@
 - [ ] Fix script TS errors: seed.ts
 
 ### 4. Code Quality
+- [x] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (`StatusIcon.tsx`)
 - [ ] Split `AuthContext.tsx` — move hook to separate file (rule 10)
 - [ ] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
-- [ ] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (rule 6)
 - [ ] Add import/order ESLint rule (rule 8)
 - [ ] Remove remaining `console.log` from CLI scripts (deploy-previews.ts, smoke-test.ts, seed.ts) — these are CLI tools, can keep
 

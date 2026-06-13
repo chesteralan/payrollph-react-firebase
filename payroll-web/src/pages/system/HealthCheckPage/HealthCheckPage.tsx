@@ -18,17 +18,17 @@ import { db, storage } from "@/config/firebase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { usePermissions } from "@/hooks/usePermissions";
+import { StatusIcon } from "./StatusIcon";
 import {
   Activity,
   CheckCircle,
-  XCircle,
   AlertTriangle,
-  RefreshCw,
   Database,
   HardDrive,
   Users,
   Server,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 
 import type {
@@ -85,14 +85,6 @@ const COMMON_QUERIES = [
     needsComposite: true,
   },
 ];
-
-const StatusIcon = ({ status }: { status: string }) => {
-  if (status === "pass" || status === "good")
-    return <CheckCircle className="w-5 h-5 text-green-500" />;
-  if (status === "fail" || status === "error")
-    return <XCircle className="w-5 h-5 text-red-500" />;
-  return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-};
 
 export function HealthCheckPage() {
   const { canView } = usePermissions();

@@ -274,12 +274,12 @@ export const processDueReports = async (): Promise<void> => {
 };
 
 // Placeholder export functions (implement based on your export utilties)
-const exportToXlsx = async (data: unknown[], name: string): Promise<string> => {
+const exportToXlsx = async (_data: unknown[], name: string): Promise<string> => {
   // Implement using your xlsx utility
   return `https://storage.googleapis.com/bucket/reports/${name}.xlsx`;
 };
 
-const exportToCsv = async (data: unknown[], name: string): Promise<string> => {
+const exportToCsv = async (_data: unknown[], name: string): Promise<string> => {
   // Implement using your CSV utility
   return `https://storage.googleapis.com/bucket/reports/${name}.csv`;
 };
