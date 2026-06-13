@@ -18,8 +18,7 @@
     "deploy:all": "yarn build && firebase deploy",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "backup:create": "firebase firestore:backups create",
-    "backup:list": "firebase firestore:backups list",
-    "prepare": "husky"
+    "backup:list": "firebase firestore:backups list"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -32,15 +31,12 @@
   },
   "dependencies": {
     "@sentry/react": "^10.57.0",
-    "@sentry/replay": "^7.116.0",
-    "@sentry/tracing": "^7.120.4",
     "clsx": "^2.1.1",
     "firebase": "^12.14.0",
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.17.0",
-    "tailwind-merge": "^3.5.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -62,7 +58,6 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
-    "husky": "^9.1.0",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.7",
     "prettier": "^3.8.4",

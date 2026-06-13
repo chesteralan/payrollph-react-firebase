@@ -1,5 +1,6 @@
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../config/firebase";
+
 import type { CalendarEntry } from "../types/system";
 
 export interface WorkDaysResult {
@@ -35,7 +36,7 @@ export async function getPayrollWorkDays(
 
   const current = new Date(start);
   while (current <= end) {
-    const dateStr = current.toISOString().split("T")[0];
+    const dateStr = current.toISOString().split("T")[0]!;
     const dayOfWeek = current.getDay();
     const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
@@ -120,12 +121,12 @@ export function calculateWorkingDaysSync(
   for (const entry of filteredEntries) {
     const entryDate =
       entry.date instanceof Date ? entry.date : new Date(entry.date);
-    entryMap.set(entryDate.toISOString().split("T")[0], entry);
+    entryMap.set(entryDate.toISOString().split("T")[0]!, entry);
   }
 
   const current = new Date(start);
   while (current <= end) {
-    const dateStr = current.toISOString().split("T")[0];
+    const dateStr = current.toISOString().split("T")[0]!;
     const dayOfWeek = current.getDay();
     const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
 

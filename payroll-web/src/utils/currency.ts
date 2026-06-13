@@ -49,8 +49,12 @@ export function getDefaultCurrency(): string {
  * @param code - A three-letter currency code (optional, defaults to current default)
  * @returns An object with `symbol`, `code`, and `locale` properties
  */
-export function getCurrencyInfo(code?: string) {
-  return CURRENCIES[code || defaultCurrency] || CURRENCIES.PHP;
+export function getCurrencyInfo(code?: string): {
+  symbol: string;
+  code: string;
+  locale: string;
+} {
+  return (CURRENCIES[code || defaultCurrency] ?? CURRENCIES.PHP)!;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export type DateFormat =
   | "MM/DD/YYYY"
@@ -178,41 +178,41 @@ export function parseDate(input: string, format: DateFormat): Date | null {
       case "MM/DD/YYYY": {
         const parts = cleaned.split("/");
         if (parts.length !== 3) return null;
-        month = parseInt(parts[0], 10) - 1;
-        day = parseInt(parts[1], 10);
-        year = parseInt(parts[2], 10);
+        month = parseInt(parts[0]!, 10) - 1;
+        day = parseInt(parts[1]!, 10);
+        year = parseInt(parts[2]!, 10);
         break;
       }
       case "DD/MM/YYYY": {
         const parts = cleaned.split("/");
         if (parts.length !== 3) return null;
-        day = parseInt(parts[0], 10);
-        month = parseInt(parts[1], 10) - 1;
-        year = parseInt(parts[2], 10);
+        day = parseInt(parts[0]!, 10);
+        month = parseInt(parts[1]!, 10) - 1;
+        year = parseInt(parts[2]!, 10);
         break;
       }
       case "YYYY-MM-DD": {
         const parts = cleaned.split("-");
         if (parts.length !== 3) return null;
-        year = parseInt(parts[0], 10);
-        month = parseInt(parts[1], 10) - 1;
-        day = parseInt(parts[2], 10);
+        year = parseInt(parts[0]!, 10);
+        month = parseInt(parts[1]!, 10) - 1;
+        day = parseInt(parts[2]!, 10);
         break;
       }
       case "DD-MMM-YYYY": {
         const parts = cleaned.split("-");
         if (parts.length !== 3) return null;
-        day = parseInt(parts[0], 10);
-        month = monthNames.indexOf(parts[1]);
-        year = parseInt(parts[2], 10);
+        day = parseInt(parts[0]!, 10);
+        month = monthNames.indexOf(parts[1]!);
+        year = parseInt(parts[2]!, 10);
         break;
       }
       case "MMM DD, YYYY": {
         const match = cleaned.match(/^(\w+)\s+(\d{1,2}),?\s+(\d{4})$/);
         if (!match) return null;
-        month = monthNames.indexOf(match[1]);
-        day = parseInt(match[2], 10);
-        year = parseInt(match[3], 10);
+        month = monthNames.indexOf(match[1]!);
+        day = parseInt(match[2]!, 10);
+        year = parseInt(match[3]!, 10);
         break;
       }
       default:
