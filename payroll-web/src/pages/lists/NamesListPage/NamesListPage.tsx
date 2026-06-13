@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  collection,
-  getDocs,
   addDoc,
-  updateDoc,
+  collection,
   doc,
+  getDocs,
   query,
-  where,
-  writeBatch,
   serverTimestamp,
   Timestamp,
+  updateDoc,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -19,30 +19,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { SearchBar } from "@/components/ui/SearchBar";
 import {
-  Plus,
+  AlertCircle,
+  Check,
+  CheckSquare,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
+  Download,
   Edit,
+  Plus,
+  Square,
   Trash2,
   Upload,
   X,
-  Check,
-  AlertCircle,
-  Download,
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
-  CheckSquare,
-  Square,
 } from "lucide-react";
 import { useTableSort } from "@/hooks/useTableSort";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type {
+  EmployeeArea,
   EmployeeGroup,
   EmployeePosition,
-  EmployeeArea,
   EmployeeStatus,
 } from "@/types/employee";
 
-import type { NameRecord, CsvPreviewRow } from "./NamesListPage.types";
+import type { CsvPreviewRow, NameRecord } from "./NamesListPage.types";
 
 export function NamesListPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

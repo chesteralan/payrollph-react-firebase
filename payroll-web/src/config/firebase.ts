@@ -3,10 +3,10 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import {
+  type AppCheck,
+  getToken,
   initializeAppCheck,
   ReCaptchaV3Provider,
-  getToken,
-  type AppCheck,
 } from "firebase/app-check";
 
 const firebaseConfig = {

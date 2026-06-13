@@ -2,14 +2,14 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   Building2,
   ChevronDown,
-  Settings,
   Lock,
   LogOut,
+  Settings,
   User,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import type { Company } from "@/types";
 

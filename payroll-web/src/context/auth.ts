@@ -1,12 +1,12 @@
 import { createContext } from "react";
 import type { User as FirebaseUser } from "firebase/auth";
 import type {
-  UserAccount,
-  UserRestriction,
-  UserCompany,
-  UserSettings,
   Department,
   Section,
+  UserAccount,
+  UserCompany,
+  UserRestriction,
+  UserSettings,
 } from "../types";
 
 export interface AuthContextType {

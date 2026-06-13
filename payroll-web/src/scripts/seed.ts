@@ -11,7 +11,7 @@
  *   - FIRESTORE_EMULATOR_HOST set (for local) or live Firestore access
  */
 
-import { initializeApp, cert, type ServiceAccount } from "firebase-admin/app";
+import { cert, initializeApp, type ServiceAccount } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 // ============================================================

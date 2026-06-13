@@ -4,12 +4,12 @@ import type {
 } from "./UserSettingsPage.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { ArrowLeft, Save, Lock, Palette } from "lucide-react";
+import { ArrowLeft, Lock, Palette, Save } from "lucide-react";
 import { getAvailableCurrencies } from "@/utils/currency";
 import { localeLabels } from "@/i18n";
 

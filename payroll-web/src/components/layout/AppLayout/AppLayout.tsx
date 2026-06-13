@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
@@ -7,7 +7,7 @@ import { AlertBannerProvider } from "@/components/ui/AlertBanner";
 import { useGlobalShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { NetworkStatusBanner } from "@/components/ui/NetworkStatusBanner";
 import { useToast } from "@/hooks/useToast";
-import { syncQueuedActions, getQueuedActionCount } from "@/services/offline";
+import { getQueuedActionCount, syncQueuedActions } from "@/services/offline";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);

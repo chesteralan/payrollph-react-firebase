@@ -1,17 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  collection,
-  getDocs,
   addDoc,
+  collection,
   deleteDoc,
   doc,
-  query,
+  getDocs,
   limit,
+  query,
 } from "firebase/firestore";
 import {
-  ref,
-  listAll,
   getMetadata,
+  listAll,
+  ref,
   type StorageReference,
 } from "firebase/storage";
 import { db, storage } from "@/config/firebase";
@@ -21,19 +21,19 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { StatusIcon } from "./StatusIcon";
 import {
   Activity,
-  CheckCircle,
   AlertTriangle,
+  CheckCircle,
+  Clock,
   Database,
   HardDrive,
-  Users,
-  Server,
-  Clock,
   RefreshCw,
+  Server,
+  Users,
 } from "lucide-react";
 
 import type {
-  HealthCheckResult,
   CollectionHealth,
+  HealthCheckResult,
 } from "./HealthCheckPage.types";
 
 const MAJOR_COLLECTIONS = [

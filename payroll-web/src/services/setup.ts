@@ -1,11 +1,11 @@
 import { auth, db } from "../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
-  doc,
-  setDoc,
   collection,
+  doc,
   getDocs,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 
 const DEPARTMENTS = [

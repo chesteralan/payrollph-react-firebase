@@ -1,33 +1,33 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  addDoc,
+  collection,
+  deleteDoc,
   doc,
   getDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
   getDocs,
-  addDoc,
-  deleteDoc,
+  query,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import {
+  deleteObject,
+  getDownloadURL,
   ref,
   uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
 } from "firebase/storage";
 import { db, storage } from "@/config/firebase";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/hooks/useToast";
 import { ArrowLeft } from "lucide-react";
 import type {
+  DocumentCategory,
   Employee,
   EmployeeContact,
+  EmployeeDocument,
   EmployeeProfile,
   EmployeeSalary,
-  EmployeeDocument,
-  DocumentCategory,
   ProfileTab,
   SelectOption,
 } from "./EmployeeProfilePage.types";

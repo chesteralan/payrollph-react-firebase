@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  loadMessages,
   type Locale,
   type LocaleMessages,
-  loadMessages,
-  t as translate,
   setHtmlLang,
+  t as translate,
 } from "./index";
 
 interface UseLocaleReturn {

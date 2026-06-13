@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-react";
 import type { AlertBannerProps, SystemAlert } from "./AlertBanner.types";
 import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/config/firebase";
-import { getDocs, query, collection, where, limit } from "firebase/firestore";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 
 const alertIcons: Record<string, React.ReactNode> = {
   info: <Info className="w-5 h-5" />,

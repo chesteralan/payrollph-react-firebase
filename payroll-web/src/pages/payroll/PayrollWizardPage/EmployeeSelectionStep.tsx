@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/Card";
 
 interface EmployeeSelectionStepProps {

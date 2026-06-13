@@ -1,4 +1,4 @@
-import { useState, memo, useRef } from "react";
+import { memo, useRef, useState } from "react";
 import { clsx } from "clsx";
 
 interface EditableCellProps {

@@ -1,14 +1,14 @@
 // -nocheck
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  collection,
-  getDocs,
   addDoc,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -19,21 +19,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
-  Plus,
-  Edit,
-  Trash2,
-  Copy,
-  ChevronRight,
-  ChevronLeft,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Edit,
+  Plus,
+  Trash2,
   X,
 } from "lucide-react";
 import type {
-  PayrollTemplate,
+  EmployeeArea,
   EmployeeGroup,
   EmployeePosition,
-  EmployeeArea,
   EmployeeStatus,
+  PayrollTemplate,
   PrintFormat,
 } from "./TemplatesPage.types";
 

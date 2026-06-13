@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
   query,
-  where,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   serverTimestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,12 +19,12 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type {
-  PayrollGroup,
-  PayrollTemplate,
+  EmployeeArea,
   EmployeeGroup,
   EmployeePosition,
-  EmployeeArea,
   EmployeeStatus,
+  PayrollGroup,
+  PayrollTemplate,
   Term,
 } from "./PayrollWizardPage.types";
 import { PayrollConfigStep } from "./PayrollConfigStep";

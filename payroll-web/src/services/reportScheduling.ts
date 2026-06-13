@@ -3,15 +3,15 @@
 // Schedule reports to be generated and sent automatically
 
 import {
-  collection,
   addDoc,
-  getDocs,
-  query,
-  where,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
+  query,
   serverTimestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 

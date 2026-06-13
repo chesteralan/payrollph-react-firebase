@@ -1,4 +1,4 @@
-import { doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 interface QueuedAction {

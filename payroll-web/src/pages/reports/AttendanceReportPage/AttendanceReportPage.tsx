@@ -1,5 +1,5 @@
 // -nocheck
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,10 +10,10 @@ import { FileSpreadsheet, Printer } from "lucide-react";
 import * as XLSX from "xlsx";
 
 import type {
+  AttendanceData,
+  DtrEntry,
   Employee,
   NameRecord,
-  DtrEntry,
-  AttendanceData,
 } from "./AttendanceReportPage.types";
 
 export function AttendanceReportPage() {

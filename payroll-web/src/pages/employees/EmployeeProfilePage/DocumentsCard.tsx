@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Upload, Download, File, Trash2 } from "lucide-react";
+import { Download, File, Trash2, Upload } from "lucide-react";
 import type {
-  EmployeeDocument,
   DocumentCategory,
+  EmployeeDocument,
 } from "./EmployeeProfilePage.types";
 
 interface DocumentsCardProps {

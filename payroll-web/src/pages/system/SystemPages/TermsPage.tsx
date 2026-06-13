@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  collection,
-  getDocs,
   addDoc,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
-  query,
+  getDocs,
   orderBy,
+  query,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -17,12 +17,12 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
 import {
-  Plus,
-  Edit,
-  Trash2,
-  ChevronUp,
   ChevronDown,
   ChevronsUpDown,
+  ChevronUp,
+  Edit,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import type { Term } from "@/types";
 

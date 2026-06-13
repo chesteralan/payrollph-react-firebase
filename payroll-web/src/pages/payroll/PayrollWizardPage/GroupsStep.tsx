@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/Button";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/Card";
 import type {
-  PayrollGroup,
+  EmployeeArea,
   EmployeeGroup,
   EmployeePosition,
-  EmployeeArea,
   EmployeeStatus,
+  PayrollGroup,
 } from "./PayrollWizardPage.types";
 
 interface GroupsStepProps {

@@ -1,4 +1,4 @@
-import { Phone, Users, Briefcase, MapPin, FileText } from "lucide-react";
+import { Briefcase, FileText, MapPin, Phone, Users } from "lucide-react";
 import type { ProfileTab } from "./EmployeeProfilePage.types";
 
 interface ProfileTabsProps {

@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { Lock, AlertTriangle } from "lucide-react";
+import { AlertTriangle, Lock } from "lucide-react";
 import { useMemo } from "react";
 
 interface AccountLockoutProps {

@@ -1,11 +1,11 @@
-import { expect, afterEach, beforeAll, afterAll, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, expect, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import {
-  createFirestoreMocks,
-  createAuthMocks,
-  createStorageMocks,
   clearMockDocs,
+  createAuthMocks,
+  createFirestoreMocks,
+  createStorageMocks,
 } from "../__mocks__/firebase";
 
 expect.extend(matchers);

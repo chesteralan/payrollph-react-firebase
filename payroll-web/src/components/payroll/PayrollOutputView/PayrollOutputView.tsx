@@ -1,20 +1,20 @@
-import { useState, useMemo, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
-  Printer,
-  FileSpreadsheet,
-  Download,
-  Filter,
   Columns,
+  Download,
+  FileSpreadsheet,
+  Filter,
+  Printer,
 } from "lucide-react";
 
 import type {
-  ProcessingRow,
   CompanyInfo,
-  PayrollOutputViewProps,
   OutputMode,
+  PayrollOutputViewProps,
+  ProcessingRow,
 } from "./PayrollOutputView.types";
 
 // PrintHeader and PrintFooter must be declared outside the main component to avoid lint errors

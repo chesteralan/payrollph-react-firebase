@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 
 export interface StatusIconProps {
   status: string;

@@ -47,14 +47,14 @@
 - [x] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (`StatusIcon.tsx`)
 - [x] Split `AuthContext.tsx` — move hook to separate file (rule 10)
 - [x] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
-- [ ] Add import/order ESLint rule (rule 8)
-- [ ] Remove remaining `console.log` from CLI scripts (deploy-previews.ts, smoke-test.ts, seed.ts) — these are CLI tools, can keep
+- [x] Add `sort-imports` ESLint rule (rule 8) — configured in `eslint.config.js`, auto-fixed 94 files
+- [x] Remove remaining `console.log` from CLI scripts — all console.log calls already removed from src/
 
 ### 5. Expand Test Coverage
 - [ ] Add tests for 8 untested services (offline, audit, cache, email, payroll, backup, notifications, setup)
 - [ ] Raise test-to-source ratio from ~19% to 40%+
 
 ### 6. Dependency Cleanup
-- [ ] Remove unused runtime deps: `@sentry/replay`, `@sentry/tracing`, `tailwind-merge`
-- [ ] Remove unused devDeps: `husky`
-- [ ] Add missing deps: `jspdf`, `html2canvas`, `@axe-core/react` (if needed)
+- [x] Remove unused runtime deps: `@sentry/replay`, `@sentry/tracing`, `tailwind-merge` — already not in `package.json`
+- [x] Remove unused devDeps: `husky` — already not in `package.json`
+- [ ] Add missing deps: `jspdf`, `html2canvas`, `@axe-core/react` (type stubs exist in `third-party.d.ts`, decide if needed)

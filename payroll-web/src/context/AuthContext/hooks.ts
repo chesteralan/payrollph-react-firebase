@@ -1,11 +1,11 @@
 import {
-  useCallback,
-  useMemo,
-  useContext,
   createContext,
+  useCallback,
+  useContext,
+  useMemo,
   useSyncExternalStore,
 } from "react";
-import type { UserRestriction, Department, Section } from "@/types";
+import type { Department, Section, UserRestriction } from "@/types";
 import { ValueStore } from "@/utils/valueStore";
 
 // ──────────────────────────────────────────────

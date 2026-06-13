@@ -1,15 +1,15 @@
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
   addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
   serverTimestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import type { PayrollEmployee, Employee, EmployeeSalary } from "../types";
+import type { Employee, EmployeeSalary, PayrollEmployee } from "../types";
 
 export async function fetchPayrollEmployees(
   payrollId: string,

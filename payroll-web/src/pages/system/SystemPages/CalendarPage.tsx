@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  collection,
-  getDocs,
   addDoc,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
   query,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
-  Plus,
-  Edit,
-  Trash2,
-  Download,
-  Repeat,
   Calendar as CalendarIcon,
+  Download,
+  Edit,
+  Plus,
+  Repeat,
+  Trash2,
 } from "lucide-react";
 import type { CalendarEvent } from "./SystemPages.types";
 

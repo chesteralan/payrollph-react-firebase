@@ -1,14 +1,14 @@
 import { memo } from "react";
 import type { EmptyStateProps } from "./EmptyState.types";
 import {
-  FileText,
-  Users,
-  DollarSign,
-  Calendar,
-  BarChart3,
-  Settings,
-  FolderOpen,
   AlertCircle,
+  BarChart3,
+  Calendar,
+  DollarSign,
+  FileText,
+  FolderOpen,
+  Settings,
+  Users,
 } from "lucide-react";
 
 // ...existing code...

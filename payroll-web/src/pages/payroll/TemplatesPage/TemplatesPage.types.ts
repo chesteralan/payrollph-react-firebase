@@ -1,4 +1,4 @@
-import type { EmployeeGroup as EG, EmployeePosition as EP, EmployeeArea as EA, EmployeeStatus as ES } from "@/types/employee";
+import type { EmployeeArea as EA, EmployeeGroup as EG, EmployeePosition as EP, EmployeeStatus as ES } from "@/types/employee";
 
 export type EmployeeGroup = EG;
 export type EmployeePosition = EP;

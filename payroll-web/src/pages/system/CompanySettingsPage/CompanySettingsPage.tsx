@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Settings, Calculator, Monitor, Bell } from "lucide-react";
+import { Bell, Calculator, Monitor, Settings } from "lucide-react";
 import type { Company } from "@/types";
 
 import type { CompanySettings } from "./CompanySettingsPage.types";

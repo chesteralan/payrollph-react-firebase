@@ -1,4 +1,4 @@
-import { useContext, createContext, useSyncExternalStore } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import type { Company } from "@/types";
 import { ValueStore } from "@/utils/valueStore";
 

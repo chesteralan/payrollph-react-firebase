@@ -9,32 +9,32 @@
  * Firebase SDK primitives directly.
  */
 import {
+  create,
   getAll,
   getById,
-  create,
   update,
 } from "@/services/firestore";
 import type {
   Employee,
+  EmployeeArea,
+  EmployeeContact,
   EmployeeGroup,
   EmployeePosition,
-  EmployeeArea,
-  EmployeeStatus,
-  EmployeeContact,
   EmployeeProfile,
+  EmployeeStatus,
 } from "@/types/employee";
 import type { Company, CompanyOptions } from "@/types/company";
 import type {
   UserAccount,
-  UserSettings,
   UserCompany,
+  UserSettings,
 } from "@/types/user";
 import type {
   Payroll,
-  PayrollGroup,
   PayrollEmployee,
-  PayrollTemplate,
+  PayrollGroup,
   PayrollInclusiveDate,
+  PayrollTemplate,
 } from "@/types/payroll";
 
 // ──────────────────────────────────────────────

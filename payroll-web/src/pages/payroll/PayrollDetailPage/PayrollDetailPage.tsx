@@ -1,16 +1,16 @@
 // -nocheck
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
+  addDoc,
+  collection,
   doc,
   getDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
   getDocs,
-  addDoc,
+  query,
   serverTimestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useToast } from "@/hooks/useToast";
@@ -18,7 +18,7 @@ import { EditableCell } from "@/components/ui/EditableCell";
 import { PayrollOutputView } from "@/components/payroll/PayrollOutputView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Lock, Unlock, Save, Send } from "lucide-react";
+import { ArrowLeft, Lock, Save, Send, Unlock } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
 import { calculateWorkingDaysSync } from "@/utils/calendarUtils";
 import type {
@@ -39,7 +39,7 @@ const STAGES = [
 ];
 
 import type { ProcessingRow } from "../PayrollDetailPage.types";
-import { StageSelector, DTRStage } from "./PayrollStages";
+import { DTRStage, StageSelector } from "./PayrollStages";
 import { ComputationSummary } from "./ComputationSummary";
 import { ValidationPanel } from "./ValidationPanel";
 

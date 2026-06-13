@@ -1,10 +1,10 @@
 import {
-  collection,
   addDoc,
-  query,
-  orderBy,
-  limit,
+  collection,
   getDocs,
+  limit,
+  orderBy,
+  query,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebase";

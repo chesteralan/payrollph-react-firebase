@@ -3,12 +3,12 @@
 // This provides the client-side configuration and validation structure
 
 import {
-  doc,
-  setDoc,
-  updateDoc,
   collection,
+  doc,
   getDocs,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../config/firebase";

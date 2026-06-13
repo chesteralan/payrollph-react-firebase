@@ -138,7 +138,7 @@ async function checkStorage(): Promise<ServiceCheck> {
 // Health Check Page Component
 // ============================================================
 
-import { useState, useEffect, type FC } from "react";
+import { type FC, useEffect, useState } from "react";
 
 export const HealthCheckPage: FC = () => {
   const [health, setHealth] = useState<HealthStatus | null>(null);

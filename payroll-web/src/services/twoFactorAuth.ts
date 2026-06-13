@@ -4,16 +4,16 @@
 
 import { auth } from "../config/firebase";
 import {
+  multiFactor,
+  type MultiFactorError,
+  MultiFactorResolver,
   PhoneAuthProvider,
   PhoneMultiFactorGenerator,
-  MultiFactorResolver,
-  multiFactor,
   TotpMultiFactorGenerator,
   TotpSecret,
   type User,
-  type MultiFactorError,
 } from "firebase/auth";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 export interface TwoFactorSetupResult {

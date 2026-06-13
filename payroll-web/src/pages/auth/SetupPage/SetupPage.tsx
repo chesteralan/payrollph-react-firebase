@@ -1,10 +1,10 @@
 import type { SetupPageForm } from "./SetupPage.types";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { setupAdminUser, checkSetupNeeded } from "@/services/setup";
+import { checkSetupNeeded, setupAdminUser } from "@/services/setup";
 
 export function SetupPage() {
   const navigate = useNavigate();

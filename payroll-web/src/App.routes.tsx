@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/ui/ProtectedRoute";
 import { AppLayout } from "./components/layout/AppLayout";
 import { LazyPage } from "./components/ui/LazyPage";

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Plus, Trash2, Phone, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, Phone, Plus, Trash2 } from "lucide-react";
 import type { EmployeeContact } from "./EmployeeProfilePage.types";
 
 interface ContactForm {

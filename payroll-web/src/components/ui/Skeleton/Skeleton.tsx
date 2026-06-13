@@ -2,10 +2,10 @@ import { memo } from "react";
 import { clsx } from "clsx";
 
 import type {
-  SkeletonProps,
   CardSkeletonProps,
-  TableSkeletonProps,
   PageSkeletonProps,
+  SkeletonProps,
+  TableSkeletonProps,
 } from "./Skeleton.types";
 
 export const Skeleton = memo(function Skeleton({

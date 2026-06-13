@@ -1,39 +1,39 @@
 import {
-  useEffect,
-  useState,
-  useRef,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  EmailAuthProvider,
+  onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  setPersistence,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
   updatePassword,
-  sendPasswordResetEmail,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  setPersistence,
-  browserSessionPersistence,
-  browserLocalPersistence,
 } from "firebase/auth";
 import type { User as FirebaseUser } from "firebase/auth";
 import {
+  collection,
   doc,
   getDoc,
-  collection,
+  getDocs,
   query,
   where,
-  getDocs,
 } from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
 import type {
-  UserAccount,
-  UserRestriction,
-  UserCompany,
-  UserSettings,
   Department,
   Section,
+  UserAccount,
+  UserCompany,
+  UserRestriction,
+  UserSettings,
 } from "@/types";
 import type { Locale } from "@/i18n";
 import { setHtmlLang } from "@/i18n";

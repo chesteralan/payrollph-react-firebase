@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  collection,
-  getDocs,
   addDoc,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
+  getDocs,
   query,
+  updateDoc,
   where,
   writeBatch,
 } from "firebase/firestore";
@@ -20,26 +20,26 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { useTableSort } from "@/hooks/useTableSort";
 import {
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-  X,
+  AlertCircle,
   Check,
-  Shield,
-  ChevronUp,
+  CheckSquare,
   ChevronDown,
   ChevronsUpDown,
-  Upload,
-  AlertCircle,
-  CheckSquare,
+  ChevronUp,
+  Edit,
+  Plus,
+  Save,
+  Shield,
   Square,
+  Trash2,
+  Upload,
+  X,
 } from "lucide-react";
 import type {
-  UserAccount,
-  UserRestriction,
   Department,
   Section,
+  UserAccount,
+  UserRestriction,
 } from "@/types";
 import { DEPARTMENTS } from "./SystemPages.constants";
 
