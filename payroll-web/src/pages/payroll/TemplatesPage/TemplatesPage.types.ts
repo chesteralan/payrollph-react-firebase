@@ -11,6 +11,13 @@ export interface PayrollTemplate {
   description?: string;
   companyId: string;
   isActive: boolean;
+  pages?: number;
+  printFormat?: string;
+  groupBy?: string;
+  earnings?: string[];
+  deductions?: string[];
+  benefits?: string[];
+  printColumns?: string[];
   createdAt: Date;
   updatedAt: Date;
   groups?: EmployeeGroup[];
@@ -19,10 +26,16 @@ export interface PayrollTemplate {
 export interface PrintFormat {
   id: string;
   name: string;
-  outputFormat: string;
+  outputType: string;
+  isActive?: boolean;
   paperSize: string;
   orientation: string;
   [key: string]: unknown;
+}
+
+export interface SelectionItem {
+  id: string;
+  label: string;
 }
 
 export interface TemplatesPageFilters {

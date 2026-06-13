@@ -72,7 +72,7 @@ export function Report13thMonthPage() {
 
         for (const payroll of empPayrolls) {
           const month = payroll.month;
-          monthsWorked.add(month);
+          if (month != null) monthsWorked.add(month);
           totalBasic += payroll.totalBasic || 0;
         }
 

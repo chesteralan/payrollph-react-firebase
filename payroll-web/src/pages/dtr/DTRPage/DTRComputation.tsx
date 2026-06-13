@@ -6,8 +6,8 @@ import type { DTREntry } from "@/types/dtr";
  */
 export function calcHours(timeIn: string, timeOut: string): number {
   if (!timeIn || !timeOut) return 0;
-  const [h1, m1] = timeIn.split(":").map(Number);
-  const [h2, m2] = timeOut.split(":").map(Number);
+  const [h1 = 0, m1 = 0] = timeIn.split(":").map(Number);
+  const [h2 = 0, m2 = 0] = timeOut.split(":").map(Number);
   const diff = h2 * 60 + m2 - (h1 * 60 + m1);
   return diff > 0 ? Math.round((diff / 60) * 100) / 100 : 0;
 }

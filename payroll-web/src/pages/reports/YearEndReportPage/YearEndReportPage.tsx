@@ -145,6 +145,7 @@ export function YearEndReportPage() {
         0,
       ),
       total13thMonth: summaries.reduce((sum, s) => sum + s.total13thMonth, 0),
+      totalTaxWithheld: 0,
       totalEmployees: summaries.length,
       totalPayrollRuns: summaries.reduce(
         (sum, s) => Math.max(sum, s.payrollRuns),

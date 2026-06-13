@@ -117,7 +117,7 @@ export function CalendarPage() {
   const handleEdit = (event: CalendarEvent) => {
     setEditingId(event.id);
     setFormData({
-      date: new Date(event.date).toISOString().split("T")[0],
+      date: new Date(event.date).toISOString().split("T")[0]!,
       name: event.name,
       type: event.type,
       isPaid: event.isPaid ?? true,

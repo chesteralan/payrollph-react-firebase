@@ -33,6 +33,7 @@ export async function fetchEmployeeDetails(
     );
     if (!snap.empty) {
       const emp = snap.docs[0];
+      if (!emp) continue;
       map.set(nameId, { id: emp.id, ...emp.data() } as Employee);
     }
   }
@@ -54,6 +55,7 @@ export async function fetchEmployeeSalaries(
     );
     if (!snap.empty) {
       const sal = snap.docs[0];
+      if (!sal) continue;
       map.set(empId, { id: sal.id, ...sal.data() } as EmployeeSalary);
     }
   }
@@ -89,7 +91,9 @@ export async function updatePayrollDTR(
     ),
   );
   if (!snap.empty) {
-    await updateDoc(doc(db, "payroll_employees", snap.docs[0].id), data);
+    const dtrDoc = snap.docs[0];
+    if (!dtrDoc) return;
+    await updateDoc(doc(db, "payroll_employees", dtrDoc.id), data);
   }
 }
 
@@ -108,7 +112,9 @@ export async function savePayrollEarning(
     ),
   );
   if (!snap.empty) {
-    await updateDoc(doc(db, "payroll_employees_earnings", snap.docs[0].id), {
+    const earningDoc = snap.docs[0];
+    if (!earningDoc) return;
+    await updateDoc(doc(db, "payroll_employees_earnings", earningDoc.id), {
       amount,
     });
   } else {
@@ -137,7 +143,9 @@ export async function savePayrollDeduction(
     ),
   );
   if (!snap.empty) {
-    await updateDoc(doc(db, "payroll_employees_deductions", snap.docs[0].id), {
+    const deductionDoc = snap.docs[0];
+    if (!deductionDoc) return;
+    await updateDoc(doc(db, "payroll_employees_deductions", deductionDoc.id), {
       amount,
     });
   } else {
@@ -167,7 +175,9 @@ export async function savePayrollBenefit(
     ),
   );
   if (!snap.empty) {
-    await updateDoc(doc(db, "payroll_employees_benefits", snap.docs[0].id), {
+    const benefitDoc = snap.docs[0];
+    if (!benefitDoc) return;
+    await updateDoc(doc(db, "payroll_employees_benefits", benefitDoc.id), {
       employeeShare,
       employerShare,
     });

@@ -5,6 +5,9 @@ export interface DashboardStats {
   pendingPayrolls: number;
   totalCompanies: number;
   recentActivities: number;
+  publishedPayrolls: number;
+  recentPayrolls: Array<{ id: string; name: string; status: string; month: number; year: number }>;
+  upcomingPayrolls: Array<{ id: string; name: string; status: string; month: number; year: number }>;
 }
 
 export interface DashboardWidget {

@@ -47,7 +47,7 @@ export function UsersPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
   const { addToast } = useToast();
   const [users, setUsers] = useState<
-    (UserAccount & { restrictions?: UserRestriction[] })[]
+    (UserAccount & { restrictions?: UserRestriction[]; role?: string })[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -260,7 +260,7 @@ export function UsersPage() {
       const text = event.target?.result as string;
       const lines = text.split("\n").filter((line) => line.trim());
 
-      const startIndex = lines[0].toLowerCase().includes("email") ? 1 : 0;
+      const startIndex = lines[0]?.toLowerCase().includes("email") ? 1 : 0;
 
       const existingEmails = new Set(users.map((u) => u.email.toLowerCase()));
 
@@ -303,7 +303,7 @@ export function UsersPage() {
         error?: string;
       }[] = [];
       for (let i = startIndex; i < lines.length; i++) {
-        const line = lines[i].trim();
+        const line = lines[i]?.trim();
         if (!line) continue;
 
         const columns = line.split(",").map((c) => c.trim());
@@ -500,7 +500,7 @@ export function UsersPage() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="warning"
+                  variant="secondary"
                   onClick={() => handleBulkStatusUpdate(false)}
                   disabled={bulkLoading}
                 >

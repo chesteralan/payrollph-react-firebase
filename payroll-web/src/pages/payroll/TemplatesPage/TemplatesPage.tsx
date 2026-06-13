@@ -503,7 +503,7 @@ export function TemplatesPage() {
               <div className="space-y-6">
                 <SelectionPanel
                   title="Earnings"
-                  items={earningsList}
+                  items={earningsList.map((e) => ({ id: e.id, label: e.name }))}
                   selected={selectedEarnings}
                   onToggle={(id) =>
                     toggleItem(selectedEarnings, id, setSelectedEarnings)
@@ -511,7 +511,7 @@ export function TemplatesPage() {
                 />
                 <SelectionPanel
                   title="Deductions"
-                  items={deductionsList}
+                  items={deductionsList.map((d) => ({ id: d.id, label: d.name }))}
                   selected={selectedDeductions}
                   onToggle={(id) =>
                     toggleItem(selectedDeductions, id, setSelectedDeductions)
@@ -519,7 +519,7 @@ export function TemplatesPage() {
                 />
                 <SelectionPanel
                   title="Benefits"
-                  items={benefitsList}
+                  items={benefitsList.map((b) => ({ id: b.id, label: b.name }))}
                   selected={selectedBenefits}
                   onToggle={(id) =>
                     toggleItem(selectedBenefits, id, setSelectedBenefits)

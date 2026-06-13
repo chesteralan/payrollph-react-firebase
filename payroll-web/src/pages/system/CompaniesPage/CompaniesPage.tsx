@@ -46,7 +46,13 @@ export function CompaniesPage() {
     printCss: "",
     defaultWorkdays: 22,
     currency: "PHP",
-    payrollPeriods: [] as import("./CompaniesPage.types").PayrollPeriod[],
+    payrollPeriods: [] as Array<{
+      type: "monthly" | "semi-monthly" | "bi-weekly" | "weekly";
+      cutOff1Day?: number;
+      cutOff2Day?: number;
+      payDay?: number;
+      frequency?: string;
+    }>,
   });
 
   const [columnGroup, setColumnGroup] = useState<
@@ -173,7 +179,7 @@ export function CompaniesPage() {
     value: string | number | undefined,
   ) => {
     const updated = [...formData.payrollPeriods];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = { ...updated[index], [field]: value } as unknown as PayrollPeriod;
     setFormData({ ...formData, payrollPeriods: updated });
   };
 

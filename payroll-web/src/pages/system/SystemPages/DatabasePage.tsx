@@ -29,6 +29,7 @@ export function DatabasePage() {
       collections: string[];
       size: number;
       status: string;
+      totalDocuments?: number;
     }>
   >([]);
   const [loading, setLoading] = useState(true);
@@ -876,7 +877,7 @@ export function DatabasePage() {
                 id: "expiredLeave",
                 name: "Expire Old Leave Applications",
                 desc: "Mark approved/pending leave applications as expired if end date passed",
-                variant: "secondary" as const,
+                variant: "info" as const,
               },
               {
                 id: "softDeleted",
@@ -888,7 +889,7 @@ export function DatabasePage() {
                 id: "archivePayroll",
                 name: "Archive Old Payroll Runs",
                 desc: `Mark payroll runs and related data older than ${archiveYears} years as archived`,
-                variant: "secondary" as const,
+                variant: "info" as const,
               },
             ].map((op) => (
               <div
@@ -911,8 +912,8 @@ export function DatabasePage() {
                       variant={
                         op.variant === "danger"
                           ? "danger"
-                          : op.variant === "warning"
-                            ? "warning"
+                          : op.variant === "info"
+                            ? "secondary"
                             : "secondary"
                       }
                       size="sm"

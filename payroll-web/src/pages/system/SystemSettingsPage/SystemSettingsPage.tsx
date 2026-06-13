@@ -204,7 +204,6 @@ export function SystemSettingsPage() {
                   <Toggle
                     checked={settings.maintenanceMode}
                     onChange={(val) => updateSetting("maintenanceMode", val)}
-                    disabled={!canEdit("system", "companies")}
                   />
                 </div>
                 {settings.maintenanceMode && (
@@ -267,7 +266,6 @@ export function SystemSettingsPage() {
                     onChange={(val) =>
                       updateSetting("passwordRequireSpecialChars", val)
                     }
-                    disabled={!canEdit("system", "companies")}
                   />
                 </div>
               </div>
@@ -297,7 +295,6 @@ export function SystemSettingsPage() {
                   <Toggle
                     checked={settings.autoCleanup}
                     onChange={(val) => updateSetting("autoCleanup", val)}
-                    disabled={!canEdit("system", "companies")}
                   />
                 </div>
               </div>

@@ -10,6 +10,7 @@ import { Download, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import type {
   Payroll,
+  PayrollEmployee,
   PayrollEmployeeBenefit,
   PayrollEmployeeDeduction,
   PayrollEmployeeEarning,
@@ -217,7 +218,7 @@ export function EarningsDeductionsReportPage() {
           ),
         ]);
 
-      const employees = new Map(
+      const employees = new Map<string, Record<string, unknown>>(
         employeesSnap.docs.map((d) => [
           d.data().nameId,
           { id: d.id, ...d.data() },

@@ -12,6 +12,8 @@ export interface CsvPreviewRow {
   middleName?: string;
   lastName: string;
   suffix?: string;
+  isValid?: boolean;
+  error?: string;
   errors?: string[];
 }
 

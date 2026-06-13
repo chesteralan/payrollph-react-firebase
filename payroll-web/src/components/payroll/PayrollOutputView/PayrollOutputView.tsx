@@ -1113,7 +1113,7 @@ export function PayrollOutputView({
   const [filterGroup, setFilterGroup] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
   const [filterArea, setFilterArea] = useState("");
-  const [visibleColumns, setVisibleColumns] = useState({
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
     basic: true,
     earnings: true,
     gross: true,
@@ -1148,7 +1148,7 @@ export function PayrollOutputView({
     });
   }, [rows, filterGroup, filterPosition, filterArea]);
 
-  const hasActiveFilters = filterGroup || filterPosition || filterArea;
+  const hasActiveFilters = !!(filterGroup || filterPosition || filterArea);
   const activeFilterCount = [filterGroup, filterPosition, filterArea].filter(
     Boolean,
   ).length;

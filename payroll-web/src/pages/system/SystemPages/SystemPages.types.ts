@@ -2,6 +2,7 @@ import type { CalendarEntry } from "@/types";
 
 export interface CalendarEvent extends CalendarEntry {
   isPaid?: boolean;
+  recurring?: boolean;
 }
 
 export type Department =

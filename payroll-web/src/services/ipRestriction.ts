@@ -176,7 +176,9 @@ const matchesIp = (
 
   // CIDR matching for IPv4
   if (restrictedIp.includes("/")) {
-    const [baseIp, cidrStr] = restrictedIp.split("/");
+    const parts = restrictedIp.split("/");
+    const baseIp = parts[0] ?? "";
+    const cidrStr = parts[1] ?? "32";
     const cidr = parseInt(cidrStr, 10);
     return isInSubnet(clientIp, baseIp, cidr);
   }
@@ -200,14 +202,12 @@ const isInSubnet = (
 
   if (ipParts.length !== 4 || baseParts.length !== 4) return false;
 
+  const [p0 = 0, p1 = 0, p2 = 0, p3 = 0] = ipParts;
+  const [b0 = 0, b1 = 0, b2 = 0, b3 = 0] = baseParts;
+
   // Convert to 32-bit integers
-  const ipInt =
-    (ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3];
-  const baseInt =
-    (baseParts[0] << 24) |
-    (baseParts[1] << 16) |
-    (baseParts[2] << 8) |
-    baseParts[3];
+  const ipInt = (p0 << 24) | (p1 << 16) | (p2 << 8) | p3;
+  const baseInt = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
 
   // Create mask
   const mask = subnetMask === 0 ? 0 : (0xffffffff << (32 - subnetMask)) >>> 0;
@@ -266,8 +266,8 @@ export const parseCidr = (
   if (!match) return null;
 
   return {
-    baseIp: match[1],
-    subnet: parseInt(match[2], 10),
+    baseIp: match[1] ?? "",
+    subnet: parseInt(match[2] ?? "0", 10),
   };
 };
 

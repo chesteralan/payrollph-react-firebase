@@ -41,10 +41,12 @@ export function DashboardPage() {
     totalEmployees: 0,
     activeEmployees: 0,
     totalPayrolls: 0,
+    pendingPayrolls: 0,
     publishedPayrolls: 0,
     totalCompanies: 0,
-    upcomingPayrolls: [],
-    recentPayrolls: [],
+    recentActivities: 0,
+    upcomingPayrolls: [] as Array<{id: string; name: string; status: string; month: number; year: number}>,
+    recentPayrolls: [] as Array<{id: string; name: string; status: string; month: number; year: number}>,
   });
   const [loading, setLoading] = useState(true);
 
@@ -113,6 +115,7 @@ export function DashboardPage() {
           name: p.name,
           month: p.month,
           year: p.year,
+          status: p.status || "draft",
         }));
 
       const recentPayrolls = payrolls.slice(0, 5).map((p) => ({
@@ -128,8 +131,10 @@ export function DashboardPage() {
         totalEmployees: employees.length,
         activeEmployees,
         totalPayrolls: payrolls.length,
+        pendingPayrolls: upcomingPayrolls.length,
         publishedPayrolls,
         totalCompanies: companies.length,
+        recentActivities: recentPayrolls.length,
         upcomingPayrolls,
         recentPayrolls,
       });

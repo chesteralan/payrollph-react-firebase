@@ -60,4 +60,5 @@ export type Section =
   | "terms"
   | "users"
   | "audit"
-  | "database";
+  | "database"
+  | "attendance";

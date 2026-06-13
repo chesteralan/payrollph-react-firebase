@@ -11,7 +11,7 @@
  *   - FIRESTORE_EMULATOR_HOST set (for local) or live Firestore access
  */
 
-import { cert, initializeApp, type ServiceAccount } from "firebase-admin/app";
+import { cert, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 // ============================================================
@@ -56,7 +56,7 @@ const DEPARTMENTS = [
 ];
 
 function randomElement<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
 function randomInt(min: number, max: number): number {
@@ -78,7 +78,7 @@ function randomDate(start: Date, end: Date): Date {
 async function seedDatabase() {
   // Initialize Firebase Admin
   const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-    ? (JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount)
+    ? (JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as Record<string, unknown>)
     : undefined;
 
   const app = initializeApp(
@@ -102,7 +102,7 @@ async function seedDatabase() {
       name: `PayrollPH ${["Demo Corp", "Sample Inc", "Test LLC"][i]}`,
       isActive: true,
       address: `${[100, 200, 300][i]} ${["Ayala Ave", "Makati Ave", "EDSA"][i]}, Makati City`,
-      contactEmail: `info@${companyCodes[i].toLowerCase()}corp.com`,
+      contactEmail: `info@${companyCodes[i]!.toLowerCase()}corp.com`,
       contactPhone: `+63${String(randomInt(9000000000, 9999999999))}`,
       settings: {
         workDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -132,7 +132,7 @@ async function seedDatabase() {
       const employeeRef = db.collection("employees").doc();
       await employeeRef.set({
         companyId,
-        employeeCode: generateEmployeeCode(i + 1, companyCodes[companyIds.indexOf(companyId)]),
+        employeeCode: generateEmployeeCode(i + 1, companyCodes[companyIds.indexOf(companyId)]!),
         firstName,
         lastName,
         fullName: `${firstName} ${lastName}`,
@@ -174,8 +174,8 @@ async function seedDatabase() {
       const role = USER_ROLES[i];
       const userRef = db.collection("user_accounts").doc();
       await userRef.set({
-        email: `${role}@${companyCodes[companyIds.indexOf(companyId)].toLowerCase()}corp.com`,
-        displayName: `${role.charAt(0).toUpperCase() + role.slice(1)} User`,
+        email: `${role}@${companyCodes[companyIds.indexOf(companyId)]!.toLowerCase()}corp.com`,
+        displayName: `${role!.charAt(0).toUpperCase() + role!.slice(1)} User`,
         role,
         companyIds: [companyId],
         isActive: true,

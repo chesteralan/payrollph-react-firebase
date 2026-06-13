@@ -1,3 +1,5 @@
+import type { Employee, EmployeeContact, EmployeeProfile } from "@/types";
+
 export interface EmployeeReportFilter {
   companyId: string;
   dateFrom: string;
@@ -21,4 +23,16 @@ export interface EmployeeReportSummary {
   totalDeductions: number;
   totalNetPay: number;
   employeeCount: number;
+}
+
+export interface EmployeeReportData extends Employee {
+  name: string;
+  groupName?: string;
+  positionName?: string;
+  areaName?: string;
+  statusName?: string;
+  salary?: number;
+  salaryFrequency?: string;
+  contacts: EmployeeContact[];
+  profile?: EmployeeProfile;
 }

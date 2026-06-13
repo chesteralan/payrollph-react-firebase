@@ -215,6 +215,8 @@ export function TermsPage() {
                 type: "semi-monthly",
                 frequency: "",
                 daysPerPeriod: 0,
+                cutOff1: 0,
+                cutOff2: 0,
               });
               setShowForm(!showForm);
             }}
@@ -512,13 +514,15 @@ export function TermsPage() {
           confirmText="Delete"
           onConfirm={() => handleDelete(confirmDelete)}
         >
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setConfirmDelete(null)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          {(_open) => (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirmDelete(null)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
         </ConfirmDialog>
       )}
     </div>

@@ -133,8 +133,8 @@ export function EmployeeProfilePage() {
       if (empSnap.exists())
         setEmployee({ id: empSnap.id, ...empSnap.data() } as Employee);
       if (!profileSnap.empty) {
-        const p = profileSnap.docs[0].data();
-        setProfile({ id: profileSnap.docs[0].id, ...p } as EmployeeProfile);
+        const p = profileSnap.docs[0]!.data();
+        setProfile({ id: profileSnap.docs[0]!.id, ...p } as EmployeeProfile);
         setProfileForm({
           sss: p.sss || "",
           tin: p.tin || "",
@@ -143,7 +143,7 @@ export function EmployeeProfilePage() {
           bankName: p.bankName || "",
           bankAccount: p.bankAccount || "",
           dateOfBirth: p.dateOfBirth
-            ? new Date(p.dateOfBirth).toISOString().split("T")[0]
+            ? new Date(p.dateOfBirth).toISOString().split("T")[0] || ""
             : "",
           gender: p.gender || "",
           civilStatus: p.civilStatus || "",
@@ -156,13 +156,13 @@ export function EmployeeProfilePage() {
         })) as EmployeeContact[],
       );
       if (!salarySnap.empty) {
-        const s = salarySnap.docs[0].data();
-        setSalary({ id: salarySnap.docs[0].id, ...s } as EmployeeSalary);
+        const s = salarySnap.docs[0]!.data();
+        setSalary({ id: salarySnap.docs[0]!.id, ...s } as EmployeeSalary);
         setSalaryForm({
           amount: String(s.amount || ""),
           frequency: s.frequency || "monthly",
           effectiveDate: s.effectiveDate
-            ? new Date(s.effectiveDate).toISOString().split("T")[0]
+            ? new Date(s.effectiveDate).toISOString().split("T")[0] || ""
             : "",
         });
       }
@@ -358,7 +358,7 @@ export function EmployeeProfilePage() {
       addToast({
         type: "success",
         title: "Document deleted",
-        message: `${doc.fileName} deleted successfully`,
+        message: `${document.fileName} deleted successfully`,
       });
       loadData();
     } catch (error) {

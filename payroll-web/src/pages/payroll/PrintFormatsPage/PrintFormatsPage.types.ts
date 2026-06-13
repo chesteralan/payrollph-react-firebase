@@ -5,7 +5,7 @@ export interface PrintFormat {
   outputType: string;
   paperSize: string;
   orientation: string;
-  fontSize: number;
+  fontSize: "xs" | "sm" | "md" | "lg";
   showHeader: boolean;
   showFooter: boolean;
   headerHtml?: string;
@@ -16,6 +16,10 @@ export interface PrintFormat {
   showCompanyTIN: boolean;
   showTitle: boolean;
   showPeriod: boolean;
+  showSignatureLines: boolean;
+  signatureLabels: string[];
+  columnOrder: string[];
+  includeTotals: boolean;
   companyId: string;
   isDefault: boolean;
   template?: string;

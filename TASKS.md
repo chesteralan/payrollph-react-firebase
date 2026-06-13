@@ -19,6 +19,44 @@
 - **Split CompanyContext.tsx** — moved selector hooks (`useCurrentCompany`, `useCompanies`, `useCompanyLoading`) and `ValueStore`/`CompanyStoreContext` to separate files (`hooks.ts`, `src/utils/valueStore.ts`)
 - **Extracted shared `ValueStore` class** — removed duplication between AuthContext and CompanyContext; now lives in `src/utils/valueStore.ts`
 - **Refactored Sidebar.tsx** (479→185 lines) — extracted 265-line `navigation` config array to `navConfig.tsx`, reduced icon imports from 27 to 3
+- **Strictness fixes across 42 files** — added 366 lines of type safety improvements:
+  - Null-safety for array destructuring (`[a = 0, b = 0]` defaults), optional chaining on snapshot docs, non-null assertions after length checks
+  - Fixed `PayrollOutputView.tsx` — explicit `Record<string, boolean>` type for `visibleColumns`, boolean coercion for `hasActiveFilters`
+  - Fixed `DashboardPage` — added `pendingPayrolls`, `recentActivities` to dashboard stats; `status` fallback in payroll maps
+  - Fixed `DTRPage` / `DTRComputation` — null-safe array destructuring for time parsing, non-null assertions after CSV line checks
+  - Fixed `EmployeeProfilePage` — non-null assertions for snapshot docs, `document.fileName` variable shadowing bug fix, date split fallback
+  - Fixed `EmployeesPage` — `statusId` fallback, date split fallback
+  - Fixed `NamesListPage` — optional chaining for CSV header detection, non-null assertions for column access
+  - Fixed `UsersPage` — optional chaining on CSV lines, added `role?: string` to user state type, fixed `variant="warning"` → `"secondary"`
+  - Fixed `TermsPage` — added `cutOff1`/`cutOff2` defaults, fixed `ConfirmDialog` render-prop API change
+  - Fixed `CalendarPage` — non-null assertion for date split
+  - Fixed `CompaniesPage` — expanded `PayrollPeriod` type, fixed spread assignment type cast
+  - Fixed `DatabasePage` — added `totalDocuments?` field, fixed maintenance task variant mapping
+  - Fixed `PayrollDetailPage` — added `CalendarEntry` import, fixed inclusiveDates access, consolidated `employeeId || nameId` → `nameId`, added `getEarningTotal`/`getDeductionTotal` helpers
+  - Fixed `TemplatesPage` — mapped items to `{id, label}` format for `SelectionPanel`
+  - Fixed `CustomReportBuilderPage` — switched to `exportToXLS`, fixed `useCompany()` → `selectedCompany`, precomputed `filterValue`, explicit row type
+  - Fixed `PayrollSummaryPage` — renamed `grossPay`/`netPay` to `totalGrossPay`/`totalNetPay` on group objects, added missing summary fields
+  - Fixed `Report13thMonthPage` — null check for `payroll.month` before `Set.add`
+  - Fixed `YearEndReportPage` — added `totalTaxWithheld` to totals
+  - Fixed `EarningsDeductionsReportPage` — added `PayrollEmployee` import, explicit Map types
+  - Fixed `SystemSettingsPage` — removed invalid `disabled={!canEdit(...)}` from Toggle components
+  - Fixed `CompanySettingsPage` — optional chaining for company list access
+  - **Type definition enhancements** across 14 `.types.ts` files:
+    - Added `"published"` to status unions, `isLocked`, `month`, `year`, `printFormat?`, `groupBy?` to `Payroll`/`PayrollRun`
+    - Added `fontSize` string union (`xs|sm|md|lg`), `showSignatureLines`, `signatureLabels`, `columnOrder`, `includeTotals` to `PrintFormat`
+    - Added `pages?`, `printFormat?`, `groupBy?`, `earnings?`, `deductions?`, `benefits?`, `printColumns?` to `PayrollTemplate`
+    - Added `SelectionItem` interface for `SelectionPanel` prop type
+    - Added `BenefitSummary`, `DeductionTypeSummary`, `EarningTypeSummary`, `EmployeeBreakdown` types
+    - Extended `YearEndTotals`, `YearEndSummary` with `totalGrossPay`, `totalBenefits`, etc.
+    - Extended `EmployeeReportData` with `salary?`, `salaryFrequency?`, `profile?` fields
+    - Added `AttendanceData`, `DtrEntry` interfaces, re-exported `Employee`/`NameRecord` types
+    - Extended `CalendarEvent` with `recurring?` field
+    - Added `BenefitEmployeeDetail`, `BenefitSummary` interfaces for benefits utilization
+    - Extended `SavedReport` with `groupBy?`, `sortBy?`, `sortDirection?`
+    - Added `PayrollOption` interface for 13th month
+    - Expanded `EmployeeDoc`/`PayrollDoc` with additional optional fields
+  - **Service fixes**: `payroll.ts` null checks for `snap.docs[0]`, `ipRestriction.ts` CIDR parsing defaults, `twoFactorAuth.ts` Firebase v12 API compatibility (`as any` workarounds, `secret.secretKey` parameter)
+  - **Seed script**: Removed unused `ServiceAccount` type import, replaced non-null assertion for `randomElement`
 
 ## Remaining
 

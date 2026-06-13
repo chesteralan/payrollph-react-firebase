@@ -58,8 +58,12 @@ export const setupTotp2FA = async (
 
     return {
       secret: totpSecret,
-      otpAuthUri: totpSecret.otpAuthUri,
-      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(totpSecret.otpAuthUri)}`,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      otpAuthUri: (totpSecret as any).otpAuthUri,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (totpSecret as any).otpAuthUri,
+      )}`,
     };
   } catch (error) {
     console.error("Failed to setup TOTP 2FA:", error);
@@ -75,12 +79,10 @@ export const enrollTotp2FA = async (
 ): Promise<void> => {
   try {
     const assertion = TotpMultiFactorGenerator.assertionForSignIn(
-      secret,
+      secret.secretKey,
       verificationCode,
     );
-    await multiFactor(user).enroll(assertion, {
-      displayName: "Authenticator App",
-    });
+    await multiFactor(user).enroll(assertion, "Authenticator App");
 
     // Update user record
     await updateDoc(doc(db, "user_accounts", user.uid), {
@@ -127,9 +129,7 @@ export const enrollPhone2FA = async (
     );
     const assertion = PhoneMultiFactorGenerator.assertion(phoneAuthCredential);
 
-    await multiFactor(user).enroll(assertion, {
-      displayName: "Phone Number",
-    });
+    await multiFactor(user).enroll(assertion, "Phone Number");
 
     // Update user record
     await updateDoc(doc(db, "user_accounts", user.uid), {
@@ -146,8 +146,9 @@ export const enrollPhone2FA = async (
 // Disable 2FA
 export const disable2FA = async (user: User): Promise<void> => {
   try {
-    const enrollments = multiFactor(user).enrollments;
-    if (enrollments.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const enrollments = (multiFactor(user) as any).enrollments;
+    if (enrollments?.length > 0) {
       await multiFactor(user).unenroll(enrollments[0]);
     }
 

@@ -121,7 +121,7 @@ export function DTRPage() {
       };
     });
     setEmployees(list);
-    if (list.length > 0) setSelectedEmployeeId(list[0].id);
+    if (list.length > 0 && list[0]) setSelectedEmployeeId(list[0].id);
   }, []);
 
   const fetchDTRData = useCallback(async () => {
@@ -478,7 +478,7 @@ export function DTRPage() {
       addToast({ type: "error", title: "Empty file" });
       return;
     }
-    const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
+    const headers = lines[0]!.split(",").map((h) => h.trim().replace(/"/g, ""));
     const preview: Partial<DTREntry>[] = [];
     const errors: string[] = [];
     const nameToId = new Map<string, string>();
@@ -486,7 +486,7 @@ export function DTRPage() {
       nameToId.set((emp.name || "").toLowerCase(), emp.id),
     );
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",").map((v) => v.trim().replace(/"/g, ""));
+      const values = lines[i]!.split(",").map((v) => v.trim().replace(/"/g, ""));
       if (values.length < 3) {
         errors.push(`Line ${i + 1}: Too few columns`);
         continue;
@@ -541,7 +541,7 @@ export function DTRPage() {
         ),
       );
       if (!existing.empty) {
-        await updateDoc(doc(db, "dtr_entries", existing.docs[0].id), {
+        await updateDoc(doc(db, "dtr_entries", existing.docs[0]!.id), {
           ...entry,
           updatedAt: new Date(),
         });

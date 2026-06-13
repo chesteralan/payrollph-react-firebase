@@ -1,9 +1,20 @@
 export interface Employee13thMonth {
-  employeeId: string;
-  employeeName: string;
-  basicSalary: number;
+  employeeId?: string;
+  employeeCode: string;
+  employeeName?: string;
+  firstName: string;
+  lastName: string;
+  hireDate: Date | null;
+  basicSalary?: number;
+  totalBasicSalary: number;
   monthsWorked: number;
-  proRataAmount: number;
+  proRataAmount?: number;
+  thirteenthMonth: number;
+}
+
+export interface PayrollOption {
+  id: string;
+  name: string;
 }
 
 export interface EmployeeDoc {
@@ -12,6 +23,9 @@ export interface EmployeeDoc {
   companyId: string;
   isActive: boolean;
   employeeCode: string;
+  hireDate?: string;
+  firstName?: string;
+  lastName?: string;
   [key: string]: unknown;
 }
 
@@ -21,6 +35,9 @@ export interface PayrollDoc {
   periodStart: string;
   periodEnd: string;
   status: string;
+  month?: number;
+  totalBasic?: number;
+  employees?: Array<{ nameId: string; [key: string]: unknown }>;
   [key: string]: unknown;
 }
 

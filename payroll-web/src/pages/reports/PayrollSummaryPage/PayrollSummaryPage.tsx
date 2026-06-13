@@ -61,14 +61,14 @@ export function PayrollSummaryPage() {
           groupId: groupKey,
           groupName: emp.groupId || "Ungrouped",
           employeeCount: 0,
-          grossPay: 0,
-          netPay: 0,
+          totalGrossPay: 0,
+          totalNetPay: 0,
         });
       }
       const group = groupMap.get(groupKey)!;
       group.employeeCount++;
-      group.grossPay += emp.grossPay || 0;
-      group.netPay += emp.netPay || 0;
+      group.totalGrossPay += emp.grossPay || 0;
+      group.totalNetPay += emp.netPay || 0;
     }
 
     return Array.from(groupMap.values());
@@ -132,6 +132,11 @@ export function PayrollSummaryPage() {
           grossPay: employees.reduce((sum, e) => sum + (e.grossPay || 0), 0),
           netPay: employees.reduce((sum, e) => sum + (e.netPay || 0), 0),
           groups,
+          periodStart: "",
+          periodEnd: "",
+          totalGrossPay: employees.reduce((sum, e) => sum + (e.grossPay || 0), 0),
+          totalDeductions: 0,
+          totalNetPay: employees.reduce((sum, e) => sum + (e.netPay || 0), 0),
         });
       }
 
@@ -492,10 +497,10 @@ export function PayrollSummaryPage() {
                                             {g.employeeCount}
                                           </td>
                                           <td className="py-2 text-sm text-right">
-                                            {formatCurrency(g.grossPay)}
+                                            {formatCurrency(g.totalGrossPay)}
                                           </td>
                                           <td className="py-2 text-sm text-right">
-                                            {formatCurrency(g.netPay)}
+                                            {formatCurrency(g.totalNetPay)}
                                           </td>
                                         </tr>
                                       ))}

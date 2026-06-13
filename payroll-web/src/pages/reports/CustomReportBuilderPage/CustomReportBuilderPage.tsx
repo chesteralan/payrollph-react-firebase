@@ -3,7 +3,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useCompany } from "@/hooks/useCompany";
 import type { Employee, Payroll, PayrollEmployee } from "@/types";
-import { exportToXlsx } from "@/utils/exportUtils";
+import { exportToXLS } from "@/utils/exportUtils";
 
 import type {
   ReportField,
@@ -145,7 +145,8 @@ const AVAILABLE_FIELDS: ReportField[] = [
 ];
 
 export default function CustomReportBuilderPage() {
-  const { currentCompanyId } = useCompany();
+  const { selectedCompany: currentCompany } = useCompany();
+  const currentCompanyId = currentCompany?.id;
   const [reportName, setReportName] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([
     "emp_name",
@@ -239,7 +240,7 @@ export default function CustomReportBuilderPage() {
       })) as PayrollEmployee[];
 
       // Build report data
-      let data = payrollEmps.map((pe) => {
+      let data: Record<string, unknown>[] = payrollEmps.map((pe) => {
         const emp = employees.find((e) => e.nameId === pe.nameId);
         const payroll = payrolls.find((p) => p.id === pe.payrollId);
 
@@ -261,19 +262,20 @@ export default function CustomReportBuilderPage() {
       filters.forEach((filter) => {
         data = data.filter((row) => {
           const value = row[filter.field as keyof typeof row];
+          const filterValue = String(filter.value);
           if (filter.operator === "contains") {
             return String(value)
               .toLowerCase()
-              .includes(filter.value.toLowerCase());
+              .includes(filterValue.toLowerCase());
           }
           if (filter.operator === "equals") {
-            return String(value) === filter.value;
+            return String(value) === filterValue;
           }
           if (filter.operator === "greater_than") {
-            return Number(value) > Number(filter.value);
+            return Number(value) > Number(filterValue);
           }
           if (filter.operator === "less_than") {
-            return Number(value) < Number(filter.value);
+            return Number(value) < Number(filterValue);
           }
           return true;
         });
@@ -295,18 +297,18 @@ export default function CustomReportBuilderPage() {
 
       // Apply grouping
       if (groupBy) {
-        const grouped = data.reduce(
+        const grouped = data.reduce<Record<string, Record<string, unknown>[]>>(
           (acc, row) => {
             const key = String(row[groupBy as keyof typeof row] || "Unknown");
             if (!acc[key]) acc[key] = [];
-            acc[key].push(row);
+            acc[key]!.push(row);
             return acc;
           },
-          {} as Record<string, typeof data>,
+          {},
         );
 
         data = Object.entries(grouped).flatMap(([key, rows]) => [
-          { __isGroupHeader: true, __groupKey: key },
+          { __isGroupHeader: true, __groupKey: key } as Record<string, unknown>,
           ...rows,
         ]);
       }
@@ -330,11 +332,13 @@ export default function CustomReportBuilderPage() {
         width: 15,
       }));
 
-    exportToXlsx(
+    exportToXLS(
       previewData.filter((row) => !row.__isGroupHeader),
-      columns,
-      `custom_report_${new Date().toISOString().split("T")[0]}`,
-      "Custom Report",
+      {
+        filename: `custom_report_${new Date().toISOString().split("T")[0]}`,
+        columns,
+        sheetName: "Custom Report",
+      },
     );
   };
 
@@ -350,6 +354,7 @@ export default function CustomReportBuilderPage() {
       sortBy,
       sortDirection,
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     setSavedReports((prev) => [...prev, newReport]);
@@ -361,7 +366,7 @@ export default function CustomReportBuilderPage() {
     setFilters(report.filters);
     setGroupBy(report.groupBy || "");
     setSortBy(report.sortBy || "");
-    setSortDirection(report.sortDirection);
+    setSortDirection(report.sortDirection ?? "asc");
     setActiveTab("builder");
   };
 
@@ -565,7 +570,7 @@ export default function CustomReportBuilderPage() {
                     </label>
                     <input
                       type="text"
-                      value={filter.value}
+                      value={String(filter.value)}
                       onChange={(e) =>
                         updateFilter(index, { value: e.target.value })
                       }
@@ -702,7 +707,7 @@ export default function CustomReportBuilderPage() {
                           colSpan={selectedFields.length}
                           className="px-4 py-2"
                         >
-                          {row.__groupKey}
+                          {String(row.__groupKey)}
                         </td>
                       ) : (
                         selectedFields.map((fieldId) => (

@@ -27,6 +27,7 @@ import type {
   PayrollValidationError,
   Term,
 } from "@/types";
+import type { CalendarEntry } from "@/types/system";
 
 const STAGES = [
   "dtr",
@@ -175,13 +176,19 @@ export function PayrollDetailPage() {
           });
         }
 
-        const sd = dateRange?.startDate || null;
-        const ed = dateRange?.endDate || null;
+        const inclusiveDateData = inclusiveDatesSnap.docs
+          .map((d) => d.data() as { startDate?: string; endDate?: string })
+          .find(Boolean);
+        const sd = inclusiveDateData?.startDate || null;
+        const ed = inclusiveDateData?.endDate || null;
         if (sd && ed) {
-          const calendarEntries = calendarSnap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          })) as Record<string, unknown>[];
+          const calendarEntries = calendarSnap.docs.map(
+            (d) =>
+              ({
+                id: d.id,
+                ...d.data(),
+              }) as CalendarEntry & { isPaid?: boolean },
+          );
           const workDaysResult = calculateWorkingDaysSync(
             sd,
             ed,
@@ -221,7 +228,7 @@ export function PayrollDetailPage() {
             where(
               "employeeId",
               "in",
-              payEmps.map((e) => e.employeeId || e.nameId).slice(0, 10),
+              payEmps.map((e) => e.nameId).slice(0, 10),
             ),
           ),
         );
@@ -279,7 +286,7 @@ export function PayrollDetailPage() {
       for (const emp of payEmps) {
         const basicSalary = emp.basicSalary || 0;
         const ratePerDay = basicSalary / effectiveWorkdays;
-        const empDtr = dtrData.get(emp.employeeId || emp.nameId);
+        const empDtr = dtrData.get(emp.nameId || "");
         const daysWorked = empDtr?.daysWorked ?? emp.daysWorked ?? 0;
         const absences = empDtr?.absences ?? emp.absences ?? 0;
         const lateHours = empDtr?.lateHours
@@ -380,6 +387,28 @@ export function PayrollDetailPage() {
       return getEmployeeGross(row) - deductions - benefits;
     },
     [deductionData, benefitData, getEmployeeGross],
+  );
+
+  const getEarningTotal = useCallback(
+    (earningId: string) => {
+      let total = 0;
+      earningData.forEach((empEarnings) => {
+        total += empEarnings.get(earningId) || 0;
+      });
+      return total;
+    },
+    [earningData],
+  );
+
+  const getDeductionTotal = useCallback(
+    (deductionId: string) => {
+      let total = 0;
+      deductionData.forEach((empDeductions) => {
+        total += empDeductions.get(deductionId) || 0;
+      });
+      return total;
+    },
+    [deductionData],
   );
 
   const validatePayroll = useCallback((): PayrollValidationError[] => {

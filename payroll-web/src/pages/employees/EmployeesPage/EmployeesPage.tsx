@@ -159,9 +159,9 @@ export function EmployeesPage() {
       groupId: employee.groupId || "",
       positionId: employee.positionId || "",
       areaId: employee.areaId || "",
-      statusId: employee.statusId,
+      statusId: employee.statusId || "",
       hireDate: employee.hireDate
-        ? new Date(employee.hireDate).toISOString().split("T")[0]
+        ? new Date(employee.hireDate).toISOString().split("T")[0] || ""
         : "",
     });
     setShowForm(true);

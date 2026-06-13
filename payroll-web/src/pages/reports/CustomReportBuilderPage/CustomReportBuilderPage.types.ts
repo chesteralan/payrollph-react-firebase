@@ -2,8 +2,9 @@ export interface ReportField {
   id: string;
   label: string;
   category: string;
-  selected: boolean;
+  selected?: boolean;
   type: string;
+  enabled?: boolean;
 }
 
 export interface ReportFilter {
@@ -17,6 +18,9 @@ export interface SavedReport {
   name: string;
   fields: string[];
   filters: ReportFilter[];
+  groupBy?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
   createdAt: Date;
   updatedAt: Date;
 }

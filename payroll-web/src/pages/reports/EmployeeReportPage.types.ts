@@ -1,4 +1,4 @@
-import type { Employee, EmployeeContact } from "../../types";
+import type { Employee, EmployeeContact, EmployeeProfile } from "../../types";
 
 export interface EmployeeReportData extends Employee {
   name?: string;

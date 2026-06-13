@@ -292,8 +292,8 @@ export function NamesListPage() {
       const lines = text.split("\n").filter((line) => line.trim());
 
       const startIndex =
-        lines[0].toLowerCase().includes("first") ||
-        lines[0].toLowerCase().includes("name")
+        lines[0]?.toLowerCase().includes("first") ||
+        lines[0]?.toLowerCase().includes("name")
           ? 1
           : 0;
 
@@ -305,7 +305,7 @@ export function NamesListPage() {
 
       const preview: CsvPreviewRow[] = [];
       for (let i = startIndex; i < lines.length; i++) {
-        const line = lines[i].trim();
+        const line = lines[i]?.trim();
         if (!line) continue;
 
         const columns = line.includes("\t")
@@ -339,8 +339,8 @@ export function NamesListPage() {
         } else {
           const parts = line.split(",");
           if (parts.length >= 2) {
-            lastName = parts[0].trim();
-            const nameParts = parts[1].trim().split(" ");
+            lastName = parts[0]!.trim();
+            const nameParts = parts[1]!.trim().split(" ");
             firstName = nameParts[0] || "";
             middleName = nameParts.slice(1).join(" ");
           } else {

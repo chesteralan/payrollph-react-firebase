@@ -58,7 +58,7 @@ export function CompanySettingsPage() {
     setCompanies(list);
     setSelectedCompanyId((prev) => {
       if (!prev && list.length > 0) {
-        return list[0].id;
+        return list[0]?.id ?? prev;
       }
       return prev;
     });

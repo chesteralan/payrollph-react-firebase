@@ -1,6 +1,8 @@
 export interface PayrollSummary {
   id: string;
   name: string;
+  month: number;
+  year: number;
   periodStart: string;
   periodEnd: string;
   status: string;
@@ -8,9 +10,13 @@ export interface PayrollSummary {
   totalGrossPay: number;
   totalDeductions: number;
   totalNetPay: number;
+  grossPay: number;
+  netPay: number;
+  groups: GroupSummary[];
 }
 
 export interface GroupSummary {
+  groupId?: string;
   groupName: string;
   employeeCount: number;
   totalGrossPay: number;
