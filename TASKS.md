@@ -96,8 +96,9 @@
   - Removed duplicate `HealthCheckPage` component from `services/healthCheck.ts` (routes use `pages/system/HealthCheckPage/`)
   - Renamed `healthCheck.tsx` → `healthCheck.ts` (no longer contains JSX)
 
-### 5. Expand Test Coverage ✅
+### 5. Expand Test Coverage
 - [x] Add tests for 8 untested services — all already have comprehensive test files (offline 20 tests ✓, audit 28 tests ✓, email 18 tests ✓, payroll 55 tests ✓, backup 16 tests ✓, notifications 25 tests ✓, setup 12 tests ✓, twoFactorAuth 19 tests ✓)
+- [x] Added ValueStore.test.ts — 17 tests covering initialization, get/set, subscribe/unsubscribe, Object.is equality, rapid updates, useSyncExternalStore pattern
 - [ ] Raise test-to-source ratio from ~19% to 40%+
 
 ### 6. Dependency Cleanup
