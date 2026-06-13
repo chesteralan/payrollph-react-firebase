@@ -4,7 +4,7 @@
 - **Dead code cleanup**: Removed 97 unused hooks, 7 unused services, 3 unused utils, 70+ unused UI components, 10 unused E2E tests, CLI scripts, config files — 286 files total, 12,056 lines removed
 - **Fixed i18n**: Removed fil-PH locale reference that broke module resolution
 - **Fixed orphaned tests**: Removed codeSplitter.test.ts, fixed i18n test
-- **Fixed TypeScript errors**:
+- **Fixed TypeScript errors**: All ~373 errors resolved — `tsc --noEmit` passes with 0 errors
   - `sanitize.ts` line 155 — fixed generic type constraint (keyof T vs Extract<keyof T, string>)
   - `importUtils.ts` line 113 — fixed index type error from noUncheckedIndexedAccess
   - `__mocks__/firebase.ts` — fixed implicit any returns on `exists`, `data`, `get` methods
@@ -15,6 +15,9 @@
 - **Fixed `AuthContext.tsx`** — optional chaining on `companiesData[0]?.companyId`
 - **Fixed pipeline tests**: Created `reportGenerator.ts` (needed by `reportScheduling.ts` app code + tests); Added 12 missing lucide-react icons to `__mocks__/lucide-react.ts` (`Server`, `HardDrive`, `LayoutDashboard`, `Layers`, `ListChecks`, `Banknote`, `ArrowDownToLine`, `ArrowUpFromLine`, `CopyPlus`, `UserCog`, `ShieldCheck`)
 - **Extracted `StatusIcon`**: Moved from inline inside `HealthCheckPage.tsx` to `StatusIcon.tsx` separate component file
+- **Split AuthContext.tsx** — moved selector hooks (`useCurrentCompanyId`, `useCurrentUser`, `useAuthLoading`, `useUserPermissions`) and `ValueStore`/`AuthStoreContext` to separate files (`hooks.ts`, `src/utils/valueStore.ts`)
+- **Split CompanyContext.tsx** — moved selector hooks (`useCurrentCompany`, `useCompanies`, `useCompanyLoading`) and `ValueStore`/`CompanyStoreContext` to separate files (`hooks.ts`, `src/utils/valueStore.ts`)
+- **Extracted shared `ValueStore` class** — removed duplication between AuthContext and CompanyContext; now lives in `src/utils/valueStore.ts`
 
 ## Remaining
 
@@ -37,18 +40,13 @@
 - [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
 - [ ] Refactor `Sidebar.tsx` (479 lines) — extract nav items, user section
 
-### 3. TypeScript Fixes (~373 remaining errors across codebase)
-- [ ] Fix large page TS errors: DashboardPage, PayrollDetailPage, PayrollRunsPage, PrintFormatsPage, TemplatesPage, NamesListPage, etc.
-- [ ] Fix service TS errors: payroll.ts, backup.ts, email.ts, notifications.ts, ipRestriction.ts, firestore-optimized.ts, repositories/index.ts, etc.
-- [ ] Fix utility TS errors: calendarUtils.ts, dateFormat.ts, currency.ts, encryption.ts, etc.
-- [ ] Fix report page TS errors: 13thMonth, YearEnd, Attendance, BenefitsUtilization
-- [ ] Fix CompanySettingsPage, CalendarPage, DatabasePage, TermsPage, UsersPage
-- [ ] Fix script TS errors: seed.ts
+### 3. TypeScript Fixes ✅ (0 errors — all resolved)
+- [x] All TypeScript errors resolved — `tsc --noEmit` passes cleanly
 
 ### 4. Code Quality
 - [x] Move inline `StatusIcon` in `HealthCheckPage.tsx` to separate file (`StatusIcon.tsx`)
-- [ ] Split `AuthContext.tsx` — move hook to separate file (rule 10)
-- [ ] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
+- [x] Split `AuthContext.tsx` — move hook to separate file (rule 10)
+- [x] Split `CompanyContext.tsx` — move hook to separate file (rule 10)
 - [ ] Add import/order ESLint rule (rule 8)
 - [ ] Remove remaining `console.log` from CLI scripts (deploy-previews.ts, smoke-test.ts, seed.ts) — these are CLI tools, can keep
 
