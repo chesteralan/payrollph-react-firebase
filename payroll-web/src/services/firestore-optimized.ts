@@ -208,7 +208,7 @@ export const QueryOptimizer = {
 
   // Optimize with pagination
   withPagination: (
-    page: number,
+    _page: number,
     pageSize: number,
     orderField: string = "createdAt",
   ): QueryConstraint[] => [orderBy(orderField, "desc"), limit(pageSize)],
@@ -231,7 +231,7 @@ export const QueryOptimizer = {
         optimizedGetById<T>(collectionName, id),
       );
       const results = await Promise.all(promises);
-      batches.push(results.filter((r): r is T => r !== null));
+      batches.push(results.filter(Boolean) as T[]);
     }
 
     return batches.flat();

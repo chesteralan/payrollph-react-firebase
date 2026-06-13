@@ -13,7 +13,8 @@ export type EmailTemplate =
   | "password_reset"
   | "welcome"
   | "deadline_reminder"
-  | "system_alert";
+  | "system_alert"
+  | "report_ready";
 
 export interface EmailOptions {
   to: string | string[];
@@ -169,6 +170,81 @@ Login: {{loginUrl}}
     `,
   },
 
+  approval_rejected: {
+    subject: "Rejected: {{entityType}} {{entityId}}",
+    htmlBody: `
+      <h2 style="color: red;">Approval Rejected ✗</h2>
+      <p>Dear {{requesterName}},</p>
+      <p>Your {{entityType}} has been rejected.</p>
+      <ul>
+        <li><strong>{{entityType}}:</strong> #{{entityId}}</li>
+        <li><strong>Rejected by:</strong> {{approverName}}</li>
+        <li><strong>Reason:</strong> {{comments}}</li>
+      </ul>
+      <p><a href="{{actionUrl}}">View Details</a></p>
+    `,
+    textBody: `
+Approval Rejected ✗
+
+Your {{entityType}} has been rejected.
+- {{entityType}}: #{{entityId}}
+- Rejected by: {{approverName}}
+- Reason: {{comments}}
+
+View details: {{actionUrl}}
+    `,
+  },
+
+  leave_approved: {
+    subject: "Leave Approved: {{leaveType}}",
+    htmlBody: `
+      <h2 style="color: green;">Leave Approved ✓</h2>
+      <p>Dear {{employeeName}},</p>
+      <p>Your leave request has been approved.</p>
+      <ul>
+        <li><strong>Type:</strong> {{leaveType}}</li>
+        <li><strong>Date:</strong> {{leaveDate}}</li>
+        <li><strong>Approved by:</strong> {{approverName}}</li>
+      </ul>
+      <p><a href="{{actionUrl}}">View Details</a></p>
+    `,
+    textBody: `
+Leave Approved ✓
+
+Your leave request has been approved.
+- Type: {{leaveType}}
+- Date: {{leaveDate}}
+- Approved by: {{approverName}}
+
+View details: {{actionUrl}}
+    `,
+  },
+
+  leave_rejected: {
+    subject: "Leave Rejected: {{leaveType}}",
+    htmlBody: `
+      <h2 style="color: red;">Leave Rejected ✗</h2>
+      <p>Dear {{employeeName}},</p>
+      <p>Your leave request has been rejected.</p>
+      <ul>
+        <li><strong>Type:</strong> {{leaveType}}</li>
+        <li><strong>Date:</strong> {{leaveDate}}</li>
+        <li><strong>Reason:</strong> {{comments}}</li>
+      </ul>
+      <p><a href="{{actionUrl}}">View Details</a></p>
+    `,
+    textBody: `
+Leave Rejected ✗
+
+Your leave request has been rejected.
+- Type: {{leaveType}}
+- Date: {{leaveDate}}
+- Reason: {{comments}}
+
+View details: {{actionUrl}}
+    `,
+  },
+
   deadline_reminder: {
     subject: "Reminder: {{entityType}} Due Soon",
     htmlBody: `
@@ -204,6 +280,36 @@ Message: {{message}}
 Time: {{timestamp}}
 
 View details: {{detailsUrl}}
+    `,
+  },
+
+  report_ready: {
+    subject: "Scheduled Report Ready: {{reportName}}",
+    htmlBody: `
+      <h2>Scheduled Report Ready</h2>
+      <p>Dear {{userName}},</p>
+      <p>Your scheduled report <strong>{{reportName}}</strong> is ready.</p>
+      <ul>
+        <li><strong>Report Type:</strong> {{reportType}}</li>
+        <li><strong>Frequency:</strong> {{frequency}}</li>
+      </ul>
+      <p>
+        <a href="{{downloadUrl}}" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Download Report
+        </a>
+      </p>
+      <p><small>This is an automated message from Payroll v2.</small></p>
+    `,
+    textBody: `
+Scheduled Report Ready
+
+Your scheduled report {{reportName}} is ready.
+- Report Type: {{reportType}}
+- Frequency: {{frequency}}
+
+Download: {{downloadUrl}}
+
+This is an automated message from Payroll v2.
     `,
   },
 };

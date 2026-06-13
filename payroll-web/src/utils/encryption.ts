@@ -8,7 +8,7 @@ const IV_LENGTH = 12; // 12 bytes for AES-GCM
 // Derive a key from a passphrase using PBKDF2
 const deriveKey = async (
   passphrase: string,
-  salt: Uint8Array,
+  salt: Uint8Array<ArrayBuffer>,
 ): Promise<CryptoKey> => {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
@@ -34,12 +34,12 @@ const deriveKey = async (
 };
 
 // Generate a random IV
-const generateIV = (): Uint8Array => {
+const generateIV = (): Uint8Array<ArrayBuffer> => {
   return crypto.getRandomValues(new Uint8Array(IV_LENGTH));
 };
 
 // Generate a random salt
-const generateSalt = (): Uint8Array => {
+const generateSalt = (): Uint8Array<ArrayBuffer> => {
   return crypto.getRandomValues(new Uint8Array(16));
 };
 

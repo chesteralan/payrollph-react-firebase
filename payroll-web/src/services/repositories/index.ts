@@ -13,8 +13,6 @@ import {
   getById,
   create,
   update,
-  remove,
-  type CollectionName,
 } from "@/services/firestore";
 import type {
   Employee,

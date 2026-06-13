@@ -75,7 +75,7 @@ export async function setupAdminUser({
   });
 
   for (const dept of DEPARTMENTS) {
-    for (const section of SECTIONS[dept]) {
+    for (const section of SECTIONS[dept] ?? []) {
       await setDoc(
         doc(db, "user_restrictions", `${userId}_${dept}_${section}`),
         {

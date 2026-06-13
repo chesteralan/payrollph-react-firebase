@@ -3,7 +3,7 @@
 // Note: Actual backups should be automated via Firebase CLI or Cloud Functions
 // This provides client-side backup metadata tracking
 
-import { collection, getDocs, writeBatch, doc } from "firebase/firestore";
+import { collection, getDocs, writeBatch, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import type { UserAccount } from "../types";
 
@@ -108,7 +108,7 @@ export const updateBackupStatus = async (
 ) => {
   try {
     const docRef = doc(db, "backups", backupId);
-    await docRef.update({
+    await updateDoc(docRef, {
       status,
       ...(backupUrl && { backupUrl }),
     });

@@ -103,7 +103,7 @@ export async function getAll<T>(
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as T[];
 }
 
-export async function create<T extends Record<string, unknown>>(
+export async function create<T extends object>(
   collectionName: CollectionName,
   data: Omit<T, "id" | "createdAt" | "updatedAt">,
 ): Promise<string> {
@@ -115,7 +115,7 @@ export async function create<T extends Record<string, unknown>>(
   return docRef.id;
 }
 
-export async function update<T extends Record<string, unknown>>(
+export async function update<T extends object>(
   collectionName: CollectionName,
   id: string,
   data: Partial<Omit<T, "id" | "createdAt">>,

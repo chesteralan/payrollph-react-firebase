@@ -198,7 +198,7 @@ export const submitApproval = async (
     level: workflow.currentLevel,
     approverId,
     status: decision,
-    timestamp: serverTimestamp(),
+    timestamp: serverTimestamp() as unknown as Date,
     comments,
   };
 
