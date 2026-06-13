@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { Company } from "@/types";
+import type { PayrollPeriod } from "../CompaniesPage.types";
 
 export function CompaniesPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

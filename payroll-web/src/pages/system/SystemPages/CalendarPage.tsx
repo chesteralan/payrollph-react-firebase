@@ -23,27 +23,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { CalendarEvent } from "./SystemPages.types";
-
-const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const typeColors: Record<string, string> = {
-  holiday: "bg-red-100 text-red-800",
-  special: "bg-blue-100 text-blue-800",
-  workday: "bg-green-100 text-green-800",
-};
+import { CALENDAR_TYPE_COLORS, MONTH_NAMES } from "./CalendarPage.constants";
 
 export function CalendarPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
@@ -476,7 +456,7 @@ export function CalendarPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {monthNames.map((month, index) => {
+          {MONTH_NAMES.map((month, index) => {
             const monthEvents = groupedByMonth[index] || [];
             if (monthEvents.length === 0) return null;
             return (
@@ -502,7 +482,7 @@ export function CalendarPage() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span
-                            className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${typeColors[event.type]}`}
+                            className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${CALENDAR_TYPE_COLORS[event.type]}`}
                           >
                             {event.type}
                           </span>

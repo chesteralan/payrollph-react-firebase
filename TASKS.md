@@ -78,6 +78,11 @@
 - [ ] Refactor remaining 27 page files over 300 lines
 - [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
 - [x] Refactor `Sidebar.tsx` (479→185 lines) — extracted `navConfig.tsx` with navigation tree
+- [x] **Extracted CalendarPage constants** — moved `monthNames` and `typeColors` from inline to `CalendarPage.constants.ts` (544→524 lines)
+- [x] **Fixed TS regressions**:
+  - `EarningsDeductionsReportPage.tsx` lines 261-263 — added `as string` casts for `Record<string, unknown>` property access
+  - `CompaniesPage.tsx` line 182 — added missing `PayrollPeriod` type import from `../CompaniesPage.types`
+  TypeScript compilation now passes with 0 errors
 
 ### 3. TypeScript Fixes ✅ (0 errors — all resolved)
 - [x] All TypeScript errors resolved — `tsc --noEmit` passes cleanly

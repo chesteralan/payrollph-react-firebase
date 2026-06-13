@@ -258,9 +258,9 @@ export function EarningsDeductionsReportPage() {
         if (!empBreakdownMap.has(key)) {
           empBreakdownMap.set(key, {
             nameId: emp.nameId,
-            employeeCode: empData?.employeeCode || emp.nameId,
-            firstName: empData?.firstName || "",
-            lastName: empData?.lastName || emp.nameId,
+            employeeCode: (empData?.employeeCode as string) || emp.nameId,
+            firstName: (empData?.firstName as string) || "",
+            lastName: (empData?.lastName as string) || emp.nameId,
             groupName: emp.groupId || "Ungrouped",
             earnings: [],
             deductions: [],
