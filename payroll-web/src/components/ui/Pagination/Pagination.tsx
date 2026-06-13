@@ -38,12 +38,12 @@ export const Pagination = memo(function Pagination({
   totalItems,
   itemsPerPage,
 }: PaginationProps) {
-  if (totalPages <= 1) return null;
-
   const pageNumbers = useMemo(
     () => getPageNumbers(currentPage, totalPages),
     [currentPage, totalPages],
   );
+
+  if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">

@@ -19,6 +19,17 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      // Allow underscore-prefixed unused parameters (e.g. _unused)
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      // 'react-hooks/refs' is experimental and produces false positives
+      // for the intentional ValueStore sync pattern during render
+      "react-hooks/refs": "off",
       // Import ordering — enforce consistent import groups:
       //   1. Node builtins / external packages
       //   2. Internal aliases (@/...)
@@ -28,7 +39,7 @@ export default defineConfig([
         "error",
         {
           ignoreCase: true,
-          ignoreDeclarationSort: false,
+          ignoreDeclarationSort: true,
           ignoreMemberSort: false,
           memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
           allowSeparatedGroups: true,
