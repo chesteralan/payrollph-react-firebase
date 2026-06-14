@@ -74,7 +74,7 @@
 - [ ] Refactor `DatabasePage.tsx` (982 lines)
 - [ ] Refactor `EarningsDeductionsReportPage.tsx` (956 lines)
 - [ ] Refactor `NamesListPage.tsx` (954 lines)
-- [ ] Refactor `PrintFormatsPage.tsx` (844 lines)
+- [x] Refactor `PrintFormatsPage.tsx` (844→488 lines) — extracted constants, wizard step components, and ToggleField to separate files
 - [ ] Refactor remaining 27 page files over 300 lines
 - [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
 - [x] Refactor `Sidebar.tsx` (479→185 lines) — extracted `navConfig.tsx` with navigation tree
