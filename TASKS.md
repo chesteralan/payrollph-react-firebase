@@ -71,7 +71,7 @@
 - [x] Refactor `PayrollDetailPage.tsx` (1,166→949 lines) — extracted Salaries, Earnings, Benefits, Deductions stages into separate components (SalariesStage.tsx, EarningsStage.tsx, BenefitsStage.tsx, DeductionsStage.tsx); removed 4 inline render blocks (246 lines)
 - [x] Refactor `UsersPage.tsx` (1,097→528 lines) — extracted BulkActionBar, UserForm, UserImportCard, UserPermissionsCard, UsersTable into separate component files
 - [x] Refactor `DTRPage.tsx` (1,079→673 lines) — extracted DayEntryModal, LeaveApplicationModal, DTRImportModal, DTRSummaryTable, and DTRPage.constants into separate files
-- [ ] Refactor `DatabasePage.tsx` (983 lines)
+- [x] Refactor `DatabasePage.tsx` (983→617 lines) — extracted CollectionStatsTable, BackupHistoryTable, VerificationResultsTable, DataCleanupSection into separate component files; extracted types
 - [ ] Refactor `EarningsDeductionsReportPage.tsx` (957 lines)
 - [x] Refactor `NamesListPage.tsx` (954→507 lines) — extracted BulkEditCard, CsvImportCard, NameForm, NamesTable, SelectionToolbar into separate component files
 - [x] Refactor `PrintFormatsPage.tsx` (844→488 lines) — extracted constants, wizard step components, and ToggleField to separate files

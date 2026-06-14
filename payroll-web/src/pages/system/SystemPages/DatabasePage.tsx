@@ -12,43 +12,29 @@ import {
 import { db } from "@/config/firebase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
-import { AlertTriangle, CheckCircle, Download, Save } from "lucide-react";
+import { Download, Save } from "lucide-react";
 import { COLLECTIONS } from "./SystemPages.constants";
+import { CollectionStatsTable } from "./CollectionStatsTable";
+import { BackupHistoryTable } from "./BackupHistoryTable";
+import { VerificationResultsTable } from "./VerificationResultsTable";
+import { DataCleanupSection } from "./DataCleanupSection";
+import type { Backup, CleanupResult, VerificationResult } from "./DatabasePage.types";
 
 export function DatabasePage() {
   const { canView, canAdd } = usePermissions();
   const { addToast } = useToast();
   const [stats, setStats] = useState<Record<string, number>>({});
-  const [backups, setBackups] = useState<
-    Array<{
-      id: string;
-      timestamp: Date;
-      collections: string[];
-      size: number;
-      status: string;
-      totalDocuments?: number;
-    }>
-  >([]);
+  const [backups, setBackups] = useState<Backup[]>([]);
   const [loading, setLoading] = useState(true);
   const [backupLoading, setBackupLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState("");
   const [selectedCollection, setSelectedCollection] = useState("");
-  const [verificationResults, setVerificationResults] = useState<
-    Array<{
-      name: string;
-      status: "Pass" | "Fail" | "Warning";
-      details: string;
-      issueCount: number;
-    }>
-  >([]);
+  const [verificationResults, setVerificationResults] = useState<VerificationResult[]>([]);
   const [verifying, setVerifying] = useState(false);
   const [cleanupLoading, setCleanupLoading] = useState("");
-  const [cleanupResults, setCleanupResults] = useState<
-    Array<{ name: string; count: number; time: number; success: boolean }>
-  >([]);
+  const [cleanupResults, setCleanupResults] = useState<CleanupResult[]>([]);
   const [dtrMonths, setDtrMonths] = useState(6);
   const [softDeleteDays, setSoftDeleteDays] = useState(30);
   const [archiveYears, setArchiveYears] = useState(2);
@@ -172,12 +158,7 @@ export function DatabasePage() {
   const runVerification = async () => {
     setVerifying(true);
     setVerificationResults([]);
-    const results: Array<{
-      name: string;
-      status: "Pass" | "Fail" | "Warning";
-      details: string;
-      issueCount: number;
-    }> = [];
+    const results: VerificationResult[] = [];
 
     try {
       const [
@@ -603,381 +584,34 @@ export function DatabasePage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Collection Statistics</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Collection
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Documents
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
-                </tr>
-              ) : (
-                COLLECTIONS.map((col) => (
-                  <tr key={col} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {col}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                      {stats[col] || 0}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={!!exportLoading}
-                        onClick={() => exportCollection(col)}
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        {exportLoading === col ? "Exporting..." : "Export"}
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+      <CollectionStatsTable
+        stats={stats}
+        loading={loading}
+        exportLoading={exportLoading}
+        exportCollection={exportCollection}
+      />
 
       {canView("system", "database") && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Backup History</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Date/Time
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Collections
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Documents
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Size
-                  </th>
-                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {backups.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-4 text-center text-gray-500"
-                    >
-                      No backups yet
-                    </td>
-                  </tr>
-                ) : (
-                  backups.map((backup) => (
-                    <tr key={backup.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {backup.timestamp
-                          ? new Date(backup.timestamp).toLocaleString()
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {backup.collections?.length || 0} collections
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                        {backup.totalDocuments || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                        {backup.size
-                          ? `${(backup.size / 1024).toFixed(1)} KB`
-                          : "-"}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                            backup.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {backup.status || "unknown"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <BackupHistoryTable backups={backups} />
       )}
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Database Verification</CardTitle>
-            <Button onClick={runVerification} disabled={verifying}>
-              <CheckCircle className="w-4 h-4 mr-2" />
-              {verifying ? "Verifying..." : "Run Verification"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {verificationResults.length === 0 ? (
-            <div className="px-6 py-8 text-center text-gray-500">
-              Click "Run Verification" to check database integrity
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Check Name
-                  </th>
-                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Details
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Issues
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {verificationResults.map((result, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {result.name}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          result.status === "Pass"
-                            ? "bg-green-100 text-green-800"
-                            : result.status === "Fail"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {result.status === "Pass" && (
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                        )}
-                        {result.status === "Fail" && (
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                        )}
-                        {result.status === "Warning" && (
-                          <AlertTriangle className="w-3 h-3 mr-1" />
-                        )}
-                        {result.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {result.details}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                      {result.issueCount}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </CardContent>
-      </Card>
+      <VerificationResultsTable
+        results={verificationResults}
+        verifying={verifying}
+        onRunVerification={runVerification}
+      />
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Data Cleanup</CardTitle>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">DTR cutoff:</span>
-              <input
-                type="number"
-                value={dtrMonths}
-                onChange={(e) => setDtrMonths(Number(e.target.value))}
-                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                min={1}
-                max={36}
-              />
-              <span className="text-sm text-gray-500">mo</span>
-              <span className="text-sm text-gray-500 ml-4">
-                Soft-delete cutoff:
-              </span>
-              <input
-                type="number"
-                value={softDeleteDays}
-                onChange={(e) => setSoftDeleteDays(Number(e.target.value))}
-                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                min={1}
-                max={365}
-              />
-              <span className="text-sm text-gray-500">days</span>
-              <span className="text-sm text-gray-500 ml-4">
-                Archive cutoff:
-              </span>
-              <input
-                type="number"
-                value={archiveYears}
-                onChange={(e) => setArchiveYears(Number(e.target.value))}
-                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
-                min={1}
-                max={20}
-              />
-              <span className="text-sm text-gray-500">years</span>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              {
-                id: "orphaned",
-                name: "Remove Orphaned Records",
-                desc: "Delete employees with invalid name refs and payroll_employees without valid payroll",
-                variant: "danger" as const,
-              },
-              {
-                id: "duplicates",
-                name: "Remove Duplicate Names",
-                desc: "Delete duplicate names in the names collection (keeps first occurrence)",
-                variant: "warning" as const,
-              },
-              {
-                id: "oldDtr",
-                name: "Clear Old DTR Entries",
-                desc: `Delete DTR entries older than ${dtrMonths} months`,
-                variant: "warning" as const,
-              },
-              {
-                id: "expiredLeave",
-                name: "Expire Old Leave Applications",
-                desc: "Mark approved/pending leave applications as expired if end date passed",
-                variant: "info" as const,
-              },
-              {
-                id: "softDeleted",
-                name: "Purge Soft-Deleted Records",
-                desc: `Permanently delete soft-deleted records older than ${softDeleteDays} days`,
-                variant: "danger" as const,
-              },
-              {
-                id: "archivePayroll",
-                name: "Archive Old Payroll Runs",
-                desc: `Mark payroll runs and related data older than ${archiveYears} years as archived`,
-                variant: "info" as const,
-              },
-            ].map((op) => (
-              <div
-                key={op.id}
-                className="border border-gray-200 rounded-lg p-4 space-y-3"
-              >
-                <div>
-                  <h4 className="font-medium text-gray-900">{op.name}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{op.desc}</p>
-                </div>
-                <ConfirmDialog
-                  title={`Confirm: ${op.name}`}
-                  message={`This operation cannot be undone. Are you sure you want to proceed?`}
-                  confirmText="Run Cleanup"
-                  variant={op.variant}
-                  onConfirm={() => runCleanup(op.id)}
-                >
-                  {(open) => (
-                    <Button
-                      variant={
-                        op.variant === "danger"
-                          ? "danger"
-                          : op.variant === "info"
-                            ? "secondary"
-                            : "secondary"
-                      }
-                      size="sm"
-                      onClick={() => open()}
-                      disabled={!!cleanupLoading}
-                      className="w-full"
-                    >
-                      {cleanupLoading === op.id ? "Running..." : "Run"}
-                    </Button>
-                  )}
-                </ConfirmDialog>
-              </div>
-            ))}
-          </div>
-
-          {cleanupResults.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-medium text-gray-900 mb-3">
-                Cleanup History
-              </h4>
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                      Operation
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                      Records
-                    </th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                      Time (ms)
-                    </th>
-                    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {cleanupResults.map((result, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {result.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right">
-                        {result.count}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                        {result.time}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${result.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                        >
-                          {result.success ? "Success" : "Failed"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <DataCleanupSection
+        dtrMonths={dtrMonths}
+        onDtrMonthsChange={setDtrMonths}
+        softDeleteDays={softDeleteDays}
+        onSoftDeleteDaysChange={setSoftDeleteDays}
+        archiveYears={archiveYears}
+        onArchiveYearsChange={setArchiveYears}
+        runCleanup={runCleanup}
+        cleanupLoading={cleanupLoading}
+        cleanupResults={cleanupResults}
+      />
     </div>
   );
 }
