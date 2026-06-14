@@ -14,10 +14,9 @@ import {
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useToast } from "@/hooks/useToast";
-import { EditableCell } from "@/components/ui/EditableCell";
 import { PayrollOutputView } from "@/components/payroll/PayrollOutputView";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ArrowLeft, Lock, Save, Send, Unlock } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
 import { calculateWorkingDaysSync } from "@/utils/calendarUtils";
@@ -43,6 +42,10 @@ import type { ProcessingRow } from "../PayrollDetailPage.types";
 import { DTRStage, StageSelector } from "./PayrollStages";
 import { ComputationSummary } from "./ComputationSummary";
 import { ValidationPanel } from "./ValidationPanel";
+import { SalariesStage } from "./SalariesStage";
+import { EarningsStage } from "./EarningsStage";
+import { BenefitsStage } from "./BenefitsStage";
+import { DeductionsStage } from "./DeductionsStage";
 
 export function PayrollDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -860,290 +863,41 @@ export function PayrollDetailPage() {
       )}
 
       {activeStage === "salaries" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Salaries</CardTitle>
-            <p className="text-sm text-gray-500">
-              Based on{" "}
-              {actualWorkdays !== null
-                ? `${actualWorkdays} actual workdays (calendar-adjusted)`
-                : `${defaultWorkdays} workdays/month (default)`}
-              . Rate/Day and Salary Amount auto-calculated.
-            </p>
-          </CardHeader>
-          <CardContent className="p-0">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Employee
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Basic Salary
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Rate/Day
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Days
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Salary Amount
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {row.lastName}
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <EditableCell
-                        value={row.basicSalary}
-                        onChange={(v) =>
-                          updateRow(row.nameId, "basicSalary", Number(v))
-                        }
-                        type="number"
-                        className="text-right"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm text-gray-700">
-                      {formatCurrency(row.ratePerDay)}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm text-gray-500">
-                      {row.daysWorked}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm font-medium text-gray-900">
-                      {formatCurrency(row.salaryAmount)}
-                    </td>
-                  </tr>
-                ))}
-                {rows.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      No employees in this payroll.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <SalariesStage
+          rows={rows}
+          actualWorkdays={actualWorkdays}
+          defaultWorkdays={defaultWorkdays}
+          updateRow={updateRow}
+        />
       )}
 
       {activeStage === "earnings" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Earnings</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
-                    Employee
-                  </th>
-                  {earningsList.map((e) => (
-                    <th
-                      key={e.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-30"
-                    >
-                      {e.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 sticky left-0 bg-white">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {row.lastName}
-                      </div>
-                    </td>
-                    {earningsList.map((e) => (
-                      <td key={e.id} className="px-4 py-2 text-right">
-                        <EditableCell
-                          value={earningData.get(row.nameId)?.get(e.id) || 0}
-                          onChange={(v) =>
-                            updateEarning(row.nameId, e.id, Number(v))
-                          }
-                          type="number"
-                          className="text-right"
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-                <tr className="bg-gray-50 font-medium">
-                  <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">
-                    Total
-                  </td>
-                  {earningsList.map((e) => (
-                    <td key={e.id} className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(getEarningTotal(e.id))}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <EarningsStage
+          rows={rows}
+          earningsList={earningsList}
+          earningData={earningData}
+          updateEarning={updateEarning}
+          getEarningTotal={getEarningTotal}
+        />
       )}
 
       {activeStage === "benefits" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Benefits</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
-                    Employee
-                  </th>
-                  {benefitsList.map((b) => (
-                    <th
-                      key={b.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-50"
-                      colSpan={2}
-                    >
-                      {b.name} (EE / ER)
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 sticky left-0 bg-white">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {row.lastName}
-                      </div>
-                    </td>
-                    {benefitsList.map((b) => {
-                      const val = benefitData.get(row.nameId)?.get(b.id) || {
-                        employeeShare: 0,
-                        employerShare: 0,
-                      };
-                      return (
-                        <td key={b.id} className="px-4 py-2 text-right">
-                          <div className="flex gap-1 justify-end">
-                            <EditableCell
-                              value={val.employeeShare}
-                              onChange={(v) =>
-                                updateBenefit(
-                                  row.nameId,
-                                  b.id,
-                                  Number(v),
-                                  val.employerShare,
-                                )
-                              }
-                              type="number"
-                              className="w-20 text-right"
-                            />
-                            <EditableCell
-                              value={val.employerShare}
-                              onChange={(v) =>
-                                updateBenefit(
-                                  row.nameId,
-                                  b.id,
-                                  val.employeeShare,
-                                  Number(v),
-                                )
-                              }
-                              type="number"
-                              className="w-20 text-right"
-                            />
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <BenefitsStage
+          rows={rows}
+          benefitsList={benefitsList}
+          benefitData={benefitData}
+          updateBenefit={updateBenefit}
+        />
       )}
 
       {activeStage === "deductions" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Deductions</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">
-                    Employee
-                  </th>
-                  {deductionsList.map((d) => (
-                    <th
-                      key={d.id}
-                      className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase min-w-30"
-                    >
-                      {d.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((row) => (
-                  <tr key={row.nameId} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 sticky left-0 bg-white">
-                      <div className="text-sm font-medium text-gray-900">
-                        {row.employeeCode}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {row.lastName}
-                      </div>
-                    </td>
-                    {deductionsList.map((d) => (
-                      <td key={d.id} className="px-4 py-2 text-right">
-                        <EditableCell
-                          value={deductionData.get(row.nameId)?.get(d.id) || 0}
-                          onChange={(v) =>
-                            updateDeduction(row.nameId, d.id, Number(v))
-                          }
-                          type="number"
-                          className="text-right"
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-                <tr className="bg-gray-50 font-medium">
-                  <td className="px-4 py-2 sticky left-0 bg-gray-50 text-sm">
-                    Total
-                  </td>
-                  {deductionsList.map((d) => (
-                    <td key={d.id} className="px-4 py-2 text-right text-sm">
-                      {formatCurrency(getDeductionTotal(d.id))}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <DeductionsStage
+          rows={rows}
+          deductionsList={deductionsList}
+          deductionData={deductionData}
+          updateDeduction={updateDeduction}
+          getDeductionTotal={getDeductionTotal}
+        />
       )}
 
       {activeStage === "summary" && (

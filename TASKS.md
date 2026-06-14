@@ -68,7 +68,7 @@
 - [x] Fix `HealthCheckPage.test.tsx` — added missing `Server`, `HardDrive` mock exports
 
 ### 2. Refactor Large Components (33 files over 300 lines)
-- [ ] Refactor `PayrollDetailPage.tsx` (1,166 lines) — split into per-stage components
+- [ ] Refactor `PayrollDetailPage.tsx` (1,166→949 lines) — extracted Salaries, Earnings, Benefits, Deductions stages into separate components (SalariesStage.tsx, EarningsStage.tsx, BenefitsStage.tsx, DeductionsStage.tsx); removed 4 inline render blocks (246 lines)
 - [ ] Refactor `UsersPage.tsx` (1,097 lines) — extract user form, table, filters
 - [ ] Refactor `DTRPage.tsx` (1,079 lines) — extract calendar, computation, time selector
 - [ ] Refactor `DatabasePage.tsx` (982 lines)
