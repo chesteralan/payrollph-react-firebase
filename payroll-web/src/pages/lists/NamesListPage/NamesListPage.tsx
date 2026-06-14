@@ -15,26 +15,8 @@ import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { SearchBar } from "@/components/ui/SearchBar";
-import {
-  AlertCircle,
-  Check,
-  CheckSquare,
-  ChevronDown,
-  ChevronsUpDown,
-  ChevronUp,
-  Download,
-  Edit,
-  Plus,
-  Square,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
+import { Download, Plus, Upload } from "lucide-react";
 import { useTableSort } from "@/hooks/useTableSort";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type {
   EmployeeArea,
   EmployeeGroup,
@@ -43,9 +25,14 @@ import type {
 } from "@/types/employee";
 
 import type { CsvPreviewRow, NameRecord } from "./NamesListPage.types";
+import { BulkEditCard } from "./BulkEditCard";
+import { CsvImportCard } from "./CsvImportCard";
+import { NameForm } from "./NameForm";
+import { NamesTable } from "./NamesTable";
+import { SelectionToolbar } from "./SelectionToolbar";
 
 export function NamesListPage() {
-  const { canView, canAdd, canEdit, canDelete } = usePermissions();
+  const { canView, canAdd } = usePermissions();
   const { addToast } = useToast();
   const [names, setNames] = useState<NameRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -419,6 +406,17 @@ export function NamesListPage() {
 
   const selectedCount = selectedIds.size;
 
+  const handleEdit = (n: NameRecord) => {
+    setEditingId(n.id);
+    setFormData({
+      firstName: n.firstName,
+      middleName: n.middleName || "",
+      lastName: n.lastName,
+      suffix: n.suffix || "",
+    });
+    setShowForm(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -441,514 +439,70 @@ export function NamesListPage() {
         </div>
       </div>
 
-      {selectedCount > 0 && (
-        <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-          <span className="text-sm text-blue-800">
-            {selectedCount} name{selectedCount !== 1 ? "s" : ""} selected
-          </span>
-          <div className="flex gap-2">
-            {canEdit("lists", "names") && (
-              <Button size="sm" onClick={() => setShowBulkEdit(true)}>
-                Bulk Edit
-              </Button>
-            )}
-            {canDelete("lists", "names") && (
-              <ConfirmDialog
-                title="Bulk Archive"
-                message={`Archive ${selectedCount} selected name${selectedCount !== 1 ? "s" : ""}? They can be restored from Trash.`}
-                confirmText="Archive All"
-                variant="warning"
-                onConfirm={handleBulkDelete}
-              >
-                {(open) => (
-                  <Button size="sm" variant="danger" onClick={open}>
-                    Bulk Archive
-                  </Button>
-                )}
-              </ConfirmDialog>
-            )}
-            <Button size="sm" variant="ghost" onClick={clearSelection}>
-              Clear Selection
-            </Button>
-          </div>
-        </div>
-      )}
+      <SelectionToolbar
+        selectedCount={selectedCount}
+        onBulkEdit={() => setShowBulkEdit(true)}
+        onBulkDelete={handleBulkDelete}
+        onClear={clearSelection}
+      />
 
       {showImport && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Import Names from CSV</CardTitle>
-              <Button variant="ghost" size="sm" onClick={resetImport}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!csvPreview.length && !importStats && (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                <p className="text-sm text-gray-600 mb-2">
-                  Upload a CSV file with names
-                </p>
-                <p className="text-xs text-gray-500 mb-4">
-                  Format: firstName, lastName, middleName, suffix (or lastName,
-                  firstName middleName)
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".csv,.txt"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <Button
-                  variant="secondary"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Select File
-                </Button>
-              </div>
-            )}
-
-            {csvFileName && csvPreview.length > 0 && !importStats && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm text-gray-600">
-                    File: <span className="font-medium">{csvFileName}</span>
-                    <span className="ml-2">
-                      ({csvPreview.length} rows found)
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-sm text-green-600">
-                      {csvPreview.filter((r) => r.isValid).length} valid
-                    </span>
-                    <span className="text-sm text-red-600">
-                      {csvPreview.filter((r) => !r.isValid).length} invalid
-                    </span>
-                  </div>
-                </div>
-
-                <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
-                      <tr>
-                        <th className="text-left px-3 py-2">#</th>
-                        <th className="text-left px-3 py-2">First Name</th>
-                        <th className="text-left px-3 py-2">Middle Name</th>
-                        <th className="text-left px-3 py-2">Last Name</th>
-                        <th className="text-left px-3 py-2">Suffix</th>
-                        <th className="text-left px-3 py-2">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {csvPreview.map((row, index) => (
-                        <tr
-                          key={index}
-                          className={row.isValid ? "" : "bg-red-50"}
-                        >
-                          <td className="px-3 py-2 text-gray-500">
-                            {index + 1}
-                          </td>
-                          <td className="px-3 py-2">{row.firstName}</td>
-                          <td className="px-3 py-2">{row.middleName}</td>
-                          <td className="px-3 py-2">{row.lastName}</td>
-                          <td className="px-3 py-2">{row.suffix}</td>
-                          <td className="px-3 py-2">
-                            {row.isValid ? (
-                              <Check className="w-4 h-4 text-green-500" />
-                            ) : (
-                              <span className="flex items-center gap-1 text-red-600 text-xs">
-                                <AlertCircle className="w-3 h-3" />
-                                {row.error}
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button variant="ghost" onClick={resetImport}>
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleImport}
-                    disabled={
-                      importing ||
-                      csvPreview.filter((r) => r.isValid).length === 0
-                    }
-                  >
-                    {importing
-                      ? "Importing..."
-                      : `Import ${csvPreview.filter((r) => r.isValid).length} Names`}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {importStats && (
-              <div className="text-center py-8">
-                <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Import Complete</h3>
-                <p className="text-gray-600 mb-4">
-                  Successfully imported{" "}
-                  <span className="font-medium text-green-600">
-                    {importStats.success}
-                  </span>{" "}
-                  names
-                  {importStats.failed > 0 && (
-                    <span>
-                      ,{" "}
-                      <span className="font-medium text-red-600">
-                        {importStats.failed}
-                      </span>{" "}
-                      failed
-                    </span>
-                  )}
-                  {importStats.duplicates > 0 && (
-                    <span>
-                      ,{" "}
-                      <span className="font-medium text-yellow-600">
-                        {importStats.duplicates}
-                      </span>{" "}
-                      duplicates skipped
-                    </span>
-                  )}
-                </p>
-                <Button onClick={resetImport}>Done</Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <CsvImportCard
+          csvPreview={csvPreview}
+          csvFileName={csvFileName}
+          importStats={importStats}
+          importing={importing}
+          onFileSelect={handleFileSelect}
+          onImport={handleImport}
+          onReset={resetImport}
+        />
       )}
 
       {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit" : "Add"} Name</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  id="firstName"
-                  label="First Name"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  required
-                />
-                <Input
-                  id="middleName"
-                  label="Middle Name"
-                  value={formData.middleName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, middleName: e.target.value })
-                  }
-                />
-                <Input
-                  id="lastName"
-                  label="Last Name"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  required
-                />
-                <Input
-                  id="suffix"
-                  label="Suffix"
-                  value={formData.suffix}
-                  onChange={(e) =>
-                    setFormData({ ...formData, suffix: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit">{editingId ? "Update" : "Create"}</Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        <NameForm
+          editingId={editingId}
+          formData={formData}
+          onUpdate={setFormData}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingId(null);
+          }}
+        />
       )}
 
       {showBulkEdit && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>
-                Bulk Edit {selectedCount} Name{selectedCount !== 1 ? "s" : ""}
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowBulkEdit(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Group
-                </label>
-                <select
-                  value={bulkEditData.groupId}
-                  onChange={(e) =>
-                    setBulkEditData({
-                      ...bulkEditData,
-                      groupId: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">-- No Change --</option>
-                  {groups.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Position
-                </label>
-                <select
-                  value={bulkEditData.positionId}
-                  onChange={(e) =>
-                    setBulkEditData({
-                      ...bulkEditData,
-                      positionId: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">-- No Change --</option>
-                  {positions.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Area
-                </label>
-                <select
-                  value={bulkEditData.areaId}
-                  onChange={(e) =>
-                    setBulkEditData({ ...bulkEditData, areaId: e.target.value })
-                  }
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">-- No Change --</option>
-                  {areas.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  value={bulkEditData.statusId}
-                  onChange={(e) =>
-                    setBulkEditData({
-                      ...bulkEditData,
-                      statusId: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">-- No Change --</option>
-                  {statuses.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="ghost" onClick={() => setShowBulkEdit(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleBulkEdit}
-                disabled={
-                  bulkLoading || !Object.values(bulkEditData).some((v) => v)
-                }
-              >
-                {bulkLoading ? "Updating..." : "Apply Changes"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <BulkEditCard
+          selectedCount={selectedCount}
+          groups={groups}
+          positions={positions}
+          areas={areas}
+          statuses={statuses}
+          bulkEditData={bulkEditData}
+          bulkLoading={bulkLoading}
+          onUpdate={(field, value) =>
+            setBulkEditData((prev) => ({ ...prev, [field]: value }))
+          }
+          onApply={handleBulkEdit}
+          onCancel={() => setShowBulkEdit(false)}
+        />
       )}
 
-      <Card>
-        <CardHeader className="py-3">
-          <div className="flex items-center gap-4">
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search names..."
-            />
-            <span className="text-sm text-gray-500 ml-auto">
-              {sortedNames.length} name{sortedNames.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3">
-                  <button
-                    onClick={toggleSelectAll}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    {selectedIds.size === sortedNames.length &&
-                    sortedNames.length > 0 ? (
-                      <CheckSquare className="w-4 h-4" />
-                    ) : (
-                      <Square className="w-4 h-4" />
-                    )}
-                  </button>
-                </th>
-                <th
-                  className="text-left px-2 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("fullName")}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig?.key === "fullName" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
-                </tr>
-              ) : sortedNames.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No names found
-                  </td>
-                </tr>
-              ) : (
-                sortedNames.map((n) => (
-                  <tr
-                    key={n.id}
-                    className={
-                      selectedIds.has(n.id) ? "bg-blue-50" : "hover:bg-gray-50"
-                    }
-                  >
-                    <td className="px-4">
-                      <button
-                        onClick={() => toggleSelect(n.id)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        {selectedIds.has(n.id) ? (
-                          <CheckSquare className="w-4 h-4 text-blue-600" />
-                        ) : (
-                          <Square className="w-4 h-4" />
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-2 py-4 text-sm text-gray-900">
-                      {n.firstName} {n.middleName || ""} {n.lastName}
-                      {n.suffix ? `, ${n.suffix}` : ""}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canEdit("lists", "names") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingId(n.id);
-                              setFormData({
-                                firstName: n.firstName,
-                                middleName: n.middleName || "",
-                                lastName: n.lastName,
-                                suffix: n.suffix || "",
-                              });
-                              setShowForm(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("lists", "names") && (
-                          <ConfirmDialog
-                            title="Archive Name"
-                            message={`Archive ${n.firstName} ${n.lastName}? It can be restored from Trash.`}
-                            confirmText="Archive"
-                            variant="danger"
-                            onConfirm={() =>
-                              handleDelete(n.id, `${n.firstName} ${n.lastName}`)
-                            }
-                          >
-                            {(open) => (
-                              <Button variant="ghost" size="sm" onClick={open}>
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+      <div>
+        <NamesTable
+          names={sortedNames}
+          loading={loading}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedIds={selectedIds}
+          sortConfig={sortConfig}
+          onToggleSelect={toggleSelect}
+          onToggleSelectAll={toggleSelectAll}
+          onSort={(key: string) => handleSort(key as any)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
     </div>
   );
 }

@@ -68,12 +68,12 @@
 - [x] Fix `HealthCheckPage.test.tsx` — added missing `Server`, `HardDrive` mock exports
 
 ### 2. Refactor Large Components (33 files over 300 lines)
-- [ ] Refactor `PayrollDetailPage.tsx` (1,166→949 lines) — extracted Salaries, Earnings, Benefits, Deductions stages into separate components (SalariesStage.tsx, EarningsStage.tsx, BenefitsStage.tsx, DeductionsStage.tsx); removed 4 inline render blocks (246 lines)
+- [x] Refactor `PayrollDetailPage.tsx` (1,166→949 lines) — extracted Salaries, Earnings, Benefits, Deductions stages into separate components (SalariesStage.tsx, EarningsStage.tsx, BenefitsStage.tsx, DeductionsStage.tsx); removed 4 inline render blocks (246 lines)
 - [ ] Refactor `UsersPage.tsx` (1,097 lines) — extract user form, table, filters
 - [ ] Refactor `DTRPage.tsx` (1,079 lines) — extract calendar, computation, time selector
-- [ ] Refactor `DatabasePage.tsx` (982 lines)
-- [ ] Refactor `EarningsDeductionsReportPage.tsx` (956 lines)
-- [ ] Refactor `NamesListPage.tsx` (954 lines)
+- [ ] Refactor `DatabasePage.tsx` (983 lines)
+- [ ] Refactor `EarningsDeductionsReportPage.tsx` (957 lines)
+- [x] Refactor `NamesListPage.tsx` (954→507 lines) — extracted BulkEditCard, CsvImportCard, NameForm, NamesTable, SelectionToolbar into separate component files
 - [x] Refactor `PrintFormatsPage.tsx` (844→488 lines) — extracted constants, wizard step components, and ToggleField to separate files
 - [ ] Refactor remaining 27 page files over 300 lines
 - [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
