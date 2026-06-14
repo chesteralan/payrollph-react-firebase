@@ -13,11 +13,7 @@ import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { BarChart3, Download, Trash2, Upload, X } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import type { Employee, NameRecord } from "@/types/employee";
 import type { DTREntry, LeaveApplication, LeaveBalance } from "@/types/dtr";
 import type {
@@ -35,21 +31,11 @@ import {
 } from "./DTRComputation";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { DTRCalendar } from "./DTRCalendar";
-
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+import { DayEntryModal } from "./DayEntryModal";
+import { LeaveApplicationModal } from "./LeaveApplicationModal";
+import { DTRImportModal } from "./DTRImportModal";
+import { DTRSummaryTable } from "./DTRSummaryTable";
+import { MONTH_NAMES } from "./DTRPage.constants";
 
 export function DTRPage() {
   const { canView, canEdit, canDelete } = usePermissions();
@@ -567,6 +553,17 @@ export function DTRPage() {
   const dim = daysInMonth(selectedYear, selectedMonth);
   const fdm = firstDayOfMonth(selectedYear, selectedMonth);
 
+  // selectedDay entry for modal
+  const selectedDateStr =
+    selectedDay !== null
+      ? dateStr(selectedYear, selectedMonth, selectedDay)
+      : "";
+  const hasExistingEntry = entryMap.has(selectedDateStr);
+  const hoursWorked =
+    dayForm.timeIn && dayForm.timeOut
+      ? calcHours(dayForm.timeIn, dayForm.timeOut)
+      : 0;
+
   if (!canView("employees", "calendar"))
     return <div className="text-center py-12 text-gray-500">Access denied</div>;
 
@@ -631,449 +628,46 @@ export function DTRPage() {
       )}
 
       {viewMode === "summary" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                DTR Summary - {MONTH_NAMES[selectedMonth]} {selectedYear}
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardHeader className="py-3">
-            <div className="flex items-center gap-4">
-              <SearchBar
-                value={dtrSearchQuery}
-                onChange={setDtrSearchQuery}
-                placeholder="Search by employee name or code..."
-              />
-              <span className="text-sm text-gray-500 ml-auto">
-                {filteredMonthEntries.length} entr
-                {filteredMonthEntries.length !== 1 ? "ies" : "y"}
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Employee
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Code
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Date
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Time In
-                  </th>
-                  <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Time Out
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Hours
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    OT
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Late
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredMonthEntries.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      className="px-6 py-4 text-center text-gray-500"
-                    >
-                      No entries for this period
-                    </td>
-                  </tr>
-                ) : (
-                  filteredMonthEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {entry.employeeName || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {entry.employeeCode || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {entry.date}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        {entry.timeIn || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-center">
-                        {entry.timeOut || "-"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {entry.hoursWorked || 0}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {entry.overtimeHours || 0}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {entry.lateHours || 0}
-                      </td>
-                      <td className="px-4 py-3">
-                        {entry.absenceType ? (
-                          <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-800 capitalize">
-                            {entry.absenceType}
-                          </span>
-                        ) : entry.timeIn && entry.timeOut ? (
-                          <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                            Present
-                          </span>
-                        ) : (
-                          <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                            Incomplete
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+        <DTRSummaryTable
+          entries={filteredMonthEntries}
+          searchQuery={dtrSearchQuery}
+          onSearchChange={setDtrSearchQuery}
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+        />
       )}
 
-      {showDayModal && selectedDay !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={() => setShowDayModal(false)}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                {MONTH_NAMES[selectedMonth]} {selectedDay}, {selectedYear}
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDayModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  id="timeIn"
-                  label="Time In"
-                  type="time"
-                  value={dayForm.timeIn}
-                  onChange={(e) =>
-                    setDayForm({ ...dayForm, timeIn: e.target.value })
-                  }
-                />
-                <Input
-                  id="timeOut"
-                  label="Time Out"
-                  type="time"
-                  value={dayForm.timeOut}
-                  onChange={(e) =>
-                    setDayForm({ ...dayForm, timeOut: e.target.value })
-                  }
-                />
-              </div>
-              {dayForm.timeIn && dayForm.timeOut && (
-                <p className="text-sm text-gray-600">
-                  Hours Worked:{" "}
-                  <span className="font-medium">
-                    {calcHours(dayForm.timeIn, dayForm.timeOut)}
-                  </span>
-                </p>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  id="lateHours"
-                  label="Late Hours"
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  value={dayForm.lateHours}
-                  onChange={(e) =>
-                    setDayForm({
-                      ...dayForm,
-                      lateHours: Number(e.target.value),
-                    })
-                  }
-                />
-                <Input
-                  id="overtimeHours"
-                  label="Overtime Hours"
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  value={dayForm.overtimeHours}
-                  onChange={(e) =>
-                    setDayForm({
-                      ...dayForm,
-                      overtimeHours: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Absence Type
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  value={dayForm.absenceType}
-                  onChange={(e) =>
-                    setDayForm({
-                      ...dayForm,
-                      absenceType: e.target.value as DTREntry["absenceType"],
-                    })
-                  }
-                >
-                  <option value="">None</option>
-                  <option value="absent">Absent</option>
-                  <option value="late">Late</option>
-                  <option value="undertime">Undertime</option>
-                  <option value="sick">Sick Leave</option>
-                  <option value="vacation">Vacation Leave</option>
-                </select>
-              </div>
-              {dayForm.absenceType && (
-                <Input
-                  id="absenceReason"
-                  label="Absence Reason"
-                  value={dayForm.absenceReason}
-                  onChange={(e) =>
-                    setDayForm({ ...dayForm, absenceReason: e.target.value })
-                  }
-                />
-              )}
-              <Input
-                id="notes"
-                label="Notes"
-                value={dayForm.notes}
-                onChange={(e) =>
-                  setDayForm({ ...dayForm, notes: e.target.value })
-                }
-              />
-              <div className="flex items-center justify-between pt-2">
-                {canDelete("employees", "calendar") &&
-                  entryMap.get(
-                    dateStr(selectedYear, selectedMonth, selectedDay),
-                  ) && (
-                    <ConfirmDialog
-                      title="Delete Entry"
-                      message="Delete this DTR entry?"
-                      confirmText="Delete"
-                      onConfirm={deleteDayEntry}
-                    >
-                      {(open) => (
-                        <Button variant="ghost" size="sm" onClick={open}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </Button>
-                      )}
-                    </ConfirmDialog>
-                  )}
-                <div className="flex gap-2 ml-auto">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowDayModal(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={saveDayEntry}>Save</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DayEntryModal
+        show={showDayModal}
+        selectedDay={selectedDay}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        dayForm={dayForm}
+        hasExistingEntry={hasExistingEntry}
+        canDelete={canDelete("employees", "calendar")}
+        hoursWorked={hoursWorked}
+        onClose={() => setShowDayModal(false)}
+        onChange={setDayForm}
+        onSave={saveDayEntry}
+        onDelete={deleteDayEntry}
+      />
 
-      {showLeaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={() => setShowLeaveModal(false)}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Apply for Leave</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowLeaveModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Leave Type
-                </label>
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  value={leaveForm.benefitId}
-                  onChange={(e) =>
-                    setLeaveForm({ ...leaveForm, benefitId: e.target.value })
-                  }
-                >
-                  <option value="">Select leave type</option>
-                  {benefits.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  id="startDate"
-                  label="Start Date"
-                  type="date"
-                  value={leaveForm.startDate}
-                  onChange={(e) =>
-                    setLeaveForm({ ...leaveForm, startDate: e.target.value })
-                  }
-                />
-                <Input
-                  id="endDate"
-                  label="End Date"
-                  type="date"
-                  value={leaveForm.endDate}
-                  onChange={(e) =>
-                    setLeaveForm({ ...leaveForm, endDate: e.target.value })
-                  }
-                />
-              </div>
-              {leaveForm.startDate && leaveForm.endDate && (
-                <p className="text-sm text-gray-600">
-                  Total Days:{" "}
-                  <span className="font-medium">
-                    {Math.ceil(
-                      (new Date(leaveForm.endDate).getTime() -
-                        new Date(leaveForm.startDate).getTime()) /
-                        (1000 * 60 * 60 * 24),
-                    ) + 1}
-                  </span>
-                </p>
-              )}
-              <Input
-                id="reason"
-                label="Reason"
-                value={leaveForm.reason}
-                onChange={(e) =>
-                  setLeaveForm({ ...leaveForm, reason: e.target.value })
-                }
-              />
-              <div className="flex justify-end gap-2 pt-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowLeaveModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={applyLeave}>Submit Application</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <LeaveApplicationModal
+        show={showLeaveModal}
+        leaveForm={leaveForm}
+        benefits={benefits}
+        onClose={() => setShowLeaveModal(false)}
+        onChange={setLeaveForm}
+        onSubmit={applyLeave}
+      />
 
-      {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={() => setShowImportModal(false)}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 p-6 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Import DTR Entries</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowImportModal(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            {importErrors.length > 0 && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm font-medium text-red-800 mb-1">
-                  {importErrors.length} error(s) found:
-                </p>
-                <ul className="text-xs text-red-700 space-y-0.5">
-                  {importErrors.map((err, i) => (
-                    <li key={i}>{err}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {importPreview.length > 0 && (
-              <>
-                <p className="text-sm text-gray-600 mb-2">
-                  {importPreview.length} entries ready to import
-                </p>
-                <div className="overflow-x-auto border rounded-lg mb-4">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="text-left px-3 py-2">Date</th>
-                        <th className="text-left px-3 py-2">Time In</th>
-                        <th className="text-left px-3 py-2">Time Out</th>
-                        <th className="text-right px-3 py-2">Hours</th>
-                        <th className="text-right px-3 py-2">OT</th>
-                        <th className="text-right px-3 py-2">Late</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {importPreview.slice(0, 20).map((p, i) => (
-                        <tr key={i}>
-                          <td className="px-3 py-2">{p.date}</td>
-                          <td className="px-3 py-2">{p.timeIn || "-"}</td>
-                          <td className="px-3 py-2">{p.timeOut || "-"}</td>
-                          <td className="px-3 py-2 text-right">
-                            {p.hoursWorked || 0}
-                          </td>
-                          <td className="px-3 py-2 text-right">
-                            {p.overtimeHours || 0}
-                          </td>
-                          <td className="px-3 py-2 text-right">
-                            {p.lateHours || 0}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {importPreview.length > 20 && (
-                  <p className="text-xs text-gray-500 mb-4">
-                    ...and {importPreview.length - 20} more entries
-                  </p>
-                )}
-              </>
-            )}
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setShowImportModal(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleImport}>
-                Import {importPreview.length} Entries
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DTRImportModal
+        show={showImportModal}
+        importPreview={importPreview}
+        importErrors={importErrors}
+        onClose={() => setShowImportModal(false)}
+        onImport={handleImport}
+      />
     </div>
   );
 }
