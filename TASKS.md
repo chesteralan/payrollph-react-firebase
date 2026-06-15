@@ -76,7 +76,7 @@
 - [x] Refactor `NamesListPage.tsx` (954→507 lines) — extracted BulkEditCard, CsvImportCard, NameForm, NamesTable, SelectionToolbar into separate component files
 - [x] Refactor `PrintFormatsPage.tsx` (844→488 lines) — extracted constants, wizard step components, and ToggleField to separate files
 - [ ] Refactor remaining 27 page files over 300 lines
-- [ ] Refactor `PayrollOutputView.tsx` (1,575 lines) — split by view type
+- [x] Refactor `PayrollOutputView.tsx` (1,575→~500 lines) — split by view type into RegisterMode.tsx, PayslipMode.tsx, TransmittalMode.tsx, JournalMode.tsx, DenominationMode.tsx, and shared.tsx
 - [x] Refactor `Sidebar.tsx` (479→185 lines) — extracted `navConfig.tsx` with navigation tree
 - [x] **Extracted CalendarPage constants** — moved `monthNames` and `typeColors` from inline to `CalendarPage.constants.ts` (544→524 lines)
 - [x] **Fixed TS regressions**:
