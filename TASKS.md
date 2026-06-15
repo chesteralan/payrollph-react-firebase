@@ -80,7 +80,8 @@
 - [x] Refactor `PayrollOutputView.tsx` (1,575→~500 lines) — split by view type into 6 separate files + shared
 - [x] Refactor `Sidebar.tsx` (479→185 lines) — extracted `navConfig.tsx` with navigation tree
 - [x] Extracted CalendarPage constants — moved `monthNames` and `typeColors` from inline to `CalendarPage.constants.ts`
-- [ ] Refactor remaining ~24 page files over 300 lines (799-liner CompaniesPage, 785-liner TemplatesPage, etc.)
+- [x] Refactor `CompaniesPage.tsx` (799→99 lines) — extracted `useCompanies` hook, `CompanyForm`, `CompanyTable` components
+- [ ] Refactor remaining ~23 page files over 300 lines (785-liner TemplatesPage, 729-liner CustomReportBuilderPage, etc.)
 - [x] Fixed TS regressions — all TypeScript compilation passes with 0 errors
 
 ### 3. TypeScript Fixes ✅ (0 errors — all resolved)
