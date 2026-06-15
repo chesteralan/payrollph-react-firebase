@@ -81,7 +81,9 @@
 - [x] Refactor `Sidebar.tsx` (479→185 lines) — extracted `navConfig.tsx` with navigation tree
 - [x] Extracted CalendarPage constants — moved `monthNames` and `typeColors` from inline to `CalendarPage.constants.ts`
 - [x] Refactor `CompaniesPage.tsx` (799→99 lines) — extracted `useCompanies` hook, `CompanyForm`, `CompanyTable` components
-- [ ] Refactor remaining ~23 page files over 300 lines (785-liner TemplatesPage, 729-liner CustomReportBuilderPage, etc.)
+- [x] Refactor TemplatesPage.tsx (785→→350→160 lines) — extracted `useTemplatesPage` hook, removed `// -nocheck` directive, deleted unused `TemplatesPageFilters` type
+- [x] Refactor CustomReportBuilderPage.tsx (729→~380 lines) — extracted `useCustomReportBuilder` hook, extracted `AVAILABLE_FIELDS`/`CATEGORIES` constants, inlined FieldSelector/ReportConfiguration/FilterEditor/SavedReportsTable/ReportPreview sub-components
+- [ ] Refactor remaining ~21 page files over 300 lines
 - [x] Fixed TS regressions — all TypeScript compilation passes with 0 errors
 
 ### 3. TypeScript Fixes ✅ (0 errors — all resolved)
