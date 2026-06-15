@@ -1,6 +1,6 @@
 import { useCustomReportBuilder } from "./useCustomReportBuilder";
 import { AVAILABLE_FIELDS, CATEGORIES } from "./CustomReportBuilderPage.constants";
-import type { ReportFilter } from "./CustomReportBuilderPage.types";
+import type { ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
 
 function FieldSelector({
   selectedFields,
@@ -212,8 +212,8 @@ function SavedReportsTable({
   savedReports,
   onLoad,
 }: {
-  savedReports: { id: string; name: string; fields: string[]; createdAt: Date }[];
-  onLoad: (report: { id: string; name: string; fields: string[]; createdAt: Date }) => void;
+  savedReports: SavedReport[];
+  onLoad: (report: SavedReport) => void;
 }) {
   if (savedReports.length === 0) {
     return (
