@@ -320,7 +320,6 @@ export function DatabasePage() {
   };
 
   const runCleanup = async (operation: string) => {
-    /* eslint-disable react-hooks/purity */
     setCleanupLoading(operation);
     const startTime = Date.now();
     let count = 0;
@@ -493,7 +492,6 @@ export function DatabasePage() {
       addToast({ type: "error", title: `Cleanup failed: ${e}` });
     }
     setCleanupLoading("");
-    /* eslint-enable react-hooks/purity */
   };
 
   const totalDocuments = Object.values(stats).reduce((a, b) => a + b, 0);

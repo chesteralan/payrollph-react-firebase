@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +44,7 @@ export function useEmployeeReport() {
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  const fetchLookups = async () => {
+  const fetchLookups = useCallback(async () => {
     if (!currentCompanyId) return;
     const [groupsSnap, positionsSnap, areasSnap, statusesSnap] =
       await Promise.all([
@@ -90,13 +90,14 @@ export function useEmployeeReport() {
         (d) => ({ id: d.id, ...d.data() }) as EmployeeStatus,
       ),
     );
-  };
+  }, [currentCompanyId]);
 
   useEffect(() => {
     if (currentCompanyId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchLookups();
     }
-  }, [currentCompanyId]);
+  }, [currentCompanyId, fetchLookups]);
 
   const generateReport = async () => {
     if (!currentCompanyId) return;
