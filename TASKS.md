@@ -72,7 +72,7 @@
 - [x] Refactor `UsersPage.tsx` (1,097→528 lines) — extracted BulkActionBar, UserForm, UserImportCard, UserPermissionsCard, UsersTable into separate component files
 - [x] Refactor `DTRPage.tsx` (1,079→673 lines) — extracted DayEntryModal, LeaveApplicationModal, DTRImportModal, DTRSummaryTable, and DTRPage.constants into separate files
 - [x] Refactor `DatabasePage.tsx` (983→617 lines) — extracted CollectionStatsTable, BackupHistoryTable, VerificationResultsTable, DataCleanupSection into separate component files; extracted types
-- [ ] Refactor `EarningsDeductionsReportPage.tsx` (957 lines)
+- [x] Refactor `EarningsDeductionsReportPage.tsx` (957→264 lines) — extracted `useEarningsDeductionsReport` hook, `SummaryCards`, `EarningsByTypeTable`, `DeductionsByTypeTable`, `BenefitsSummaryTable`, `EmployeeBreakdownTable` components
 - [x] Refactor `NamesListPage.tsx` (954→507 lines) — extracted BulkEditCard, CsvImportCard, NameForm, NamesTable, SelectionToolbar into separate component files
 - [x] Refactor `PrintFormatsPage.tsx` (844→488 lines) — extracted constants, wizard step components, and ToggleField to separate files
 - [ ] Refactor remaining 27 page files over 300 lines
