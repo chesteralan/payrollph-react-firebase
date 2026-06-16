@@ -58,6 +58,7 @@
   - **Service fixes**: `payroll.ts` null checks for `snap.docs[0]`, `ipRestriction.ts` CIDR parsing defaults, `twoFactorAuth.ts` Firebase v12 API compatibility (`as any` workarounds, `secret.secretKey` parameter)
   - **Seed script**: Removed unused `ServiceAccount` type import, replaced non-null assertion for `randomElement`
 - **Extracted shared `Toggle` component**: Moved inline `Toggle` switch from `SystemSettingsPage.tsx` to `src/components/ui/Toggle/Toggle.tsx`; eliminated 30-line duplication
+- **Fixed Sidebar test crash (jsdom threading)**: Changed vitest pool from `threads` to `forks` in `vite.config.ts` — the `v8::Module::IsGraphAsync` fatal error in jsdom 29.x + Node.js 20 is a known threading race condition. All 21 Sidebar tests now run reliably.
 
 ## Remaining
 
