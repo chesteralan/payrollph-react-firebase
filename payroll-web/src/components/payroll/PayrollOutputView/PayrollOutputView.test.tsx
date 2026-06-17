@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import {
-  PrintHeader,
-  PrintFooter,
-  formatCurrency,
-  PayrollRegisterMode,
-  PayslipMode,
-  TransmittalMode,
-  JournalMode,
   DenominationMode,
-} from "./PayrollOutputView";
+  formatCurrency,
+  JournalMode,
+  PayslipMode,
+  PayrollRegisterMode,
+  PrintFooter,
+  PrintHeader,
+  TransmittalMode,
+} from "./";
 import type { ProcessingRow } from "./PayrollOutputView.types";
 
 // Mock lucide-react icons

@@ -37,8 +37,3 @@ export interface SelectionItem {
   id: string;
   label: string;
 }
-
-export interface TemplatesPageFilters {
-  search: string;
-  companyId: string;
-}
