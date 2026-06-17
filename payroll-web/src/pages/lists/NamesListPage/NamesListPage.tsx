@@ -498,7 +498,7 @@ export function NamesListPage() {
           sortConfig={sortConfig}
           onToggleSelect={toggleSelect}
           onToggleSelectAll={toggleSelectAll}
-          onSort={(key: string) => handleSort(key as any)}
+          onSort={(key: string) => handleSort(key as keyof (NameRecord & { fullName: string }))}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
