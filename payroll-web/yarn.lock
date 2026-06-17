@@ -1123,7 +1123,7 @@
     "@tailwindcss/oxide-win32-arm64-msvc" "4.3.1"
     "@tailwindcss/oxide-win32-x64-msvc" "4.3.1"
 
-"@tailwindcss/vite@^4.2.4":
+"@tailwindcss/vite@^4.3.1":
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/@tailwindcss/vite/-/vite-4.3.1.tgz#636f812c870061bd9255ca24d756216f4df031d9"
   integrity sha512-hItDHuIIlEV61R+faXu66s1K36aTurO/Qw0e45Vskz57gXl9pWOT6eg3zmcEui6CZXddbN7zd41bwmvag4JGwQ==
