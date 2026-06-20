@@ -119,3 +119,12 @@
 - [x] Remove unused runtime deps: `@sentry/replay`, `@sentry/tracing`, `tailwind-merge` — already not in `package.json`
 - [x] Remove unused devDeps: `husky` — already not in `package.json`
 - [x] Add missing deps: `jspdf`, `html2canvas`, `@axe-core/react` — not imported anywhere in code, no type stubs found; no action needed
+
+### 7. Install & Integrate Fallow ✅
+- [x] Install Fallow (`fallow-rs/fallow`) — Rust-native codebase intelligence tool (v2.100.0, Linux x64 binary)
+- [x] Run `fallow health` — score: 63 C, 59,294 LOC, 8.6% dead files, 28.8% dead exports, maintainability 90.3, duplication 12.1%
+- [x] Run `fallow dead-code` — 335 issues (38 unused files, 228 unused exports, 64 unused types). Many false positives (barrel exports, test mocks). Fixed: deleted `useScreenReaderAnnouncement.tsx`, `bundlewatch.config.js`, `App.css`, `lucide-react.tsx` (duplicate mock)
+- [x] Run `fallow dupes` — 65 clone groups. Notable: AreasPage/GroupsPage/PositionsPage share heavily duplicated table JSX (125+ lines each). Test mocks in AppLayout/Header/Sidebar share mockAuth setup (36 lines). Not addressing in this session — extracting a shared `<SortableTable>` component is a larger refactor.
+- [x] Run `fallow complexity` — report not available as subcommand (health includes complexity metrics). Key hotspots: PayrollDetailPage (900 lines, 52 cyclomatic), DTRPage (634 lines, 8 cyclomatic), sentry.ts `classifyError` (41 cyclomatic)
+- [x] Run `fallow security` — 6 findings: 1 dynamic regex in `email.ts` (medium, cross-module taint from `reportScheduling.ts`), 5 SSRF in `smoke-test.ts` (unused file — will be removed in future cleanup). No critical findings.
+- [x] Integrate findings into TASKS.md — all findings noted, unused files deleted.
