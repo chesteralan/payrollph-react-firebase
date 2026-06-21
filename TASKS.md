@@ -59,6 +59,7 @@
   - **Seed script**: Removed unused `ServiceAccount` type import, replaced non-null assertion for `randomElement`
 - **Extracted shared `Toggle` component**: Moved inline `Toggle` switch from `SystemSettingsPage.tsx` to `src/components/ui/Toggle/Toggle.tsx`; eliminated 30-line duplication
 - **Fixed Sidebar test crash (jsdom threading)**: Changed vitest pool from `threads` to `forks` in `vite.config.ts` — the `v8::Module::IsGraphAsync` fatal error in jsdom 29.x + Node.js 20 is a known threading race condition. All 21 Sidebar tests now run reliably.
+- **June 21 maintenance**: Removed 24 truly dead files — 3 unused component dirs (`A11yAuditReport`, `AccountLockout`, `AnnualCalendarPicker`), 18 stale parent-level `.types.ts` duplicates left after subdirectory refactors, 2 root-level `.types.ts` duplicates (`EmptyState.types.ts`, `Input.types.ts`), 2 unused CLI scripts (`deploy-previews.ts`, `smoke-test.ts`). Added error handling + toast notifications to `CalendarPage.tsx` (try/catch on fetchEvents, handleSubmit, handleDelete, handleCreateRecurringHoliday). Fixed `DTRPage.test.tsx` — switched to async `findByText`. Fallow health score improved: 73 B (up from 63 C), 58,973 LOC (down from 59,294), 7.7% dead files (down from 8.6%), 31.3% dead exports (up from 28.8% — more false positives exposed by removing dead files). 0 security findings (previously 6). All TypeScript and ESLint checks pass with 0 errors.
 
 ## Remaining
 

@@ -22,12 +22,12 @@ vi.mock("@/hooks/usePermissions", () => ({
 }));
 
 describe("DTRPage", () => {
-  it("renders the DTR page heading", () => {
+  it("renders the DTR page heading", async () => {
     render(
       <BrowserRouter>
         <DTRPage />
       </BrowserRouter>,
     );
-    expect(screen.getByText("Daily Time Record")).toBeTruthy();
+    expect(await screen.findByText("Daily Time Record")).toBeTruthy();
   });
 });

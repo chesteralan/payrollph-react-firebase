@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/useToast";
 import {
   Calendar as CalendarIcon,
   Download,
@@ -27,6 +28,7 @@ import { CALENDAR_TYPE_COLORS, MONTH_NAMES } from "./CalendarPage.constants";
 
 export function CalendarPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
+  const { addToast } = useToast();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -50,23 +52,27 @@ export function CalendarPage() {
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
-    const snap = await getDocs(query(collection(db, "calendar")));
-    const allEvents = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    })) as CalendarEvent[];
-    setEvents(
-      allEvents
-        .filter((e) => {
-          const d = new Date(e.date);
-          return d.getFullYear() === selectedYear;
-        })
-        .sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        ),
-    );
+    try {
+      const snap = await getDocs(query(collection(db, "calendar")));
+      const allEvents = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as CalendarEvent[];
+      setEvents(
+        allEvents
+          .filter((e) => {
+            const d = new Date(e.date);
+            return d.getFullYear() === selectedYear;
+          })
+          .sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+          ),
+      );
+    } catch {
+      addToast({ type: "error", title: "Failed to load calendar events" });
+    }
     setLoading(false);
-  }, [selectedYear]);
+  }, [selectedYear, addToast]);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -76,22 +82,36 @@ export function CalendarPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = {
-      ...formData,
-      date: new Date(formData.date),
-      companyId: "global",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    if (editingId) {
-      await updateDoc(doc(db, "calendar", editingId), data);
-    } else {
-      await addDoc(collection(db, "calendar"), data);
+    try {
+      const data = {
+        ...formData,
+        date: new Date(formData.date),
+        companyId: "global",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      if (editingId) {
+        await updateDoc(doc(db, "calendar", editingId), data);
+        addToast({
+          type: "success",
+          title: "Event updated",
+          message: `${formData.name} has been updated`,
+        });
+      } else {
+        await addDoc(collection(db, "calendar"), data);
+        addToast({
+          type: "success",
+          title: "Event created",
+          message: `${formData.name} has been added`,
+        });
+      }
+      setShowForm(false);
+      setEditingId(null);
+      setFormData({ date: "", name: "", type: "holiday", isPaid: true });
+      fetchEvents();
+    } catch {
+      addToast({ type: "error", title: "Failed to save calendar event" });
     }
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({ date: "", name: "", type: "holiday", isPaid: true });
-    fetchEvents();
   };
 
   const handleEdit = (event: CalendarEvent) => {
@@ -107,8 +127,13 @@ export function CalendarPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this calendar entry?")) {
-      await deleteDoc(doc(db, "calendar", id));
-      fetchEvents();
+      try {
+        await deleteDoc(doc(db, "calendar", id));
+        addToast({ type: "success", title: "Event deleted" });
+        fetchEvents();
+      } catch {
+        addToast({ type: "error", title: "Failed to delete calendar event" });
+      }
     }
   };
 
@@ -134,38 +159,47 @@ export function CalendarPage() {
 
   const handleCreateRecurringHoliday = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { month, day, name, type, isPaid, years } = recurringFormData;
-    const currentYear = new Date().getFullYear();
-    const batch = writeBatch(db);
+    try {
+      const { month, day, name, type, isPaid, years } = recurringFormData;
+      const currentYear = new Date().getFullYear();
+      const batch = writeBatch(db);
 
-    for (let i = 0; i < years; i++) {
-      const year = currentYear + i;
-      const date = new Date(year, month - 1, day);
-      const entryData = {
-        date,
-        name,
-        type,
-        isPaid,
-        companyId: "global",
-        recurring: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      const newDocRef = doc(collection(db, "calendar"));
-      batch.set(newDocRef, entryData);
+      for (let i = 0; i < years; i++) {
+        const year = currentYear + i;
+        const date = new Date(year, month - 1, day);
+        const entryData = {
+          date,
+          name,
+          type,
+          isPaid,
+          companyId: "global",
+          recurring: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        const newDocRef = doc(collection(db, "calendar"));
+        batch.set(newDocRef, entryData);
+      }
+
+      await batch.commit();
+      setShowRecurringForm(false);
+      setRecurringFormData({
+        month: 1,
+        day: 1,
+        name: "",
+        type: "holiday",
+        isPaid: true,
+        years: 5,
+      });
+      addToast({
+        type: "success",
+        title: "Recurring holidays created",
+        message: `Created ${years} years of "${name}"`,
+      });
+      fetchEvents();
+    } catch {
+      addToast({ type: "error", title: "Failed to create recurring holidays" });
     }
-
-    await batch.commit();
-    setShowRecurringForm(false);
-    setRecurringFormData({
-      month: 1,
-      day: 1,
-      name: "",
-      type: "holiday",
-      isPaid: true,
-      years: 5,
-    });
-    fetchEvents();
   };
 
   const groupedByMonth = events.reduce(
