@@ -287,113 +287,133 @@ export function DTRPage() {
 
   const saveDayEntry = async () => {
     if (!selectedDay || !selectedEmployeeId) return;
-    const ds = dateStr(selectedYear, selectedMonth, selectedDay);
-    const ti = dayForm.timeIn || undefined;
-    const to = dayForm.timeOut || undefined;
-    const hw = ti && to ? calcHours(ti, to) : 0;
-    const at = dayForm.absenceType || undefined;
-    const ar = dayForm.absenceReason || undefined;
-    const nt = dayForm.notes || undefined;
-    const data = {
-      employeeId: selectedEmployeeId,
-      date: ds,
-      timeIn: ti,
-      timeOut: to,
-      hoursWorked: hw,
-      overtimeHours: dayForm.overtimeHours,
-      lateHours: dayForm.lateHours,
-      absenceType: at,
-      absenceReason: ar,
-      notes: nt,
-      updatedAt: new Date(),
-    };
+    try {
+      const ds = dateStr(selectedYear, selectedMonth, selectedDay);
+      const ti = dayForm.timeIn || undefined;
+      const to = dayForm.timeOut || undefined;
+      const hw = ti && to ? calcHours(ti, to) : 0;
+      const at = dayForm.absenceType || undefined;
+      const ar = dayForm.absenceReason || undefined;
+      const nt = dayForm.notes || undefined;
+      const data = {
+        employeeId: selectedEmployeeId,
+        date: ds,
+        timeIn: ti,
+        timeOut: to,
+        hoursWorked: hw,
+        overtimeHours: dayForm.overtimeHours,
+        lateHours: dayForm.lateHours,
+        absenceType: at,
+        absenceReason: ar,
+        notes: nt,
+        updatedAt: new Date(),
+      };
 
-    const existing = entryMap.get(ds);
-    if (existing) {
-      await updateDoc(doc(db, "dtr_entries", existing.id), data);
-      addToast({ type: "success", title: "Entry updated" });
-    } else {
-      await addDoc(collection(db, "dtr_entries"), {
-        ...data,
-        createdAt: new Date(),
-      });
-      addToast({ type: "success", title: "Entry created" });
+      const existing = entryMap.get(ds);
+      if (existing) {
+        await updateDoc(doc(db, "dtr_entries", existing.id), data);
+        addToast({ type: "success", title: "Entry updated" });
+      } else {
+        await addDoc(collection(db, "dtr_entries"), {
+          ...data,
+          createdAt: new Date(),
+        });
+        addToast({ type: "success", title: "Entry created" });
+      }
+      setShowDayModal(false);
+      fetchDTRData();
+    } catch {
+      addToast({ type: "error", title: "Failed to save DTR entry" });
     }
-    setShowDayModal(false);
-    fetchDTRData();
   };
 
   const deleteDayEntry = async () => {
     if (!selectedDay) return;
-    const ds = dateStr(selectedYear, selectedMonth, selectedDay);
-    const existing = entryMap.get(ds);
-    if (existing) {
-      await deleteDoc(doc(db, "dtr_entries", existing.id));
-      addToast({ type: "success", title: "Entry deleted" });
-      setShowDayModal(false);
-      fetchDTRData();
+    try {
+      const ds = dateStr(selectedYear, selectedMonth, selectedDay);
+      const existing = entryMap.get(ds);
+      if (existing) {
+        await deleteDoc(doc(db, "dtr_entries", existing.id));
+        addToast({ type: "success", title: "Entry deleted" });
+        setShowDayModal(false);
+        fetchDTRData();
+      }
+    } catch {
+      addToast({ type: "error", title: "Failed to delete DTR entry" });
     }
   };
 
   const applyLeave = async () => {
     if (!leaveForm.benefitId || !leaveForm.startDate || !leaveForm.endDate)
       return;
-    const start = new Date(leaveForm.startDate);
-    const end = new Date(leaveForm.endDate);
-    const days =
-      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    if (days <= 0) {
-      addToast({ type: "error", title: "Invalid date range" });
-      return;
-    }
+    try {
+      const start = new Date(leaveForm.startDate);
+      const end = new Date(leaveForm.endDate);
+      const days =
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      if (days <= 0) {
+        addToast({ type: "error", title: "Invalid date range" });
+        return;
+      }
 
-    const bal = leaveBalances.find((b) => b.benefitId === leaveForm.benefitId);
-    if (bal && bal.remaining < days) {
-      addToast({
-        type: "error",
-        title: "Insufficient leave balance",
-        message: `Available: ${bal.remaining} days`,
+      const bal = leaveBalances.find((b) => b.benefitId === leaveForm.benefitId);
+      if (bal && bal.remaining < days) {
+        addToast({
+          type: "error",
+          title: "Insufficient leave balance",
+          message: `Available: ${bal.remaining} days`,
+        });
+        return;
+      }
+
+      await addDoc(collection(db, "leave_applications"), {
+        employeeId: selectedEmployeeId,
+        benefitId: leaveForm.benefitId,
+        startDate: leaveForm.startDate,
+        endDate: leaveForm.endDate,
+        days,
+        reason: leaveForm.reason,
+        status: "pending",
+        createdAt: new Date(),
       });
-      return;
+      addToast({ type: "success", title: "Leave application submitted" });
+      setShowLeaveModal(false);
+      setLeaveForm({ benefitId: "", startDate: "", endDate: "", reason: "" });
+      fetchLeaveData();
+    } catch {
+      addToast({ type: "error", title: "Failed to submit leave application" });
     }
-
-    await addDoc(collection(db, "leave_applications"), {
-      employeeId: selectedEmployeeId,
-      benefitId: leaveForm.benefitId,
-      startDate: leaveForm.startDate,
-      endDate: leaveForm.endDate,
-      days,
-      reason: leaveForm.reason,
-      status: "pending",
-      createdAt: new Date(),
-    });
-    addToast({ type: "success", title: "Leave application submitted" });
-    setShowLeaveModal(false);
-    setLeaveForm({ benefitId: "", startDate: "", endDate: "", reason: "" });
-    fetchLeaveData();
   };
 
   const approveLeave = async (app: LeaveApplication) => {
-    await updateDoc(doc(db, "leave_applications", app.id), {
-      status: "approved",
-    });
-    const bal = leaveBalances.find((b) => b.benefitId === app.benefitId);
-    if (bal) {
-      await updateDoc(doc(db, "leave_balances", bal.id), {
-        used: bal.used + app.days,
-        remaining: bal.remaining - app.days,
+    try {
+      await updateDoc(doc(db, "leave_applications", app.id), {
+        status: "approved",
       });
+      const bal = leaveBalances.find((b) => b.benefitId === app.benefitId);
+      if (bal) {
+        await updateDoc(doc(db, "leave_balances", bal.id), {
+          used: bal.used + app.days,
+          remaining: bal.remaining - app.days,
+        });
+      }
+      addToast({ type: "success", title: "Leave approved" });
+      fetchLeaveData();
+    } catch {
+      addToast({ type: "error", title: "Failed to approve leave" });
     }
-    addToast({ type: "success", title: "Leave approved" });
-    fetchLeaveData();
   };
 
   const rejectLeave = async (app: LeaveApplication) => {
-    await updateDoc(doc(db, "leave_applications", app.id), {
-      status: "rejected",
-    });
-    addToast({ type: "info", title: "Leave rejected" });
-    fetchLeaveData();
+    try {
+      await updateDoc(doc(db, "leave_applications", app.id), {
+        status: "rejected",
+      });
+      addToast({ type: "info", title: "Leave rejected" });
+      fetchLeaveData();
+    } catch {
+      addToast({ type: "error", title: "Failed to reject leave" });
+    }
   };
 
   const handleExport = () => {
@@ -516,37 +536,41 @@ export function DTRPage() {
   };
 
   const handleImport = async () => {
-    let success = 0;
-    for (const entry of importPreview) {
-      if (!entry.employeeId || !entry.date) continue;
-      const existing = await getDocs(
-        query(
-          collection(db, "dtr_entries"),
-          where("employeeId", "==", entry.employeeId),
-          where("date", "==", entry.date),
-        ),
-      );
-      if (!existing.empty) {
-        await updateDoc(doc(db, "dtr_entries", existing.docs[0]!.id), {
-          ...entry,
-          updatedAt: new Date(),
-        });
-      } else {
-        await addDoc(collection(db, "dtr_entries"), {
-          ...entry,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
+    try {
+      let success = 0;
+      for (const entry of importPreview) {
+        if (!entry.employeeId || !entry.date) continue;
+        const existing = await getDocs(
+          query(
+            collection(db, "dtr_entries"),
+            where("employeeId", "==", entry.employeeId),
+            where("date", "==", entry.date),
+          ),
+        );
+        if (!existing.empty) {
+          await updateDoc(doc(db, "dtr_entries", existing.docs[0]!.id), {
+            ...entry,
+            updatedAt: new Date(),
+          });
+        } else {
+          await addDoc(collection(db, "dtr_entries"), {
+            ...entry,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+        success++;
       }
-      success++;
+      setShowImportModal(false);
+      setImportPreview([]);
+      setImportErrors([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      fetchDTRData();
+      fetchAllMonthEntries();
+      addToast({ type: "success", title: `Imported ${success} entries` });
+    } catch {
+      addToast({ type: "error", title: "Failed to import DTR entries" });
     }
-    setShowImportModal(false);
-    setImportPreview([]);
-    setImportErrors([]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    fetchDTRData();
-    fetchAllMonthEntries();
-    addToast({ type: "success", title: `Imported ${success} entries` });
   };
 
   const today = new Date();
