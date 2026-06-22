@@ -1,4 +1,3 @@
-// -nocheck
 // Email Notification Service
 // Note: Actual email sending should be handled by Firebase Cloud Functions
 // This provides the frontend interface and Cloud Function definitions

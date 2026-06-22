@@ -1,4 +1,3 @@
-// -nocheck
 // Report Scheduling Service
 // Schedule reports to be generated and sent automatically
 
