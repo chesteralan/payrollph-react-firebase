@@ -92,7 +92,9 @@ export function classifyError(
 
 export const initSentry = () => {
   if (!SENTRY_DSN) {
-    console.warn("Sentry DSN not configured. Error tracking disabled.");
+    if (import.meta.env.DEV) {
+      console.warn("Sentry DSN not configured. Error tracking disabled.");
+    }
     return;
   }
 
