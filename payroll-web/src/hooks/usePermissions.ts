@@ -1,9 +1,11 @@
+import { useCallback } from "react";
 import { useAuth } from "./useAuth";
 import type { Department, Section } from "../types";
 
 /**
  * Hook providing role-based permission helpers for the current user.
  * Wraps the `hasPermission` function from AuthContext with shorthand methods.
+ * All returned functions are memoized with useCallback to prevent unnecessary re-renders.
  *
  * @returns An object containing:
  *  - `can(department, section, action)` — Check arbitrary permission
@@ -22,22 +24,33 @@ import type { Department, Section } from "../types";
 export function usePermissions() {
   const { hasPermission } = useAuth();
 
-  const can = (
-    department: Department,
-    section: Section,
-    action: "view" | "add" | "edit" | "delete" = "view",
-  ) => {
-    return hasPermission(department, section, action);
-  };
+  const can = useCallback(
+    (
+      department: Department,
+      section: Section,
+      action: "view" | "add" | "edit" | "delete" = "view",
+    ) => {
+      return hasPermission(department, section, action);
+    },
+    [hasPermission],
+  );
 
-  const canView = (department: Department, section: Section) =>
-    can(department, section, "view");
-  const canAdd = (department: Department, section: Section) =>
-    can(department, section, "add");
-  const canEdit = (department: Department, section: Section) =>
-    can(department, section, "edit");
-  const canDelete = (department: Department, section: Section) =>
-    can(department, section, "delete");
+  const canView = useCallback(
+    (department: Department, section: Section) => can(department, section, "view"),
+    [can],
+  );
+  const canAdd = useCallback(
+    (department: Department, section: Section) => can(department, section, "add"),
+    [can],
+  );
+  const canEdit = useCallback(
+    (department: Department, section: Section) => can(department, section, "edit"),
+    [can],
+  );
+  const canDelete = useCallback(
+    (department: Department, section: Section) => can(department, section, "delete"),
+    [can],
+  );
 
   return { can, canView, canAdd, canEdit, canDelete };
 }

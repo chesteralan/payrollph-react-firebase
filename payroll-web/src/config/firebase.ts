@@ -42,7 +42,9 @@ export const getCSRFToken = async (): Promise<string> => {
     const appCheckToken = await getToken(appCheck);
     return appCheckToken.token;
   } catch {
-    console.warn("App Check not available, using fallback CSRF token");
+    if (import.meta.env.DEV) {
+      console.warn("App Check not available, using fallback CSRF token");
+    }
     return generateFallbackToken();
   }
 };

@@ -415,57 +415,10 @@ export const sendPasswordResetEmail = async (
 };
 
 // Firebase Cloud Function code (to be deployed separately)
-export const CLOUD_FUNCTION_CODE = `
-// This code goes in your Firebase Cloud Functions project
-import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
-import * as nodemailer from 'nodemailer'
-
-admin.initializeApp()
-
-const transporter = nodemailer.createTransporter({
-  service: 'gmail', // or your SMTP provider
-  auth: {
-    user: functions.config().email.user,
-    pass: functions.config().email.pass,
-  },
-})
-
-export const sendEmail = functions.https.onRequest(async (req, res) => {
-  try {
-    const { to, subject, htmlBody, textBody, cc, bcc, attachments } = req.body
-
-    const mailOptions = {
-      from: functions.config().email.from,
-      to: Array.isArray(to) ? to.join(',') : to,
-      cc: cc ? (Array.isArray(cc) ? cc.join(',') : cc) : undefined,
-      bcc: bcc ? (Array.isArray(bcc) ? bcc.join(',') : bcc) : undefined,
-      subject,
-      html: htmlBody,
-      text: textBody,
-      attachments: attachments?.map(att => ({
-        filename: att.filename,
-        content: att.content,
-        encoding: att.encoding,
-        contentType: att.type,
-      })),
-    }
-
-    await transporter.sendMail(mailOptions)
-
-    res.json({ success: true })
-  } catch (error) {
-    console.error('Email sending failed:', error)
-    res.status(500).json({ error: (error as Error).message })
-  }
-})
-`;
-
 export default {
   sendEmail,
   sendApprovalEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   EmailTemplates,
-  CLOUD_FUNCTION_CODE,
 };

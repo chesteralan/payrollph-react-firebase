@@ -284,36 +284,6 @@ const exportToCsv = async (_data: unknown[], name: string): Promise<string> => {
   return `https://storage.googleapis.com/bucket/reports/${name}.csv`;
 };
 
-// Cloud Function code (deploy separately)
-export const CLOUD_FUNCTION = `
-import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
-
-admin.initializeApp()
-
-export const processScheduledReports = functions.pubsub
-  .schedule('every 1 hour')
-  .onRun(async () => {
-    const snapshot = await admin.firestore()
-      .collection('scheduled_reports')
-      .where('isActive', '==', true)
-      .where('nextRun', '<=', new Date())
-      .get()
-
-    for (const doc of snapshot.docs) {
-      await admin.firestore()
-        .collection('jobs')
-        .add({
-          type: 'process_report',
-          scheduleId: doc.id,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        })
-    }
-
-    return null
-  })
-`;
-
 export default {
   createScheduledReport,
   getScheduledReports,
