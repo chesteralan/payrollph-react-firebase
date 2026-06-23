@@ -77,12 +77,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }
 
-  // Sync observable stores when state changes
   const stores = storesRef.current;
-  stores.user.set(user);
-  stores.currentCompanyId.set(currentCompanyId);
-  stores.loading.set(loading);
-  stores.restrictions.set(restrictions);
+
+  // Sync observable stores via useEffect to avoid doing it during render
+  useEffect(() => {
+    stores.user.set(user);
+    stores.currentCompanyId.set(currentCompanyId);
+    stores.loading.set(loading);
+    stores.restrictions.set(restrictions);
+  }, [user, currentCompanyId, loading, restrictions, stores]);
 
   const clearSessionTimers = useCallback(() => {
     if (idleTimerRef.current) {

@@ -74,7 +74,9 @@
 
 |- **June 23 maintenance (hourly run 2)**: Added error handling with try/catch + toast notifications to AreasPage, GroupsPage, and PositionsPage CRUD operations (fetch, create, update, delete, toggle status). Refactored App.routes.tsx from 500→130 lines using `lazyNamed` helper + route config array pattern, eliminating 370 lines of boilerplate. All TypeScript and ESLint checks pass. Tests for AreasPage, GroupsPage, and PositionsPage all pass.
 
-|- **June 23 maintenance (hourly run 3)**: Fixed ReDoS vulnerability in email.ts — `processTemplate` now escapes regex-special characters in variable keys. Ran Fallow analysis (health: 64 C, 57,896 LOC, 320 dead-code issues, 65 clone groups, 1 security finding fixed). Confirmed NetworkStatusBanner already rendered in AppLayout (line 95) and AlertBannerProvider already connected (line 98). Marked completed items in TASKS.md. All TypeScript and ESLint checks pass with 0 errors.
+| - **June 23 maintenance (hourly run 3)**: Fixed ReDoS vulnerability in email.ts — `processTemplate` now escapes regex-special characters in variable keys. Ran Fallow analysis (health: 64 C, 57,896 LOC, 320 dead-code issues, 65 clone groups, 1 security finding fixed). Confirmed NetworkStatusBanner already rendered in AppLayout (line 95) and AlertBannerProvider already connected (line 98). Marked completed items in TASKS.md. All TypeScript and ESLint checks pass with 0 errors.
+|
+| - **June 23 maintenance (hourly run 4)**: Moved ValueStore.set() calls in AuthContext.tsx from render phase to useEffect — prevents redundant subscriber notifications during parent re-renders (fixes CRITICAL finding). Skipped build (Firebase env vars unavailable). Ran Fallow v2.100.0 analysis (health: 58 C, 57,561 LOC, 320 dead-code issues, ~65 clone groups, 1 security finding remains in email.ts dynamic regex). All TypeScript, ESLint, and 30+ tests pass with 0 errors. Reviewed DTR/Calendar feature — already has proper error handling, loading states, and toast notifications.
 
 ## Remaining
     74|
@@ -238,10 +240,10 @@
    231|
    232|**Recommendation:** Move ValueStore sync into a `useEffect`, or integrate it into the state setters themselves so `.set()` only fires when the corresponding state actually changes.
    233|
-   234|**Acceptance Criteria:**
-   235|- [ ] Move ValueStore sync to `useEffect` or integrate into state setters
-   236|- [ ] Verify selectors don't receive unnecessary update notifications
-   237|- [ ] Verify existing tests still pass
+   **Acceptance Criteria:**
+   - [x] Move ValueStore sync to `useEffect` or integrate into state setters
+   - [x] Verify selectors don't receive unnecessary update notifications
+   - [x] Verify existing tests still pass
    238|
    239|---
    240|
