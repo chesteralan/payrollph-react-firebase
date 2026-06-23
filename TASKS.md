@@ -72,9 +72,11 @@
 |
 |- **June 23 maintenance**: Removed `// -nocheck` from all 8 remaining files (twoFactorAuth.ts, backup.ts, firestore-optimized.ts, notifications.ts, AttendanceReportPage.tsx, PayrollSummaryPage.tsx, PayrollDetailPage.tsx, SystemPages.tsx). All TypeScript checking now enabled project-wide. Refactored calendarUtils.ts — extracted `processDayEntry` and `createInitialState` shared functions, eliminating 56 lines of duplicated date-processing logic between `getPayrollWorkDays` and `calculateWorkingDaysSync`. All 16 calendarUtils tests pass. Fallow health score: 64 C, 57,896 LOC.
 
-- **June 23 maintenance (hourly run 2)**: Added error handling with try/catch + toast notifications to AreasPage, GroupsPage, and PositionsPage CRUD operations (fetch, create, update, delete, toggle status). Refactored App.routes.tsx from 500→130 lines using `lazyNamed` helper + route config array pattern, eliminating 370 lines of boilerplate. All TypeScript and ESLint checks pass. Tests for AreasPage, GroupsPage, and PositionsPage all pass.
-    72|
-    73|## Remaining
+|- **June 23 maintenance (hourly run 2)**: Added error handling with try/catch + toast notifications to AreasPage, GroupsPage, and PositionsPage CRUD operations (fetch, create, update, delete, toggle status). Refactored App.routes.tsx from 500→130 lines using `lazyNamed` helper + route config array pattern, eliminating 370 lines of boilerplate. All TypeScript and ESLint checks pass. Tests for AreasPage, GroupsPage, and PositionsPage all pass.
+
+|- **June 23 maintenance (hourly run 3)**: Fixed ReDoS vulnerability in email.ts — `processTemplate` now escapes regex-special characters in variable keys. Ran Fallow analysis (health: 64 C, 57,896 LOC, 320 dead-code issues, 65 clone groups, 1 security finding fixed). Confirmed NetworkStatusBanner already rendered in AppLayout (line 95) and AlertBannerProvider already connected (line 98). Marked completed items in TASKS.md. All TypeScript and ESLint checks pass with 0 errors.
+
+## Remaining
     74|
     75|### 1. Fix Pipeline ✅ (all tests passing)
     76|- [x] Fix `reportScheduling.test.ts` — created missing `reportGenerator.ts` module
@@ -542,10 +544,10 @@
    539|
    540|**Recommendation:** Render NetworkStatusBanner in AppLayout (parent of all protected routes) so it appears consistently. Wire AlertBanner to render system-wide notifications from a shared context.
    541|
-   542|**Acceptance Criteria:**
-   543|- [ ] NetworkStatusBanner rendered in AppLayout
-   544|- [ ] Verified it appears on all protected route pages
-   545|- [ ] AlertBanner connected to global notification context
+   **Acceptance Criteria:**
+   - [x] NetworkStatusBanner rendered in AppLayout (confirmed at line 95)
+   - [x] Verified it appears on all protected route pages
+   - [x] AlertBanner connected to global notification context (confirmed at line 98)
    546|
    547|---
    548|- [x] Install Fallow (`fallow-rs/fallow`) — Rust-native codebase intelligence tool (v2.100.0, Linux x64 binary)

@@ -313,6 +313,10 @@ This is an automated message from Payroll v2.
   },
 };
 
+// Escape special regex characters in a string
+const escapeRegex = (s: string): string =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // Process template variables
 const processTemplate = (
   template: string,
@@ -320,7 +324,7 @@ const processTemplate = (
 ): string => {
   let processed = template;
   for (const [key, value] of Object.entries(variables)) {
-    const regex = new RegExp(`{{${key}}}`, "g");
+    const regex = new RegExp(`{{${escapeRegex(key)}}}`, "g");
     processed = processed.replace(regex, String(value));
   }
   return processed;
