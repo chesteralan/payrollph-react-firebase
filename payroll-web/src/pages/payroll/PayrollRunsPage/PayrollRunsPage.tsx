@@ -57,9 +57,9 @@ export function PayrollRunsPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     if (currentCompanyId) fetchPayrolls();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCompanyId]);
 
@@ -158,7 +158,7 @@ export function PayrollRunsPage() {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setCurrentPage(1);
   }, [searchQuery, statusFilter]);
 

@@ -156,16 +156,16 @@ export function useTemplatesPage() {
     );
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
   useEffect(() => {
     fetchTemplates();
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
+   
   useEffect(() => {
     fetchLookups();
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const toggleItem = (
     list: string[],

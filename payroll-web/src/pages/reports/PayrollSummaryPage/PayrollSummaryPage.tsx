@@ -26,14 +26,14 @@ export function PayrollSummaryPage() {
     null,
   );
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false);
       setPayrolls([]);
     }
   }, [currentCompanyId]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const fetchPayrollDetails = async (
     payroll: Payroll,

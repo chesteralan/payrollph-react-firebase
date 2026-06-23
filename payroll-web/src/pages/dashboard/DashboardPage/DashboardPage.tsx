@@ -145,7 +145,7 @@ export function DashboardPage() {
 
   useEffect(() => {
     if (currentCompanyId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       loadDashboard();
     }
   }, [currentCompanyId, loadDashboard]);

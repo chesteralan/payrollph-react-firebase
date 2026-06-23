@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -10,6 +10,7 @@ import {
 import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -27,6 +28,7 @@ import type { EmployeeGroup } from "@/types";
 
 export function EmployeeGroupsPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
+  const { addToast } = useToast();
   const [groups, setGroups] = useState<EmployeeGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,48 +36,64 @@ export function EmployeeGroupsPage() {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     setLoading(true);
-    const snap = await getDocs(collection(db, "employee_groups"));
-    setGroups(
-      snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
-    );
+    try {
+      const snap = await getDocs(collection(db, "employee_groups"));
+      setGroups(
+        snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
+      );
+    } catch {
+      addToast({ type: "error", title: "Failed to load groups" });
+    }
     setLoading(false);
-  };
+  }, [addToast]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchGroups();
-     
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [fetchGroups]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      await updateDoc(doc(db, "employee_groups", editingId), formData);
-    } else {
-      await addDoc(collection(db, "employee_groups"), {
-        ...formData,
-        isActive: true,
-      });
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, "employee_groups", editingId), formData);
+        addToast({ type: "success", title: "Group updated" });
+      } else {
+        await addDoc(collection(db, "employee_groups"), {
+          ...formData,
+          isActive: true,
+        });
+        addToast({ type: "success", title: "Group created" });
+      }
+      setShowForm(false);
+      setEditingId(null);
+      setFormData({ name: "", description: "" });
+      fetchGroups();
+    } catch {
+      addToast({ type: "error", title: "Failed to save group" });
     }
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({ name: "", description: "" });
-    fetchGroups();
   };
 
   const handleDelete = async (id: string) => {
-    await deleteDoc(doc(db, "employee_groups", id));
-    fetchGroups();
+    try {
+      await deleteDoc(doc(db, "employee_groups", id));
+      addToast({ type: "success", title: "Group deleted" });
+      fetchGroups();
+    } catch {
+      addToast({ type: "error", title: "Failed to delete group" });
+    }
   };
 
   const handleToggleStatus = async (group: EmployeeGroup) => {
-    await updateDoc(doc(db, "employee_groups", group.id), {
-      isActive: !group.isActive,
-    });
-    fetchGroups();
+    try {
+      await updateDoc(doc(db, "employee_groups", group.id), {
+        isActive: !group.isActive,
+      });
+      fetchGroups();
+    } catch {
+      addToast({ type: "error", title: "Failed to update group status" });
+    }
   };
 
   const filteredGroups = useMemo(() => {

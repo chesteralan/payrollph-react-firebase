@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -10,6 +10,7 @@ import {
 import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -27,6 +28,7 @@ import type { EmployeePosition } from "@/types";
 
 export function PositionsPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
+  const { addToast } = useToast();
   const [positions, setPositions] = useState<EmployeePosition[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,48 +36,64 @@ export function PositionsPage() {
   const [formData, setFormData] = useState({ name: "", department: "" });
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchPositions = async () => {
+  const fetchPositions = useCallback(async () => {
     setLoading(true);
-    const snap = await getDocs(collection(db, "employee_positions"));
-    setPositions(
-      snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeePosition[],
-    );
+    try {
+      const snap = await getDocs(collection(db, "employee_positions"));
+      setPositions(
+        snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeePosition[],
+      );
+    } catch {
+      addToast({ type: "error", title: "Failed to load positions" });
+    }
     setLoading(false);
-  };
+  }, [addToast]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchPositions();
-     
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [fetchPositions]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      await updateDoc(doc(db, "employee_positions", editingId), formData);
-    } else {
-      await addDoc(collection(db, "employee_positions"), {
-        ...formData,
-        isActive: true,
-      });
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, "employee_positions", editingId), formData);
+        addToast({ type: "success", title: "Position updated" });
+      } else {
+        await addDoc(collection(db, "employee_positions"), {
+          ...formData,
+          isActive: true,
+        });
+        addToast({ type: "success", title: "Position created" });
+      }
+      setShowForm(false);
+      setEditingId(null);
+      setFormData({ name: "", department: "" });
+      fetchPositions();
+    } catch {
+      addToast({ type: "error", title: "Failed to save position" });
     }
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({ name: "", department: "" });
-    fetchPositions();
   };
 
   const handleDelete = async (id: string) => {
-    await deleteDoc(doc(db, "employee_positions", id));
-    fetchPositions();
+    try {
+      await deleteDoc(doc(db, "employee_positions", id));
+      addToast({ type: "success", title: "Position deleted" });
+      fetchPositions();
+    } catch {
+      addToast({ type: "error", title: "Failed to delete position" });
+    }
   };
 
   const handleToggleStatus = async (position: EmployeePosition) => {
-    await updateDoc(doc(db, "employee_positions", position.id), {
-      isActive: !position.isActive,
-    });
-    fetchPositions();
+    try {
+      await updateDoc(doc(db, "employee_positions", position.id), {
+        isActive: !position.isActive,
+      });
+      fetchPositions();
+    } catch {
+      addToast({ type: "error", title: "Failed to update position status" });
+    }
   };
 
   const filteredPositions = useMemo(() => {

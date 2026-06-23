@@ -196,9 +196,9 @@ export function EmployeeProfilePage() {
   }, [id]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     if (id) loadData();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, [id, loadData]);
 
   const handleSaveProfile = async () => {

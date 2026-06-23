@@ -58,12 +58,12 @@ export function EarningsPage() {
     setLoading(false);
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
   useEffect(() => {
     fetchItems();
      
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

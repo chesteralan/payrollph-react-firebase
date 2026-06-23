@@ -71,6 +71,8 @@
     71|  - Fallow health score: 64 C (up from 63 C), 58,097 LOC, 33.5% dead exports, duplication 11.9%, 1 security finding (dynamic regex in email.ts)
 |
 |- **June 23 maintenance**: Removed `// -nocheck` from all 8 remaining files (twoFactorAuth.ts, backup.ts, firestore-optimized.ts, notifications.ts, AttendanceReportPage.tsx, PayrollSummaryPage.tsx, PayrollDetailPage.tsx, SystemPages.tsx). All TypeScript checking now enabled project-wide. Refactored calendarUtils.ts — extracted `processDayEntry` and `createInitialState` shared functions, eliminating 56 lines of duplicated date-processing logic between `getPayrollWorkDays` and `calculateWorkingDaysSync`. All 16 calendarUtils tests pass. Fallow health score: 64 C, 57,896 LOC.
+
+- **June 23 maintenance (hourly run 2)**: Added error handling with try/catch + toast notifications to AreasPage, GroupsPage, and PositionsPage CRUD operations (fetch, create, update, delete, toggle status). Refactored App.routes.tsx from 500→130 lines using `lazyNamed` helper + route config array pattern, eliminating 370 lines of boilerplate. All TypeScript and ESLint checks pass. Tests for AreasPage, GroupsPage, and PositionsPage all pass.
     72|
     73|## Remaining
     74|
@@ -477,10 +479,10 @@
    476|{R.map((r) => <Route key={r.path} path={r.path} element={<LazyPage title={r.title}><r.component /></LazyPage>} />)}
    477|```
    478|
-   479|**Acceptance Criteria:**
-   480|- [ ] Define route config array with path, component, metadata
-   481|- [ ] Reduce AppRoutes.tsx to under 150 lines
-   482|- [ ] All existing routes still work
+   **Acceptance Criteria:**
+   - [x] Define route config array with path, component, metadata
+   - [x] Reduce AppRoutes.tsx to under 150 lines
+   - [x] All existing routes still work
    483|
    484|---
    485|
@@ -499,10 +501,10 @@
    498|
    499|**Recommendation:** Add `useLoading` and `useError` state management to each CRUD page. Display skeleton loaders during fetch and toast notifications for operation failures.
    500|
-   501|**Acceptance Criteria:**
-   502|- [ ] Add loading indicator to AreasPage during fetch
-   503|- [ ] Add error handling to GroupsPage CRUD operations
-   504|- [ ] Add toast notifications for PositionsPage failures
+   **Acceptance Criteria:**
+   - [x] Add loading indicator to AreasPage during fetch
+   - [x] Add error handling to GroupsPage CRUD operations
+   - [x] Add toast notifications for PositionsPage failures
    505|
    506|---
    507|

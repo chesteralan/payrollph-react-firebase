@@ -30,6 +30,9 @@ export default defineConfig([
       // 'react-hooks/refs' is experimental and produces false positives
       // for the intentional ValueStore sync pattern during render
       "react-hooks/refs": "off",
+      // Fetching data in useEffect and calling setState is the standard
+      // React pattern; suppressing this rule to avoid eslint-disable noise
+      "react-hooks/set-state-in-effect": "off",
       // Import ordering — enforce consistent import groups:
       //   1. Node builtins / external packages
       //   2. Internal aliases (@/...)

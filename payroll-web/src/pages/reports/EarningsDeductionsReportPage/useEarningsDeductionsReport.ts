@@ -133,14 +133,14 @@ export function useEarningsDeductionsReport() {
     );
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (currentCompanyId) {
       loadPayrolls();
       loadLists();
     }
   }, [currentCompanyId]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const generateReport = async () => {
     if (!currentCompanyId) return;

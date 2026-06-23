@@ -83,9 +83,9 @@ export function UsersPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     fetchUsers();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, []);
 
   const filteredUsers = useMemo(() => {

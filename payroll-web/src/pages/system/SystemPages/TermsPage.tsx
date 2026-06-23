@@ -62,9 +62,9 @@ export function TermsPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     fetchTerms();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, []);
 
   const validateForm = useCallback(() => {
@@ -127,9 +127,9 @@ export function TermsPage() {
   }, [formData, terms, editingId]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     if (showForm) validateForm();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, [formData, showForm, validateForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {

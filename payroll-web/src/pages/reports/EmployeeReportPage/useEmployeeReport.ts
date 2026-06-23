@@ -94,7 +94,7 @@ export function useEmployeeReport() {
 
   useEffect(() => {
     if (currentCompanyId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       fetchLookups();
     }
   }, [currentCompanyId, fetchLookups]);

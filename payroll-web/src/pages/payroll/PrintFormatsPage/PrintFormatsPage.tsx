@@ -105,7 +105,7 @@ export function PrintFormatsPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */ fetchFormats(); /* eslint-enable react-hooks/set-state-in-effect */
+      fetchFormats();  
   }, [currentCompanyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetWizard = () => {

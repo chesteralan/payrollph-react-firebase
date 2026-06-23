@@ -101,7 +101,7 @@ export function CompanySettingsPage() {
 
   useEffect(() => {
     if (selectedCompanyId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       fetchSettings(selectedCompanyId);
     }
   }, [selectedCompanyId]);
@@ -139,8 +139,7 @@ export function CompanySettingsPage() {
     setSettings({
       ...settings,
       [section]: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(settings[section] as any),
+        ...(settings[section] as Record<string, unknown>),
         [field]: value,
       },
     });

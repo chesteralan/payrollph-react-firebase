@@ -199,7 +199,7 @@ export function PayrollWizardPage() {
   };
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     if (currentCompanyId) {
       fetchTemplates();
       fetchTerms();
@@ -207,7 +207,7 @@ export function PayrollWizardPage() {
       fetchEmployees();
       if (id) fetchPayroll();
     }
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, currentCompanyId]);
 
@@ -265,10 +265,10 @@ export function PayrollWizardPage() {
     if (!formData.templateId) return;
     const tmpl = templates.find((t) => t.id === formData.templateId)?.data;
     if (!tmpl) return;
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     if (tmpl.groupBy)
       setFormData((prev) => ({ ...prev, templateId: formData.templateId }));
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, [formData.templateId, templates]);
 
   const createPayroll = async (): Promise<string> => {

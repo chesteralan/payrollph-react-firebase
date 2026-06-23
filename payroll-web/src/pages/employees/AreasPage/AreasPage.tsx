@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -10,6 +10,7 @@ import {
 import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -27,6 +28,7 @@ import type { EmployeeArea } from "@/types";
 
 export function AreasPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
+  const { addToast } = useToast();
   const [areas, setAreas] = useState<EmployeeArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,48 +36,64 @@ export function AreasPage() {
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchAreas = async () => {
+  const fetchAreas = useCallback(async () => {
     setLoading(true);
-    const snap = await getDocs(collection(db, "employee_areas"));
-    setAreas(
-      snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeArea[],
-    );
+    try {
+      const snap = await getDocs(collection(db, "employee_areas"));
+      setAreas(
+        snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeArea[],
+      );
+    } catch {
+      addToast({ type: "error", title: "Failed to load areas" });
+    }
     setLoading(false);
-  };
+  }, [addToast]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchAreas();
-     
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [fetchAreas]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      await updateDoc(doc(db, "employee_areas", editingId), formData);
-    } else {
-      await addDoc(collection(db, "employee_areas"), {
-        ...formData,
-        isActive: true,
-      });
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, "employee_areas", editingId), formData);
+        addToast({ type: "success", title: "Area updated" });
+      } else {
+        await addDoc(collection(db, "employee_areas"), {
+          ...formData,
+          isActive: true,
+        });
+        addToast({ type: "success", title: "Area created" });
+      }
+      setShowForm(false);
+      setEditingId(null);
+      setFormData({ name: "", description: "" });
+      fetchAreas();
+    } catch {
+      addToast({ type: "error", title: "Failed to save area" });
     }
-    setShowForm(false);
-    setEditingId(null);
-    setFormData({ name: "", description: "" });
-    fetchAreas();
   };
 
   const handleDelete = async (id: string) => {
-    await deleteDoc(doc(db, "employee_areas", id));
-    fetchAreas();
+    try {
+      await deleteDoc(doc(db, "employee_areas", id));
+      addToast({ type: "success", title: "Area deleted" });
+      fetchAreas();
+    } catch {
+      addToast({ type: "error", title: "Failed to delete area" });
+    }
   };
 
   const handleToggleStatus = async (area: EmployeeArea) => {
-    await updateDoc(doc(db, "employee_areas", area.id), {
-      isActive: !area.isActive,
-    });
-    fetchAreas();
+    try {
+      await updateDoc(doc(db, "employee_areas", area.id), {
+        isActive: !area.isActive,
+      });
+      fetchAreas();
+    } catch {
+      addToast({ type: "error", title: "Failed to update area status" });
+    }
   };
 
   const filteredAreas = useMemo(() => {

@@ -75,9 +75,7 @@ export function CalendarPage() {
   }, [selectedYear, addToast]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
     fetchEvents();
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [fetchEvents, selectedYear]);
 
   const handleSubmit = async (e: React.FormEvent) => {

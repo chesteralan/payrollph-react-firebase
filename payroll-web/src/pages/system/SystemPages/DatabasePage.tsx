@@ -74,10 +74,10 @@ export function DatabasePage() {
   }, []);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+     
     fetchStats();
     fetchBackups();
-    /* eslint-enable react-hooks/set-state-in-effect */
+     
   }, [fetchStats, fetchBackups]);
 
   const exportCollection = async (collectionName: string) => {
