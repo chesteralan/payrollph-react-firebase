@@ -1,4 +1,3 @@
-// -nocheck
 // SystemPages.tsx - Barrel module that re-exports individual page components.
 // Each page has been extracted to its own file for better maintainability.
 

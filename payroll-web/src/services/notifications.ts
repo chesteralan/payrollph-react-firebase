@@ -1,4 +1,3 @@
-// -nocheck
 // Approval Workflow & Notification Service
 import {
   addDoc,

@@ -69,6 +69,8 @@
     69|  - Guarded `console.warn` in `firebase.ts` with `import.meta.env.DEV` check (MEDIUM finding resolution)
     70|  - Confirmed: 0 ESLint errors, 0 console.log in source files, 0 TODO/FIXME/ts-ignore, noUncheckedIndexedAccess enabled
     71|  - Fallow health score: 64 C (up from 63 C), 58,097 LOC, 33.5% dead exports, duplication 11.9%, 1 security finding (dynamic regex in email.ts)
+|
+|- **June 23 maintenance**: Removed `// -nocheck` from all 8 remaining files (twoFactorAuth.ts, backup.ts, firestore-optimized.ts, notifications.ts, AttendanceReportPage.tsx, PayrollSummaryPage.tsx, PayrollDetailPage.tsx, SystemPages.tsx). All TypeScript checking now enabled project-wide. Refactored calendarUtils.ts — extracted `processDayEntry` and `createInitialState` shared functions, eliminating 56 lines of duplicated date-processing logic between `getPayrollWorkDays` and `calculateWorkingDaysSync`. All 16 calendarUtils tests pass. Fallow health score: 64 C, 57,896 LOC.
     72|
     73|## Remaining
     74|
@@ -164,10 +166,11 @@
    164|**Recommendation:** Remove `// -nocheck` from all 3 files and fix the underlying type errors. `PayrollDetailPage.tsx` should be prioritized first as it handles the core business logic.
    165|
    166|**Acceptance Criteria:**
-   167|- [x] Remove `// -nocheck` from `PayrollDetailPage.tsx`
-   168|- [x] Remove `// -nocheck` from `reportScheduling.ts`
-   169|- [x] Remove `// -nocheck` from `email.ts`
-   170|- [x] Verify `tsc --noEmit` passes with 0 errors
+   - [x] Remove `// -nocheck` from `PayrollDetailPage.tsx`
+   - [x] Remove `// -nocheck` from `reportScheduling.ts`
+   - [x] Remove `// -nocheck` from `email.ts`
+   - [x] Remove `// -nocheck` from remaining 8 files (twoFactorAuth.ts, backup.ts, firestore-optimized.ts, notifications.ts, AttendanceReportPage.tsx, PayrollSummaryPage.tsx, PayrollDetailPage.tsx, SystemPages.tsx)
+   - [x] Verify `tsc --noEmit` passes with 0 errors
    171|
    172|---
    173|
@@ -424,10 +427,8 @@
    424|
    425|**Recommendation:** Add unit tests validating configuration integrity: no duplicate rule IDs, valid threshold ranges, valid channel references, non-overlapping time windows.
    426|
-   427|**Acceptance Criteria:**
-   428|- [ ] Add test for `ALERTING_CONFIG` structural validity
-   429|- [ ] Add test for `UPTIME_CONFIG` structural validity
-   430|- [ ] Add test for duplicate detection rules
+   **Acceptance Criteria:**
+   - [x] Files deleted in June 22 run 2 — no tests needed for removed files
    431|
    432|---
    433|

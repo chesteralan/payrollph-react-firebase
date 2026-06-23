@@ -14,6 +14,76 @@ export interface WorkDaysResult {
   }[];
 }
 
+function processDayEntry(
+  calendarEntry: (CalendarEntry & { isPaid?: boolean }) | undefined,
+  dateStr: string,
+  isWeekday: boolean,
+  state: {
+    totalWorkingDays: number;
+    holidaysSubtracted: number;
+    specialWorkdaysAdded: number;
+    details: WorkDaysResult["details"];
+  },
+): void {
+  if (calendarEntry) {
+    if (calendarEntry.type === "workday") {
+      if (!isWeekday) {
+        state.totalWorkingDays++;
+        state.specialWorkdaysAdded++;
+        state.details.push({
+          date: dateStr,
+          type: "workday",
+          name: calendarEntry.name,
+        });
+      } else {
+        state.totalWorkingDays++;
+        state.details.push({
+          date: dateStr,
+          type: "working",
+          name: calendarEntry.name,
+        });
+      }
+    } else if (
+      calendarEntry.type === "holiday" ||
+      calendarEntry.type === "special"
+    ) {
+      if (isWeekday) {
+        state.holidaysSubtracted++;
+        state.details.push({
+          date: dateStr,
+          type: calendarEntry.type,
+          name: calendarEntry.name,
+        });
+      } else {
+        state.details.push({
+          date: dateStr,
+          type: "weekend",
+          name: calendarEntry.name,
+        });
+      }
+    }
+  } else if (isWeekday) {
+    state.totalWorkingDays++;
+    state.details.push({ date: dateStr, type: "working" });
+  } else {
+    state.details.push({ date: dateStr, type: "weekend" });
+  }
+}
+
+function createInitialState(): {
+  totalWorkingDays: number;
+  holidaysSubtracted: number;
+  specialWorkdaysAdded: number;
+  details: WorkDaysResult["details"];
+} {
+  return {
+    totalWorkingDays: 0,
+    holidaysSubtracted: 0,
+    specialWorkdaysAdded: 0,
+    details: [],
+  };
+}
+
 export async function getPayrollWorkDays(
   startDate: string,
   endDate: string,
@@ -21,10 +91,7 @@ export async function getPayrollWorkDays(
 ): Promise<WorkDaysResult> {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const details: WorkDaysResult["details"] = [];
-  let totalWorkingDays = 0;
-  let holidaysSubtracted = 0;
-  let specialWorkdaysAdded = 0;
+  const state = createInitialState();
 
   const calendarSnap = await getDocs(
     query(collection(db, "calendar"), where("companyId", "==", companyId)),
@@ -45,58 +112,15 @@ export async function getPayrollWorkDays(
       return entryDate.toISOString().split("T")[0] === dateStr;
     });
 
-    if (calendarEntry) {
-      if (calendarEntry.type === "workday") {
-        if (!isWeekday) {
-          totalWorkingDays++;
-          specialWorkdaysAdded++;
-          details.push({
-            date: dateStr,
-            type: "workday",
-            name: calendarEntry.name,
-          });
-        } else {
-          totalWorkingDays++;
-          details.push({
-            date: dateStr,
-            type: "working",
-            name: calendarEntry.name,
-          });
-        }
-      } else if (
-        calendarEntry.type === "holiday" ||
-        calendarEntry.type === "special"
-      ) {
-        if (isWeekday) {
-          holidaysSubtracted++;
-          details.push({
-            date: dateStr,
-            type: calendarEntry.type,
-            name: calendarEntry.name,
-          });
-        } else {
-          details.push({
-            date: dateStr,
-            type: "weekend",
-            name: calendarEntry.name,
-          });
-        }
-      }
-    } else if (isWeekday) {
-      totalWorkingDays++;
-      details.push({ date: dateStr, type: "working" });
-    } else {
-      details.push({ date: dateStr, type: "weekend" });
-    }
-
+    processDayEntry(calendarEntry, dateStr, isWeekday, state);
     current.setDate(current.getDate() + 1);
   }
 
   return {
-    totalWorkingDays,
-    holidaysSubtracted,
-    specialWorkdaysAdded,
-    details,
+    totalWorkingDays: state.totalWorkingDays,
+    holidaysSubtracted: state.holidaysSubtracted,
+    specialWorkdaysAdded: state.specialWorkdaysAdded,
+    details: state.details,
   };
 }
 
@@ -107,10 +131,7 @@ export function calculateWorkingDaysSync(
 ): WorkDaysResult {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const details: WorkDaysResult["details"] = [];
-  let totalWorkingDays = 0;
-  let holidaysSubtracted = 0;
-  let specialWorkdaysAdded = 0;
+  const state = createInitialState();
 
   const filteredEntries = calendarEntries.filter((e) => {
     const entryDate = e.date instanceof Date ? e.date : new Date(e.date);
@@ -132,57 +153,14 @@ export function calculateWorkingDaysSync(
 
     const calendarEntry = entryMap.get(dateStr);
 
-    if (calendarEntry) {
-      if (calendarEntry.type === "workday") {
-        if (!isWeekday) {
-          totalWorkingDays++;
-          specialWorkdaysAdded++;
-          details.push({
-            date: dateStr,
-            type: "workday",
-            name: calendarEntry.name,
-          });
-        } else {
-          totalWorkingDays++;
-          details.push({
-            date: dateStr,
-            type: "working",
-            name: calendarEntry.name,
-          });
-        }
-      } else if (
-        calendarEntry.type === "holiday" ||
-        calendarEntry.type === "special"
-      ) {
-        if (isWeekday) {
-          holidaysSubtracted++;
-          details.push({
-            date: dateStr,
-            type: calendarEntry.type,
-            name: calendarEntry.name,
-          });
-        } else {
-          details.push({
-            date: dateStr,
-            type: "weekend",
-            name: calendarEntry.name,
-          });
-        }
-      }
-    } else if (isWeekday) {
-      totalWorkingDays++;
-      details.push({ date: dateStr, type: "working" });
-    } else {
-      details.push({ date: dateStr, type: "weekend" });
-    }
-
+    processDayEntry(calendarEntry, dateStr, isWeekday, state);
     current.setDate(current.getDate() + 1);
   }
 
   return {
-    totalWorkingDays,
-    holidaysSubtracted,
-    specialWorkdaysAdded,
-    details,
+    totalWorkingDays: state.totalWorkingDays,
+    holidaysSubtracted: state.holidaysSubtracted,
+    specialWorkdaysAdded: state.specialWorkdaysAdded,
+    details: state.details,
   };
 }

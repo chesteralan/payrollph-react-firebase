@@ -1,4 +1,3 @@
-// -nocheck
 // Firestore backup utilities
 // Note: Actual backups should be automated via Firebase CLI or Cloud Functions
 // This provides client-side backup metadata tracking

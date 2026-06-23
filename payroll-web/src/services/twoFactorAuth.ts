@@ -1,4 +1,3 @@
-// -nocheck
 // Two-Factor Authentication service using TOTP (Time-based One-Time Password)
 // Uses Firebase Phone Auth as the second factor
 
