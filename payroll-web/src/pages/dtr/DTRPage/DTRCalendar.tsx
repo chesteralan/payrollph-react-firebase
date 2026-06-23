@@ -1,16 +1,14 @@
 import {
-  AlertCircle,
   Calendar as CalendarIcon,
   Check,
-  Clock,
   Plus,
-  Timer,
   X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import type { DTREntry, LeaveApplication, LeaveBalance } from "@/types/dtr";
 import { dateStr, dayStatus } from "./DTRComputation";
+import { DTRStatsCards } from "./DTRStatsCards";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -71,64 +69,7 @@ export function DTRCalendar({
 }: DTRCalendarProps) {
   return (
     <>
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <CalendarIcon className="w-8 h-8 text-blue-500" />
-              <div>
-                <p className="text-xs text-gray-500">Days Worked</p>
-                <p className="text-xl font-bold">{stats.daysWorked}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Clock className="w-8 h-8 text-green-500" />
-              <div>
-                <p className="text-xs text-gray-500">Total Hours</p>
-                <p className="text-xl font-bold">{stats.totalHours}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Timer className="w-8 h-8 text-purple-500" />
-              <div>
-                <p className="text-xs text-gray-500">Overtime</p>
-                <p className="text-xl font-bold">{stats.totalOvertime}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-8 h-8 text-orange-500" />
-              <div>
-                <p className="text-xs text-gray-500">Late Hours</p>
-                <p className="text-xl font-bold">{stats.totalLate}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <X className="w-8 h-8 text-red-500" />
-              <div>
-                <p className="text-xs text-gray-500">Absences</p>
-                <p className="text-xl font-bold">{stats.totalAbsences}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <DTRStatsCards stats={stats} />
 
       {/* Calendar Grid */}
       <Card>
@@ -195,119 +136,91 @@ export function DTRCalendar({
       {/* Leave Management */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Leave Management</CardTitle>
-            <Button size="sm" onClick={onApplyLeave}>
-              <Plus className="w-4 h-4 mr-2" />
-              Apply Leave
-            </Button>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-4 h-4" />
+            Leave Management
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Leave Balances ({selectedYear})
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {leaveBalances.length === 0 && (
-                  <p className="text-sm text-gray-500 col-span-4">
-                    No leave benefits configured
-                  </p>
-                )}
+          {canEditPerm && (
+            <Button onClick={onApplyLeave} className="mb-4">
+              <Plus className="w-4 h-4 mr-2" />
+              Apply for Leave
+            </Button>
+          )}
+
+          {leaveBalances.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2">Leave Balances</h4>
+              <div className="flex flex-wrap gap-2">
                 {leaveBalances.map((bal) => {
-                  const benefit = benefits.find((b) => b.id === bal.benefitId);
+                  const benefitName =
+                    benefits.find((b) => b.id === bal.benefitId)?.name ??
+                    "Unknown";
                   return (
-                    <div key={bal.id} className="p-3 border rounded-lg">
-                      <p className="text-sm font-medium">
-                        {benefit?.name || "Leave"}
-                      </p>
-                      <div className="flex justify-between mt-2 text-xs">
-                        <span className="text-gray-500">
-                          Allowance: {bal.totalAllowance}
-                        </span>
-                        <span className="text-gray-500">Used: {bal.used}</span>
-                      </div>
-                      <div className="mt-1">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full"
-                            style={{
-                              width: `${bal.totalAllowance > 0 ? (bal.used / bal.totalAllowance) * 100 : 0}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <p className="text-xs text-right mt-1 font-medium">
-                        {bal.remaining} remaining
-                      </p>
-                    </div>
+                    <span
+                      key={bal.id}
+                      className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded"
+                    >
+                      {benefitName}: {bal.remaining}
+                    </span>
                   );
                 })}
               </div>
             </div>
+          )}
 
+          {leaveApplications.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+              <h4 className="text-sm font-medium mb-2">
                 Leave Applications
-              </h3>
+              </h4>
               <div className="space-y-2">
-                {leaveApplications.length === 0 && (
-                  <p className="text-sm text-gray-500">No leave applications</p>
-                )}
-                {leaveApplications
-                  .sort(
-                    (a, b) =>
-                      new Date(b.createdAt).getTime() -
-                      new Date(a.createdAt).getTime(),
-                  )
-                  .map((app) => (
+                {leaveApplications.map((app) => {
+                  const benefitName =
+                    benefits.find((b) => b.id === app.benefitId)?.name ??
+                    "Unknown";
+                  return (
                     <div
                       key={app.id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
                     >
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${LEAVE_STATUS_COLORS[app.status]}`}
-                          >
-                            {app.status}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {benefits.find((b) => b.id === app.benefitId)
-                              ?.name || "Leave"}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {app.startDate} to {app.endDate} ({app.days} days)
+                        <p className="text-sm font-medium">{benefitName}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(app.startDate).toLocaleDateString()} -{" "}
+                          {new Date(app.endDate).toLocaleDateString()}
                         </p>
-                        {app.reason && (
-                          <p className="text-xs text-gray-500">{app.reason}</p>
-                        )}
+                        <span
+                          className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full mt-1 ${LEAVE_STATUS_COLORS[app.status]}`}
+                        >
+                          {app.status}
+                        </span>
                       </div>
-                      {canEditPerm && app.status === "pending" && (
+                      {app.status === "pending" && canEditPerm && (
                         <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onApproveLeave(app)}
                           >
-                            <Check className="w-4 h-4 text-green-600" />
+                            <Check className="w-4 h-4 text-green-500" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onRejectLeave(app)}
                           >
-                            <X className="w-4 h-4 text-red-600" />
+                            <X className="w-4 h-4 text-red-500" />
                           </Button>
                         </div>
                       )}
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </>
