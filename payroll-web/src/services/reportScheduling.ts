@@ -272,15 +272,27 @@ export const processDueReports = async (): Promise<void> => {
   }
 };
 
-// Placeholder export functions (implement based on your export utilties)
-const exportToXlsx = async (_data: unknown[], name: string): Promise<string> => {
-  // Implement using your xlsx utility
-  return `https://storage.googleapis.com/bucket/reports/${name}.xlsx`;
+// Real export implementations using the `xlsx` dependency
+const exportToXlsx = async (data: unknown[], name: string): Promise<string> => {
+  const XLSX = await import("xlsx");
+  const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([wbout], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  return url;
 };
 
-const exportToCsv = async (_data: unknown[], name: string): Promise<string> => {
-  // Implement using your CSV utility
-  return `https://storage.googleapis.com/bucket/reports/${name}.csv`;
+const exportToCsv = async (data: unknown[], name: string): Promise<string> => {
+  const XLSX = await import("xlsx");
+  const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
+  const csv = XLSX.utils.sheet_to_csv(worksheet);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  return url;
 };
 
 export default {

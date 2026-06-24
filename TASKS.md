@@ -78,6 +78,8 @@
 |
 | - **June 23 maintenance (hourly run 4)**: Moved ValueStore.set() calls in AuthContext.tsx from render phase to useEffect — prevents redundant subscriber notifications during parent re-renders (fixes CRITICAL finding). Skipped build (Firebase env vars unavailable). Ran Fallow v2.100.0 analysis (health: 58 C, 57,561 LOC, 320 dead-code issues, ~65 clone groups, 1 security finding remains in email.ts dynamic regex). All TypeScript, ESLint, and 30+ tests pass with 0 errors. Reviewed DTR/Calendar feature — already has proper error handling, loading states, and toast notifications.
 
+- **June 24 maintenance**: Refactored CalendarPage.tsx (556→141 lines) — extracted `useCalendarPage` hook, `CalendarEventForm`, `RecurringHolidayForm`, `CalendarEventCard` components. Replaced placeholder `exportToXlsx`/`exportToCsv` stubs in `reportScheduling.ts` (previously returning fake google storage URLs) with real implementations using the `xlsx` library — create blob URLs from actual XLSX/CSV data. All 26 reportScheduling tests pass. TypeScript compiles with 0 errors. 0 console.log, 0 TODO/FIXME, 0 any types found.
+|
 ## Remaining
     74|
     75|### 1. Fix Pipeline ✅ (all tests passing)
@@ -270,24 +272,24 @@
    261|
    262|---
    263|
-   264|#### [HIGH] Placeholder Export Functions Returning Fake URLs
-   265|
-   266|**Category:** Bug | Missing Feature
-   267|
-   268|**Location:**
-   269|- `src/services/reportScheduling.ts` (lines 277-285)
-   270|
-   271|**Problem:** `exportToXlsx` and `exportToCsv` are stub functions that return a hardcoded placeholder URL (`https://storage.googleapis.com/bucket/reports/{name}.xlsx`). They accept unused `_data` parameters. These functions are called directly in `processDueReports` (lines 215-217), meaning any actual report scheduling would produce reports that "succeed" but generate no real output.
-   272|
-   273|**Impact:** If `processDueReports` were deployed or triggered, it would silently generate fake download URLs. Users would click "Download Report" and receive a 404. No automated process validates or corrects this.
-   274|
-   275|**Recommendation:** Implement real export logic using the existing `xlsx` npm dependency or create a deferred job pattern that surfaces the unimplemented state clearly (error message, toast notification, or explicit status).
-   276|
-   277|**Acceptance Criteria:**
-   278|- [ ] Replace `exportToXlsx` with real implementation using the `xlsx` library
-   279|- [ ] Replace `exportToCsv` with real CSV generation
-   280|- [ ] Add tests for export output
-   281|- [ ] Remove placeholder return URL
+   #### [HIGH] Placeholder Export Functions — Now Implemented Using `xlsx` Library
+
+   **Category:** Bug | Missing Feature
+
+   **Location:**
+   - `src/services/reportScheduling.ts` (lines 275-294)
+
+   **Problem:** `exportToXlsx` and `exportToCsv` were stub functions returning a hardcoded placeholder URL (`https://storage.googleapis.com/bucket/reports/{name}.xlsx`).
+
+   **Impact:** Resolved — real implementations now create Blob URLs from actual XLSX/CSV data using the `xlsx` library.
+
+   **Recommendation:** ✅ Implemented
+
+   **Acceptance Criteria:**
+   - [x] Replace `exportToXlsx` with real implementation using the `xlsx` library
+   - [x] Replace `exportToCsv` with real CSV generation via xlsx
+   - [ ] Add dedicated tests for export output functions
+   - [x] Remove placeholder return URL
    282|
    283|---
    284|
@@ -440,25 +442,27 @@
    433|
    434|### 🟢 Low
    435|
-   436|#### [LOW] DTR and Calendar Feature Has Dual Implementations
-   437|
-   438|**Category:** Architecture
-   439|
-   440|**Location:**
-   441|- `src/pages/dtr/DTRPage/` (calendar view within DTR)
-   442|- `src/pages/system/SystemPages/CalendarPage.tsx` (company calendar)
-   443|
-   444|**Problem:** There are two separate calendar implementations: one embedded in the DTR feature (showing per-employee attendance) and one in the system settings (showing company-wide holidays and events). They operate independently with no shared logic for date rendering, event display, or entry interaction.
-   445|
-   446|**Impact:** Duplicate calendar rendering code. Bugs fixed in one calendar may still exist in the other. Feature additions (e.g., drag-to-mark, ICS export) need to be implemented twice.
-   447|
-   448|**Recommendation:** Extract shared calendar rendering primitives (month grid, day cell, event overlay) into a reusable `CalendarPrimitive` component. Keep DTR-specific logic and system-specific logic as separate compositions.
-   449|
-   450|**Acceptance Criteria:**
-   451|- [ ] Identify shared calendar rendering logic
-   452|- [ ] Extract to shared component(s) in `src/components/ui/CalendarBase/`
-   453|- [ ] Both calendars use shared primitives
-   454|- [ ] No functional regression
+   #### [LOW] DTR and Calendar Feature Has Dual Implementations
+
+   **Category:** Architecture
+
+   **Location:**
+   - `src/pages/dtr/DTRPage/` (calendar view within DTR)
+   - `src/pages/system/SystemPages/CalendarPage.tsx` (company calendar)
+
+   **Problem:** There are two separate calendar implementations: one embedded in the DTR feature (showing per-employee attendance) and one in the system settings (showing company-wide holidays and events). They operate independently with no shared logic for date rendering, event display, or entry interaction.
+
+   **Impact:** Duplicate calendar rendering code. Bugs fixed in one calendar may still exist in the other. Feature additions (e.g., drag-to-mark, ICS export) need to be implemented twice.
+
+   **Recommendation:** Extract shared calendar rendering primitives (month grid, day cell, event overlay) into a reusable `CalendarPrimitive` component. Keep DTR-specific logic and system-specific logic as separate compositions.
+
+   **Status Update (June 24):** System CalendarPage refactored from 556→141 lines — extracted `useCalendarPage` hook (state/CRUD logic), `CalendarEventForm`, `RecurringHolidayForm`, and `CalendarEventCard` components. These extracted form components can serve as building blocks for a shared calendar primitive. The remaining step is extracting shared month-grid/event-display primitives used by both calendars.
+
+   **Acceptance Criteria:**
+   - [ ] Identify shared calendar rendering logic
+   - [ ] Extract to shared component(s) in `src/components/ui/CalendarBase/`
+   - [ ] Both calendars use shared primitives
+   - [ ] No functional regression
    455|
    456|---
    457|
