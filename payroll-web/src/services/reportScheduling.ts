@@ -272,7 +272,6 @@ export const processDueReports = async (): Promise<void> => {
   }
 };
 
-// Real export implementations using the `xlsx` dependency
 const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => {
   const XLSX = await import("xlsx");
   const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
@@ -303,4 +302,6 @@ export default {
   toggleScheduleStatus,
   calculateNextRun,
   processDueReports,
+  exportToXlsx,
+  exportToCsv,
 };

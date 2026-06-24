@@ -80,7 +80,9 @@
 
 |- **June 24 maintenance**: Refactored CalendarPage.tsx (556→141 lines) — extracted `useCalendarPage` hook, `CalendarEventForm`, `RecurringHolidayForm`, `CalendarEventCard` components. Replaced placeholder `exportToXlsx`/`exportToCsv` stubs in `reportScheduling.ts` (previously returning fake google storage URLs) with real implementations using the `xlsx` library — create blob URLs from actual XLSX/CSV data. All 26 reportScheduling tests pass. TypeScript compiles with 0 errors. 0 console.log, 0 TODO/FIXME, 0 any types found.
 |
-|- **June 24 maintenance (hourly run 2)**: Extracted `usePayrollDetail` hook from PayrollDetailPage.tsx (948→260 lines, well under 400 limit) — moved all state, data loading, and business logic into `usePayrollDetail.ts` hook. Extracted inline `PayrollHeader` into separate component. Fixed TS errors: missing `editingId` destructure in CalendarPage, unused `name` params in exportToXlsx/exportToCsv. Fixed ESLint import ordering in CalendarEventCard. Removed unused `formatCurrency` import from refactored PayrollDetailPage. All TypeScript, ESLint, and 26 reportScheduling + PayrollDetailPage tests pass with 0 errors.
+||- **June 24 maintenance (hourly run 2)**: Extracted `usePayrollDetail` hook from PayrollDetailPage.tsx (948→260 lines, well under 400 limit) — moved all state, data loading, and business logic into `usePayrollDetail.ts` hook. Extracted inline `PayrollHeader` into separate component. Fixed TS errors: missing `editingId` destructure in CalendarPage, unused `name` params in exportToXlsx/exportToCsv. Fixed ESLint import ordering in CalendarEventCard. Removed unused `formatCurrency` import from refactored PayrollDetailPage. All TypeScript, ESLint, and 26 reportScheduling + PayrollDetailPage tests pass with 0 errors.
+|
+||- **June 24 maintenance (hourly run 3)**: Added dedicated `exportToXlsx`/`exportToCsv` tests (8 new tests) exported from reportScheduling.ts. Added `tsconfig.tsbuildinfo` to `.gitignore`. All 34 reportScheduling tests pass. TypeScript compiles with 0 errors. Confirmed 0 console.log, 0 TODO/FIXME, 0 any types, 0 empty catch blocks, 0 ESLint errors across the codebase.
 |
 ## Remaining
     74|
@@ -290,7 +292,7 @@
    **Acceptance Criteria:**
    - [x] Replace `exportToXlsx` with real implementation using the `xlsx` library
    - [x] Replace `exportToCsv` with real CSV generation via xlsx
-   - [ ] Add dedicated tests for export output functions
+   - [x] Add dedicated tests for export output functions
    - [x] Remove placeholder return URL
    282|
    283|---

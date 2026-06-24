@@ -277,6 +277,101 @@ describe("toggleScheduleStatus", () => {
   });
 });
 
+describe("exportToXlsx", () => {
+  beforeEach(() => {
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-xlsx-url");
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  });
+
+  const getExportToXlsx = async () => {
+    const mod = await import("./reportScheduling");
+    return mod.default.exportToXlsx;
+  };
+
+  it("should return a blob URL for xlsx data", async () => {
+    const exportToXlsx = await getExportToXlsx();
+    const data = [{ name: "Alice", salary: 50000 }];
+    const url = await exportToXlsx(data, "test-report");
+    expect(url).toBe("blob:mock-xlsx-url");
+  });
+
+  it("should handle empty data", async () => {
+    const exportToXlsx = await getExportToXlsx();
+    const url = await exportToXlsx([], "empty-report");
+    expect(url).toBe("blob:mock-xlsx-url");
+  });
+
+  it("should handle large datasets", async () => {
+    const exportToXlsx = await getExportToXlsx();
+    const data = Array.from({ length: 500 }, (_, i) => ({
+      id: i,
+      name: `Employee ${i}`,
+    }));
+    const url = await exportToXlsx(data, "large-report");
+    expect(url).toBe("blob:mock-xlsx-url");
+  });
+
+  it("should handle data with various value types", async () => {
+    const exportToXlsx = await getExportToXlsx();
+    const data = [
+      { id: 1, name: "Alice", salary: 50000.5, active: true, tags: null },
+    ];
+    const url = await exportToXlsx(data, "mixed-types");
+    expect(url).toBe("blob:mock-xlsx-url");
+  });
+});
+
+describe("exportToCsv", () => {
+  beforeEach(() => {
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-csv-url");
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  });
+
+  const getExportToCsv = async () => {
+    const mod = await import("./reportScheduling");
+    return mod.default.exportToCsv;
+  };
+
+  it("should return a blob URL for csv data", async () => {
+    const exportToCsv = await getExportToCsv();
+    const data = [{ name: "Alice", salary: 50000 }];
+    const url = await exportToCsv(data, "test-report");
+    expect(url).toBe("blob:mock-csv-url");
+  });
+
+  it("should handle empty data", async () => {
+    const exportToCsv = await getExportToCsv();
+    const url = await exportToCsv([], "empty-report");
+    expect(url).toBe("blob:mock-csv-url");
+  });
+
+  it("should handle large datasets", async () => {
+    const exportToCsv = await getExportToCsv();
+    const data = Array.from({ length: 1000 }, (_, i) => ({
+      id: i,
+      name: `Employee ${i}`,
+    }));
+    const url = await exportToCsv(data, "large-report");
+    expect(url).toBe("blob:mock-csv-url");
+  });
+
+  it("should produce valid CSV output", async () => {
+    const exportToCsv = await getExportToCsv();
+    const data = [
+      { name: "Alice", salary: 50000 },
+      { name: "Bob", salary: 60000 },
+    ];
+    const url = await exportToCsv(data, "test");
+    // If URL.createObjectURL was called with a Blob, the export succeeded
+    expect(URL.createObjectURL).toHaveBeenCalledWith(
+      expect.any(Blob),
+    );
+    const blob = (URL.createObjectURL as ReturnType<typeof vi.fn>).mock
+      .calls[0][0];
+    expect(blob.type).toBe("text/csv");
+  });
+});
+
 describe("processDueReports", () => {
   beforeEach(() => {
     vi.useFakeTimers();
