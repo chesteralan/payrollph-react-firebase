@@ -6,11 +6,10 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { CalendarGrid } from "@/components/ui/CalendarGrid";
 import type { DTREntry, LeaveApplication, LeaveBalance } from "@/types/dtr";
 import { dateStr, dayStatus } from "./DTRComputation";
 import { DTRStatsCards } from "./DTRStatsCards";
-
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const STATUS_COLORS: Record<string, string> = {
   complete: "bg-green-100 text-green-700 border-green-200",
@@ -74,19 +73,21 @@ export function DTRCalendar({
       {/* Calendar Grid */}
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-7 gap-1">
-            {DAY_NAMES.map((d) => (
+          <CalendarGrid
+            year={selectedYear}
+            month={selectedMonth}
+            firstDayOfMonth={fdm}
+            daysInMonth={dim}
+            today={today}
+            renderDayHeader={(name) => (
               <div
-                key={d}
+                key={name}
                 className="text-center text-xs font-medium text-gray-500 py-2"
               >
-                {d}
+                {name}
               </div>
-            ))}
-            {Array.from({ length: fdm }, (_, i) => (
-              <div key={`empty-${i}`} />
-            ))}
-            {Array.from({ length: dim }, (_, i) => i + 1).map((day) => {
+            )}
+            renderDay={(day, isToday) => {
               const status = dayStatus(
                 day,
                 selectedYear,
@@ -96,10 +97,6 @@ export function DTRCalendar({
               const entry = entryMap.get(
                 dateStr(selectedYear, selectedMonth, day),
               );
-              const isToday =
-                day === today.getDate() &&
-                selectedMonth === today.getMonth() &&
-                selectedYear === today.getFullYear();
               return (
                 <button
                   key={day}
@@ -128,8 +125,8 @@ export function DTRCalendar({
                   )}
                 </button>
               );
-            })}
-          </div>
+            }}
+          />
         </CardContent>
       </Card>
 

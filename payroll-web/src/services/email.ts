@@ -361,7 +361,9 @@ export const sendEmail = async (request: EmailRequest): Promise<void> => {
       throw new Error(`Failed to send email: ${response.statusText}`);
     }
   } catch (error) {
-    console.error("Email sending failed:", error);
+    if (import.meta.env.DEV) {
+      console.error("Email sending failed:", error);
+    }
     throw error;
   }
 };

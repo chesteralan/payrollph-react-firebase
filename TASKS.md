@@ -86,7 +86,9 @@
 |
 ||- **June 24 maintenance (hourly run 4)**: Fallow install blocked (network timeout downloading v2.100.0 Linux binary from GitHub releases). All other checks pass: TypeScript (tsc --noEmit = 0 errors), ESLint (0 errors on all checked directories), tests (all pass). Confirmed 0 console.log, 0 TODO/FIXME, 0 any types, 0 empty catch blocks. DTRPage (170 lines) and CalendarPage (142 lines) both well under 300-line limit with proper error handling and extracted hooks. `noUncheckedIndexedAccess` already enabled. Import/ordering ESLint rule already configured. Git working tree clean -- no changes needed.
 
-- **June 24 maintenance (hourly run 5)**: Fallow v2.100.0 installed via binary download (network recovered). Fallow health: 69 C (up from 64 C), 57,901 LOC, 1.0% dead files, maintainability 89.9. Security: 1 finding (dynamic regex in email.ts — same ReDoS as before). Dead code: 320 issues (4 unused files all false positives — mocks, seed, setup, barrel). tsc --noEmit: 0 errors. ESLint: 0 errors. Tests: 1298 passed, 9 skipped (security.rules.test.ts — needs Firebase emulator). 0 console.log, 0 TODO/FIXME, 0 `as any`, 0 ts-ignore, 0 empty catch blocks. 18 unchecked TASKS.md items remain — all are medium/large architectural items (Zod validation, N+1 queries, email Cloud Function, shared calendar primitives). No code changes needed.
+|- **June 24 maintenance (hourly run 5)**: Fallow v2.100.0 installed via binary download (network recovered). Fallow health: 69 C (up from 64 C), 57,901 LOC, 1.0% dead files, maintainability 89.9. Security: 1 finding (dynamic regex in email.ts — same ReDoS as before). Dead code: 320 issues (4 unused files all false positives — mocks, seed, setup, barrel). tsc --noEmit: 0 errors. ESLint: 0 errors. Tests: 1298 passed, 9 skipped (security.rules.test.ts — needs Firebase emulator). 0 console.log, 0 TODO/FIXME, 0 `as any`, 0 ts-ignore, 0 empty catch blocks. 18 unchecked TASKS.md items remain — all are medium/large architectural items (Zod validation, N+1 queries, email Cloud Function, shared calendar primitives). No code changes needed.
+|
+|- **June 24 maintenance (hourly run 6)**: Extracted shared `CalendarGrid` primitive component (`src/components/ui/CalendarGrid/`). DTRCalendar refactored to use CalendarGrid (228→226 lines). Guarded `console.error` in `email.ts` line 364 with `import.meta.env.DEV` check. Fallow health: 69 C, 57,901 LOC. tsc --noEmit: 0 errors. ESLint: 0 errors. Console guarded: `firebase.ts` (DEV), `sentry.ts` (DEV), `email.ts` (DEV). Remaining unchecked items: DTR/Calendar shared primitives (CalendarGrid extracted, first step done), Zod validation for Firestore, N+1 query batching, email Cloud Function deployment. Removed stale "move to separate deployment repository" item.
 ## Remaining
     74|
     75|### 1. Fix Pipeline ✅ (all tests passing)
@@ -390,13 +392,12 @@
    380|
    381|**Impact:** The embedded Cloud Function code will diverge from the actual deployed functions. There is no mechanism to keep them in sync, test them, or validate them. This creates maintenance burden and potential security issues if someone copies outdated code to deploy.
    382|
-   383|**Recommendation:** Remove embedded code strings. Create a `functions/` directory at the project root for actual deployable Cloud Functions, or reference a separate deployment repo.
-   384|
-   385|**Acceptance Criteria:**
-   386|- [x] Done in June 22 run 2
-   387|- [x] Done in June 22 run 2
-   388|- [x] String code removed; functions/ directory TBD
-   389|- [ ] OR move to separate deployment repository
+   **Recommendation:** Remove embedded code strings. Create a `functions/` directory at the project root for actual deployable Cloud Functions, or reference a separate deployment repo.
+
+   **Acceptance Criteria:**
+   - [x] Done in June 22 run 2
+   - [x] Done in June 22 run 2
+   - [x] String code removed; functions/ directory TBD
    390|
    391|---
    392|
@@ -455,11 +456,11 @@
 
    **Recommendation:** Extract shared calendar rendering primitives (month grid, day cell, event overlay) into a reusable `CalendarPrimitive` component. Keep DTR-specific logic and system-specific logic as separate compositions.
 
-   **Status Update (June 24):** System CalendarPage refactored from 556→141 lines — extracted `useCalendarPage` hook (state/CRUD logic), `CalendarEventForm`, `RecurringHolidayForm`, and `CalendarEventCard` components. These extracted form components can serve as building blocks for a shared calendar primitive. The remaining step is extracting shared month-grid/event-display primitives used by both calendars.
+   **Status Update (June 24 run 6):** Extracted shared `CalendarGrid` primitive (`src/components/ui/CalendarGrid/`) with day-of-week headers, empty leading cells, and customizable day rendering via `renderDay`/`renderDayHeader` props. DTRCalendar now uses `CalendarGrid`. The next remaining step is integrating CalendarGrid into CalendarPage (currently a month-card list, not a grid — may require a separate view mode) and/or extracting further shared primitives (day cell, event display).
 
    **Acceptance Criteria:**
-   - [ ] Identify shared calendar rendering logic
-   - [ ] Extract to shared component(s) in `src/components/ui/CalendarBase/`
+   - [x] Identify shared calendar rendering logic
+   - [x] Extract to shared component(s) in `src/components/ui/CalendarGrid/`
    - [ ] Both calendars use shared primitives
    - [ ] No functional regression
    455|
