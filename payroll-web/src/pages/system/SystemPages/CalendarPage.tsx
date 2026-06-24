@@ -23,6 +23,7 @@ export function CalendarPage() {
     setFormData,
     setRecurringFormData,
     setSelectedYear,
+    editingId,
     setEditingId,
     handleSubmit,
     handleEdit,

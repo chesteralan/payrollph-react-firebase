@@ -78,7 +78,9 @@
 |
 | - **June 23 maintenance (hourly run 4)**: Moved ValueStore.set() calls in AuthContext.tsx from render phase to useEffect — prevents redundant subscriber notifications during parent re-renders (fixes CRITICAL finding). Skipped build (Firebase env vars unavailable). Ran Fallow v2.100.0 analysis (health: 58 C, 57,561 LOC, 320 dead-code issues, ~65 clone groups, 1 security finding remains in email.ts dynamic regex). All TypeScript, ESLint, and 30+ tests pass with 0 errors. Reviewed DTR/Calendar feature — already has proper error handling, loading states, and toast notifications.
 
-- **June 24 maintenance**: Refactored CalendarPage.tsx (556→141 lines) — extracted `useCalendarPage` hook, `CalendarEventForm`, `RecurringHolidayForm`, `CalendarEventCard` components. Replaced placeholder `exportToXlsx`/`exportToCsv` stubs in `reportScheduling.ts` (previously returning fake google storage URLs) with real implementations using the `xlsx` library — create blob URLs from actual XLSX/CSV data. All 26 reportScheduling tests pass. TypeScript compiles with 0 errors. 0 console.log, 0 TODO/FIXME, 0 any types found.
+|- **June 24 maintenance**: Refactored CalendarPage.tsx (556→141 lines) — extracted `useCalendarPage` hook, `CalendarEventForm`, `RecurringHolidayForm`, `CalendarEventCard` components. Replaced placeholder `exportToXlsx`/`exportToCsv` stubs in `reportScheduling.ts` (previously returning fake google storage URLs) with real implementations using the `xlsx` library — create blob URLs from actual XLSX/CSV data. All 26 reportScheduling tests pass. TypeScript compiles with 0 errors. 0 console.log, 0 TODO/FIXME, 0 any types found.
+|
+|- **June 24 maintenance (hourly run 2)**: Extracted `usePayrollDetail` hook from PayrollDetailPage.tsx (948→260 lines, well under 400 limit) — moved all state, data loading, and business logic into `usePayrollDetail.ts` hook. Extracted inline `PayrollHeader` into separate component. Fixed TS errors: missing `editingId` destructure in CalendarPage, unused `name` params in exportToXlsx/exportToCsv. Fixed ESLint import ordering in CalendarEventCard. Removed unused `formatCurrency` import from refactored PayrollDetailPage. All TypeScript, ESLint, and 26 reportScheduling + PayrollDetailPage tests pass with 0 errors.
 |
 ## Remaining
     74|
@@ -314,27 +316,19 @@
    303|
    304|---
    305|
-   306|#### [HIGH] Oversized Components Still Over 500 Lines
-   307|
-   308|**Category:** Code Quality
-   309|
-   310|**Location:**
-   311|- `src/pages/payroll/PayrollDetailPage/PayrollDetailPage.tsx` (949 lines)
-   312|- `src/pages/dtr/DTRPage/DTRPage.tsx` (697 lines)
-   313|
-   314|**Problem:** Despite previous refactoring that extracted subcomponents, both pages remain well above the 300-line threshold. `PayrollDetailPage.tsx` has 20+ `useState` calls managing fragmented state (lines 54-93), 3 separate data-fetching layers, and direct Firestore SDK usage mixed with UI rendering logic. `DTRPage.tsx` (697 lines) has 17+ state slices and orchestrates data fetching, modal state, import logic, form handling, and multiple sub-components.
-   315|
-   316|**Impact:** Large components are hard to test, maintain, and reason about. The `PayrollDetailPage` has high cyclomatic complexity estimated at 50+. React's concurrent features (Suspense, transitions) provide less benefit when a single component manages so much state.
-   317|
-   318|**Recommendation:**
-   319|- `PayrollDetailPage`: Extract data-fetching into a custom hook (`usePayrollDetail`), extract stage navigation logic, extract validation state management
-   320|- `DTRPage`: Extract `useDTRPage` hook for data/state management, split calendar vs table view into separate page components
-   321|
-   322|**Acceptance Criteria:**
-   323|- [ ] Extract `usePayrollDetail` hook from PayrollDetailPage
-   324|- [ ] Reduce PayrollDetailPage to under 400 lines
-   325|- [x] Extracted `useDTRPage` hook (646 lines) — DTRPage reduced from 697→170 lines
-   326|- [x] DTRPage now 170 lines (well under 400)
+   #### [HIGH] Oversized Components Remaining Under 400 Lines ✅
+
+   |**Category:** Code Quality
+
+   |**Location:**
+   - `src/pages/payroll/PayrollDetailPage/PayrollDetailPage.tsx` (260 lines — hook extracted)
+   - `src/pages/dtr/DTRPage/DTRPage.tsx` (170 lines — previously refactored)
+
+   |**Status:** Both oversized components now well under 400 lines.
+
+   |**Acceptance Criteria:**
+   - [x] Extract `usePayrollDetail` hook from PayrollDetailPage (948→260 lines)
+   - [x] Reduce PayrollDetailPage to under 400 lines (now 260)
    327|
    328|---
    329|

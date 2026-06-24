@@ -273,7 +273,7 @@ export const processDueReports = async (): Promise<void> => {
 };
 
 // Real export implementations using the `xlsx` dependency
-const exportToXlsx = async (data: unknown[], name: string): Promise<string> => {
+const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => {
   const XLSX = await import("xlsx");
   const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
   const workbook = XLSX.utils.book_new();
@@ -286,7 +286,7 @@ const exportToXlsx = async (data: unknown[], name: string): Promise<string> => {
   return url;
 };
 
-const exportToCsv = async (data: unknown[], name: string): Promise<string> => {
+const exportToCsv = async (data: unknown[], _name: string): Promise<string> => {
   const XLSX = await import("xlsx");
   const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
   const csv = XLSX.utils.sheet_to_csv(worksheet);

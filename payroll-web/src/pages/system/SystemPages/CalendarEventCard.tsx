@@ -1,4 +1,4 @@
-import { Repeat, Edit, Trash2 } from "lucide-react";
+import { Edit, Repeat, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { CalendarEvent } from "./SystemPages.types";
 import { CALENDAR_TYPE_COLORS } from "./CalendarPage.constants";
