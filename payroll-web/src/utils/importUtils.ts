@@ -1,4 +1,3 @@
-// -nocheck
 export interface ImportResult<T> {
   success: boolean;
   data: T[];

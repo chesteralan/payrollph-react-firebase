@@ -1,4 +1,3 @@
-// -nocheck
 // Data encryption utilities for sensitive fields using Web Crypto API
 
 const ALGORITHM = "AES-GCM";

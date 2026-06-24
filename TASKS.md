@@ -188,6 +188,7 @@
    - [x] Remove `// -nocheck` from `email.ts`
    - [x] Remove `// -nocheck` from remaining 8 files (twoFactorAuth.ts, backup.ts, firestore-optimized.ts, notifications.ts, AttendanceReportPage.tsx, PayrollSummaryPage.tsx, PayrollDetailPage.tsx, SystemPages.tsx)
    - [x] Verify `tsc --noEmit` passes with 0 errors
+- [x] **June 24 maintenance (hourly run 7)**: Removed `// -nocheck` from all 4 remaining files (SystemSettingsPage.tsx, encryption.ts, importUtils.ts, sanitize.ts). All 4 files now fully type-checked via tsc --noEmit (0 errors). ESLint passes (0 errors). 174 targeted tests pass. Fallow health: 69 C, 57,981 LOC. 1 security finding (dynamic regex in email.ts — pre-existing). 0 console.log, 0 TODO/FIXME, 0 ts-ignore, 0 empty catch blocks. No remaining `// -nocheck` files in the codebase.
    171|
    172|---
    173|

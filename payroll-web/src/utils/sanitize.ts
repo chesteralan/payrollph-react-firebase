@@ -1,4 +1,3 @@
-// -nocheck
 // Input sanitization utilities for preventing XSS and injection attacks
 
 /**
