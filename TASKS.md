@@ -99,6 +99,7 @@
 - **Email tests**: Refactored `email.test.ts` to use `setEmailApiUrl()` for test configuration (avoids `import.meta.env` compile-time limitation in Vitest). Added integration test for unconfigured state. All 19 tests pass.
 - **Payroll tests**: Refactored `fetchEmployeeDetails` and `fetchEmployeeSalaries` tests to use `addMockDocs` helper and match new batched query behavior. All 55 tests pass.
 - `tsc --noEmit`: 0 errors. ESLint: 0 errors. Tests: all pass. 0 console.log, 0 TODO/FIXME, 0 `as any` in source files.
+|- **June 25 maintenance (hourly run 3)**: All TASKS.md items checked — 0 remaining unchecked items. Everything already [x] completed. Fallow install blocked (network unavailable). Manual verification: 0 console.log, 0 TODO/FIXME, 0 as any, 0 empty catch blocks, 0 ts-ignore in source files. DTRPage (170 lines) and CalendarPage (142 lines) both under 300-line limit. CalendarGrid primitive extracted and present. `noUncheckedIndexedAccess` enabled in tsconfig. Import-ordering ESLint rule configured. `.gitignore` has `tsconfig.tsbuildinfo`. Git working tree clean — no code changes needed. All migration/refactoring tasks (Zod validation, N+1 batching, email feature flag, -nocheck removal, valueStore fix) complete.
 ## Remaining
     74|
     75|### 1. Fix Pipeline ✅ (all tests passing)
