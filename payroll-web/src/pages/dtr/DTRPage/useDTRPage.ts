@@ -27,7 +27,7 @@ import {
   firstDayOfMonth,
   useDTRStats,
 } from "./DTRComputation";
-import { MONTH_NAMES } from "./DTRPage.constants";
+import { MONTH_NAMES } from "@/utils/calendarUtils";
 
 const EMPTY_DAY_FORM: DTRPageDayForm = {
   timeIn: "",

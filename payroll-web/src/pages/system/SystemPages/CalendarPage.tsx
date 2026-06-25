@@ -6,7 +6,7 @@ import { useCalendarPage } from "./useCalendarPage";
 import { CalendarEventForm } from "./CalendarEventForm";
 import { RecurringHolidayForm } from "./RecurringHolidayForm";
 import { CalendarEventCard } from "./CalendarEventCard";
-import { MONTH_NAMES } from "./CalendarPage.constants";
+import { MONTH_NAMES } from "@/utils/calendarUtils";
 
 export function CalendarPage() {
   const { canView, canAdd, canEdit, canDelete } = usePermissions();

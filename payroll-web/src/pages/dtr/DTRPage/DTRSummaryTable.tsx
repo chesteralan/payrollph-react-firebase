@@ -1,7 +1,7 @@
 import { SearchBar } from "@/components/ui/SearchBar";
 import { BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { MONTH_NAMES } from "./DTRPage.constants";
+import { MONTH_NAMES } from "@/utils/calendarUtils";
 import type { DTREntry } from "@/types/dtr";
 
 interface SummaryEntry extends DTREntry {

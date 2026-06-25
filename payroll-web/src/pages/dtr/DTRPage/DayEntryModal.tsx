@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { Trash2, X } from "lucide-react";
-import { MONTH_NAMES } from "./DTRPage.constants";
+import { MONTH_NAMES } from "@/utils/calendarUtils";
 import type { DTREntry } from "@/types/dtr";
 import type { DTRPageDayForm } from "./DTRPage.types";
 
