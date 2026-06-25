@@ -2,6 +2,22 @@
 // Note: Actual email sending should be handled by Firebase Cloud Functions
 // This provides the frontend interface and Cloud Function definitions
 
+import { captureException } from "../config/sentry";
+
+/** Email API URL, configured via VITE_EMAIL_API_URL env var or programmatic override. */
+let _emailApiUrl: string | undefined;
+
+export function setEmailApiUrl(url: string | undefined): void {
+  _emailApiUrl = url;
+}
+
+function getEmailApiUrl(): string | undefined {
+  return (
+    _emailApiUrl ??
+    (import.meta.env.VITE_EMAIL_API_URL as string | undefined)
+  );
+}
+
 export type EmailTemplate =
   | "approval_required"
   | "approval_approved"
@@ -332,6 +348,17 @@ const processTemplate = (
 
 // Send email via Cloud Function
 export const sendEmail = async (request: EmailRequest): Promise<void> => {
+  const apiUrl = getEmailApiUrl();
+  if (!apiUrl) {
+    const msg =
+      "Email service is not configured. Set VITE_EMAIL_API_URL env var to enable email sending.";
+    if (import.meta.env.DEV) {
+      console.warn(msg);
+    }
+    captureException(new Error(msg), { source: "email" });
+    throw new Error(msg);
+  }
+
   try {
     const template = EmailTemplates[request.template];
     if (!template) {
@@ -343,7 +370,7 @@ export const sendEmail = async (request: EmailRequest): Promise<void> => {
     const subject = processTemplate(request.subject, request.variables);
 
     // Call Firebase Cloud Function
-    const response = await fetch("/api/send-email", {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

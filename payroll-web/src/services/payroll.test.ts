@@ -222,30 +222,10 @@ describe("fetchEmployeeDetails", () => {
   });
 
   it("should return a map of employee details for given nameIds", async () => {
-    const mockDoc1 = {
-      id: "emp1",
-      exists: () => true,
-      data: () => ({ nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" }),
-    };
-    const mockDoc2 = {
-      id: "emp2",
-      exists: () => true,
-      data: () => ({ nameId: "n2", companyId: "c1", employeeCode: "E002", isActive: true, statusId: "active" }),
-    };
-
-    vi.mocked(getDocs)
-      .mockResolvedValueOnce({
-        docs: [mockDoc1],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockDoc1) => void) => [mockDoc1].forEach(cb),
-      } as any)
-      .mockResolvedValueOnce({
-        docs: [mockDoc2],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockDoc2) => void) => [mockDoc2].forEach(cb),
-      } as any);
+    addMockDocs("employees", [
+      { id: "emp1", nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" },
+      { id: "emp2", nameId: "n2", companyId: "c1", employeeCode: "E002", isActive: true, statusId: "active" },
+    ]);
 
     const result = await fetchEmployeeDetails(["n1", "n2"]);
 
@@ -255,9 +235,8 @@ describe("fetchEmployeeDetails", () => {
     expect(result.get("n2")?.id).toBe("emp2");
     expect(result.get("n2")?.employeeCode).toBe("E002");
     expect(collection).toHaveBeenCalledWith({}, "employees");
-    expect(where).toHaveBeenCalledWith("nameId", "==", "n1");
-    expect(where).toHaveBeenCalledWith("nameId", "==", "n2");
-    expect(getDocs).toHaveBeenCalledTimes(2);
+    expect(where).toHaveBeenCalledWith("nameId", "in", ["n1", "n2"]);
+    expect(getDocs).toHaveBeenCalledTimes(1);
   });
 
   it("should return empty map when given an empty array", async () => {
@@ -268,26 +247,9 @@ describe("fetchEmployeeDetails", () => {
   });
 
   it("should skip nameIds with no matching employee document", async () => {
-    const mockDoc1 = {
-      id: "emp1",
-      exists: () => true,
-      data: () => ({ nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" }),
-    };
-    const emptySnapshot = {
-      docs: [],
-      empty: true,
-      size: 0,
-      forEach: () => {},
-    };
-
-    vi.mocked(getDocs)
-      .mockResolvedValueOnce({
-        docs: [mockDoc1],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockDoc1) => void) => [mockDoc1].forEach(cb),
-      } as any)
-      .mockResolvedValueOnce(emptySnapshot as any);
+    addMockDocs("employees", [
+      { id: "emp1", nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" },
+    ]);
 
     const result = await fetchEmployeeDetails(["n1", "n2"]);
 
@@ -310,30 +272,10 @@ describe("fetchEmployeeSalaries", () => {
   });
 
   it("should return a map of primary active salaries for given employeeIds", async () => {
-    const mockSal1 = {
-      id: "sal1",
-      exists: () => true,
-      data: () => ({ employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true }),
-    };
-    const mockSal2 = {
-      id: "sal2",
-      exists: () => true,
-      data: () => ({ employeeId: "emp2", amount: 30000, frequency: "monthly", isPrimary: true, isActive: true }),
-    };
-
-    vi.mocked(getDocs)
-      .mockResolvedValueOnce({
-        docs: [mockSal1],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockSal1) => void) => [mockSal1].forEach(cb),
-      } as any)
-      .mockResolvedValueOnce({
-        docs: [mockSal2],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockSal2) => void) => [mockSal2].forEach(cb),
-      } as any);
+    addMockDocs("employee_salaries", [
+      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true },
+      { id: "sal2", employeeId: "emp2", amount: 30000, frequency: "monthly", isPrimary: true, isActive: true },
+    ]);
 
     const result = await fetchEmployeeSalaries(["emp1", "emp2"]);
 
@@ -341,11 +283,10 @@ describe("fetchEmployeeSalaries", () => {
     expect(result.get("emp1")?.amount).toBe(25000);
     expect(result.get("emp2")?.amount).toBe(30000);
     expect(collection).toHaveBeenCalledWith({}, "employee_salaries");
-    expect(where).toHaveBeenCalledWith("employeeId", "==", "emp1");
-    expect(where).toHaveBeenCalledWith("employeeId", "==", "emp2");
+    expect(where).toHaveBeenCalledWith("employeeId", "in", ["emp1", "emp2"]);
     expect(where).toHaveBeenCalledWith("isPrimary", "==", true);
     expect(where).toHaveBeenCalledWith("isActive", "==", true);
-    expect(getDocs).toHaveBeenCalledTimes(2);
+    expect(getDocs).toHaveBeenCalledTimes(1);
   });
 
   it("should return empty map when given an empty array", async () => {
@@ -356,26 +297,9 @@ describe("fetchEmployeeSalaries", () => {
   });
 
   it("should skip employeeIds with no matching salary record", async () => {
-    const mockSal1 = {
-      id: "sal1",
-      exists: () => true,
-      data: () => ({ employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true }),
-    };
-    const emptySnapshot = {
-      docs: [],
-      empty: true,
-      size: 0,
-      forEach: () => {},
-    };
-
-    vi.mocked(getDocs)
-      .mockResolvedValueOnce({
-        docs: [mockSal1],
-        empty: false,
-        size: 1,
-        forEach: (cb: (d: typeof mockSal1) => void) => [mockSal1].forEach(cb),
-      } as any)
-      .mockResolvedValueOnce(emptySnapshot as any);
+    addMockDocs("employee_salaries", [
+      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true },
+    ]);
 
     const result = await fetchEmployeeSalaries(["emp1", "emp2"]);
 
@@ -385,18 +309,9 @@ describe("fetchEmployeeSalaries", () => {
   });
 
   it("should call where with isPrimary and isActive filters", async () => {
-    const mockSal1 = {
-      id: "sal1",
-      exists: () => true,
-      data: () => ({ employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: false, isActive: true }),
-    };
-
-    vi.mocked(getDocs).mockResolvedValueOnce({
-      docs: [mockSal1],
-      empty: false,
-      size: 1,
-      forEach: (cb: (d: typeof mockSal1) => void) => [mockSal1].forEach(cb),
-    } as any);
+    addMockDocs("employee_salaries", [
+      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: false, isActive: true },
+    ]);
 
     const result = await fetchEmployeeSalaries(["emp1"]);
 

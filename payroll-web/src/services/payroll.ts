@@ -23,17 +23,21 @@ export async function fetchPayrollEmployees(
   return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as PayrollEmployee[];
 }
 
+const CHUNK_SIZE = 30;
+
 export async function fetchEmployeeDetails(
   nameIds: string[],
 ): Promise<Map<string, Employee>> {
   const map = new Map<string, Employee>();
-  for (const nameId of nameIds) {
+  for (let i = 0; i < nameIds.length; i += CHUNK_SIZE) {
+    const chunk = nameIds.slice(i, i + CHUNK_SIZE);
     const snap = await getDocs(
-      query(collection(db, "employees"), where("nameId", "==", nameId)),
+      query(collection(db, "employees"), where("nameId", "in", chunk)),
     );
-    if (!snap.empty) {
-      const emp = snap.docs[0];
+    for (const emp of snap.docs) {
       if (!emp) continue;
+      const nameId = emp.data().nameId as string | undefined;
+      if (!nameId) continue;
       map.set(nameId, { id: emp.id, ...emp.data() } as Employee);
     }
   }
@@ -44,18 +48,20 @@ export async function fetchEmployeeSalaries(
   employeeIds: string[],
 ): Promise<Map<string, EmployeeSalary>> {
   const map = new Map<string, EmployeeSalary>();
-  for (const empId of employeeIds) {
+  for (let i = 0; i < employeeIds.length; i += CHUNK_SIZE) {
+    const chunk = employeeIds.slice(i, i + CHUNK_SIZE);
     const snap = await getDocs(
       query(
         collection(db, "employee_salaries"),
-        where("employeeId", "==", empId),
+        where("employeeId", "in", chunk),
         where("isPrimary", "==", true),
         where("isActive", "==", true),
       ),
     );
-    if (!snap.empty) {
-      const sal = snap.docs[0];
+    for (const sal of snap.docs) {
       if (!sal) continue;
+      const empId = sal.data().employeeId as string | undefined;
+      if (!empId) continue;
       map.set(empId, { id: sal.id, ...sal.data() } as EmployeeSalary);
     }
   }

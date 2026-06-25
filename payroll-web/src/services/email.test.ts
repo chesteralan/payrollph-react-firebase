@@ -5,7 +5,13 @@ import {
   sendWelcomeEmail,
   sendPasswordResetEmail,
   EmailTemplates,
+  setEmailApiUrl,
 } from "./email";
+
+/** Enable email in tests */
+beforeEach(() => {
+  setEmailApiUrl("http://localhost:5001/send-email");
+});
 
 const mockFetch = vi.fn();
 
@@ -33,7 +39,7 @@ describe("sendEmail", () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/send-email",
+      "http://localhost:5001/send-email",
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -136,6 +142,24 @@ describe("sendEmail", () => {
     expect(callArg.cc).toBe("manager@example.com");
     expect(callArg.bcc).toBe("audit@example.com");
     expect(callArg.replyTo).toBe("support@example.com");
+  });
+
+  it("should throw when email API URL is not configured", async () => {
+    setEmailApiUrl(undefined);
+
+    await expect(
+      sendEmail({
+        template: "welcome",
+        to: "user@example.com",
+        subject: "Welcome",
+        variables: {
+          userName: "John",
+          email: "john@example.com",
+          companyName: "Acme",
+          loginUrl: "https://app.example.com/login",
+        },
+      }),
+    ).rejects.toThrow("Email service is not configured");
   });
 });
 
