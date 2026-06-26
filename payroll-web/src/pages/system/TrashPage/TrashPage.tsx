@@ -76,7 +76,7 @@ export function TrashPage() {
             });
           });
         } catch {
-          // Collection might not exist or have deleted items
+          // Collection might not exist or have deleted items — skip silently
         }
       }
 
@@ -126,7 +126,7 @@ export function TrashPage() {
           });
         });
       } catch {
-        // Collection might not exist or have deleted items
+        // Collection might not exist or have deleted items — skip silently
       }
     }
 
