@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "production",
-      "public": "payroll-web/dist",
+      "public": "apps/web/dist",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -36,7 +36,7 @@
     },
     {
       "target": "staging",
-      "public": "payroll-web/dist",
+      "public": "apps/web/dist",
       "ignore": [
         "firebase.json",
         "**/.*",
