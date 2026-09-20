@@ -11,7 +11,7 @@
     "test": "turbo test",
     "test:run": "turbo test:run",
     "type-check": "turbo type-check",
-    "deploy": "turbo deploy --filter=web",
+    "deploy": "turbo deploy --filter=payroll-web",
     "deploy:all": "turbo deploy"
   },
   "devDependencies": {
