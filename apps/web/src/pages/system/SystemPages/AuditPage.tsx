@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
 import { ChevronDown, ChevronsUpDown, ChevronUp, Download } from "lucide-react";
-import * as XLSX from "xlsx";
+import { exportToXLS } from "@/utils/exportUtils";
 import type { AuditEntry } from "@/services/audit";
 
 const actionColors: Record<string, string> = {
@@ -103,7 +103,7 @@ export function AuditPage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleExportXLS = () => {
+  const handleExportXLS = async () => {
     const data = sortedLogs.map((log) => ({
       "Date/Time": log.timestamp
         ? new Date(log.timestamp).toLocaleString()
@@ -115,13 +115,21 @@ export function AuditPage() {
       "Entity ID": log.entityId || "",
       "Entity Type": log.entityType || "",
     }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Audit Log");
-    XLSX.writeFile(
-      wb,
-      `audit_log_${new Date().toISOString().split("T")[0]}.xlsx`,
-    );
+
+    await exportToXLS(data, {
+      filename: `audit_log_${new Date().toISOString().split("T")[0]}`,
+      sheetName: "Audit Log",
+      includeTimestamp: false,
+      columns: [
+        { header: "Date/Time", key: "Date/Time", width: 25 },
+        { header: "User", key: "User", width: 25 },
+        { header: "Action", key: "Action", width: 12 },
+        { header: "Module", key: "Module", width: 12 },
+        { header: "Description", key: "Description", width: 40 },
+        { header: "Entity ID", key: "Entity ID", width: 20 },
+        { header: "Entity Type", key: "Entity Type", width: 15 },
+      ],
+    });
   };
 
   if (!canView("system", "audit"))
@@ -136,7 +144,7 @@ export function AuditPage() {
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
-          <Button variant="secondary" onClick={handleExportXLS}>
+          <Button variant="secondary" onClick={() => handleExportXLS()}>
             <Download className="w-4 h-4 mr-2" />
             Export XLS
           </Button>

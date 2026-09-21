@@ -6,7 +6,8 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileSpreadsheet, Printer } from "lucide-react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { downloadBlob } from "@/utils/exportUtils";
 
 import type {
   AttendanceData,
@@ -189,61 +190,68 @@ export function AttendanceReportPage() {
     return "text-red-600 bg-red-50";
   };
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Attendance Report");
 
-    const data = filteredData.map((d) => ({
-      "Employee Code": d.employeeCode,
-      Name: d.employeeName,
-      "Days Worked": d.daysWorked,
-      "Total Days": d.totalDaysInPeriod,
-      Absences: d.absences,
-      "Late Hours": d.lateHours,
-      "Overtime Hours": d.overtimeHours,
-      "Attendance Rate (%)": d.attendanceRate,
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(data);
-
-    const colWidths = [
-      { wch: 15 },
-      { wch: 30 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 10 },
-      { wch: 12 },
-      { wch: 15 },
-      { wch: 18 },
+    sheet.columns = [
+      { header: "Employee Code", key: "employeeCode", width: 15 },
+      { header: "Name", key: "employeeName", width: 30 },
+      { header: "Days Worked", key: "daysWorked", width: 12 },
+      { header: "Total Days", key: "totalDaysInPeriod", width: 12 },
+      { header: "Absences", key: "absences", width: 10 },
+      { header: "Late Hours", key: "lateHours", width: 12 },
+      { header: "Overtime Hours", key: "overtimeHours", width: 15 },
+      { header: "Attendance Rate (%)", key: "attendanceRate", width: 18 },
     ];
-    ws["!cols"] = colWidths;
 
-    const range = XLSX.utils.decode_range(ws["!ref"] || "");
-    for (let row = range.s.r + 1; row <= range.e.r; row++) {
-      const cellAddr = XLSX.utils.encode_cell({ r: row, c: 7 });
-      const cell = ws[cellAddr];
-      if (cell && cell.v !== undefined) {
-        const rate = cell.v as number;
-        if (rate >= 90) {
-          cell.s = {
-            fill: { fgColor: { rgb: "C6EFCE" } },
-            font: { color: { rgb: "006100" } },
-          };
-        } else if (rate >= 75) {
-          cell.s = {
-            fill: { fgColor: { rgb: "FFEB9C" } },
-            font: { color: { rgb: "9C5700" } },
-          };
-        } else {
-          cell.s = {
-            fill: { fgColor: { rgb: "FFC7CE" } },
-            font: { color: { rgb: "9C0006" } },
-          };
-        }
-      }
+    for (const d of filteredData) {
+      sheet.addRow({
+        employeeCode: d.employeeCode,
+        employeeName: d.employeeName,
+        daysWorked: d.daysWorked,
+        totalDaysInPeriod: d.totalDaysInPeriod,
+        absences: d.absences,
+        lateHours: d.lateHours,
+        overtimeHours: d.overtimeHours,
+        attendanceRate: d.attendanceRate,
+      });
     }
 
-    XLSX.utils.book_append_sheet(wb, ws, "Attendance Report");
-    XLSX.writeFile(wb, `Attendance_Report_${MONTH_NAMES[month]}_${year}.xlsx`);
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+      const rate = row.getCell(8).value as number;
+      if (typeof rate === "number") {
+        if (rate >= 90) {
+          row.getCell(8).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFC6EFCE" },
+          };
+          row.getCell(8).font = { color: { argb: "FF006100" } };
+        } else if (rate >= 75) {
+          row.getCell(8).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFEB9C" },
+          };
+          row.getCell(8).font = { color: { argb: "FF9C5700" } };
+        } else {
+          row.getCell(8).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFC7CE" },
+          };
+          row.getCell(8).font = { color: { argb: "FF9C0006" } };
+        }
+      }
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(blob, `Attendance_Report_${MONTH_NAMES[month]}_${year}.xlsx`);
   };
 
   const handleExportCSV = () => {
@@ -292,7 +300,7 @@ export function AttendanceReportPage() {
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button variant="secondary" onClick={handleExportXLS}>
+            <Button variant="secondary" onClick={() => void handleExportXLS()}>
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export XLS
             </Button>

@@ -6,7 +6,8 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Download, FileSpreadsheet } from "lucide-react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { downloadBlob } from "@/utils/exportUtils";
 import type {
   BenefitItem,
   EmployeeGroup,
@@ -189,18 +190,28 @@ export function BenefitsUtilizationReportPage() {
     [benefits],
   );
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
 
-    const summaryData = benefits.map((b) => ({
-      Benefit: b.benefitName,
-      "Employees Covered": b.employeeCount,
-      "EE Share": b.totalEmployeeShare,
-      "ER Share": b.totalEmployerShare,
-      "Total Cost": b.totalCost,
-    }));
+    const summarySheet = workbook.addWorksheet("Summary");
+    summarySheet.columns = [
+      { header: "Benefit", key: "Benefit", width: 30 },
+      { header: "Employees Covered", key: "Employees Covered", width: 16 },
+      { header: "EE Share", key: "EE Share", width: 15 },
+      { header: "ER Share", key: "ER Share", width: 15 },
+      { header: "Total Cost", key: "Total Cost", width: 15 },
+    ];
 
-    summaryData.push({
+    for (const b of benefits) {
+      summarySheet.addRow({
+        Benefit: b.benefitName,
+        "Employees Covered": b.employeeCount,
+        "EE Share": b.totalEmployeeShare,
+        "ER Share": b.totalEmployerShare,
+        "Total Cost": b.totalCost,
+      });
+    }
+    summarySheet.addRow({
       Benefit: "TOTAL",
       "Employees Covered": totalEmployees,
       "EE Share": totalEE,
@@ -208,38 +219,34 @@ export function BenefitsUtilizationReportPage() {
       "Total Cost": totalCost,
     });
 
-    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-    wsSummary["!cols"] = [
-      { wch: 30 },
-      { wch: 16 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-    ];
-    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
-
     for (const b of benefits) {
-      const detailData = b.employees.map((e) => ({
-        Employee: e.employeeName,
-        Group: e.groupName,
-        Payroll: e.payrollName,
-        Period: e.period,
-        "EE Share": e.employeeShare,
-        "ER Share": e.employerShare,
-      }));
-      const ws = XLSX.utils.json_to_sheet(detailData);
-      ws["!cols"] = [
-        { wch: 25 },
-        { wch: 20 },
-        { wch: 25 },
-        { wch: 12 },
-        { wch: 15 },
-        { wch: 15 },
+      const sheet = workbook.addWorksheet(b.benefitName.slice(0, 31));
+      sheet.columns = [
+        { header: "Employee", key: "Employee", width: 25 },
+        { header: "Group", key: "Group", width: 20 },
+        { header: "Payroll", key: "Payroll", width: 25 },
+        { header: "Period", key: "Period", width: 12 },
+        { header: "EE Share", key: "EE Share", width: 15 },
+        { header: "ER Share", key: "ER Share", width: 15 },
       ];
-      XLSX.utils.book_append_sheet(wb, ws, b.benefitName.slice(0, 31));
+
+      for (const e of b.employees) {
+        sheet.addRow({
+          Employee: e.employeeName,
+          Group: e.groupName,
+          Payroll: e.payrollName,
+          Period: e.period,
+          "EE Share": e.employeeShare,
+          "ER Share": e.employerShare,
+        });
+      }
     }
 
-    XLSX.writeFile(wb, `Benefits_Utilization_${selectedYear}.xlsx`);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(blob, `Benefits_Utilization_${selectedYear}.xlsx`);
   };
 
   const handleExportCSV = () => {
@@ -305,7 +312,7 @@ export function BenefitsUtilizationReportPage() {
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button variant="secondary" onClick={handleExportXLS}>
+            <Button variant="secondary" onClick={() => handleExportXLS()}>
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export XLS
             </Button>

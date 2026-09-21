@@ -3,7 +3,8 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { downloadBlob } from "@/utils/exportUtils";
 import type {
   Employee,
   EmployeeArea,
@@ -228,60 +229,60 @@ export function useEmployeeReport() {
     });
   };
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Employee Master List");
 
-    const data = employees.map((r) => ({
-      "Employee Code": r.employeeCode,
-      Name: r.name || r.nameId,
-      Group: r.groupName || "",
-      Position: r.positionName || "",
-      Area: r.areaName || "",
-      Status: r.isActive ? "Active" : "Inactive",
-      Salary: r.salary || 0,
-      Frequency: r.salaryFrequency || "",
-      "Hire Date": r.hireDate ? new Date(r.hireDate).toLocaleDateString() : "",
-      Phone:
-        r.contacts?.find((c) => c.type === "phone" && c.isPrimary)?.value ||
-        r.contacts?.find((c) => c.type === "phone")?.value ||
-        "",
-      Email:
-        r.contacts?.find((c) => c.type === "email" && c.isPrimary)?.value ||
-        r.contacts?.find((c) => c.type === "email")?.value ||
-        "",
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(data);
-
-    ws["!cols"] = [
-      { wch: 15 },
-      { wch: 30 },
-      { wch: 20 },
-      { wch: 25 },
-      { wch: 20 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 15 },
-      { wch: 25 },
+    sheet.columns = [
+      { header: "Employee Code", key: "employeeCode", width: 15 },
+      { header: "Name", key: "name", width: 30 },
+      { header: "Group", key: "group", width: 20 },
+      { header: "Position", key: "position", width: 25 },
+      { header: "Area", key: "area", width: 20 },
+      { header: "Status", key: "status", width: 12 },
+      { header: "Salary", key: "salary", width: 12 },
+      { header: "Frequency", key: "frequency", width: 12 },
+      { header: "Hire Date", key: "hireDate", width: 12 },
+      { header: "Phone", key: "phone", width: 15 },
+      { header: "Email", key: "email", width: 25 },
     ];
 
-    const headerStyle = {
-      font: { bold: true },
-      fill: { fgColor: { rgb: "CCCCCC" } },
-    };
-    const range = XLSX.utils.decode_range(ws["!ref"] || "");
-    for (let C = range.s.c; C <= range.e.c; C++) {
-      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-      if (ws[cellAddress]) {
-        ws[cellAddress].s = headerStyle;
-      }
+    for (const r of employees) {
+      sheet.addRow({
+        employeeCode: r.employeeCode,
+        name: r.name || r.nameId,
+        group: r.groupName || "",
+        position: r.positionName || "",
+        area: r.areaName || "",
+        status: r.isActive ? "Active" : "Inactive",
+        salary: r.salary || 0,
+        frequency: r.salaryFrequency || "",
+        hireDate: r.hireDate ? new Date(r.hireDate).toLocaleDateString() : "",
+        phone:
+          r.contacts?.find((c) => c.type === "phone" && c.isPrimary)?.value ||
+          r.contacts?.find((c) => c.type === "phone")?.value ||
+          "",
+        email:
+          r.contacts?.find((c) => c.type === "email" && c.isPrimary)?.value ||
+          r.contacts?.find((c) => c.type === "email")?.value ||
+          "",
+      });
     }
 
-    XLSX.utils.book_append_sheet(wb, ws, "Employee Master List");
-    XLSX.writeFile(
-      wb,
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFCCCCCC" },
+    };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(
+      blob,
       `Employee_Report_${new Date().toISOString().split("T")[0]}.xlsx`,
     );
   };

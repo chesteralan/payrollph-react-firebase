@@ -6,7 +6,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Download, FileSpreadsheet } from "lucide-react";
-import * as XLSX from "xlsx";
+import { exportToXLS } from "@/utils/exportUtils";
 import type {
   Payroll,
   PayrollEmployee,
@@ -155,41 +155,42 @@ export function YearEndReportPage() {
     [summaries],
   );
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
-
-    const summaryData = summaries.map((s) => ({
-      Employee: s.employeeName,
-      "Payroll Runs": s.payrollRuns,
-      "Basic Salary": s.totalBasicSalary,
-      "Total Earnings": s.totalEarnings,
-      "Total Benefits": s.totalBenefits,
-      "Gross Pay": s.totalGrossPay,
-      "Net Pay": s.totalNetPay,
-    }));
-
-    summaryData.push({
-      Employee: "TOTAL",
-      "Payroll Runs": totals.totalPayrollRuns,
-      "Basic Salary": totals.totalBasicSalary,
-      "Total Earnings": totals.totalEarnings,
-      "Total Benefits": totals.totalBenefits,
-      "Gross Pay": totals.totalGrossPay,
-      "Net Pay": totals.totalNetPay,
-    });
-
-    const ws = XLSX.utils.json_to_sheet(summaryData);
-    ws["!cols"] = [
-      { wch: 25 },
-      { wch: 12 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
+  const handleExportXLS = async () => {
+    const data = [
+      ...summaries.map((s) => ({
+        Employee: s.employeeName,
+        "Payroll Runs": s.payrollRuns,
+        "Basic Salary": s.totalBasicSalary,
+        "Total Earnings": s.totalEarnings,
+        "Total Benefits": s.totalBenefits,
+        "Gross Pay": s.totalGrossPay,
+        "Net Pay": s.totalNetPay,
+      })),
+      {
+        Employee: "TOTAL",
+        "Payroll Runs": totals.totalPayrollRuns,
+        "Basic Salary": totals.totalBasicSalary,
+        "Total Earnings": totals.totalEarnings,
+        "Total Benefits": totals.totalBenefits,
+        "Gross Pay": totals.totalGrossPay,
+        "Net Pay": totals.totalNetPay,
+      },
     ];
-    XLSX.utils.book_append_sheet(wb, ws, "Year End Summary");
-    XLSX.writeFile(wb, `Year_End_Report_${selectedYear}.xlsx`);
+
+    await exportToXLS(data, {
+      filename: `Year_End_Report_${selectedYear}`,
+      sheetName: "Year End Summary",
+      includeTimestamp: false,
+      columns: [
+        { header: "Employee", key: "Employee", width: 25 },
+        { header: "Payroll Runs", key: "Payroll Runs", width: 12 },
+        { header: "Basic Salary", key: "Basic Salary", width: 15 },
+        { header: "Total Earnings", key: "Total Earnings", width: 15 },
+        { header: "Total Benefits", key: "Total Benefits", width: 15 },
+        { header: "Gross Pay", key: "Gross Pay", width: 15 },
+        { header: "Net Pay", key: "Net Pay", width: 15 },
+      ],
+    });
   };
 
   const handleExportCSV = () => {
@@ -251,7 +252,7 @@ export function YearEndReportPage() {
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button variant="secondary" onClick={handleExportXLS}>
+            <Button variant="secondary" onClick={() => handleExportXLS()}>
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export XLS
             </Button>

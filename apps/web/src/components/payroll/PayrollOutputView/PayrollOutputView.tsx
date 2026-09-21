@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { Button } from "@/components/ui/Button";
 import {
   Download,
@@ -204,113 +204,111 @@ export function PayrollOutputView({
     window.print();
   };
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const ws = workbook.addWorksheet("Payroll Register");
 
-    const registerData = rows.map((row) => ({
-      "Employee ID": row.employeeCode,
-      Name: `${row.firstName} ${row.lastName}`,
-      "Basic Salary": row.salaryAmount,
-      Earnings: Array.from(earningData.get(row.nameId)?.values() || []).reduce(
-        (s, v) => s + v,
-        0,
-      ),
-      "Gross Pay": getEmployeeGross(row),
-      Deductions: Array.from(
-        deductionData.get(row.nameId)?.values() || [],
-      ).reduce((s, v) => s + v, 0),
-      "Benefits (EE)": Array.from(
-        benefitData.get(row.nameId)?.values() || [],
-      ).reduce((s, v) => s + v.employeeShare, 0),
-      "Net Pay": getEmployeeNet(row),
-    }));
-
-    registerData.push({
-      "Employee ID": "TOTAL",
-      Name: "",
-      "Basic Salary": totals.totalBasic,
-      Earnings: totals.totalEarnings,
-      "Gross Pay": totals.totalGross,
-      Deductions: totals.totalDeductions,
-      "Benefits (EE)": totals.totalBenefitsEE,
-      "Net Pay": totals.totalNet,
-    });
-
-    const ws = XLSX.utils.json_to_sheet(registerData);
-    XLSX.utils.book_append_sheet(wb, ws, "Payroll Register");
-
-    // Column widths
-    ws["!cols"] = [
-      { wch: 15 }, // Employee ID
-      { wch: 25 }, // Name
-      { wch: 15 }, // Basic Salary
-      { wch: 15 }, // Earnings
-      { wch: 15 }, // Gross Pay
-      { wch: 15 }, // Deductions
-      { wch: 15 }, // Benefits (EE)
-      { wch: 15 }, // Net Pay
+    ws.columns = [
+      { header: "Employee ID", key: "employeeId", width: 15 },
+      { header: "Name", key: "name", width: 25 },
+      { header: "Basic Salary", key: "basicSalary", width: 15 },
+      { header: "Earnings", key: "earnings", width: 15 },
+      { header: "Gross Pay", key: "grossPay", width: 15 },
+      { header: "Deductions", key: "deductions", width: 15 },
+      { header: "Benefits (EE)", key: "benefitsEE", width: 15 },
+      { header: "Net Pay", key: "netPay", width: 15 },
     ];
 
-    // Freeze header row
-    ws["!freeze"] = { xSplit: 0, ySplit: 1 };
+    rows.forEach((row) => {
+      ws.addRow({
+        employeeId: row.employeeCode,
+        name: `${row.firstName} ${row.lastName}`,
+        basicSalary: row.salaryAmount,
+        earnings: Array.from(
+          earningData.get(row.nameId)?.values() || [],
+        ).reduce((s, v) => s + v, 0),
+        grossPay: getEmployeeGross(row),
+        deductions: Array.from(
+          deductionData.get(row.nameId)?.values() || [],
+        ).reduce((s, v) => s + v, 0),
+        benefitsEE: Array.from(
+          benefitData.get(row.nameId)?.values() || [],
+        ).reduce((s, v) => s + v.employeeShare, 0),
+        netPay: getEmployeeNet(row),
+      });
+    });
 
-    // Apply header row styles (row 1, 0-indexed r=0)
-    for (let c = 0; c < 8; c++) {
-      const cellAddr = XLSX.utils.encode_cell({ r: 0, c });
-      const cell = ws[cellAddr];
-      if (cell) {
-        cell.s = {
-          font: { bold: true, color: { rgb: "FFFFFFFF" } },
-          fill: { fgColor: { rgb: "FF4472C4" } },
-          border: {
-            top: { style: "thin", color: { rgb: "FF000000" } },
-            bottom: { style: "thin", color: { rgb: "FF000000" } },
-            left: { style: "thin", color: { rgb: "FF000000" } },
-            right: { style: "thin", color: { rgb: "FF000000" } },
-          },
-        };
-      }
-    }
+    const totalRow = ws.addRow({
+      employeeId: "TOTAL",
+      name: "",
+      basicSalary: totals.totalBasic,
+      earnings: totals.totalEarnings,
+      grossPay: totals.totalGross,
+      deductions: totals.totalDeductions,
+      benefitsEE: totals.totalBenefitsEE,
+      netPay: totals.totalNet,
+    });
 
-    // Apply data and total row styles
-    const totalRowIndex = registerData.length - 1;
-    for (let r = 1; r < registerData.length; r++) {
-      const isTotalRow = r === totalRowIndex;
-      // Numeric columns: C to H (c=2 to 7)
-      for (let c = 2; c < 8; c++) {
-        const cellAddr = XLSX.utils.encode_cell({ r, c });
-        const cell = ws[cellAddr];
-        if (!cell) continue;
+    ws.views = [{ state: "frozen", ySplit: 1 }];
 
+    const borderStyle: Partial<ExcelJS.Border> = {
+      style: "thin",
+      color: { argb: "FF000000" },
+    };
+    const thinBorders: ExcelJS.Borders = {
+      top: borderStyle,
+      bottom: borderStyle,
+      left: borderStyle,
+      right: borderStyle,
+    };
+
+    ws.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF4472C4" },
+      };
+      cell.border = thinBorders;
+    });
+
+    for (let r = 2; r <= ws.rowCount; r++) {
+      const row = ws.getRow(r);
+      const isTotalRow = r === ws.rowCount;
+      for (let c = 3; c <= 8; c++) {
+        const cell = row.getCell(c);
+        cell.numFmt = "₱#,##0.00";
         if (isTotalRow) {
-          cell.s = {
-            font: { bold: true },
-            fill: { fgColor: { rgb: "FFD9E1F2" } },
-            border: {
-              top: { style: "medium", color: { rgb: "FF000000" } },
-              bottom: { style: "thin", color: { rgb: "FF000000" } },
-              left: { style: "thin", color: { rgb: "FF000000" } },
-              right: { style: "thin", color: { rgb: "FF000000" } },
-            },
-            numFmt: "₱#,##0.00",
+          cell.font = { bold: true };
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFD9E1F2" },
           };
-        } else {
-          cell.s = { ...cell.s, numFmt: "₱#,##0.00" };
+          cell.border = {
+            top: { style: "medium", color: { argb: "FF000000" } },
+            bottom: thinBorders.bottom,
+            left: thinBorders.left,
+            right: thinBorders.right,
+          };
         }
       }
-      // Total row label styling
       if (isTotalRow) {
-        const labelCell = ws[XLSX.utils.encode_cell({ r, c: 0 })];
-        if (labelCell) labelCell.s = { ...labelCell.s, font: { bold: true } };
-        const nameCell = ws[XLSX.utils.encode_cell({ r, c: 1 })];
-        if (nameCell) nameCell.s = { ...nameCell.s, font: { bold: true } };
+        row.getCell(1).font = { bold: true };
+        row.getCell(2).font = { bold: true };
       }
     }
 
-    XLSX.writeFile(
-      wb,
-      `Payroll_${payroll.name}_${monthName}_${payroll.year}.xlsx`,
-    );
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Payroll_${payroll.name}_${monthName}_${payroll.year}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleExportCSV = () => {

@@ -3,7 +3,8 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { downloadBlob } from "@/utils/exportUtils";
 import type {
   Payroll,
   PayrollEmployee,
@@ -401,10 +402,19 @@ export function useEarningsDeductionsReport() {
     [benefitSummaries],
   );
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const workbook = new ExcelJS.Workbook();
 
-    const summaryData = [
+    // Summary sheet
+    const summarySheet = workbook.addWorksheet("Summary");
+    summarySheet.columns = [
+      { header: "Type", key: "Type", width: 15 },
+      { header: "Name", key: "Name", width: 30 },
+      { header: "Total Amount", key: "Total Amount", width: 20 },
+      { header: "Employee Count", key: "Employee Count", width: 15 },
+    ];
+
+    const summaryRows: Record<string, string | number>[] = [
       { Type: "EARNINGS", Name: "", "Total Amount": "", "Employee Count": "" },
       ...earningSummaries.map((e) => ({
         Type: "",
@@ -452,33 +462,38 @@ export function useEarningsDeductionsReport() {
         "Employee Count": "",
       },
     ];
+    for (const row of summaryRows) {
+      summarySheet.addRow(row);
+    }
 
-    const ws1 = XLSX.utils.json_to_sheet(summaryData);
-    ws1["!cols"] = [{ wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, ws1, "Summary");
-
-    const detailData = employeeBreakdowns.map((emp) => ({
-      "Employee Code": emp.employeeCode,
-      Name: `${emp.firstName} ${emp.lastName}`,
-      Group: emp.groupName,
-      "Total Earnings": emp.totalEarnings,
-      "Total Deductions": emp.totalDeductions,
-      "Total Benefits": emp.totalBenefits,
-    }));
-
-    const ws2 = XLSX.utils.json_to_sheet(detailData);
-    ws2["!cols"] = [
-      { wch: 15 },
-      { wch: 30 },
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
+    // Employee Details sheet
+    const detailSheet = workbook.addWorksheet("Employee Details");
+    detailSheet.columns = [
+      { header: "Employee Code", key: "employeeCode", width: 15 },
+      { header: "Name", key: "name", width: 30 },
+      { header: "Group", key: "group", width: 20 },
+      { header: "Total Earnings", key: "totalEarnings", width: 15 },
+      { header: "Total Deductions", key: "totalDeductions", width: 15 },
+      { header: "Total Benefits", key: "totalBenefits", width: 15 },
     ];
-    XLSX.utils.book_append_sheet(wb, ws2, "Employee Details");
 
-    XLSX.writeFile(
-      wb,
+    for (const emp of employeeBreakdowns) {
+      detailSheet.addRow({
+        employeeCode: emp.employeeCode,
+        name: `${emp.firstName} ${emp.lastName}`,
+        group: emp.groupName,
+        totalEarnings: emp.totalEarnings,
+        totalDeductions: emp.totalDeductions,
+        totalBenefits: emp.totalBenefits,
+      });
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    downloadBlob(
+      blob,
       `Earnings_Deductions_Report_${startYear}_${endYear}.xlsx`,
     );
   };

@@ -6,7 +6,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Download, FileSpreadsheet } from "lucide-react";
-import * as XLSX from "xlsx";
+import { exportToXLS } from "@/utils/exportUtils";
 import type { Payroll } from "@/types";
 
 import type { GroupSummary, PayrollSummary } from "./PayrollSummaryPage.types";
@@ -172,38 +172,39 @@ export function PayrollSummaryPage() {
     [payrolls],
   );
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
-
-    const data = payrolls.map((p) => ({
-      "Payroll Name": p.name,
-      Period: `${new Date(0, p.month - 1).toLocaleString("default", { month: "long" })} ${p.year}`,
-      Status: p.status,
-      Employees: p.employeeCount,
-      "Gross Pay": p.grossPay,
-      "Net Pay": p.netPay,
-    }));
-
-    data.push({
-      "Payroll Name": "TOTAL",
-      Period: "",
-      Status: "",
-      Employees: totalEmployees,
-      "Gross Pay": totalGross,
-      "Net Pay": totalNet,
-    });
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    ws["!cols"] = [
-      { wch: 30 },
-      { wch: 20 },
-      { wch: 12 },
-      { wch: 10 },
-      { wch: 15 },
-      { wch: 15 },
+  const handleExportXLS = async () => {
+    const data = [
+      ...payrolls.map((p) => ({
+        "Payroll Name": p.name,
+        Period: `${new Date(0, p.month - 1).toLocaleString("default", { month: "long" })} ${p.year}`,
+        Status: p.status,
+        Employees: p.employeeCount,
+        "Gross Pay": p.grossPay,
+        "Net Pay": p.netPay,
+      })),
+      {
+        "Payroll Name": "TOTAL",
+        Period: "",
+        Status: "",
+        Employees: totalEmployees,
+        "Gross Pay": totalGross,
+        "Net Pay": totalNet,
+      },
     ];
-    XLSX.utils.book_append_sheet(wb, ws, "Payroll Summary");
-    XLSX.writeFile(wb, `Payroll_Summary_${selectedYear}.xlsx`);
+
+    await exportToXLS(data, {
+      filename: `Payroll_Summary_${selectedYear}`,
+      sheetName: "Payroll Summary",
+      includeTimestamp: false,
+      columns: [
+        { header: "Payroll Name", key: "Payroll Name", width: 30 },
+        { header: "Period", key: "Period", width: 20 },
+        { header: "Status", key: "Status", width: 12 },
+        { header: "Employees", key: "Employees", width: 10 },
+        { header: "Gross Pay", key: "Gross Pay", width: 15 },
+        { header: "Net Pay", key: "Net Pay", width: 15 },
+      ],
+    });
   };
 
   const handleExportCSV = () => {
@@ -278,7 +279,7 @@ export function PayrollSummaryPage() {
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button variant="secondary" onClick={handleExportXLS}>
+            <Button variant="secondary" onClick={() => handleExportXLS()}>
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export XLS
             </Button>

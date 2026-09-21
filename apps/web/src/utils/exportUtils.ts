@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 interface ExportColumn {
   header: string;
@@ -32,31 +32,34 @@ interface ExportOptions {
  * });
  * ```
  */
-export function exportToXLS<T extends Record<string, unknown>>(
+export async function exportToXLS<T extends Record<string, unknown>>(
   data: T[],
   options: ExportOptions,
-) {
-  const wb = XLSX.utils.book_new();
+): Promise<void> {
+  const workbook = new ExcelJS.Workbook();
+  const sheetName = (options.sheetName || "Data").slice(0, 31);
+  const sheet = workbook.addWorksheet(sheetName);
 
-  const formatted = data.map((row) => {
-    const result: Record<string, unknown> = {};
-    for (const col of options.columns) {
-      result[col.header] = row[col.key];
-    }
-    return result;
-  });
+  sheet.columns = options.columns.map((col) => ({
+    header: col.header,
+    key: col.key,
+    width: col.width ?? 15,
+  }));
 
-  const ws = XLSX.utils.json_to_sheet(formatted);
-  ws["!cols"] = options.columns.map((col) => ({ wch: col.width ?? 15 }));
-
-  const sheetName = options.sheetName || "Data";
-  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  for (const row of data) {
+    sheet.addRow(row);
+  }
 
   const timestamp =
     options.includeTimestamp !== false
       ? `_${new Date().toISOString().slice(0, 10)}`
       : "";
-  XLSX.writeFile(wb, `${options.filename}${timestamp}.xlsx`);
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  downloadBlob(blob, `${options.filename}${timestamp}.xlsx`);
 }
 
 /**

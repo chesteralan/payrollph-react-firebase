@@ -6,7 +6,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileSpreadsheet } from "lucide-react";
-import * as XLSX from "xlsx";
+import { exportToXLS } from "@/utils/exportUtils";
 
 import type {
   Employee13thMonth,
@@ -101,33 +101,41 @@ export function Report13thMonthPage() {
     }
   };
 
-  const handleExportXLS = () => {
-    const wb = XLSX.utils.book_new();
+  const handleExportXLS = async () => {
+    const data = [
+      ...results.map((r) => ({
+        "Employee Code": r.employeeCode,
+        Name: `${r.firstName} ${r.lastName}`,
+        "Hire Date": r.hireDate
+          ? new Date(r.hireDate).toLocaleDateString()
+          : "N/A",
+        "Months Worked": r.monthsWorked,
+        "Total Basic Salary": r.totalBasicSalary,
+        "13th Month Pay": r.thirteenthMonth,
+      })),
+      {
+        "Employee Code": "",
+        Name: "TOTAL",
+        "Hire Date": "",
+        "Months Worked": 0,
+        "Total Basic Salary": results.reduce((s, r) => s + r.totalBasicSalary, 0),
+        "13th Month Pay": results.reduce((s, r) => s + r.thirteenthMonth, 0),
+      },
+    ];
 
-    const data = results.map((r) => ({
-      "Employee Code": r.employeeCode,
-      Name: `${r.firstName} ${r.lastName}`,
-      "Hire Date": r.hireDate
-        ? new Date(r.hireDate).toLocaleDateString()
-        : "N/A",
-      "Months Worked": r.monthsWorked,
-      "Total Basic Salary": r.totalBasicSalary,
-      "13th Month Pay": r.thirteenthMonth,
-    }));
-
-    const totalRow = {
-      "Employee Code": "",
-      Name: "TOTAL",
-      "Hire Date": "",
-      "Months Worked": 0,
-      "Total Basic Salary": results.reduce((s, r) => s + r.totalBasicSalary, 0),
-      "13th Month Pay": results.reduce((s, r) => s + r.thirteenthMonth, 0),
-    };
-    data.push(totalRow);
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "13th Month Report");
-    XLSX.writeFile(wb, `13th_Month_Report_${year}.xlsx`);
+    await exportToXLS(data, {
+      filename: `13th_Month_Report_${year}`,
+      sheetName: "13th Month Report",
+      includeTimestamp: false,
+      columns: [
+        { header: "Employee Code", key: "Employee Code", width: 15 },
+        { header: "Name", key: "Name", width: 25 },
+        { header: "Hire Date", key: "Hire Date", width: 15 },
+        { header: "Months Worked", key: "Months Worked", width: 15 },
+        { header: "Total Basic Salary", key: "Total Basic Salary", width: 20 },
+        { header: "13th Month Pay", key: "13th Month Pay", width: 18 },
+      ],
+    });
   };
 
   const formatCurrency = (value: number) =>
@@ -144,7 +152,7 @@ export function Report13thMonthPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">13th Month Report</h1>
         {hasGenerated && results.length > 0 && (
-          <Button variant="secondary" onClick={handleExportXLS}>
+          <Button variant="secondary" onClick={() => handleExportXLS()}>
             <FileSpreadsheet className="w-4 h-4 mr-2" />
             Export XLS
           </Button>
