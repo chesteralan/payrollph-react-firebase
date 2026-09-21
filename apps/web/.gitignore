@@ -36,4 +36,5 @@ coverage/
 .yarn/install-state.gz
 
 # Build artifacts
-tsconfig.tsbuildinfo
+tsconfig.tsbuildinfoapps/web/playwright-report/
+apps/web/test-results/

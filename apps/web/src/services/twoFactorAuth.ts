@@ -42,7 +42,9 @@ export const getTwoFactorStatus = async (
       method: data.twoFactorMethod,
     };
   } catch (error) {
-    console.error("Failed to get 2FA status:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to get 2FA status:", error);
+    }
     return { isEnabled: false };
   }
 };
@@ -65,7 +67,9 @@ export const setupTotp2FA = async (
       )}`,
     };
   } catch (error) {
-    console.error("Failed to setup TOTP 2FA:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to setup TOTP 2FA:", error);
+    }
     throw error;
   }
 };
@@ -90,7 +94,9 @@ export const enrollTotp2FA = async (
       twoFactorEnrolledAt: new Date(),
     });
   } catch (error) {
-    console.error("Failed to enroll TOTP 2FA:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to enroll TOTP 2FA:", error);
+    }
     throw error;
   }
 };
@@ -110,7 +116,9 @@ export const setupPhone2FA = async (
 
     return verificationId;
   } catch (error) {
-    console.error("Failed to setup phone 2FA:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to setup phone 2FA:", error);
+    }
     throw error;
   }
 };
@@ -137,7 +145,9 @@ export const enrollPhone2FA = async (
       twoFactorEnrolledAt: new Date(),
     });
   } catch (error) {
-    console.error("Failed to enroll phone 2FA:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to enroll phone 2FA:", error);
+    }
     throw error;
   }
 };
@@ -158,7 +168,9 @@ export const disable2FA = async (user: User): Promise<void> => {
       twoFactorEnrolledAt: null,
     });
   } catch (error) {
-    console.error("Failed to disable 2FA:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to disable 2FA:", error);
+    }
     throw error;
   }
 };
@@ -179,7 +191,9 @@ export const resolve2FAChallenge = async (
     const userCredential = await resolver.resolveSignIn(assertion);
     return userCredential.user;
   } catch (error) {
-    console.error("Failed to resolve 2FA challenge:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to resolve 2FA challenge:", error);
+    }
     throw error;
   }
 };
@@ -237,7 +251,9 @@ export const verifyBackupCode = async (
 
     return true;
   } catch (error) {
-    console.error("Failed to verify backup code:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to verify backup code:", error);
+    }
     return false;
   }
 };

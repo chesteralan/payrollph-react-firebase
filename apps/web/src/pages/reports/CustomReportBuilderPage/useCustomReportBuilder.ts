@@ -176,7 +176,9 @@ export function useCustomReportBuilder() {
       setPreviewData(data);
       setActiveTab("preview");
     } catch (error) {
-      console.error("Failed to generate report:", error);
+      if (import.meta.env.DEV) {
+        console.error("Failed to generate report:", error);
+      }
     } finally {
       setIsGenerating(false);
     }

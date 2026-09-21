@@ -94,7 +94,9 @@ export const decrypt = async (
 
     return decoder.decode(decrypted);
   } catch (error) {
-    console.error("Decryption failed:", error);
+    if (import.meta.env.DEV) {
+      console.error("Decryption failed:", error);
+    }
     return "";
   }
 };
@@ -132,7 +134,9 @@ export const decryptSensitiveFields = async <T extends Record<string, unknown>>(
         decrypted[field] = (await decrypt(value, passphrase)) as T[keyof T];
       } catch {
         // Keep original value if decryption fails
-        console.warn(`Failed to decrypt field ${String(field)}`);
+        if (import.meta.env.DEV) {
+          console.warn(`Failed to decrypt field ${String(field)}`);
+        }
       }
     }
   }

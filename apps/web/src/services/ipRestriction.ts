@@ -53,7 +53,9 @@ export const fetchIpRestrictions = async (
     const snap = await getDocs(q);
     return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as IpRestriction);
   } catch (error) {
-    console.error("Failed to fetch IP restrictions:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to fetch IP restrictions:", error);
+    }
     return [];
   }
 };
@@ -83,7 +85,9 @@ export const addIpRestriction = async (
       expiresAt: options?.expiresAt,
     });
   } catch (error) {
-    console.error("Failed to add IP restriction:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to add IP restriction:", error);
+    }
     throw error;
   }
 };
@@ -98,7 +102,9 @@ export const removeIpRestriction = async (
       // Alternatively, delete the document: await deleteDoc(doc(db, 'ip_restrictions', restrictionId))
     });
   } catch (error) {
-    console.error("Failed to remove IP restriction:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to remove IP restriction:", error);
+    }
     throw error;
   }
 };
@@ -158,7 +164,9 @@ export const isIpAllowed = async (
 
     return { allowed: true };
   } catch (error) {
-    console.error("Failed to validate IP:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to validate IP:", error);
+    }
     return { allowed: true }; // Fail open by default
   }
 };
@@ -234,7 +242,9 @@ export const logIpAccess = async (
       path,
     });
   } catch (error) {
-    console.error("Failed to log IP access:", error);
+    if (import.meta.env.DEV) {
+      console.error("Failed to log IP access:", error);
+    }
   }
 };
 
@@ -253,7 +263,9 @@ export const validateIpOnLogin = async (
 
     return allowed;
   } catch (error) {
-    console.error("IP validation failed:", error);
+    if (import.meta.env.DEV) {
+      console.error("IP validation failed:", error);
+    }
     return true; // Fail open
   }
 };
