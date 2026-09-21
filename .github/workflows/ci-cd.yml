@@ -71,6 +71,27 @@ jobs:
           name: coverage-report-${{ matrix.shard }}
           path: apps/web/coverage/
 
+  unit-tests-fast:
+    name: Tests (Fast)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run unit tests
+        working-directory: apps/web
+        run: yarn test:run --reporter=verbose
+
   coverage-check:
     name: Coverage Threshold Check
     runs-on: ubuntu-latest
@@ -92,7 +113,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint-typecheck]
+    needs: [lint-typecheck, unit-tests-fast]
 
     steps:
       - uses: actions/checkout@v6
