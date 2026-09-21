@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addDoc,
   collection,
@@ -89,7 +89,7 @@ export function PrintFormatsPage() {
   const [selectedColumns, setSelectedColumns] = useState<string[]>([...INITIAL_COLUMNS]);
   const [includeTotals, setIncludeTotals] = useState(true);
 
-  const fetchFormats = async () => {
+  const fetchFormats = useCallback(async () => {
     setLoading(true);
     const q = currentCompanyId
       ? query(
@@ -102,11 +102,11 @@ export function PrintFormatsPage() {
       snap.docs.map((d) => ({ id: d.id, ...d.data() })) as PrintFormat[],
     );
     setLoading(false);
-  };
+  }, [currentCompanyId]);
 
   useEffect(() => {
-      fetchFormats();  
-  }, [currentCompanyId]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchFormats();
+  }, [currentCompanyId, fetchFormats]);
 
   const resetWizard = () => {
     setWizardStep(0);

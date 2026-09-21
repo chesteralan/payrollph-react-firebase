@@ -42,9 +42,9 @@ export function DayEntryModal({
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">
+          <h2 className="text-lg font-semibold">
             {MONTH_NAMES[selectedMonth]} {selectedDay}, {selectedYear}
-          </h3>
+          </h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>

@@ -157,9 +157,10 @@ export function useMultiCache<T>(
 
   useEffect(() => {
     let cancelled = false;
+    const keysArr = keysStr ? keysStr.split(",") : [];
 
     Promise.all(
-      keys.map(async (key) => {
+      keysArr.map(async (key) => {
         const cached = cache.get<T>(key);
         if (cached) {
           return { key, value: cached };
@@ -186,7 +187,6 @@ export function useMultiCache<T>(
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keysStr, fetchFn, ttl]);
 
   return { results, loading };

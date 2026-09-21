@@ -27,7 +27,7 @@ export function DTRImportModal({
       />
       <div className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 p-6 max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Import DTR Entries</h3>
+          <h2 className="text-lg font-semibold">Import DTR Entries</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>

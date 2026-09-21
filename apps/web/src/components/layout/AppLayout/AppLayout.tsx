@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
@@ -81,6 +81,15 @@ export function AppLayout() {
 
   const handleClose = () => setMobileOpen(false);
 
+  function RouteFocus() {
+    const location = useLocation();
+    useEffect(() => {
+      const main = document.getElementById('main-content');
+      if (main) main.focus();
+    }, [location.pathname]);
+    return null;
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg focus:rounded">
@@ -96,7 +105,8 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setMobileOpen(true)} />
         <NetworkStatusBanner />
-        <main id="main-content" className="flex-1 overflow-y-auto p-6">
+        <RouteFocus />
+        <main id="main-content" className="flex-1 overflow-y-auto p-6" tabIndex={-1}>
           <Breadcrumb />
           <AlertBannerProvider>
             <Outlet />

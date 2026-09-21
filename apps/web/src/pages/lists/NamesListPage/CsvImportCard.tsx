@@ -144,7 +144,7 @@ export function CsvImportCard({
         {importStats && (
           <div className="text-center py-8">
             <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Import Complete</h3>
+            <h2 className="text-lg font-medium mb-2">Import Complete</h2>
             <p className="text-gray-600 mb-4">
               Successfully imported{" "}
               <span className="font-medium text-green-600">

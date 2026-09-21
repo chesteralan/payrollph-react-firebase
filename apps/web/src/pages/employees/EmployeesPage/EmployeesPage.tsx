@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   addDoc,
@@ -39,6 +39,112 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import type { Employee, EmployeeGroup } from "@/types";
 
+interface EmployeeRowProps {
+  emp: Employee & { name?: string };
+  isSelected: boolean;
+  onToggleSelect: (id: string) => void;
+  onToggleStatus: (employee: Employee) => void;
+  onEdit: (employee: Employee) => void;
+  onDelete: (id: string, code: string) => void;
+  onView: (id: string) => void;
+  canEditEmployee: boolean;
+  canDeleteEmployee: boolean;
+}
+
+const EmployeeRow = React.memo(function EmployeeRow({
+  emp,
+  isSelected,
+  onToggleSelect,
+  onToggleStatus,
+  onEdit,
+  onDelete,
+  onView,
+  canEditEmployee,
+  canDeleteEmployee,
+}: EmployeeRowProps) {
+  return (
+    <tr className={isSelected ? "bg-blue-50" : "hover:bg-gray-50"}>
+      <td className="px-4">
+        <button
+          onClick={() => onToggleSelect(emp.id)}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          {isSelected ? (
+            <CheckSquare className="w-4 h-4 text-blue-600" />
+          ) : (
+            <Square className="w-4 h-4" />
+          )}
+        </button>
+      </td>
+      <td className="px-6 py-4">
+        <div className="text-sm font-medium text-gray-900">
+          {emp.employeeCode}
+        </div>
+        {emp.name && (
+          <div className="text-xs text-gray-500">{emp.name}</div>
+        )}
+      </td>
+      <td className="px-6 py-4">
+        <button
+          onClick={() => onToggleStatus(emp)}
+          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+            emp.isActive
+              ? "bg-green-100 text-green-800 hover:bg-green-200"
+              : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+          }`}
+        >
+          {emp.isActive ? (
+            <UserCheck className="w-3 h-3" />
+          ) : (
+            <UserX className="w-3 h-3" />
+          )}
+          {emp.isActive ? "Active" : "Inactive"}
+        </button>
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-500">
+        {emp.hireDate
+          ? new Date(emp.hireDate).toLocaleDateString()
+          : "-"}
+      </td>
+      <td className="px-6 py-4 text-right">
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onView(emp.id)}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          {canEditEmployee && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(emp)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+          )}
+          {canDeleteEmployee && (
+            <ConfirmDialog
+              title="Archive Employee"
+              message={`Archive ${emp.employeeCode}? It can be restored from Trash.`}
+              confirmText="Archive"
+              variant="danger"
+              onConfirm={() => onDelete(emp.id, emp.employeeCode)}
+            >
+              {(open) => (
+                <Button variant="ghost" size="sm" onClick={open}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </ConfirmDialog>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+});
+
 export function EmployeesPage() {
   const { currentCompanyId } = useAuth();
   const { canView, canAdd, canEdit, canDelete } = usePermissions();
@@ -73,14 +179,14 @@ export function EmployeesPage() {
     "active" | "inactive" | "terminated"
   >("active");
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     const snap = await getDocs(query(collection(db, "groups")));
     setGroups(
       snap.docs.map((d) => ({ id: d.id, ...d.data() })) as EmployeeGroup[],
     );
-  };
+  }, []);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     if (!currentCompanyId) return;
     setLoading(true);
     const snap = await getDocs(
@@ -96,16 +202,14 @@ export function EmployeesPage() {
     })) as (Employee & { name?: string; deletedAt?: unknown })[];
     setEmployees(all.filter((e) => !e.deletedAt));
     setLoading(false);
-  };
+  }, [currentCompanyId]);
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (currentCompanyId) {
       fetchEmployees();
       fetchGroups();
     }
-  }, [currentCompanyId]);
-  /* eslint-enable react-hooks/exhaustive-deps */
+  }, [currentCompanyId, fetchEmployees, fetchGroups]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -588,94 +692,18 @@ export function EmployeesPage() {
                 </tr>
               ) : (
                 paginatedEmployees.map((emp) => (
-                  <tr
+                  <EmployeeRow
                     key={emp.id}
-                    className={
-                      selectedIds.has(emp.id)
-                        ? "bg-blue-50"
-                        : "hover:bg-gray-50"
-                    }
-                  >
-                    <td className="px-4">
-                      <button
-                        onClick={() => toggleSelect(emp.id)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        {selectedIds.has(emp.id) ? (
-                          <CheckSquare className="w-4 h-4 text-blue-600" />
-                        ) : (
-                          <Square className="w-4 h-4" />
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {emp.employeeCode}
-                      </div>
-                      {emp.name && (
-                        <div className="text-xs text-gray-500">{emp.name}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(emp)}
-                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
-                          emp.isActive
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                      >
-                        {emp.isActive ? (
-                          <UserCheck className="w-3 h-3" />
-                        ) : (
-                          <UserX className="w-3 h-3" />
-                        )}
-                        {emp.isActive ? "Active" : "Inactive"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {emp.hireDate
-                        ? new Date(emp.hireDate).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => navigate(`/employees/${emp.id}`)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        {canEdit("employees", "employees") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(emp)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("employees", "employees") && (
-                          <ConfirmDialog
-                            title="Archive Employee"
-                            message={`Archive ${emp.employeeCode}? It can be restored from Trash.`}
-                            confirmText="Archive"
-                            variant="danger"
-                            onConfirm={() =>
-                              handleDelete(emp.id, emp.employeeCode)
-                            }
-                          >
-                            {(open) => (
-                              <Button variant="ghost" size="sm" onClick={open}>
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                    emp={emp}
+                    isSelected={selectedIds.has(emp.id)}
+                    onToggleSelect={toggleSelect}
+                    onToggleStatus={handleToggleStatus}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onView={(id) => navigate(`/employees/${id}`)}
+                    canEditEmployee={canEdit("employees", "employees")}
+                    canDeleteEmployee={canDelete("employees", "employees")}
+                  />
                 ))
               )}
             </tbody>

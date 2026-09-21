@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   addDoc,
@@ -73,14 +73,14 @@ export function PayrollWizardPage() {
     statuses: [] as EmployeeStatus[],
   });
 
-  const fetchTerms = async () => {
+  const fetchTerms = useCallback(async () => {
     const snap = await getDocs(
       query(collection(db, "payroll_terms"), where("isActive", "==", true)),
     );
     setTerms(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Term[]);
-  };
+  }, []);
 
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
     if (!currentCompanyId) return;
     const snap = await getDocs(
       query(
@@ -95,9 +95,9 @@ export function PayrollWizardPage() {
         data: d.data() as PayrollTemplate,
       })),
     );
-  };
+  }, [currentCompanyId]);
 
-  const fetchLookups = async () => {
+  const fetchLookups = useCallback(async () => {
     const [gSnap, pSnap, aSnap, sSnap] = await Promise.all([
       getDocs(
         query(collection(db, "employee_groups"), where("isActive", "==", true)),
@@ -136,9 +136,9 @@ export function PayrollWizardPage() {
         ...d.data(),
       })) as EmployeeStatus[],
     });
-  };
+  }, []);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     if (!currentCompanyId) return;
     const snap = await getDocs(
       query(
@@ -152,9 +152,9 @@ export function PayrollWizardPage() {
         ...(d.data() as { nameId: string; employeeCode: string }),
       })),
     );
-  };
+  }, [currentCompanyId]);
 
-  const fetchPayroll = async () => {
+  const fetchPayroll = useCallback(async () => {
     if (!id) return;
     const snap = await getDoc(doc(db, "payroll", id));
     if (snap.exists()) {
@@ -196,10 +196,9 @@ export function PayrollWizardPage() {
         })),
       );
     }
-  };
+  }, [id]);
 
   useEffect(() => {
-     
     if (currentCompanyId) {
       fetchTemplates();
       fetchTerms();
@@ -207,9 +206,7 @@ export function PayrollWizardPage() {
       fetchEmployees();
       if (id) fetchPayroll();
     }
-     
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, currentCompanyId]);
+  }, [id, currentCompanyId, fetchEmployees, fetchLookups, fetchPayroll, fetchTemplates, fetchTerms]);
 
   const generateDatesFromTerm = (term: Term) => {
     const dates: Date[] = [];

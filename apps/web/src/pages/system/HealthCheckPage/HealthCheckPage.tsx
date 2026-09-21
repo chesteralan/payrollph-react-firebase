@@ -111,7 +111,7 @@ export function HealthCheckPage() {
     warningCount: number;
   }>({ status: "good", passCount: 0, failCount: 0, warningCount: 0 });
 
-  const checkFirebaseConnection = async (): Promise<HealthCheckResult> => {
+  const checkFirebaseConnection = useCallback(async (): Promise<HealthCheckResult> => {
     const start = performance.now();
     try {
       const testDoc = { test: true, timestamp: new Date(), _healthCheck: true };
@@ -135,9 +135,9 @@ export function HealthCheckPage() {
         details: error instanceof Error ? error.message : String(error),
       };
     }
-  };
+  }, []);
 
-  const checkOnlineStatus = (): HealthCheckResult => {
+  const checkOnlineStatus = useCallback((): HealthCheckResult => {
     const online = navigator.onLine;
     return {
       name: "Network Status",
@@ -147,9 +147,9 @@ export function HealthCheckPage() {
         ? "Browser reports network connectivity"
         : "Browser reports no network connectivity",
     };
-  };
+  }, []);
 
-  const checkCollections = async (): Promise<{
+  const checkCollections = useCallback(async (): Promise<{
     results: HealthCheckResult[];
     health: CollectionHealth[];
   }> => {
@@ -194,9 +194,9 @@ export function HealthCheckPage() {
     }
 
     return { results, health };
-  };
+  }, []);
 
-  const checkIndexes = (): HealthCheckResult[] => {
+  const checkIndexes = useCallback((): HealthCheckResult[] => {
     return COMMON_QUERIES.map((q) => ({
       name: `Index: ${q.name}`,
       status: q.needsComposite ? "warning" : "pass",
@@ -205,9 +205,9 @@ export function HealthCheckPage() {
         : "No composite index needed",
       details: q.query,
     }));
-  };
+  }, []);
 
-  const checkStorage = async (): Promise<{
+  const checkStorage = useCallback(async (): Promise<{
     result: HealthCheckResult;
     health: typeof storageHealth;
   }> => {
@@ -268,9 +268,9 @@ export function HealthCheckPage() {
         health: healthData,
       };
     }
-  };
+  }, []);
 
-  const checkAuth = async (): Promise<{
+  const checkAuth = useCallback(async (): Promise<{
     result: HealthCheckResult;
     health: typeof authHealth;
   }> => {
@@ -304,7 +304,7 @@ export function HealthCheckPage() {
         health: healthData,
       };
     }
-  };
+  }, []);
 
   const runHealthCheck = useCallback(async () => {
     setLoading(true);
@@ -348,8 +348,7 @@ export function HealthCheckPage() {
 
     setOverallScore({ status, passCount, failCount, warningCount });
     setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [checkAuth, checkCollections, checkFirebaseConnection, checkIndexes, checkOnlineStatus, checkStorage]);
 
   useEffect(() => {
      

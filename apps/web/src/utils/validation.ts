@@ -173,9 +173,21 @@ export const rules = {
   }),
 };
 
+export interface UseValidationReturn<T extends Record<string, unknown>> {
+  data: T;
+  errors: Record<string, string>;
+  touched: Set<string>;
+  updateField: <K extends keyof T>(field: K, value: T[K]) => void;
+  touchField: (field: string) => void;
+  validate: (validationRules: ValidationRule<T>[]) => ValidationResult;
+  getFieldError: (field: string) => string | undefined;
+  reset: () => void;
+  isValid: boolean;
+}
+
 export function useValidation<T extends Record<string, unknown>>(
   initialData: T,
-) {
+): UseValidationReturn<T> {
   const [data, setData] = useState<T>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());

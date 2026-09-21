@@ -119,6 +119,10 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
 
+      - name: Check bundle size
+        working-directory: apps/web
+        run: yarn size-check
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:

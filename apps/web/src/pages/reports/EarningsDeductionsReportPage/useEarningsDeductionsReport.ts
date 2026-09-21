@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,7 +59,7 @@ export function useEarningsDeductionsReport() {
     new Map(),
   );
 
-  const loadPayrolls = async () => {
+  const loadPayrolls = useCallback(async () => {
     if (!currentCompanyId) return;
     const snap = await getDocs(
       query(
@@ -84,9 +84,9 @@ export function useEarningsDeductionsReport() {
         year: p.year,
       })),
     );
-  };
+  }, [currentCompanyId]);
 
-  const loadLists = async () => {
+  const loadLists = useCallback(async () => {
     if (!currentCompanyId) return;
     const [earningsSnap, deductionsSnap, benefitsSnap, groupsSnap] =
       await Promise.all([
@@ -131,16 +131,14 @@ export function useEarningsDeductionsReport() {
     setGroups(
       groupsSnap.docs.map((d) => ({ id: d.id, name: d.data().name || d.id })),
     );
-  };
+  }, [currentCompanyId]);
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (currentCompanyId) {
       loadPayrolls();
       loadLists();
     }
-  }, [currentCompanyId]);
-  /* eslint-enable react-hooks/exhaustive-deps */
+  }, [currentCompanyId, loadPayrolls, loadLists]);
 
   const generateReport = async () => {
     if (!currentCompanyId) return;

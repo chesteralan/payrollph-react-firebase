@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useCompanies } from "@/context/CompanyContext/hooks";
 import {
   Building2,
   ChevronDown,
@@ -7,34 +8,17 @@ import {
   Settings,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/config/firebase";
-import type { Company } from "@/types";
 
 import type { HeaderProps } from "./Header.types";
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, currentCompanyId, setCurrentCompanyId, logout } = useAuth();
   const navigate = useNavigate();
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const companies = useCompanies();
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      const fetchCompanies = async () => {
-        const snap = await getDocs(
-          query(collection(db, "companies"), where("isActive", "==", true)),
-        );
-        setCompanies(
-          snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[],
-        );
-      };
-      fetchCompanies();
-    }
-  }, [user]);
 
   const selectedCompany = companies.find((c) => c.id === currentCompanyId);
 

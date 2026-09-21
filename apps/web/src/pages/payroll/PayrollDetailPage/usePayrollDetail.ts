@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   addDoc,
@@ -325,9 +325,11 @@ export function usePayrollDetail() {
     }
   }, [id, actualWorkdays, defaultWorkdays]);
 
+  const loadPayrollRef = useRef(loadPayroll);
+  loadPayrollRef.current = loadPayroll;
+
   useEffect(() => {
-    if (id) loadPayroll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (id) loadPayrollRef.current();
   }, [id]);
 
   const recalculateSalaries = useCallback(

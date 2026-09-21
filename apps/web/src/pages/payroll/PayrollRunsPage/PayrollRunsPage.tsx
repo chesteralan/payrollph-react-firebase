@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   addDoc,
@@ -29,6 +29,110 @@ import {
 } from "lucide-react";
 import type { Payroll } from "./PayrollRunsPage.types";
 
+const statusColors: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-800",
+  locked: "bg-blue-100 text-blue-800",
+  published: "bg-green-100 text-green-800",
+};
+
+interface PayrollRowProps {
+  payroll: Payroll;
+  onView: (id: string) => void;
+  onClone: (payroll: Payroll) => void;
+  onToggleLock: (payroll: Payroll) => void;
+  onPublish: (payroll: Payroll) => void;
+  onDelete: (id: string) => void;
+  canDeletePayroll: boolean;
+}
+
+const PayrollRow = React.memo(function PayrollRow({
+  payroll,
+  onView,
+  onClone,
+  onToggleLock,
+  onPublish,
+  onDelete,
+  canDeletePayroll,
+}: PayrollRowProps) {
+  const p = payroll;
+  return (
+    <tr className="hover:bg-gray-50">
+      <td
+        className="px-6 py-4 text-sm font-medium text-gray-900 cursor-pointer"
+        onClick={() => onView(p.id)}
+      >
+        {p.name}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-500">
+        {new Date(0, p.month - 1).toLocaleString("default", {
+          month: "long",
+        })}{" "}
+        {p.year}
+      </td>
+      <td className="px-6 py-4">
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[p.status || "draft"]}`}
+        >
+          {p.status || "draft"}
+        </span>
+      </td>
+      <td className="px-6 py-4 text-right">
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onView(p.id)}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          {p.status !== "published" && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onClone(p)}
+                title="Clone payroll"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggleLock(p)}
+              >
+                {p.isLocked ? (
+                  <Unlock className="w-4 h-4" />
+                ) : (
+                  <Lock className="w-4 h-4" />
+                )}
+              </Button>
+              {p.isLocked && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onPublish(p)}
+                  title="Publish payroll"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              )}
+            </>
+          )}
+          {canDeletePayroll && !p.isLocked && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(p.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+});
+
 export function PayrollRunsPage() {
   const { currentCompanyId } = useAuth();
   const { canView, canAdd, canDelete } = usePermissions();
@@ -43,7 +147,7 @@ export function PayrollRunsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
 
-  const fetchPayrolls = async () => {
+  const fetchPayrolls = useCallback(async () => {
     if (!currentCompanyId) return;
     setLoading(true);
     const snap = await getDocs(
@@ -54,14 +158,11 @@ export function PayrollRunsPage() {
     );
     setPayrolls(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Payroll[]);
     setLoading(false);
-  };
+  }, [currentCompanyId]);
 
   useEffect(() => {
-     
     if (currentCompanyId) fetchPayrolls();
-     
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCompanyId]);
+  }, [currentCompanyId, fetchPayrolls]);
 
   const toggleLock = async (payroll: Payroll) => {
     await updateDoc(doc(db, "payroll", payroll.id), {
@@ -165,12 +266,6 @@ export function PayrollRunsPage() {
   if (!canView("payroll", "payroll"))
     return <div className="text-center py-12 text-gray-500">Access denied</div>;
 
-  const statusColors: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-800",
-    locked: "bg-blue-100 text-blue-800",
-    published: "bg-green-100 text-green-800",
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -256,80 +351,16 @@ export function PayrollRunsPage() {
                 </tr>
               ) : (
                 paginatedPayrolls.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td
-                      className="px-6 py-4 text-sm font-medium text-gray-900 cursor-pointer"
-                      onClick={() => navigate(`/payroll/${p.id}`)}
-                    >
-                      {p.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(0, p.month - 1).toLocaleString("default", {
-                        month: "long",
-                      })}{" "}
-                      {p.year}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[p.status || "draft"]}`}
-                      >
-                        {p.status || "draft"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => navigate(`/payroll/${p.id}`)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        {p.status !== "published" && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleClone(p)}
-                              title="Clone payroll"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleLock(p)}
-                            >
-                              {p.isLocked ? (
-                                <Unlock className="w-4 h-4" />
-                              ) : (
-                                <Lock className="w-4 h-4" />
-                              )}
-                            </Button>
-                            {p.isLocked && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handlePublish(p)}
-                                title="Publish payroll"
-                              >
-                                <ArrowRight className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </>
-                        )}
-                        {canDelete("payroll", "payroll") && !p.isLocked && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(p.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                  <PayrollRow
+                    key={p.id}
+                    payroll={p}
+                    onView={(id) => navigate(`/payroll/${id}`)}
+                    onClone={handleClone}
+                    onToggleLock={toggleLock}
+                    onPublish={handlePublish}
+                    onDelete={handleDelete}
+                    canDeletePayroll={canDelete("payroll", "payroll")}
+                  />
                 ))
               )}
             </tbody>
