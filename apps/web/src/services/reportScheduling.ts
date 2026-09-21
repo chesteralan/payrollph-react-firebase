@@ -278,7 +278,7 @@ const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => 
   const sheet = workbook.addWorksheet("Report");
 
   const rows = data as Record<string, unknown>[];
-  if (rows.length > 0) {
+  if (rows.length > 0 && rows[0]) {
     const headers = Object.keys(rows[0]);
     sheet.addRow(headers);
     for (const row of rows) {
@@ -305,7 +305,7 @@ const exportToCsv = async (data: unknown[], _name: string): Promise<string> => {
   const sheet = workbook.addWorksheet("Report");
 
   const rows = data as Record<string, unknown>[];
-  if (rows.length > 0) {
+  if (rows.length > 0 && rows[0]) {
     const headers = Object.keys(rows[0]);
     sheet.addRow(headers);
     for (const row of rows) {
