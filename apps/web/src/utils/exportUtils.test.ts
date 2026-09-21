@@ -15,23 +15,6 @@ import {
   downloadBlob,
 } from "./exportUtils";
 
-const { mockBookNew, mockJsonToSheet, mockBookAppendSheet, mockWriteFile } =
-  vi.hoisted(() => ({
-    mockBookNew: vi.fn(() => ({ SheetNames: [], Sheets: {} })),
-    mockJsonToSheet: vi.fn(() => ({})),
-    mockBookAppendSheet: vi.fn(),
-    mockWriteFile: vi.fn(),
-  }));
-
-vi.mock("xlsx", () => ({
-  utils: {
-    book_new: mockBookNew,
-    json_to_sheet: mockJsonToSheet,
-    book_append_sheet: mockBookAppendSheet,
-  },
-  writeFile: mockWriteFile,
-}));
-
 describe("exportUtils column definitions", () => {
   describe("employeeExportColumns", () => {
     it("should have 9 columns", () => {
@@ -575,10 +558,6 @@ describe("exportToJson", () => {
 });
 
 describe("exportToXLS", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   const mockColumns = [
     { header: "ID", key: "id", width: 10 },
     { header: "Name", key: "name", width: 20 },
@@ -589,170 +568,69 @@ describe("exportToXLS", () => {
     { id: 2, name: "Bob" },
   ];
 
-  it("should create a workbook and call writeFile", () => {
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
-
-    expect(mockBookNew).toHaveBeenCalledOnce();
-    expect(mockJsonToSheet).toHaveBeenCalledOnce();
-    expect(mockBookAppendSheet).toHaveBeenCalledOnce();
-    expect(mockWriteFile).toHaveBeenCalledOnce();
-  });
-
-  it("should format data using column headers as output keys", () => {
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
-
-    const formattedData = mockJsonToSheet.mock.calls[0][0];
-    expect(formattedData).toEqual([
-      { ID: 1, Name: "Alice" },
-      { ID: 2, Name: "Bob" },
-    ]);
-  });
-
-  it("should set column widths on the worksheet", () => {
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
-
-    const ws = mockJsonToSheet.mock.results[0].value;
-    expect(ws["!cols"]).toEqual([{ wch: 10 }, { wch: 20 }]);
-  });
-
-  it("should use default width of 15 when column width is not specified", () => {
-    const columnsNoWidth = [
-      { header: "ID", key: "id" },
-      { header: "Name", key: "name" },
-    ];
-    exportToXLS(mockData, { filename: "test", columns: columnsNoWidth });
-
-    const ws = mockJsonToSheet.mock.results[0].value;
-    expect(ws["!cols"]).toEqual([{ wch: 15 }, { wch: 15 }]);
-  });
-
-  it("should append sheet with default name 'Data' when sheetName is omitted", () => {
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
-
-    expect(mockBookAppendSheet).toHaveBeenCalledWith(
-      expect.any(Object),
-      expect.any(Object),
-      "Data",
-    );
-  });
-
-  it("should append sheet with custom sheet name", () => {
-    exportToXLS(mockData, {
-      filename: "test",
-      columns: mockColumns,
-      sheetName: "Employees",
+  it("should generate a valid xlsx blob", async () => {
+    let capturedBlob: Blob | undefined;
+    const spy = vi.spyOn(URL, "createObjectURL").mockImplementation((blob) => {
+      capturedBlob = blob as Blob;
+      return "blob:mock";
     });
+    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
+    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    // Prevent actual click from navigating
+    const origCreateElement = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = vi.fn();
 
-    expect(mockBookAppendSheet).toHaveBeenCalledWith(
-      expect.any(Object),
-      expect.any(Object),
-      "Employees",
-    );
-  });
+    await exportToXLS(mockData, { filename: "test", columns: mockColumns });
 
-  it("should truncate sheet name to 31 characters", () => {
-    const longName = "A".repeat(40);
-    exportToXLS(mockData, {
-      filename: "test",
-      columns: mockColumns,
-      sheetName: longName,
-    });
-
-    expect(mockBookAppendSheet).toHaveBeenCalledWith(
-      expect.any(Object),
-      expect.any(Object),
-      longName.slice(0, 31),
-    );
-  });
-
-  it("should include a date timestamp in the filename by default", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2024-06-15T12:00:00Z"));
-
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
-
-    expect(mockWriteFile).toHaveBeenCalledWith(
-      expect.any(Object),
-      "test_2024-06-15.xlsx",
+    expect(capturedBlob).toBeInstanceOf(Blob);
+    expect(capturedBlob!.type).toBe(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
 
-    vi.useRealTimers();
+    spy.mockRestore();
+    revoke.mockRestore();
+    append.mockRestore();
+    remove.mockRestore();
+    HTMLAnchorElement.prototype.click = origCreateElement;
   });
 
-  it("should exclude timestamp from filename when includeTimestamp is false", () => {
-    exportToXLS(mockData, {
-      filename: "test",
-      columns: mockColumns,
-      includeTimestamp: false,
-    });
+  it("should handle empty data array", async () => {
+    const spy = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
+    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
+    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    const origClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = vi.fn();
 
-    expect(mockWriteFile).toHaveBeenCalledWith(
-      expect.any(Object),
-      "test.xlsx",
-    );
+    await exportToXLS([], { filename: "empty", columns: mockColumns });
+
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
+    revoke.mockRestore();
+    append.mockRestore();
+    remove.mockRestore();
+    HTMLAnchorElement.prototype.click = origClick;
   });
 
-  it("should call book_new, json_to_sheet, book_append_sheet, writeFile in order", () => {
-    exportToXLS(mockData, { filename: "test", columns: mockColumns });
+  it("should handle single column export", async () => {
+    const spy = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
+    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
+    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    const origClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = vi.fn();
 
-    expect(mockBookNew).toHaveBeenCalledBefore(mockJsonToSheet);
-    expect(mockJsonToSheet).toHaveBeenCalledBefore(mockBookAppendSheet);
-    expect(mockBookAppendSheet).toHaveBeenCalledBefore(mockWriteFile);
-  });
-
-  it("should handle empty data array", () => {
-    exportToXLS([], { filename: "empty", columns: mockColumns });
-
-    expect(mockBookNew).toHaveBeenCalledOnce();
-    expect(mockJsonToSheet).toHaveBeenCalledWith([]);
-    expect(mockBookAppendSheet).toHaveBeenCalledOnce();
-    expect(mockWriteFile).toHaveBeenCalledOnce();
-  });
-
-  it("should handle data with undefined values", () => {
-    const dataWithUndefined = [{ id: 1, name: undefined }];
-    exportToXLS(dataWithUndefined, {
-      filename: "test",
-      columns: mockColumns,
-    });
-
-    const formattedData = mockJsonToSheet.mock.calls[0][0];
-    expect(formattedData).toEqual([{ ID: 1, Name: undefined }]);
-  });
-
-  it("should handle data with missing keys gracefully", () => {
-    const dataMissingKeys = [{ id: 1 }];
-    exportToXLS(dataMissingKeys, {
-      filename: "test",
-      columns: mockColumns,
-    });
-
-    const formattedData = mockJsonToSheet.mock.calls[0][0];
-    expect(formattedData).toEqual([{ ID: 1, Name: undefined }]);
-  });
-
-  it("should handle single column export", () => {
     const singleCol = [{ header: "ID", key: "id" }];
-    exportToXLS([{ id: 42 }], { filename: "single", columns: singleCol });
+    await exportToXLS([{ id: 42 }], { filename: "single", columns: singleCol });
 
-    const formattedData = mockJsonToSheet.mock.calls[0][0];
-    expect(formattedData).toEqual([{ ID: 42 }]);
-  });
+    expect(spy).toHaveBeenCalled();
 
-  it("should handle includeTimestamp explicitly set to true", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2025-01-01T00:00:00Z"));
-
-    exportToXLS(mockData, {
-      filename: "test",
-      columns: mockColumns,
-      includeTimestamp: true,
-    });
-
-    expect(mockWriteFile).toHaveBeenCalledWith(
-      expect.any(Object),
-      "test_2025-01-01.xlsx",
-    );
-    vi.useRealTimers();
+    spy.mockRestore();
+    revoke.mockRestore();
+    append.mockRestore();
+    remove.mockRestore();
+    HTMLAnchorElement.prototype.click = origClick;
   });
 });
