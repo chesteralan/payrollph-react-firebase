@@ -4,9 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { Header } from "./Header";
 import * as useAuthModule from "@/hooks/useAuth";
+import * as useCompanyModule from "@/context/CompanyContext/hooks";
 import * as firestoreModule from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { addMockDocs, clearMockDocs } from "@/__mocks__/firebase";
+
+vi.mock("@/context/CompanyContext/hooks", () => ({
+  useCompanies: vi.fn(() => []),
+}));
 
 /**
  * Helper to render Header inside a MemoryRouter (needed for useNavigate)
@@ -83,32 +88,22 @@ describe("Header", () => {
 
   describe("Company Switcher", () => {
     it("does NOT render company switcher when only 1 or fewer companies exist", async () => {
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
       ]);
       renderHeader();
 
-      // Wait for the effect to fetch companies (company data loads but isn't displayed
-      // because companies.length > 1 condition hides the switcher for single companies)
-      // The company name only appears in the header when the switcher is shown
-      await vi.waitFor(async () => {
-        // Verify the company filter query was made
-        const { getDocs } = await import("firebase/firestore");
-        expect(getDocs).toHaveBeenCalled();
-      });
-
       // With only one company, the switcher is hidden (companies.length > 1 check)
       expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-      // The company switcher button should NOT be present
       expect(
         screen.queryByLabelText(/Current company/i),
       ).not.toBeInTheDocument();
     });
 
     it("renders company switcher when multiple companies exist", async () => {
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
-        { id: "company-2", name: "Acme Inc", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
+        { id: "company-2", name: "Acme Inc", isActive: true } as any,
       ]);
       renderHeader();
 
@@ -116,15 +111,14 @@ describe("Header", () => {
         expect(screen.getByText("Test Corp")).toBeInTheDocument();
       });
 
-      // Company switcher button should be present (since companies.length > 1)
       const switcherBtn = screen.getByLabelText("Current company: Test Corp");
       expect(switcherBtn).toBeInTheDocument();
     });
 
     it("shows company dropdown on click", async () => {
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
-        { id: "company-2", name: "Acme Inc", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
+        { id: "company-2", name: "Acme Inc", isActive: true } as any,
       ]);
       renderHeader();
 
@@ -135,7 +129,6 @@ describe("Header", () => {
       const switcherBtn = screen.getByLabelText("Current company: Test Corp");
       await userEvent.click(switcherBtn);
 
-      // Dropdown should now appear with both companies
       expect(screen.getByRole("listbox")).toBeInTheDocument();
       expect(screen.getByText("Acme Inc")).toBeInTheDocument();
     });
@@ -146,9 +139,9 @@ describe("Header", () => {
         createMockAuth({ setCurrentCompanyId }),
       );
 
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
-        { id: "company-2", name: "Acme Inc", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
+        { id: "company-2", name: "Acme Inc", isActive: true } as any,
       ]);
       renderHeader();
 
@@ -172,9 +165,9 @@ describe("Header", () => {
         createMockAuth({ currentCompanyId: null }),
       );
 
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
-        { id: "company-2", name: "Acme Inc", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
+        { id: "company-2", name: "Acme Inc", isActive: true } as any,
       ]);
       renderHeader();
 
@@ -187,9 +180,9 @@ describe("Header", () => {
     });
 
     it("marks the current company as selected in the dropdown", async () => {
-      addMockDocs("companies", [
-        { id: "company-1", name: "Test Corp", isActive: true },
-        { id: "company-2", name: "Acme Inc", isActive: true },
+      vi.mocked(useCompanyModule.useCompanies).mockReturnValue([
+        { id: "company-1", name: "Test Corp", isActive: true } as any,
+        { id: "company-2", name: "Acme Inc", isActive: true } as any,
       ]);
       renderHeader();
 

@@ -4,7 +4,12 @@ import { MemoryRouter } from "react-router-dom";
 import { AppLayout } from "./AppLayout";
 import * as useAuthModule from "@/hooks/useAuth";
 import * as useToastModule from "@/hooks/useToast";
+import * as useCompanyModule from "@/context/CompanyContext/hooks";
 import * as offlineService from "@/services/offline";
+
+vi.mock("@/context/CompanyContext/hooks", () => ({
+  useCompanies: vi.fn(() => []),
+}));
 
 // Mock the toast context
 const mockAddToast = vi.fn();

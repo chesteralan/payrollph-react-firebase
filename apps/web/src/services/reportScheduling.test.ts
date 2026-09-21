@@ -373,15 +373,6 @@ describe("exportToCsv", () => {
 });
 
 describe("processDueReports", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2024-07-15T10:00:00Z"));
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it("should process due reports that are active and past nextRun", async () => {
     addMockDocs("scheduled_reports", [
       baseReport({
