@@ -132,9 +132,10 @@ export function EmployeeProfilePage() {
 
       if (empSnap.exists())
         setEmployee({ id: empSnap.id, ...empSnap.data() } as Employee);
-      if (!profileSnap.empty) {
-        const p = profileSnap.docs[0]!.data();
-        setProfile({ id: profileSnap.docs[0]!.id, ...p } as EmployeeProfile);
+      if (!profileSnap.empty && profileSnap.docs[0]) {
+        const doc = profileSnap.docs[0];
+        const p = doc.data();
+        setProfile({ id: doc.id, ...p } as EmployeeProfile);
         setProfileForm({
           sss: p.sss || "",
           tin: p.tin || "",
@@ -155,9 +156,10 @@ export function EmployeeProfilePage() {
           ...d.data(),
         })) as EmployeeContact[],
       );
-      if (!salarySnap.empty) {
-        const s = salarySnap.docs[0]!.data();
-        setSalary({ id: salarySnap.docs[0]!.id, ...s } as EmployeeSalary);
+      if (!salarySnap.empty && salarySnap.docs[0]) {
+        const doc = salarySnap.docs[0];
+        const s = doc.data();
+        setSalary({ id: doc.id, ...s } as EmployeeSalary);
         setSalaryForm({
           amount: String(s.amount || ""),
           frequency: s.frequency || "monthly",

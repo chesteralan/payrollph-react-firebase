@@ -185,6 +185,7 @@ export function AuditPage() {
 
       <Card>
         <CardContent className="p-0">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -309,6 +310,7 @@ export function AuditPage() {
               )}
             </tbody>
           </table>
+          </div>
         </CardContent>
       </Card>
     </div>

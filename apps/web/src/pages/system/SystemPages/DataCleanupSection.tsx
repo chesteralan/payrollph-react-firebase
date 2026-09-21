@@ -153,6 +153,7 @@ export function DataCleanupSection({
             <h4 className="font-medium text-gray-900 mb-3">
               Cleanup History
             </h4>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
@@ -193,6 +194,7 @@ export function DataCleanupSection({
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </CardContent>

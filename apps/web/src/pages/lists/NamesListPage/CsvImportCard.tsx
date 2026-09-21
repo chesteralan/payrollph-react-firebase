@@ -81,7 +81,7 @@ export function CsvImportCard({
               </div>
             </div>
 
-            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
