@@ -238,7 +238,7 @@ export function PayrollOutputView({
       });
     });
 
-    const totalRow = ws.addRow({
+    ws.addRow({
       employeeId: "TOTAL",
       name: "",
       basicSalary: totals.totalBasic,

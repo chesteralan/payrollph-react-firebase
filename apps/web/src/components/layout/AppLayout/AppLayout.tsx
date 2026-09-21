@@ -9,6 +9,15 @@ import { NetworkStatusBanner } from "@/components/ui/NetworkStatusBanner";
 import { useToast } from "@/hooks/useToast";
 import { getQueuedActionCount, syncQueuedActions } from "@/services/offline";
 
+function RouteFocus() {
+  const location = useLocation();
+  useEffect(() => {
+    const main = document.getElementById("main-content");
+    if (main) main.focus();
+  }, [location.pathname]);
+  return null;
+}
+
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
@@ -80,15 +89,6 @@ export function AppLayout() {
   }, [addToast]);
 
   const handleClose = () => setMobileOpen(false);
-
-  function RouteFocus() {
-    const location = useLocation();
-    useEffect(() => {
-      const main = document.getElementById('main-content');
-      if (main) main.focus();
-    }, [location.pathname]);
-    return null;
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">
