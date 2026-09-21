@@ -260,6 +260,7 @@ export function PayrollOutputView({
       bottom: borderStyle,
       left: borderStyle,
       right: borderStyle,
+      diagonal: { style: "thin", color: { argb: "FF000000" }, up: false, down: false },
     };
 
     ws.getRow(1).eachCell((cell) => {
