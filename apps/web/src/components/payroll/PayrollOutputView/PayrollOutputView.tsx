@@ -260,7 +260,6 @@ export function PayrollOutputView({
       bottom: borderStyle,
       left: borderStyle,
       right: borderStyle,
-      diagonal: { style: "none", direction: "down" },
     };
 
     ws.getRow(1).eachCell((cell) => {

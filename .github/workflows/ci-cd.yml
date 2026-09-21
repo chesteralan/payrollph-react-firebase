@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1/3, 2/3, 3/3]
+        shard: [1, 2, 3]
 
     steps:
       - uses: actions/checkout@v6
@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run unit tests with coverage (shard ${{ matrix.shard }})
+      - name: Run unit tests with coverage (shard ${{ matrix.shard }} of 3)
         working-directory: apps/web
         run: yarn test:coverage --reporter=verbose
         env:
