@@ -161,7 +161,7 @@ export function useCustomReportBuilder() {
               row[groupBy as keyof typeof row] || "Unknown",
             );
             if (!acc[key]) acc[key] = [];
-            acc[key]!.push(row);
+            acc[key]?.push(row);
             return acc;
           },
           {},
@@ -187,8 +187,8 @@ export function useCustomReportBuilder() {
       .map((fieldId) => AVAILABLE_FIELDS.find((f) => f.id === fieldId))
       .filter(Boolean)
       .map((f) => ({
-        header: f!.label,
-        key: f!.id,
+        header: f?.label ?? "",
+        key: f?.id ?? "",
         width: 15,
       }));
 

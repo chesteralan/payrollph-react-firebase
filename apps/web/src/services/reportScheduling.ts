@@ -273,12 +273,26 @@ export const processDueReports = async (): Promise<void> => {
 };
 
 const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => {
-  const XLSX = await import("xlsx");
-  const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const blob = new Blob([wbout], {
+  const ExcelJS = (await import("exceljs")).default;
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Report");
+
+  const rows = data as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const headers = Object.keys(rows[0]);
+    sheet.addRow(headers);
+    for (const row of rows) {
+      sheet.addRow(headers.map((h) => row[h]));
+    }
+    sheet.columns.forEach((col) => {
+      col.width = Math.max(
+        ...(col.values?.map((v) => String(v ?? "").length) ?? [10]),
+      );
+    });
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
   const url = URL.createObjectURL(blob);
@@ -286,10 +300,21 @@ const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => 
 };
 
 const exportToCsv = async (data: unknown[], _name: string): Promise<string> => {
-  const XLSX = await import("xlsx");
-  const worksheet = XLSX.utils.json_to_sheet(data as Record<string, unknown>[]);
-  const csv = XLSX.utils.sheet_to_csv(worksheet);
-  const blob = new Blob([csv], { type: "text/csv" });
+  const ExcelJS = (await import("exceljs")).default;
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Report");
+
+  const rows = data as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const headers = Object.keys(rows[0]);
+    sheet.addRow(headers);
+    for (const row of rows) {
+      sheet.addRow(headers.map((h) => row[h]));
+    }
+  }
+
+  const buffer = await workbook.csv.writeBuffer();
+  const blob = new Blob([buffer], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   return url;
 };

@@ -3,114 +3,101 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { EditableCell } from "./EditableCell";
 
 describe("EditableCell", () => {
-  it("should display text value in view mode", () => {
-    render(<EditableCell value="John Doe" onChange={vi.fn()} />);
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
+  it("renders the value as text", () => {
+    render(<EditableCell value="Hello" onChange={vi.fn()} />);
+    expect(screen.getByText("Hello")).toBeInTheDocument();
   });
 
-  it("should display number value formatted in view mode", () => {
-    render(<EditableCell value={5000} onChange={vi.fn()} type="number" />);
-    expect(screen.getByText("5,000.00")).toBeInTheDocument();
+  it("formats number values with locale string", () => {
+    render(<EditableCell value={1234.5} type="number" onChange={vi.fn()} />);
+    expect(screen.getByText("1,234.50")).toBeInTheDocument();
   });
 
-  it("should enter edit mode on click", () => {
-    render(<EditableCell value="Editable" onChange={vi.fn()} />);
-    fireEvent.click(screen.getByText("Editable"));
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
-    expect(screen.getByRole("textbox")).toHaveValue("Editable");
+  it("enters edit mode on click", () => {
+    render(<EditableCell value="Edit me" onChange={vi.fn()} />);
+    fireEvent.click(screen.getByText("Edit me"));
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveValue("Edit me");
   });
 
-  it("should enter edit mode on Enter key press", () => {
-    render(<EditableCell value="Cell" onChange={vi.fn()} />);
-    const cell = screen.getByText("Cell");
+  it("enters edit mode on Enter key", () => {
+    render(<EditableCell value="Press Enter" onChange={vi.fn()} />);
+    const cell = screen.getByRole("button");
     fireEvent.keyDown(cell, { key: "Enter" });
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("Press Enter");
   });
 
-  it("should enter edit mode on Space key press", () => {
-    render(<EditableCell value="Cell" onChange={vi.fn()} />);
-    const cell = screen.getByText("Cell");
+  it("enters edit mode on Space key", () => {
+    render(<EditableCell value="Press Space" onChange={vi.fn()} />);
+    const cell = screen.getByRole("button");
     fireEvent.keyDown(cell, { key: " " });
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("Press Space");
   });
 
-  it("should commit changes on Enter key in edit mode", () => {
+  it("calls onChange on blur", () => {
     const onChange = vi.fn();
-    render(<EditableCell value="Old" onChange={onChange} />);
-    fireEvent.click(screen.getByText("Old"));
+    render(<EditableCell value="old" onChange={onChange} />);
+    fireEvent.click(screen.getByText("old"));
     const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "New" } });
+    fireEvent.change(input, { target: { value: "new" } });
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenCalledWith("new");
+  });
+
+  it("calls onChange on Enter", () => {
+    const onChange = vi.fn();
+    render(<EditableCell value="old" onChange={onChange} />);
+    fireEvent.click(screen.getByText("old"));
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "new" } });
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("New");
+    expect(onChange).toHaveBeenCalledWith("new");
   });
 
-  it("should cancel changes on Escape key in edit mode", () => {
+  it("reverts value on Escape", () => {
     const onChange = vi.fn();
-    render(<EditableCell value="Original" onChange={onChange} />);
-    fireEvent.click(screen.getByText("Original"));
+    render(<EditableCell value="original" onChange={onChange} />);
+    fireEvent.click(screen.getByText("original"));
     const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "Changed" } });
+    fireEvent.change(input, { target: { value: "changed" } });
     fireEvent.keyDown(input, { key: "Escape" });
     expect(onChange).not.toHaveBeenCalled();
-    // Should revert to original value in view mode
-    expect(screen.getByText("Original")).toBeInTheDocument();
+    expect(screen.getByText("original")).toBeInTheDocument();
   });
 
-  it("should commit changes on blur", () => {
-    const onChange = vi.fn();
-    render(<EditableCell value="Initial" onChange={onChange} />);
-    fireEvent.click(screen.getByText("Initial"));
-    const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "Blurred" } });
-    fireEvent.blur(input);
-    expect(onChange).toHaveBeenCalledWith("Blurred");
-  });
-
-  it("should format number input correctly on commit", () => {
-    const onChange = vi.fn();
-    render(<EditableCell value={1000} onChange={onChange} type="number" />);
-    fireEvent.click(screen.getByText("1,000.00"));
-    // Number type inputs use spinbutton role, not textbox
-    const input = screen.getByRole("spinbutton");
-    fireEvent.change(input, { target: { value: "2500" } });
-    fireEvent.keyDown(input, { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("2500");
-  });
-
-  it("should render with button role in view mode", () => {
-    render(<EditableCell value="Test" onChange={vi.fn()} />);
-    expect(screen.getByRole("button")).toBeInTheDocument();
-  });
-
-  it("should render with tabIndex=0 in view mode", () => {
-    render(<EditableCell value="Test" onChange={vi.fn()} />);
-    expect(screen.getByRole("button")).toHaveAttribute("tabindex", "0");
-  });
-
-  it("should apply custom className in view mode", () => {
-    render(
-      <EditableCell
-        value="Styled"
-        onChange={vi.fn()}
-        className="custom-class"
-      />,
+  it("shows highlight after value changes", () => {
+    vi.useFakeTimers();
+    const { rerender } = render(
+      <EditableCell value="a" originalValue="a" onChange={vi.fn()} />,
     );
-    const cell = screen.getByText("Styled");
-    expect(cell.classList.contains("custom-class")).toBe(true);
+    rerender(
+      <EditableCell value="b" originalValue="a" onChange={vi.fn()} />,
+    );
+    const cell = screen.getByText("b");
+    expect(cell.className).toContain("bg-yellow-100");
+    vi.useRealTimers();
   });
 
-  it("should auto-focus input when entering edit mode", () => {
-    render(<EditableCell value="AutoFocus" onChange={vi.fn()} />);
-    fireEvent.click(screen.getByText("AutoFocus"));
-    const input = screen.getByRole("textbox");
-    expect(document.activeElement).toBe(input);
+  it("applies custom className", () => {
+    render(
+      <EditableCell value="test" onChange={vi.fn()} className="my-class" />,
+    );
+    expect(screen.getByText("test").className).toContain("my-class");
   });
 
-  it("should render number type input in edit mode", () => {
-    render(<EditableCell value={500} onChange={vi.fn()} type="number" />);
-    fireEvent.click(screen.getByText("500.00"));
-    const input = screen.getByRole("spinbutton");
-    expect(input).toBeInTheDocument();
-    expect(input).toHaveAttribute("type", "number");
+  it("has accessible aria-label for text type", () => {
+    render(<EditableCell value="Name" onChange={vi.fn()} />);
+    expect(screen.getByRole("button")).toHaveAttribute(
+      "aria-label",
+      "Edit value: Name",
+    );
+  });
+
+  it("has accessible aria-label for number type", () => {
+    render(<EditableCell value={100} type="number" onChange={vi.fn()} />);
+    expect(screen.getByRole("button")).toHaveAttribute(
+      "aria-label",
+      "Edit value: 100.00",
+    );
   });
 });

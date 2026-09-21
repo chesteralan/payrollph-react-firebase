@@ -228,4 +228,120 @@ describe("findDuplicates", () => {
     expect(result.duplicates.has(10)).toBe(true);
     expect(result.duplicates.has(11)).toBe(true);
   });
+
+  it("should handle three or more duplicates of the same value", () => {
+    const data = [
+      { email: "a@test.com" },
+      { email: "b@test.com" },
+      { email: "a@test.com" },
+      { email: "a@test.com" },
+    ];
+    const result = findDuplicates(data, "email");
+    expect(result.count).toBe(3);
+    expect(result.duplicates.has(1)).toBe(true);
+    expect(result.duplicates.has(3)).toBe(true);
+    expect(result.duplicates.has(4)).toBe(true);
+  });
+
+  it("should handle multiple distinct duplicate groups", () => {
+    const data = [
+      { code: "X" },
+      { code: "Y" },
+      { code: "X" },
+      { code: "Y" },
+    ];
+    const result = findDuplicates(data, "code");
+    expect(result.count).toBe(4);
+  });
+
+  it("should handle null/undefined field values as empty and skip", () => {
+    const data = [
+      { id: null as unknown as string },
+      { id: undefined as unknown as string },
+    ];
+    const result = findDuplicates(data, "id");
+    expect(result.count).toBe(0);
+  });
+
+  it("should handle single element array", () => {
+    const data = [{ email: "only@test.com" }];
+    const result = findDuplicates(data, "email");
+    expect(result.count).toBe(0);
+    expect(result.duplicates.size).toBe(0);
+  });
+});
+
+describe("parseCSV additional edge cases", () => {
+  it("should handle single cell CSV", () => {
+    const result = parseCSV("hello");
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(["hello"]);
+  });
+
+  it("should handle single column CSV", () => {
+    const csv = "name\nAlice\nBob";
+    const result = parseCSV(csv);
+    expect(result).toHaveLength(3);
+    expect(result[0]).toEqual(["name"]);
+    expect(result[1]).toEqual(["Alice"]);
+    expect(result[2]).toEqual(["Bob"]);
+  });
+
+  it("should handle rows with different column counts", () => {
+    const csv = "a,b,c\n1,2\n4,5,6,7";
+    const result = parseCSV(csv);
+    expect(result[0]).toEqual(["a", "b", "c"]);
+    expect(result[1]).toEqual(["1", "2"]);
+    expect(result[2]).toEqual(["4", "5", "6", "7"]);
+  });
+
+  it("should handle multiple consecutive delimiters", () => {
+    const csv = "a,,b\n1,,3";
+    const result = parseCSV(csv);
+    expect(result[1]).toEqual(["1", "", "3"]);
+  });
+
+  it("should handle text with only whitespace", () => {
+    const result = parseCSV("   ");
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual([""]);
+  });
+
+  it("should handle mixed line endings", () => {
+    const csv = "a,b\r\n1,2\n3,4";
+    const result = parseCSV(csv);
+    expect(result).toHaveLength(3);
+  });
+});
+
+describe("validateRequired additional edge cases", () => {
+  it("should report multiple errors for multiple empty required fields in one row", () => {
+    const data = [{ name: "", email: "", phone: "" }];
+    const errors = validateRequired(data, ["name", "email", "phone"]);
+    expect(errors).toHaveLength(3);
+  });
+
+  it("should return empty array for empty rows input", () => {
+    const errors = validateRequired([], ["name"]);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should not flag whitespace-only as valid when trim is checked", () => {
+    const data = [{ name: "   " }];
+    const errors = validateRequired(data, ["name"]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].field).toBe("name");
+  });
+
+  it("should not flag numeric 0 as empty", () => {
+    const data = [{ age: 0 }];
+    const errors = validateRequired(data, ["age"]);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should default startRow to 1", () => {
+    const data = [{ name: "" }];
+    const errors = validateRequired(data, ["name"]);
+    expect(errors[0].row).toBe(1);
+  });
 });

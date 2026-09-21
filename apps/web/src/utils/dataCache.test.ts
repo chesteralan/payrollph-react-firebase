@@ -37,6 +37,19 @@ describe("DataCache (singleton)", () => {
     it("should return null for missing key", () => {
       expect(cache.get("nonexistent")).toBeNull();
     });
+
+    it("should overwrite existing key", () => {
+      cache.set("key1", "first");
+      expect(cache.get("key1")).toBe("first");
+      cache.set("key1", "second");
+      expect(cache.get("key1")).toBe("second");
+      expect(cache.size()).toBe(1);
+    });
+
+    it("should store and retrieve undefined", () => {
+      cache.set("undef", undefined);
+      expect(cache.has("undef")).toBe(true);
+    });
   });
 
   describe("TTL expiry", () => {
@@ -69,6 +82,21 @@ describe("DataCache (singleton)", () => {
       // The entry should have been deleted from the store
       expect(cache.keys()).not.toContain("key1");
     });
+
+    it("should not expire entries before TTL", () => {
+      cache.set("key1", "value1", 5000);
+      vi.advanceTimersByTime(4999);
+      expect(cache.get("key1")).toBe("value1");
+    });
+
+    it("should expire at exactly TTL boundary", () => {
+      cache.set("key1", "value1", 1000);
+      vi.advanceTimersByTime(1000);
+      // Date.now() > expiresAt is strictly greater, so at exactly TTL it's still valid
+      expect(cache.get("key1")).toBe("value1");
+      vi.advanceTimersByTime(1);
+      expect(cache.get("key1")).toBeNull();
+    });
   });
 
   describe("delete", () => {
@@ -87,6 +115,14 @@ describe("DataCache (singleton)", () => {
       cache.set("key2", "value2");
       cache.delete("key1");
       expect(cache.get("key2")).toBe("value2");
+    });
+
+    it("should reduce size after deletion", () => {
+      cache.set("key1", "value1");
+      cache.set("key2", "value2");
+      expect(cache.size()).toBe(2);
+      cache.delete("key1");
+      expect(cache.size()).toBe(1);
     });
   });
 
@@ -126,6 +162,13 @@ describe("DataCache (singleton)", () => {
       cache.has("key1");
       expect(cache.keys()).not.toContain("key1");
     });
+
+    it("should not return true after TTL with has", () => {
+      cache.set("key1", "value1", 500);
+      vi.advanceTimersByTime(501);
+      expect(cache.has("key1")).toBe(false);
+      expect(cache.size()).toBe(0);
+    });
   });
 
   describe("keys and size", () => {
@@ -147,6 +190,21 @@ describe("DataCache (singleton)", () => {
       cache.delete("key1");
       expect(cache.size()).toBe(1);
     });
+
+    it("should return empty array for keys on empty cache", () => {
+      expect(cache.keys()).toEqual([]);
+    });
+
+    it("should not include expired keys after cleanup", () => {
+      cache.set("a", "1", 1000);
+      cache.set("b", "2", 5000);
+      vi.advanceTimersByTime(2000);
+      // get triggers cleanup of expired entries
+      cache.get("a");
+      const keys = cache.keys();
+      expect(keys).not.toContain("a");
+      expect(keys).toContain("b");
+    });
   });
 
   describe("max entries eviction", () => {
@@ -163,6 +221,30 @@ describe("DataCache (singleton)", () => {
       expect(cache.get("key0")).toBeNull();
       expect(cache.get("overflow")).toBe("last");
       expect(cache.size()).toBe(100);
+    });
+
+    it("should evict multiple entries when adding many over capacity", () => {
+      for (let i = 0; i < 100; i++) {
+        cache.set(`key${i}`, `value${i}`);
+      }
+      cache.set("extra1", "a");
+      cache.set("extra2", "b");
+      expect(cache.get("key0")).toBeNull();
+      expect(cache.get("key1")).toBeNull();
+      expect(cache.size()).toBe(100);
+    });
+  });
+
+  describe("set overwrites and timestamp", () => {
+    it("should refresh expiry on overwrite", () => {
+      cache.set("key1", "first", 1000);
+      vi.advanceTimersByTime(800);
+      cache.set("key1", "second", 1000);
+      // 800 + 1000 = 1800ms from start, but entry was refreshed at 800ms
+      vi.advanceTimersByTime(999);
+      expect(cache.get("key1")).toBe("second");
+      vi.advanceTimersByTime(2);
+      expect(cache.get("key1")).toBeNull();
     });
   });
 });
@@ -220,6 +302,64 @@ describe("useCache hook", () => {
 
     await waitFor(() => expect(result.current.data).toBe("updated-value"));
   });
+
+  it("should store fetched result in cache", async () => {
+    const fetchFn = vi.fn().mockResolvedValue("fetched-value");
+
+    const { result } = renderHook(() => useCache("cache-store-key", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(cache.get("cache-store-key")).toBe("fetched-value");
+  });
+
+  it("should use cached data on refresh", async () => {
+    cache.set("refresh-cached", "cached");
+    const fetchFn = vi.fn().mockResolvedValue("fresh");
+
+    const { result } = renderHook(() => useCache("refresh-cached", fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe("cached");
+
+    act(() => {
+      result.current.refresh();
+    });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe("cached");
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("should handle refresh error", async () => {
+    const fetchFn = vi.fn().mockResolvedValue("initial");
+
+    const { result } = renderHook(() => useCache("refresh-error", fetchFn));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    fetchFn.mockRejectedValue(new Error("Refresh failed"));
+    cache.delete("refresh-error");
+
+    await act(async () => {
+      try {
+        await result.current.refresh();
+      } catch {
+        // expected
+      }
+    });
+
+    await waitFor(() => expect(result.current.error).toBeInstanceOf(Error));
+  });
+
+  it("should pass ttl option to cache.set", async () => {
+    const fetchFn = vi.fn().mockResolvedValue("ttl-value");
+
+    const { result } = renderHook(() =>
+      useCache("ttl-key", fetchFn, { ttl: 2000 }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(cache.get("ttl-key")).toBe("ttl-value");
+  });
 });
 
 describe("useMultiCache hook", () => {
@@ -265,5 +405,52 @@ describe("useMultiCache hook", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.results.a).toBeNull();
     expect(result.current.results.b).toBe("ok");
+  });
+
+  it("should handle empty keys array", async () => {
+    const fetchFn = vi.fn();
+
+    const { result } = renderHook(() => useMultiCache([], fetchFn));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.results).toEqual({});
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+
+  it("should cache fetched results", async () => {
+    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-val`);
+
+    const { result } = renderHook(() =>
+      useMultiCache(["x", "y"], fetchFn),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(cache.get("x")).toBe("x-val");
+    expect(cache.get("y")).toBe("y-val");
+  });
+
+  it("should pass ttl option to cache.set", async () => {
+    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-ttl`);
+
+    const { result } = renderHook(() =>
+      useMultiCache(["m"], fetchFn, { ttl: 3000 }),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(cache.get("m")).toBe("m-ttl");
+  });
+
+  it("should handle all keys from cache", async () => {
+    cache.set("a", "cached-a");
+    cache.set("b", "cached-b");
+    const fetchFn = vi.fn();
+
+    const { result } = renderHook(() =>
+      useMultiCache(["a", "b"], fetchFn),
+    );
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.results).toEqual({ a: "cached-a", b: "cached-b" });
+    expect(fetchFn).not.toHaveBeenCalled();
   });
 });

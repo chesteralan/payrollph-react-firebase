@@ -53,8 +53,9 @@ function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
 
   if (breadcrumbs.length === 2) {
     const segment = segments[0];
-    if (segment) {
-      breadcrumbs[1]!.label = routeLabels[segment] || segment;
+    const second = breadcrumbs[1];
+    if (segment && second) {
+      second.label = routeLabels[segment] || segment;
     }
   }
 

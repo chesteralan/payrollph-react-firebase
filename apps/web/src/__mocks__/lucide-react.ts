@@ -126,6 +126,7 @@ export const Plus = createIcon("Plus");
 export const PlusCircle = createIcon("PlusCircle");
 export const Printer = createIcon("Printer");
 export const RefreshCw = createIcon("RefreshCw");
+export const Repeat = createIcon("Repeat");
 export const RotateCcw = createIcon("RotateCcw");
 export const Save = createIcon("Save");
 export const Scan = createIcon("Scan");

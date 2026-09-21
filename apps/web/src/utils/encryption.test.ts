@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   encrypt,
   decrypt,
@@ -6,6 +6,9 @@ import {
   decryptSensitiveFields,
   hashSensitiveData,
   generateEncryptionKey,
+  storeEncryptionKey,
+  getEncryptionKey,
+  clearEncryptionKey,
   SENSITIVE_FIELDS,
 } from "./encryption";
 
@@ -93,6 +96,25 @@ describe("encryption utils", () => {
       const decrypted = await decrypt(encrypted, weakPassphrase);
       expect(decrypted).toBe(original);
     });
+
+    it("should return valid base64 from encrypt", async () => {
+      const encrypted = await encrypt("test", testPassphrase);
+      expect(() => atob(encrypted)).not.toThrow();
+    });
+
+    it("should handle single character input", async () => {
+      const original = "X";
+      const encrypted = await encrypt(original, testPassphrase);
+      const decrypted = await decrypt(encrypted, testPassphrase);
+      expect(decrypted).toBe(original);
+    });
+
+    it("should handle newline and tab characters", async () => {
+      const original = "line1\nline2\ttab";
+      const encrypted = await encrypt(original, testPassphrase);
+      const decrypted = await decrypt(encrypted, testPassphrase);
+      expect(decrypted).toBe(original);
+    });
   });
 
   describe("encryptSensitiveFields / decryptSensitiveFields", () => {
@@ -178,6 +200,59 @@ describe("encryption utils", () => {
       );
       expect(result.sss).toBe(""); // returns empty on failure
     });
+
+    it("should not modify original object", async () => {
+      const obj = { sss: "12-3456789-0", name: "Test" };
+      const originalSss = obj.sss;
+      await encryptSensitiveFields(obj, ["sss"], testPassphrase);
+      expect(obj.sss).toBe(originalSss);
+    });
+
+    it("should handle empty string field values", async () => {
+      const obj = { sss: "", name: "Test" };
+      const result = await encryptSensitiveFields(
+        obj,
+        ["sss"],
+        testPassphrase,
+      );
+      // Empty string is skipped (falsy check), so remains unchanged
+      expect(result.sss).toBe("");
+    });
+
+    it("should handle decryptSensitiveFields with non-string field values", async () => {
+      const obj = { name: "Test", age: 30 };
+      const result = await decryptSensitiveFields(
+        obj,
+        ["name", "age"],
+        testPassphrase,
+      );
+      // name is a string so it attempts decryption, which fails (not encrypted) → returns ""
+      expect(result.name).toBe("");
+      expect(result.age).toBe(30);
+    });
+
+    it("should handle all SENSITIVE_FIELDS for employeeProfile", async () => {
+      const employee = {
+        sss: "12-3456789-0",
+        tin: "123-456-789-000",
+        philhealth: "12-345678901-2",
+        hdmf: "1234-5678-9012",
+        bankAccount: "1234567890",
+      };
+
+      const encrypted = await encryptSensitiveFields(
+        employee,
+        SENSITIVE_FIELDS.employeeProfile,
+        testPassphrase,
+      );
+      const decrypted = await decryptSensitiveFields(
+        encrypted,
+        SENSITIVE_FIELDS.employeeProfile,
+        testPassphrase,
+      );
+
+      expect(decrypted).toEqual(employee);
+    });
   });
 
   describe("hashSensitiveData", () => {
@@ -209,6 +284,11 @@ describe("encryption utils", () => {
       expect(hash).toHaveLength(64);
       expect(/^[0-9a-f]{64}$/.test(hash)).toBe(true);
     });
+
+    it("should handle very long input", async () => {
+      const hash = await hashSensitiveData("x".repeat(100000));
+      expect(hash).toHaveLength(64);
+    });
   });
 
   describe("generateEncryptionKey", () => {
@@ -222,6 +302,54 @@ describe("encryption utils", () => {
       const key1 = generateEncryptionKey();
       const key2 = generateEncryptionKey();
       expect(key1).not.toBe(key2);
+    });
+  });
+
+  describe("storeEncryptionKey / getEncryptionKey / clearEncryptionKey", () => {
+    beforeEach(() => {
+      sessionStorage.clear();
+    });
+
+    it("should store and retrieve an encryption key", () => {
+      const key = generateEncryptionKey();
+      storeEncryptionKey(key);
+      expect(getEncryptionKey()).toBe(key);
+    });
+
+    it("should return null when no key is stored", () => {
+      expect(getEncryptionKey()).toBeNull();
+    });
+
+    it("should clear the stored encryption key", () => {
+      const key = generateEncryptionKey();
+      storeEncryptionKey(key);
+      expect(getEncryptionKey()).toBe(key);
+
+      clearEncryptionKey();
+      expect(getEncryptionKey()).toBeNull();
+    });
+
+    it("should overwrite previously stored key", () => {
+      const key1 = generateEncryptionKey();
+      const key2 = generateEncryptionKey();
+      storeEncryptionKey(key1);
+      storeEncryptionKey(key2);
+      expect(getEncryptionKey()).toBe(key2);
+    });
+
+    it("should handle storing empty string key", () => {
+      storeEncryptionKey("");
+      expect(getEncryptionKey()).toBe("");
+    });
+
+    it("should handle storing and clearing multiple times", () => {
+      for (let i = 0; i < 5; i++) {
+        const key = generateEncryptionKey();
+        storeEncryptionKey(key);
+        expect(getEncryptionKey()).toBe(key);
+        clearEncryptionKey();
+        expect(getEncryptionKey()).toBeNull();
+      }
     });
   });
 

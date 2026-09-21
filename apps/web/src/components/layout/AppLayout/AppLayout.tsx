@@ -83,6 +83,9 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg focus:rounded">
+        Skip to main content
+      </a>
       <Sidebar isOpen={mobileOpen} onClose={handleClose} />
       {mobileOpen && (
         <div
@@ -93,7 +96,7 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setMobileOpen(true)} />
         <NetworkStatusBanner />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main id="main-content" className="flex-1 overflow-y-auto p-6">
           <Breadcrumb />
           <AlertBannerProvider>
             <Outlet />

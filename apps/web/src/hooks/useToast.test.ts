@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
 import React from "react";
 import { useToast } from "./useToast";
 import { ToastContext } from "../components/ui/Toast/toast-context";
@@ -174,5 +174,19 @@ describe("useToast", () => {
 
     expect(result.current.toasts).toHaveLength(1);
     expect(result.current.toasts[0].title).toBe("Warning");
+  });
+
+  it("should support auto-dismiss via removeToast callback", () => {
+    vi.useFakeTimers();
+    const removeToast = vi.fn();
+    const { result } = renderHook(() => useToast(), {
+      wrapper: createWrapper({ ...mockToastValue, removeToast }),
+    });
+
+    result.current.removeToast("toast-1");
+
+    expect(removeToast).toHaveBeenCalledWith("toast-1");
+
+    vi.useRealTimers();
   });
 });

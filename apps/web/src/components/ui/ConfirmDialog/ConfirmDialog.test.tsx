@@ -1,129 +1,113 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ConfirmDialog } from "./ConfirmDialog";
 
+function setup(props?: {
+  title?: string;
+  message?: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: "danger" | "warning" | "info";
+}) {
+  const onConfirm = vi.fn();
+
+  render(
+    <ConfirmDialog
+      title={props?.title ?? "Delete item"}
+      message={props?.message ?? "Are you sure?"}
+      confirmText={props?.confirmText}
+      cancelText={props?.cancelText}
+      variant={props?.variant}
+      onConfirm={onConfirm}
+    >
+      {(open) => (
+        <button data-testid="trigger" onClick={() => act(() => open())}>
+          Open
+        </button>
+      )}
+    </ConfirmDialog>,
+  );
+
+  return { onConfirm };
+}
+
 describe("ConfirmDialog", () => {
-  const defaultProps = {
-    title: "Confirm Deletion",
-    message: "Are you sure you want to delete this item?",
-    onConfirm: vi.fn(),
-    children: (open: () => void) => <button onClick={open}>Open Dialog</button>,
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it("does not show dialog initially", () => {
+    setup();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("should render the trigger button via children prop", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    expect(screen.getByText("Open Dialog")).toBeInTheDocument();
-  });
-
-  it("should open dialog when trigger is clicked", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
+  it("opens dialog when trigger is clicked", () => {
+    setup();
+    fireEvent.click(screen.getByTestId("trigger"));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText("Confirm Deletion")).toBeInTheDocument();
-    expect(
-      screen.getByText("Are you sure you want to delete this item?"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Delete item")).toBeInTheDocument();
+    expect(screen.getByText("Are you sure?")).toBeInTheDocument();
   });
 
-  it("should show confirm and cancel buttons with default text", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    expect(screen.getByText("Confirm")).toBeInTheDocument();
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
+  it("shows default confirm and cancel text", () => {
+    setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
   });
 
-  it("should show custom button text when provided", () => {
-    render(
-      <ConfirmDialog {...defaultProps} confirmText="Yes" cancelText="No" />,
-    );
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    expect(screen.getByText("Yes")).toBeInTheDocument();
-    expect(screen.getByText("No")).toBeInTheDocument();
+  it("shows custom confirm and cancel text", () => {
+    setup({ confirmText: "Yes", cancelText: "No" });
+    fireEvent.click(screen.getByTestId("trigger"));
+    expect(screen.getByRole("button", { name: "Yes" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "No" })).toBeInTheDocument();
   });
 
-  it("should call onConfirm when Confirm button is clicked", () => {
-    const onConfirm = vi.fn();
-    render(<ConfirmDialog {...defaultProps} onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-    fireEvent.click(screen.getByText("Confirm"));
-
+  it("calls onConfirm and closes when confirm is clicked", () => {
+    const { onConfirm } = setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
     expect(onConfirm).toHaveBeenCalledTimes(1);
-  });
-
-  it("should close dialog after confirming", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-    fireEvent.click(screen.getByText("Confirm"));
-
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("should close dialog when Cancel button is clicked", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-    fireEvent.click(screen.getByText("Cancel"));
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("should close dialog when backdrop is clicked", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    const backdrop = document.querySelector(".fixed.inset-0.bg-black\\/50");
-    expect(backdrop).toBeInTheDocument();
-    if (backdrop) {
-      fireEvent.click(backdrop);
-    }
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("should close dialog when Escape key is pressed", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: "Escape" });
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("should not call onConfirm when cancelled", () => {
-    const onConfirm = vi.fn();
-    render(<ConfirmDialog {...defaultProps} onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-    fireEvent.click(screen.getByText("Cancel"));
-
+  it("closes when cancel is clicked", () => {
+    const { onConfirm } = setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onConfirm).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("should render with danger variant by default", () => {
-    render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  it("closes when clicking the backdrop", () => {
+    setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    const dialog = screen.getByRole("dialog");
+    const backdrop = dialog.parentElement!.firstElementChild as HTMLElement;
+    fireEvent.click(backdrop);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("should render with warning variant", () => {
-    render(<ConfirmDialog {...defaultProps} variant="warning" />);
-    fireEvent.click(screen.getByText("Open Dialog"));
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  it("closes on Escape key", () => {
+    setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("should render with info variant", () => {
-    render(<ConfirmDialog {...defaultProps} variant="info" />);
-    fireEvent.click(screen.getByText("Open Dialog"));
+  it("renders with warning variant", () => {
+    setup({ variant: "warning" });
+    fireEvent.click(screen.getByTestId("trigger"));
+    expect(screen.getByText("Delete item")).toBeInTheDocument();
+  });
 
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  it("renders with info variant", () => {
+    setup({ variant: "info" });
+    fireEvent.click(screen.getByTestId("trigger"));
+    expect(screen.getByText("Delete item")).toBeInTheDocument();
+  });
+
+  it("has correct dialog attributes", () => {
+    setup();
+    fireEvent.click(screen.getByTestId("trigger"));
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(dialog).toHaveAttribute("aria-labelledby", "confirm-dialog-title");
   });
 });

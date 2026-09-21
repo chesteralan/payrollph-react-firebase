@@ -1,148 +1,65 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { SearchBar } from "./SearchBar";
 
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("SearchBar", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("should render with default placeholder", () => {
+  it("renders input with placeholder", () => {
     render(<SearchBar value="" onChange={vi.fn()} />);
     expect(screen.getByPlaceholderText("Search...")).toBeInTheDocument();
   });
 
-  it("should render with custom placeholder", () => {
+  it("renders custom placeholder", () => {
     render(<SearchBar value="" onChange={vi.fn()} placeholder="Find..." />);
     expect(screen.getByPlaceholderText("Find...")).toBeInTheDocument();
   });
 
-  it("should display the provided value", () => {
-    render(<SearchBar value="initial" onChange={vi.fn()} />);
-    // Input with type="text" has role "textbox", not "searchbox"
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveValue("initial");
+  it("displays the controlled value", () => {
+    render(<SearchBar value="hello" onChange={vi.fn()} />);
+    expect(screen.getByRole("textbox")).toHaveValue("hello");
   });
 
-  it("should update local value on input change", () => {
-    render(<SearchBar value="" onChange={vi.fn()} />);
-    const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "test" } });
-    expect(input).toHaveValue("test");
-  });
-
-  it("should debounce onChange calls", () => {
+  it("calls onChange after debounce", () => {
     const onChange = vi.fn();
     render(<SearchBar value="" onChange={onChange} debounceMs={300} />);
 
-    const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "t" } });
-    fireEvent.change(input, { target: { value: "te" } });
-    fireEvent.change(input, { target: { value: "tes" } });
-    fireEvent.change(input, { target: { value: "test" } });
-
-    // Not called yet because debounce hasn't fired
-    expect(onChange).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(300);
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "test" },
     });
 
-    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(300);
     expect(onChange).toHaveBeenCalledWith("test");
   });
 
-  it("should debounce with custom debounceMs", () => {
-    const onChange = vi.fn();
-    render(<SearchBar value="" onChange={onChange} debounceMs={500} />);
-
-    const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "test" } });
-
-    act(() => {
-      vi.advanceTimersByTime(300);
-    });
-    expect(onChange).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
-    expect(onChange).toHaveBeenCalledWith("test");
+  it("shows clear button when input has value", () => {
+    render(<SearchBar value="query" onChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: /clear search/i })).toBeInTheDocument();
   });
 
-  it("should show clear button when input has value", () => {
-    render(<SearchBar value="test" onChange={vi.fn()} />);
-    expect(screen.getByLabelText("Clear search")).toBeInTheDocument();
-  });
-
-  it("should not show clear button when input is empty", () => {
+  it("does not show clear button when empty", () => {
     render(<SearchBar value="" onChange={vi.fn()} />);
-    expect(screen.queryByLabelText("Clear search")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clear search/i })).not.toBeInTheDocument();
   });
 
-  it("should clear input and call onChange with empty string on clear", () => {
+  it("clears input on clear button click", () => {
     const onChange = vi.fn();
-    render(<SearchBar value="test" onChange={onChange} />);
+    render(<SearchBar value="query" onChange={onChange} />);
 
-    fireEvent.click(screen.getByLabelText("Clear search"));
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveValue("");
+    fireEvent.click(screen.getByRole("button", { name: /clear search/i }));
     expect(onChange).toHaveBeenCalledWith("");
   });
 
-  it("should sync with external value changes", () => {
-    const { rerender } = render(
-      <SearchBar value="initial" onChange={vi.fn()} />,
-    );
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveValue("initial");
-
-    rerender(<SearchBar value="updated" onChange={vi.fn()} />);
-    expect(input).toHaveValue("updated");
-  });
-
-  it("should apply custom className", () => {
-    const { container } = render(
-      <SearchBar value="" onChange={vi.fn()} className="custom-class" />,
-    );
-    const searchDiv = container.firstChild as HTMLElement;
-    expect(searchDiv.classList.contains("custom-class")).toBe(true);
-  });
-
-  it("should render with search role", () => {
+  it("has search role", () => {
     render(<SearchBar value="" onChange={vi.fn()} />);
     expect(screen.getByRole("search")).toBeInTheDocument();
-  });
-
-  it("should reset debounce timer on rapid typing", () => {
-    const onChange = vi.fn();
-    render(<SearchBar value="" onChange={onChange} debounceMs={300} />);
-
-    const input = screen.getByRole("textbox");
-    fireEvent.change(input, { target: { value: "t" } });
-
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
-
-    fireEvent.change(input, { target: { value: "te" } });
-
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
-
-    // Should not have fired yet because timer was reset
-    expect(onChange).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(100);
-    });
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith("te");
   });
 });

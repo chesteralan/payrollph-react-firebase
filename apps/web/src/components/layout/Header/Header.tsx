@@ -88,6 +88,9 @@ export function Header({ onMenuClick }: HeaderProps) {
                 className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-10"
                 role="listbox"
                 aria-label="Select company"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") setShowCompanyDropdown(false);
+                }}
               >
                 {companies.map((company) => (
                   <button
@@ -129,6 +132,9 @@ export function Header({ onMenuClick }: HeaderProps) {
               className="absolute top-full right-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-10"
               role="menu"
               aria-label="User menu"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setShowUserDropdown(false);
+              }}
             >
               <div className="px-4 py-3 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-900">

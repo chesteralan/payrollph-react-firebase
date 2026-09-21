@@ -558,9 +558,9 @@ export function useDTRPage() {
             where("date", "==", entry.date),
           ),
         );
-        if (!existing.empty) {
+        if (!existing.empty && existing.docs[0]) {
           await updateDoc(
-            doc(db, "dtr_entries", existing.docs[0]!.id),
+            doc(db, "dtr_entries", existing.docs[0].id),
             {
               ...entry,
               updatedAt: new Date(),

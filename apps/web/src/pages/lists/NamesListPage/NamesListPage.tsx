@@ -326,8 +326,8 @@ export function NamesListPage() {
         } else {
           const parts = line.split(",");
           if (parts.length >= 2) {
-            lastName = parts[0]!.trim();
-            const nameParts = parts[1]!.trim().split(" ");
+            lastName = (parts[0] ?? "").trim();
+            const nameParts = (parts[1] ?? "").trim().split(" ");
             firstName = nameParts[0] || "";
             middleName = nameParts.slice(1).join(" ");
           } else {

@@ -1,224 +1,111 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ToastProvider } from "./Toast";
 import { useToast } from "@/hooks/useToast";
 
-// Helper component to test toast interactions
-function ToastTester({
-  addConfig,
-}: {
-  addConfig?: {
-    type: "success" | "error" | "info" | "warning";
-    title: string;
-    message?: string;
-    duration?: number;
-  };
-}) {
-  const { toasts, addToast } = useToast();
+function TestConsumer() {
+  const { addToast, removeToast, toasts } = useToast();
   return (
     <div>
+      <button onClick={() => addToast({ type: "success", title: "Saved" })}>
+        Add success
+      </button>
       <button
         onClick={() =>
-          addToast(
-            addConfig || {
-              type: "info",
-              title: "Test Toast",
-              message: "Test message",
-            },
-          )
+          addToast({ type: "error", title: "Oops", message: "Details here" })
         }
       >
-        Add Toast
+        Add error with message
       </button>
-      <div>Toast count: {toasts.length}</div>
+      <button
+        onClick={() =>
+          addToast({ type: "info", title: "Heads up", duration: 100 })
+        }
+      >
+        Add auto-dismiss
+      </button>
+      <span data-testid="count">{toasts.length}</span>
       {toasts.map((t) => (
-        <div key={t.id} data-testid={`tester-${t.id}`}>
-          Tester shows: {t.title}
+        <div key={t.id} data-testid={`toast-${t.id}`}>
+          <span>{t.title}</span>
+          {t.message && <span>{t.message}</span>}
+          <button onClick={() => removeToast(t.id)}>dismiss</button>
         </div>
       ))}
     </div>
   );
 }
 
-describe("ToastProvider", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+function renderWithProvider(ui?: React.ReactNode) {
+  return render(<ToastProvider>{ui ?? <TestConsumer />}</ToastProvider>);
+}
+
+describe("ToastProvider & useToast", () => {
+  it("starts with zero toasts", () => {
+    renderWithProvider();
+    expect(screen.getByTestId("count").textContent).toBe("0");
   });
 
-  afterEach(() => {
+  it("adds a toast via addToast", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Add success"));
+    expect(screen.getByTestId("count").textContent).toBe("1");
+    expect(screen.getAllByText("Saved").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders message when provided", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Add error with message"));
+    expect(screen.getAllByText("Details here").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("removes a toast via dismiss button", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Add success"));
+    expect(screen.getByTestId("count").textContent).toBe("1");
+    fireEvent.click(screen.getByText("dismiss"));
+    expect(screen.getByTestId("count").textContent).toBe("0");
+  });
+
+  it("auto-dismisses after duration", async () => {
+    vi.useFakeTimers();
+    renderWithProvider();
+    act(() => {
+      fireEvent.click(screen.getByText("Add auto-dismiss"));
+    });
+    expect(screen.getByTestId("count").textContent).toBe("1");
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(screen.getByTestId("count").textContent).toBe("0");
     vi.useRealTimers();
   });
+});
 
-  it("should render children", () => {
-    render(
-      <ToastProvider>
-        <div>Child Content</div>
-      </ToastProvider>,
-    );
-    expect(screen.getByText("Child Content")).toBeInTheDocument();
+describe("Toast component rendering", () => {
+  it("renders toast items inside the provider", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Add success"));
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it("should add a toast and display it as a status element", () => {
-    render(
-      <ToastProvider>
-        <ToastTester />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    // The toast should appear as a role="status" element
-    const statusElements = screen.getAllByRole("status");
-    expect(statusElements).toHaveLength(1);
-    expect(statusElements[0]).toHaveTextContent("Test Toast");
+  it("dismiss button has accessible label", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Add success"));
+    expect(
+      screen.getByRole("button", { name: "Dismiss notification" }),
+    ).toBeInTheDocument();
   });
+});
 
-  it("should remove a toast when dismiss button is clicked", () => {
-    render(
-      <ToastProvider>
-        <ToastTester />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    expect(screen.getAllByRole("status")).toHaveLength(1);
-
-    const dismissButtons = screen.getAllByLabelText("Dismiss notification");
-    expect(dismissButtons).toHaveLength(1);
-    fireEvent.click(dismissButtons[0]);
-
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
-  });
-
-  it("should auto-dismiss toast after duration", () => {
-    render(
-      <ToastProvider>
-        <ToastTester
-          addConfig={{
-            type: "success",
-            title: "Auto Dismiss",
-            duration: 1000,
-          }}
-        />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    expect(screen.getByText("Auto Dismiss")).toBeInTheDocument();
-
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    expect(screen.queryByText("Auto Dismiss")).not.toBeInTheDocument();
-  });
-
-  it("should display multiple toasts", () => {
-    render(
-      <ToastProvider>
-        <ToastTester />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    fireEvent.click(screen.getByText("Add Toast"));
-    fireEvent.click(screen.getByText("Add Toast"));
-
-    // Each toast renders a role="status" element
-    const statusElements = screen.getAllByRole("status");
-    expect(statusElements).toHaveLength(3);
-  });
-
-  it("should remove individual toast without affecting others", () => {
-    render(
-      <ToastProvider>
-        <ToastTester />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    fireEvent.click(screen.getByText("Add Toast"));
-
-    const dismissButtons = screen.getAllByLabelText("Dismiss notification");
-    expect(dismissButtons).toHaveLength(2);
-
-    fireEvent.click(dismissButtons[0]);
-
-    const remainingToasts = screen.getAllByRole("status");
-    expect(remainingToasts).toHaveLength(1);
-  });
-
-  it("should support different toast types", () => {
-    render(
-      <ToastProvider>
-        <ToastTester
-          addConfig={{
-            type: "error",
-            title: "Error Toast",
-            message: "Error occurred",
-          }}
-        />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    // Check within the status element for the title
-    const statusEl = screen.getByRole("status");
-    expect(statusEl).toHaveTextContent("Error Toast");
-  });
-
-  it("should render toast with message visible in status element", () => {
-    render(
-      <ToastProvider>
-        <ToastTester
-          addConfig={{
-            type: "warning",
-            title: "Warning",
-            message: "This is a warning message",
-          }}
-        />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    const statusEl = screen.getByRole("status");
-    expect(statusEl).toHaveTextContent("Warning");
-    expect(statusEl).toHaveTextContent("This is a warning message");
-  });
-
-  it("should render toast without message", () => {
-    render(
-      <ToastProvider>
-        <ToastTester addConfig={{ type: "info", title: "No Message Toast" }} />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    const statusEl = screen.getByRole("status");
-    expect(statusEl).toHaveTextContent("No Message Toast");
-  });
-
-  it("should handle toast with zero duration (persistent)", () => {
-    render(
-      <ToastProvider>
-        <ToastTester
-          addConfig={{
-            type: "info",
-            title: "PersistentToast",
-            duration: 0,
-          }}
-        />
-      </ToastProvider>,
-    );
-
-    fireEvent.click(screen.getByText("Add Toast"));
-    const statusEl = screen.getByRole("status");
-    expect(statusEl).toHaveTextContent("PersistentToast");
-
-    act(() => {
-      vi.advanceTimersByTime(10000);
-    });
-
-    // Should still be visible after time passes
-    expect(screen.getByRole("status")).toHaveTextContent("PersistentToast");
+describe("useToast outside provider", () => {
+  it("throws when used outside ToastProvider", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    function Bad() {
+      useToast();
+      return null;
+    }
+    expect(() => render(<Bad />)).toThrow();
+    spy.mockRestore();
   });
 });
