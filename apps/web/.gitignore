@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
+
+coverage/
+*.lcov
+.coverage
+.nyc_output/
+
+# Husky generated files
+.husky/_/
+
+# Yarn state
+.yarn/install-state.gz
+
+# Build artifacts
+tsconfig.tsbuildinfoapps/web/playwright-report/
+apps/web/test-results/
