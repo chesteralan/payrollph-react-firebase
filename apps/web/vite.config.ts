@@ -10,7 +10,7 @@ const securityHeaders = {
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: https://*.googleusercontent.com https://*.firebaseapp.com;
     font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com;
+    connect-src 'self' ws://localhost:* wss://localhost:* https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com;
     frame-src 'self' https://*.firebaseapp.com;
     object-src 'none';
     base-uri 'self';

@@ -18,7 +18,13 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+} catch (error) {
+  console.error("Firebase initialization failed:", error);
+  throw error;
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
