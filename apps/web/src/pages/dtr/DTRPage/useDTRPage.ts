@@ -51,9 +51,9 @@ export function useDTRPage() {
   const { addToast } = useToast();
 
   // ── State ──────────────────────────────────────────────
-  const [employees, setEmployees] = useState<
-    (Employee & { name?: string })[]
-  >([]);
+  const [employees, setEmployees] = useState<(Employee & { name?: string })[]>(
+    [],
+  );
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -67,7 +67,8 @@ export function useDTRPage() {
   const [dayForm, setDayForm] = useState<DTRPageDayForm>(EMPTY_DAY_FORM);
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [leaveForm, setLeaveForm] = useState<DTRPageLeaveForm>(EMPTY_LEAVE_FORM);
+  const [leaveForm, setLeaveForm] =
+    useState<DTRPageLeaveForm>(EMPTY_LEAVE_FORM);
   const [benefits, setBenefits] = useState<DTRPageBenefit[]>([]);
 
   const [viewMode, setViewMode] = useState<DTRPageViewMode>("calendar");
@@ -477,9 +478,7 @@ export function useDTRPage() {
     addToast({ type: "success", title: "DTR exported" });
   };
 
-  const handleFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const text = await file.text();
@@ -488,9 +487,7 @@ export function useDTRPage() {
       addToast({ type: "error", title: "Empty file" });
       return;
     }
-    const headers = lines[0]!
-      .split(",")
-      .map((h) => h.trim().replace(/"/g, ""));
+    const headers = lines[0]!.split(",").map((h) => h.trim().replace(/"/g, ""));
     const preview: Partial<DTREntry>[] = [];
     const errors: string[] = [];
     const nameToId = new Map<string, string>();
@@ -498,9 +495,9 @@ export function useDTRPage() {
       nameToId.set((emp.name || "").toLowerCase(), emp.id),
     );
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i]!
-        .split(",")
-        .map((v) => v.trim().replace(/"/g, ""));
+      const values = lines[i]!.split(",").map((v) =>
+        v.trim().replace(/"/g, ""),
+      );
       if (values.length < 3) {
         errors.push(`Line ${i + 1}: Too few columns`);
         continue;
@@ -514,9 +511,7 @@ export function useDTRPage() {
         nameToId.get(empName) ||
         employees.find((e) => e.employeeCode === row["Code"])?.id;
       if (!employeeId) {
-        errors.push(
-          `Line ${i + 1}: Employee "${row["Employee"]}" not found`,
-        );
+        errors.push(`Line ${i + 1}: Employee "${row["Employee"]}" not found`);
         continue;
       }
       if (!row["Date"] || !/^\d{4}-\d{2}-\d{2}$/.test(row["Date"])) {
@@ -535,8 +530,7 @@ export function useDTRPage() {
         overtimeHours: Number(row["Overtime"] || 0),
         lateHours: Number(row["Late"] || 0),
         absenceType: (row["Absence Type"] || undefined) as
-          | DTREntry["absenceType"]
-          | undefined,
+          DTREntry["absenceType"] | undefined,
         absenceReason: row["Reason"] || undefined,
         notes: row["Notes"] || undefined,
       });
@@ -559,13 +553,10 @@ export function useDTRPage() {
           ),
         );
         if (!existing.empty && existing.docs[0]) {
-          await updateDoc(
-            doc(db, "dtr_entries", existing.docs[0].id),
-            {
-              ...entry,
-              updatedAt: new Date(),
-            },
-          );
+          await updateDoc(doc(db, "dtr_entries", existing.docs[0].id), {
+            ...entry,
+            updatedAt: new Date(),
+          });
         } else {
           await addDoc(collection(db, "dtr_entries"), {
             ...entry,

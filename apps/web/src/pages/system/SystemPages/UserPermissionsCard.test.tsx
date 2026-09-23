@@ -21,9 +21,7 @@ describe("UserPermissionsCard", () => {
 
   it("renders the done button", () => {
     renderWithProviders(<UserPermissionsCard {...defaultProps} />);
-    expect(
-      screen.getByRole("button", { name: /done/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /done/i })).toBeInTheDocument();
   });
 
   it("renders department rows from constants", () => {

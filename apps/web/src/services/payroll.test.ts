@@ -182,8 +182,34 @@ describe("fetchPayrollEmployees", () => {
 
   it("should fetch payroll employees for a given payroll ID", async () => {
     addMockDocs("payroll_employees", [
-      { id: "pe1", payrollId: "payroll-1", nameId: "n1", orderId: 1, isActive: true, daysWorked: 20, absences: 0, lateHours: 0, overtimeHours: 0, basicSalary: 25000, grossPay: 25000, netPay: 25000 },
-      { id: "pe2", payrollId: "payroll-1", nameId: "n2", orderId: 2, isActive: true, daysWorked: 22, absences: 0, lateHours: 0, overtimeHours: 0, basicSalary: 30000, grossPay: 30000, netPay: 30000 },
+      {
+        id: "pe1",
+        payrollId: "payroll-1",
+        nameId: "n1",
+        orderId: 1,
+        isActive: true,
+        daysWorked: 20,
+        absences: 0,
+        lateHours: 0,
+        overtimeHours: 0,
+        basicSalary: 25000,
+        grossPay: 25000,
+        netPay: 25000,
+      },
+      {
+        id: "pe2",
+        payrollId: "payroll-1",
+        nameId: "n2",
+        orderId: 2,
+        isActive: true,
+        daysWorked: 22,
+        absences: 0,
+        lateHours: 0,
+        overtimeHours: 0,
+        basicSalary: 30000,
+        grossPay: 30000,
+        netPay: 30000,
+      },
     ]);
 
     const result = await fetchPayrollEmployees("payroll-1");
@@ -211,7 +237,9 @@ describe("fetchPayrollEmployees", () => {
   it("should propagate errors from getDocs", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Network error"));
 
-    await expect(fetchPayrollEmployees("payroll-1")).rejects.toThrow("Network error");
+    await expect(fetchPayrollEmployees("payroll-1")).rejects.toThrow(
+      "Network error",
+    );
   });
 });
 
@@ -223,8 +251,22 @@ describe("fetchEmployeeDetails", () => {
 
   it("should return a map of employee details for given nameIds", async () => {
     addMockDocs("employees", [
-      { id: "emp1", nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" },
-      { id: "emp2", nameId: "n2", companyId: "c1", employeeCode: "E002", isActive: true, statusId: "active" },
+      {
+        id: "emp1",
+        nameId: "n1",
+        companyId: "c1",
+        employeeCode: "E001",
+        isActive: true,
+        statusId: "active",
+      },
+      {
+        id: "emp2",
+        nameId: "n2",
+        companyId: "c1",
+        employeeCode: "E002",
+        isActive: true,
+        statusId: "active",
+      },
     ]);
 
     const result = await fetchEmployeeDetails(["n1", "n2"]);
@@ -248,7 +290,14 @@ describe("fetchEmployeeDetails", () => {
 
   it("should skip nameIds with no matching employee document", async () => {
     addMockDocs("employees", [
-      { id: "emp1", nameId: "n1", companyId: "c1", employeeCode: "E001", isActive: true, statusId: "active" },
+      {
+        id: "emp1",
+        nameId: "n1",
+        companyId: "c1",
+        employeeCode: "E001",
+        isActive: true,
+        statusId: "active",
+      },
     ]);
 
     const result = await fetchEmployeeDetails(["n1", "n2"]);
@@ -261,7 +310,9 @@ describe("fetchEmployeeDetails", () => {
   it("should propagate errors from getDocs", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Permission denied"));
 
-    await expect(fetchEmployeeDetails(["n1"])).rejects.toThrow("Permission denied");
+    await expect(fetchEmployeeDetails(["n1"])).rejects.toThrow(
+      "Permission denied",
+    );
   });
 });
 
@@ -273,8 +324,22 @@ describe("fetchEmployeeSalaries", () => {
 
   it("should return a map of primary active salaries for given employeeIds", async () => {
     addMockDocs("employee_salaries", [
-      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true },
-      { id: "sal2", employeeId: "emp2", amount: 30000, frequency: "monthly", isPrimary: true, isActive: true },
+      {
+        id: "sal1",
+        employeeId: "emp1",
+        amount: 25000,
+        frequency: "monthly",
+        isPrimary: true,
+        isActive: true,
+      },
+      {
+        id: "sal2",
+        employeeId: "emp2",
+        amount: 30000,
+        frequency: "monthly",
+        isPrimary: true,
+        isActive: true,
+      },
     ]);
 
     const result = await fetchEmployeeSalaries(["emp1", "emp2"]);
@@ -298,7 +363,14 @@ describe("fetchEmployeeSalaries", () => {
 
   it("should skip employeeIds with no matching salary record", async () => {
     addMockDocs("employee_salaries", [
-      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: true, isActive: true },
+      {
+        id: "sal1",
+        employeeId: "emp1",
+        amount: 25000,
+        frequency: "monthly",
+        isPrimary: true,
+        isActive: true,
+      },
     ]);
 
     const result = await fetchEmployeeSalaries(["emp1", "emp2"]);
@@ -310,7 +382,14 @@ describe("fetchEmployeeSalaries", () => {
 
   it("should call where with isPrimary and isActive filters", async () => {
     addMockDocs("employee_salaries", [
-      { id: "sal1", employeeId: "emp1", amount: 25000, frequency: "monthly", isPrimary: false, isActive: true },
+      {
+        id: "sal1",
+        employeeId: "emp1",
+        amount: 25000,
+        frequency: "monthly",
+        isPrimary: false,
+        isActive: true,
+      },
     ]);
 
     const result = await fetchEmployeeSalaries(["emp1"]);
@@ -323,9 +402,13 @@ describe("fetchEmployeeSalaries", () => {
   });
 
   it("should propagate errors from getDocs", async () => {
-    vi.mocked(getDocs).mockRejectedValueOnce(new Error("Firestore quota exceeded"));
+    vi.mocked(getDocs).mockRejectedValueOnce(
+      new Error("Firestore quota exceeded"),
+    );
 
-    await expect(fetchEmployeeSalaries(["emp1"])).rejects.toThrow("Firestore quota exceeded");
+    await expect(fetchEmployeeSalaries(["emp1"])).rejects.toThrow(
+      "Firestore quota exceeded",
+    );
   });
 });
 
@@ -341,7 +424,10 @@ describe("fetchListItems", () => {
       { id: "e2", name: "Bonus", isActive: true },
     ]);
 
-    const result = await fetchListItems<{ id: string; name: string }>("earnings", true);
+    const result = await fetchListItems<{ id: string; name: string }>(
+      "earnings",
+      true,
+    );
 
     expect(result).toHaveLength(2);
     expect(result[0].id).toBe("e1");
@@ -358,7 +444,10 @@ describe("fetchListItems", () => {
       { id: "e2", name: "Bonus", isActive: false },
     ]);
 
-    const result = await fetchListItems<{ id: string; name: string }>("earnings", false);
+    const result = await fetchListItems<{ id: string; name: string }>(
+      "earnings",
+      false,
+    );
 
     expect(result).toHaveLength(2);
     expect(result[0].id).toBe("e1");
@@ -389,10 +478,23 @@ describe("updatePayrollDTR", () => {
 
   it("should update DTR fields for an existing payroll employee", async () => {
     addMockDocs("payroll_employees", [
-      { id: "pe1", payrollId: "payroll-1", nameId: "n1", daysWorked: 0, absences: 0, lateHours: 0, overtimeHours: 0 },
+      {
+        id: "pe1",
+        payrollId: "payroll-1",
+        nameId: "n1",
+        daysWorked: 0,
+        absences: 0,
+        lateHours: 0,
+        overtimeHours: 0,
+      },
     ]);
 
-    await updatePayrollDTR("payroll-1", "n1", { daysWorked: 20, absences: 1, lateHours: 2, overtimeHours: 3 });
+    await updatePayrollDTR("payroll-1", "n1", {
+      daysWorked: 20,
+      absences: 1,
+      lateHours: 2,
+      overtimeHours: 3,
+    });
 
     expect(collection).toHaveBeenCalledWith({}, "payroll_employees");
     expect(where).toHaveBeenCalledWith("payrollId", "==", "payroll-1");
@@ -410,7 +512,12 @@ describe("updatePayrollDTR", () => {
   it("should not call updateDoc when no matching payroll employee exists", async () => {
     addMockDocs("payroll_employees", []);
 
-    await updatePayrollDTR("payroll-1", "n1", { daysWorked: 20, absences: 0, lateHours: 0, overtimeHours: 0 });
+    await updatePayrollDTR("payroll-1", "n1", {
+      daysWorked: 20,
+      absences: 0,
+      lateHours: 0,
+      overtimeHours: 0,
+    });
 
     expect(getDocs).toHaveBeenCalledTimes(1);
     expect(updateDoc).not.toHaveBeenCalled();
@@ -420,7 +527,12 @@ describe("updatePayrollDTR", () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Failed to fetch"));
 
     await expect(
-      updatePayrollDTR("payroll-1", "n1", { daysWorked: 20, absences: 0, lateHours: 0, overtimeHours: 0 }),
+      updatePayrollDTR("payroll-1", "n1", {
+        daysWorked: 20,
+        absences: 0,
+        lateHours: 0,
+        overtimeHours: 0,
+      }),
     ).rejects.toThrow("Failed to fetch");
   });
 });
@@ -433,14 +545,22 @@ describe("savePayrollEarning", () => {
 
   it("should update an existing payroll earning record", async () => {
     addMockDocs("payroll_employees_earnings", [
-      { id: "pee1", payrollId: "payroll-1", nameId: "n1", earningId: "e1", amount: 0 },
+      {
+        id: "pee1",
+        payrollId: "payroll-1",
+        nameId: "n1",
+        earningId: "e1",
+        amount: 0,
+      },
     ]);
 
     await savePayrollEarning("payroll-1", "n1", "e1", 1500);
 
     expect(getDocs).toHaveBeenCalledTimes(1);
     expect(doc).toHaveBeenCalledWith({}, "payroll_employees_earnings", "pee1");
-    expect(updateDoc).toHaveBeenCalledWith("payroll_employees_earnings/pee1", { amount: 1500 });
+    expect(updateDoc).toHaveBeenCalledWith("payroll_employees_earnings/pee1", {
+      amount: 1500,
+    });
     expect(addDoc).not.toHaveBeenCalled();
   });
 
@@ -464,7 +584,9 @@ describe("savePayrollEarning", () => {
   it("should propagate errors from getDocs", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Write failed"));
 
-    await expect(savePayrollEarning("payroll-1", "n1", "e1", 500)).rejects.toThrow("Write failed");
+    await expect(
+      savePayrollEarning("payroll-1", "n1", "e1", 500),
+    ).rejects.toThrow("Write failed");
   });
 });
 
@@ -476,14 +598,27 @@ describe("savePayrollDeduction", () => {
 
   it("should update an existing payroll deduction record", async () => {
     addMockDocs("payroll_employees_deductions", [
-      { id: "pped1", payrollId: "payroll-1", nameId: "n1", deductionId: "d1", amount: 0 },
+      {
+        id: "pped1",
+        payrollId: "payroll-1",
+        nameId: "n1",
+        deductionId: "d1",
+        amount: 0,
+      },
     ]);
 
     await savePayrollDeduction("payroll-1", "n1", "d1", 2000);
 
     expect(getDocs).toHaveBeenCalledTimes(1);
-    expect(doc).toHaveBeenCalledWith({}, "payroll_employees_deductions", "pped1");
-    expect(updateDoc).toHaveBeenCalledWith("payroll_employees_deductions/pped1", { amount: 2000 });
+    expect(doc).toHaveBeenCalledWith(
+      {},
+      "payroll_employees_deductions",
+      "pped1",
+    );
+    expect(updateDoc).toHaveBeenCalledWith(
+      "payroll_employees_deductions/pped1",
+      { amount: 2000 },
+    );
     expect(addDoc).not.toHaveBeenCalled();
   });
 
@@ -507,7 +642,9 @@ describe("savePayrollDeduction", () => {
   it("should propagate errors from getDocs", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Write failed"));
 
-    await expect(savePayrollDeduction("payroll-1", "n1", "d1", 500)).rejects.toThrow("Write failed");
+    await expect(
+      savePayrollDeduction("payroll-1", "n1", "d1", 500),
+    ).rejects.toThrow("Write failed");
   });
 });
 
@@ -519,7 +656,14 @@ describe("savePayrollBenefit", () => {
 
   it("should update an existing payroll benefit record", async () => {
     addMockDocs("payroll_employees_benefits", [
-      { id: "ppeb1", payrollId: "payroll-1", nameId: "n1", benefitId: "b1", employeeShare: 0, employerShare: 0 },
+      {
+        id: "ppeb1",
+        payrollId: "payroll-1",
+        nameId: "n1",
+        benefitId: "b1",
+        employeeShare: 0,
+        employerShare: 0,
+      },
     ]);
 
     await savePayrollBenefit("payroll-1", "n1", "b1", 500, 500);
@@ -554,6 +698,8 @@ describe("savePayrollBenefit", () => {
   it("should propagate errors from getDocs", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Write failed"));
 
-    await expect(savePayrollBenefit("payroll-1", "n1", "b1", 300, 300)).rejects.toThrow("Write failed");
+    await expect(
+      savePayrollBenefit("payroll-1", "n1", "b1", 300, 300),
+    ).rejects.toThrow("Write failed");
   });
 });

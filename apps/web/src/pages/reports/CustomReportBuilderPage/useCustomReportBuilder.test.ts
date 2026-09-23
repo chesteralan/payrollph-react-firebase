@@ -36,7 +36,11 @@ describe("useCustomReportBuilder", () => {
     expect(result.current).toBeDefined();
     expect(result.current.reportName).toBe("");
     expect(result.current.selectedFields).toEqual([
-      "emp_name", "emp_code", "basic_salary", "gross_pay", "net_pay",
+      "emp_name",
+      "emp_code",
+      "basic_salary",
+      "gross_pay",
+      "net_pay",
     ]);
     expect(result.current.filters).toEqual([]);
     expect(result.current.groupBy).toBe("");

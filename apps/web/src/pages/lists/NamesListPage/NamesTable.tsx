@@ -1,5 +1,13 @@
 import React from "react";
-import { CheckSquare, ChevronDown, ChevronsUpDown, ChevronUp, Edit, Square, Trash2 } from "lucide-react";
+import {
+  CheckSquare,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
+  Edit,
+  Square,
+  Trash2,
+} from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/SearchBar";
@@ -53,11 +61,7 @@ const NameRow = React.memo(function NameRow({
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
           {canEditName && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit(n)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => onEdit(n)}>
               <Edit className="w-4 h-4" />
             </Button>
           )}
@@ -125,81 +129,73 @@ export function NamesTable({
         </span>
       </div>
       <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th className="px-4 py-3">
-              <button
-                onClick={onToggleSelectAll}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                {allSelected ? (
-                  <CheckSquare className="w-4 h-4" />
-                ) : (
-                  <Square className="w-4 h-4" />
-                )}
-              </button>
-            </th>
-            <th
-              className="text-left px-2 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-              onClick={() => onSort("fullName")}
-            >
-              <div className="flex items-center gap-1">
-                Name
-                {sortConfig?.key === "fullName" ? (
-                  sortConfig.direction === "asc" ? (
-                    <ChevronUp className="w-3 h-3" />
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3">
+                <button
+                  onClick={onToggleSelectAll}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  {allSelected ? (
+                    <CheckSquare className="w-4 h-4" />
                   ) : (
-                    <ChevronDown className="w-3 h-3" />
-                  )
-                ) : (
-                  <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                )}
-              </div>
-            </th>
-            <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {loading ? (
-            <tr>
-              <td
-                colSpan={3}
-                className="px-6 py-4 text-center text-gray-500"
+                    <Square className="w-4 h-4" />
+                  )}
+                </button>
+              </th>
+              <th
+                className="text-left px-2 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                onClick={() => onSort("fullName")}
               >
-                Loading...
-              </td>
+                <div className="flex items-center gap-1">
+                  Name
+                  {sortConfig?.key === "fullName" ? (
+                    sortConfig.direction === "asc" ? (
+                      <ChevronUp className="w-3 h-3" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3" />
+                    )
+                  ) : (
+                    <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                  )}
+                </div>
+              </th>
+              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                Actions
+              </th>
             </tr>
-          ) : names.length === 0 ? (
-            <tr>
-              <td
-                colSpan={3}
-                className="px-6 py-4 text-center text-gray-500"
-              >
-                No names found
-              </td>
-            </tr>
-          ) : (
-            names.map((n) => (
-              <NameRow
-                key={n.id}
-                name={n}
-                isSelected={selectedIds.has(n.id)}
-                onToggleSelect={onToggleSelect}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                canEditName={canEdit("lists", "names")}
-                canDeleteName={canDelete("lists", "names")}
-              />
-            ))
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loading ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+                  Loading...
+                </td>
+              </tr>
+            ) : names.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+                  No names found
+                </td>
+              </tr>
+            ) : (
+              names.map((n) => (
+                <NameRow
+                  key={n.id}
+                  name={n}
+                  isSelected={selectedIds.has(n.id)}
+                  onToggleSelect={onToggleSelect}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  canEditName={canEdit("lists", "names")}
+                  canDeleteName={canDelete("lists", "names")}
+                />
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
-
-

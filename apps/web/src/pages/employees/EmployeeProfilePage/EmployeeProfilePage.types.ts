@@ -60,19 +60,10 @@ export interface EmployeeDocument {
 }
 
 export type DocumentCategory =
-  | "ID"
-  | "Contract"
-  | "Tax Form"
-  | "Medical"
-  | "Certificate"
-  | "Other";
+  "ID" | "Contract" | "Tax Form" | "Medical" | "Certificate" | "Other";
 
 export type ProfileTab =
-  | "info"
-  | "contact"
-  | "compensation"
-  | "dtr"
-  | "documents";
+  "info" | "contact" | "compensation" | "dtr" | "documents";
 
 export interface SelectOption {
   id: string;

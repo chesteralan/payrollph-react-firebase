@@ -3,7 +3,9 @@ import { render, screen } from "@testing-library/react";
 import { ValidationPanel } from "./ValidationPanel";
 import type { PayrollValidationError } from "@/types";
 
-const makeError = (overrides: Partial<PayrollValidationError> = {}): PayrollValidationError => ({
+const makeError = (
+  overrides: Partial<PayrollValidationError> = {},
+): PayrollValidationError => ({
   field: "salary",
   message: "Salary is required",
   severity: "error",
@@ -30,7 +32,9 @@ describe("ValidationPanel", () => {
   });
 
   it("renders employee name when provided", () => {
-    const errors = [makeError({ employeeName: "John Doe", message: "Invalid" })];
+    const errors = [
+      makeError({ employeeName: "John Doe", message: "Invalid" }),
+    ];
     render(<ValidationPanel errors={errors} onClose={vi.fn()} />);
     expect(screen.getByText(/John Doe: Invalid/)).toBeTruthy();
   });

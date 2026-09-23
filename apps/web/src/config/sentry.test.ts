@@ -6,12 +6,13 @@ vi.stubEnv("VITE_APP_VERSION", "1.0.0");
 vi.stubEnv("PROD", false);
 vi.stubEnv("DEV", true);
 
-const { mockInit, mockCaptureException, mockCaptureMessage, mockSetUser } = vi.hoisted(() => ({
-  mockInit: vi.fn(),
-  mockCaptureException: vi.fn(),
-  mockCaptureMessage: vi.fn(),
-  mockSetUser: vi.fn(),
-}));
+const { mockInit, mockCaptureException, mockCaptureMessage, mockSetUser } =
+  vi.hoisted(() => ({
+    mockInit: vi.fn(),
+    mockCaptureException: vi.fn(),
+    mockCaptureMessage: vi.fn(),
+    mockSetUser: vi.fn(),
+  }));
 
 vi.mock("@sentry/react", () => ({
   init: mockInit,
@@ -50,7 +51,9 @@ describe("ERROR_GROUPS", () => {
 
 describe("classifyError", () => {
   it("should classify network errors", () => {
-    expect(classifyError(new Error("network error"))).toBe(ERROR_GROUPS.NETWORK);
+    expect(classifyError(new Error("network error"))).toBe(
+      ERROR_GROUPS.NETWORK,
+    );
     expect(classifyError(new Error("fetch failed"))).toBe(ERROR_GROUPS.NETWORK);
     expect(classifyError(new Error("offline"))).toBe(ERROR_GROUPS.NETWORK);
     expect(classifyError(new Error("timeout"))).toBe(ERROR_GROUPS.NETWORK);
@@ -58,45 +61,81 @@ describe("classifyError", () => {
   });
 
   it("should classify auth errors", () => {
-    expect(classifyError(new Error("auth/invalid-credential"))).toBe(ERROR_GROUPS.AUTH);
+    expect(classifyError(new Error("auth/invalid-credential"))).toBe(
+      ERROR_GROUPS.AUTH,
+    );
     expect(classifyError(new Error("unauthorized"))).toBe(ERROR_GROUPS.AUTH);
     expect(classifyError(new Error("unauthenticated"))).toBe(ERROR_GROUPS.AUTH);
-    expect(classifyError(new Error("permission denied"))).toBe(ERROR_GROUPS.AUTH);
+    expect(classifyError(new Error("permission denied"))).toBe(
+      ERROR_GROUPS.AUTH,
+    );
     expect(classifyError(new Error("token expired"))).toBe(ERROR_GROUPS.AUTH);
   });
 
   it("should classify firestore errors", () => {
-    expect(classifyError(new Error("firestore error"), { source: "firestore" })).toBe(ERROR_GROUPS.FIRESTORE);
-    expect(classifyError(new Error("firebase error"))).toBe(ERROR_GROUPS.FIRESTORE);
-    expect(classifyError(new Error("document not found"))).toBe(ERROR_GROUPS.FIRESTORE);
-    expect(classifyError(new Error("collection error"))).toBe(ERROR_GROUPS.FIRESTORE);
+    expect(
+      classifyError(new Error("firestore error"), { source: "firestore" }),
+    ).toBe(ERROR_GROUPS.FIRESTORE);
+    expect(classifyError(new Error("firebase error"))).toBe(
+      ERROR_GROUPS.FIRESTORE,
+    );
+    expect(classifyError(new Error("document not found"))).toBe(
+      ERROR_GROUPS.FIRESTORE,
+    );
+    expect(classifyError(new Error("collection error"))).toBe(
+      ERROR_GROUPS.FIRESTORE,
+    );
   });
 
   it("should classify payroll errors", () => {
-    expect(classifyError(new Error("payroll computation"))).toBe(ERROR_GROUPS.PAYROLL);
+    expect(classifyError(new Error("payroll computation"))).toBe(
+      ERROR_GROUPS.PAYROLL,
+    );
     expect(classifyError(new Error("salary error"))).toBe(ERROR_GROUPS.PAYROLL);
     expect(classifyError(new Error("wage error"))).toBe(ERROR_GROUPS.PAYROLL);
-    expect(classifyError(new Error("deduction error"))).toBe(ERROR_GROUPS.PAYROLL);
-    expect(classifyError(new Error("error"), { source: "payroll" })).toBe(ERROR_GROUPS.PAYROLL);
+    expect(classifyError(new Error("deduction error"))).toBe(
+      ERROR_GROUPS.PAYROLL,
+    );
+    expect(classifyError(new Error("error"), { source: "payroll" })).toBe(
+      ERROR_GROUPS.PAYROLL,
+    );
   });
 
   it("should classify permission errors", () => {
-    expect(classifyError(new Error("rbac error"))).toBe(ERROR_GROUPS.PERMISSION);
-    expect(classifyError(new Error("access denied"))).toBe(ERROR_GROUPS.PERMISSION);
+    expect(classifyError(new Error("rbac error"))).toBe(
+      ERROR_GROUPS.PERMISSION,
+    );
+    expect(classifyError(new Error("access denied"))).toBe(
+      ERROR_GROUPS.PERMISSION,
+    );
     expect(classifyError(new Error("forbidden"))).toBe(ERROR_GROUPS.PERMISSION);
   });
 
   it("should classify validation errors", () => {
-    expect(classifyError(new Error("validation failed"))).toBe(ERROR_GROUPS.VALIDATION);
-    expect(classifyError(new Error("invalid input"))).toBe(ERROR_GROUPS.VALIDATION);
-    expect(classifyError(new Error("field required"))).toBe(ERROR_GROUPS.VALIDATION);
-    expect(classifyError(new Error("malformed data"))).toBe(ERROR_GROUPS.VALIDATION);
-    expect(classifyError(new TypeError("type mismatch"))).toBe(ERROR_GROUPS.VALIDATION);
-    expect(classifyError(new ReferenceError("ref error"))).toBe(ERROR_GROUPS.VALIDATION);
+    expect(classifyError(new Error("validation failed"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
+    expect(classifyError(new Error("invalid input"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
+    expect(classifyError(new Error("field required"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
+    expect(classifyError(new Error("malformed data"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
+    expect(classifyError(new TypeError("type mismatch"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
+    expect(classifyError(new ReferenceError("ref error"))).toBe(
+      ERROR_GROUPS.VALIDATION,
+    );
   });
 
   it("should classify unknown errors as UNKNOWN", () => {
-    expect(classifyError(new Error("something random"))).toBe(ERROR_GROUPS.UNKNOWN);
+    expect(classifyError(new Error("something random"))).toBe(
+      ERROR_GROUPS.UNKNOWN,
+    );
   });
 
   it("should handle errors with empty message", () => {
@@ -115,7 +154,10 @@ describe("initSentry", () => {
   });
 
   it("should call Sentry.init when DSN is set", () => {
-    vi.stubEnv("VITE_SENTRY_DSN", "https://examplePublicKey@o0.ingest.sentry.io/0");
+    vi.stubEnv(
+      "VITE_SENTRY_DSN",
+      "https://examplePublicKey@o0.ingest.sentry.io/0",
+    );
     vi.stubEnv("PROD", true);
     vi.stubEnv("DEV", false);
 
@@ -145,28 +187,40 @@ describe("captureException", () => {
     captureException(error);
 
     expect(mockCaptureException).toHaveBeenCalledTimes(1);
-    expect(mockCaptureException).toHaveBeenCalledWith(error, expect.objectContaining({
-      extra: expect.objectContaining({ error_group: "unknown-error" }),
-      tags: { error_group: "unknown-error" },
-    }));
+    expect(mockCaptureException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        extra: expect.objectContaining({ error_group: "unknown-error" }),
+        tags: { error_group: "unknown-error" },
+      }),
+    );
   });
 
   it("should classify error and include group in tags", () => {
     const error = new Error("network timeout");
     captureException(error);
 
-    expect(mockCaptureException).toHaveBeenCalledWith(error, expect.objectContaining({
-      tags: { error_group: "network-error" },
-    }));
+    expect(mockCaptureException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        tags: { error_group: "network-error" },
+      }),
+    );
   });
 
   it("should merge context into extra", () => {
     const error = new Error("test");
     captureException(error, { userId: "123" });
 
-    expect(mockCaptureException).toHaveBeenCalledWith(error, expect.objectContaining({
-      extra: expect.objectContaining({ userId: "123", error_group: "unknown-error" }),
-    }));
+    expect(mockCaptureException).toHaveBeenCalledWith(
+      error,
+      expect.objectContaining({
+        extra: expect.objectContaining({
+          userId: "123",
+          error_group: "unknown-error",
+        }),
+      }),
+    );
   });
 });
 
@@ -193,7 +247,11 @@ describe("setUserContext", () => {
 
   it("should call Sentry.setUser with user data", () => {
     setUserContext({ id: "u1", email: "a@b.com", username: "admin" });
-    expect(mockSetUser).toHaveBeenCalledWith({ id: "u1", email: "a@b.com", username: "admin" });
+    expect(mockSetUser).toHaveBeenCalledWith({
+      id: "u1",
+      email: "a@b.com",
+      username: "admin",
+    });
   });
 });
 

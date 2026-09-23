@@ -61,7 +61,9 @@ describe("ContactInfoCard", () => {
 
   it("shows empty state when no contacts", () => {
     render(<ContactInfoCard {...setup({ contacts: [] })} />);
-    expect(screen.getByText("No contact information added yet.")).toBeInTheDocument();
+    expect(
+      screen.getByText("No contact information added yet."),
+    ).toBeInTheDocument();
   });
 
   it("shows Add Contact button when form is hidden", () => {

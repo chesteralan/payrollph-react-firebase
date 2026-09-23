@@ -206,7 +206,15 @@ export function PayrollWizardPage() {
       fetchEmployees();
       if (id) fetchPayroll();
     }
-  }, [id, currentCompanyId, fetchEmployees, fetchLookups, fetchPayroll, fetchTemplates, fetchTerms]);
+  }, [
+    id,
+    currentCompanyId,
+    fetchEmployees,
+    fetchLookups,
+    fetchPayroll,
+    fetchTemplates,
+    fetchTerms,
+  ]);
 
   const generateDatesFromTerm = (term: Term) => {
     const dates: Date[] = [];
@@ -262,10 +270,9 @@ export function PayrollWizardPage() {
     if (!formData.templateId) return;
     const tmpl = templates.find((t) => t.id === formData.templateId)?.data;
     if (!tmpl) return;
-     
+
     if (tmpl.groupBy)
       setFormData((prev) => ({ ...prev, templateId: formData.templateId }));
-     
   }, [formData.templateId, templates]);
 
   const createPayroll = async (): Promise<string> => {

@@ -33,10 +33,20 @@ describe("CsvImportCard", () => {
 
   it("renders preview table when csv data is present", () => {
     const preview = [
-      { firstName: "John", middleName: "", lastName: "Doe", suffix: "", isValid: true },
+      {
+        firstName: "John",
+        middleName: "",
+        lastName: "Doe",
+        suffix: "",
+        isValid: true,
+      },
     ];
     renderWithProviders(
-      <CsvImportCard {...defaultProps} csvPreview={preview} csvFileName="test.csv" />,
+      <CsvImportCard
+        {...defaultProps}
+        csvPreview={preview}
+        csvFileName="test.csv"
+      />,
     );
     expect(screen.getByText("test.csv")).toBeInTheDocument();
     expect(screen.getByText("John")).toBeInTheDocument();

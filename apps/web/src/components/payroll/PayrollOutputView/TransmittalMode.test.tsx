@@ -8,8 +8,16 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("@/components/ui/Card", () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card" className={className}>{children}</div>
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card" className={className}>
+      {children}
+    </div>
   ),
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
@@ -17,8 +25,16 @@ vi.mock("@/components/ui/Card", () => ({
   CardTitle: ({ children }: { children: React.ReactNode }) => (
     <h3 data-testid="card-title">{children}</h3>
   ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-content" className={className}>{children}</div>
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card-content" className={className}>
+      {children}
+    </div>
   ),
 }));
 
@@ -56,7 +72,9 @@ describe("TransmittalMode", () => {
 
   it("renders subtitle", () => {
     render(<TransmittalMode {...defaultProps} />);
-    expect(screen.getByText("Employee net pay amounts for bank transfer")).toBeTruthy();
+    expect(
+      screen.getByText("Employee net pay amounts for bank transfer"),
+    ).toBeTruthy();
   });
 
   it("renders employee rows", () => {
@@ -87,9 +105,21 @@ describe("TransmittalMode", () => {
   it("renders multiple employees", () => {
     const rows: ProcessingRow[] = [
       mockRow,
-      { ...mockRow, nameId: "2", employeeCode: "EMP002", firstName: "Jane", lastName: "Smith" },
+      {
+        ...mockRow,
+        nameId: "2",
+        employeeCode: "EMP002",
+        firstName: "Jane",
+        lastName: "Smith",
+      },
     ];
-    render(<TransmittalMode {...defaultProps} rows={rows} totals={{ totalNet: 40000 }} />);
+    render(
+      <TransmittalMode
+        {...defaultProps}
+        rows={rows}
+        totals={{ totalNet: 40000 }}
+      />,
+    );
     expect(screen.getByText("EMP001")).toBeTruthy();
     expect(screen.getByText("EMP002")).toBeTruthy();
     expect(screen.getByText(/2 employees/)).toBeTruthy();

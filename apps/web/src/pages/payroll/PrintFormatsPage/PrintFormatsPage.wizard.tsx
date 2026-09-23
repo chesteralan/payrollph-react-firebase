@@ -76,9 +76,7 @@ export function WizardBasicInfoStep({
         id="name"
         label="Format Name"
         value={basicForm.name}
-        onChange={(e) =>
-          setBasicForm({ ...basicForm, name: e.target.value })
-        }
+        onChange={(e) => setBasicForm({ ...basicForm, name: e.target.value })}
         required
       />
       <Input
@@ -214,16 +212,12 @@ export function WizardHeaderFooterStep({
         <ToggleField
           label="Company Logo"
           checked={headerForm.showCompanyLogo}
-          onChange={(v) =>
-            setHeaderForm({ ...headerForm, showCompanyLogo: v })
-          }
+          onChange={(v) => setHeaderForm({ ...headerForm, showCompanyLogo: v })}
         />
         <ToggleField
           label="Company Name"
           checked={headerForm.showCompanyName}
-          onChange={(v) =>
-            setHeaderForm({ ...headerForm, showCompanyName: v })
-          }
+          onChange={(v) => setHeaderForm({ ...headerForm, showCompanyName: v })}
         />
         <ToggleField
           label="Company Address"
@@ -235,9 +229,7 @@ export function WizardHeaderFooterStep({
         <ToggleField
           label="Company TIN"
           checked={headerForm.showCompanyTIN}
-          onChange={(v) =>
-            setHeaderForm({ ...headerForm, showCompanyTIN: v })
-          }
+          onChange={(v) => setHeaderForm({ ...headerForm, showCompanyTIN: v })}
         />
         <ToggleField
           label="Report Title"
@@ -335,8 +327,8 @@ export function WizardColumnsStep({
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-600">
-        Select and order columns for register output. Drag not supported -
-        order is saved as listed.
+        Select and order columns for register output. Drag not supported - order
+        is saved as listed.
       </p>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {AVAILABLE_COLUMNS.map((col) => (

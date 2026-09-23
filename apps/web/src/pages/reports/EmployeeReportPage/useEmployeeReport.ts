@@ -95,7 +95,6 @@ export function useEmployeeReport() {
 
   useEffect(() => {
     if (currentCompanyId) {
-       
       fetchLookups();
     }
   }, [currentCompanyId, fetchLookups]);

@@ -42,12 +42,16 @@ describe("SearchBar", () => {
 
   it("shows clear button when input has value", () => {
     render(<SearchBar value="query" onChange={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /clear search/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /clear search/i }),
+    ).toBeInTheDocument();
   });
 
   it("does not show clear button when empty", () => {
     render(<SearchBar value="" onChange={vi.fn()} />);
-    expect(screen.queryByRole("button", { name: /clear search/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /clear search/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("clears input on clear button click", () => {

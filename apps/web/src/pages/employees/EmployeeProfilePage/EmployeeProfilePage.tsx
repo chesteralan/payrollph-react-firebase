@@ -198,9 +198,7 @@ export function EmployeeProfilePage() {
   }, [id]);
 
   useEffect(() => {
-     
     if (id) loadData();
-     
   }, [id, loadData]);
 
   const handleSaveProfile = async () => {

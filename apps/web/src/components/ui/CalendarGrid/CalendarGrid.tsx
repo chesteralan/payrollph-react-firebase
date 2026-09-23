@@ -49,8 +49,7 @@ export function CalendarGrid({
     </div>
   );
 
-  const resolvedToday =
-    today ?? (year !== undefined ? new Date() : undefined);
+  const resolvedToday = today ?? (year !== undefined ? new Date() : undefined);
 
   const renderDayFn = renderDay ?? defaultDay;
   const renderDayHeaderFn = renderDayHeader ?? defaultHeader;

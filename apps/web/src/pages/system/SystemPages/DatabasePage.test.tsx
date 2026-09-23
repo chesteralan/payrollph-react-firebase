@@ -26,7 +26,11 @@ describe("DatabasePage", () => {
     renderWithProviders(<DatabasePage />, {
       authValue: {
         hasPermission: vi.fn(() => false),
-        user: { id: "test-user", email: "test@test.com", displayName: "Test User" },
+        user: {
+          id: "test-user",
+          email: "test@test.com",
+          displayName: "Test User",
+        },
       } as never,
     });
     expect(screen.getByText(/access denied/i)).toBeInTheDocument();

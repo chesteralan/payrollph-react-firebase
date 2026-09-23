@@ -111,31 +111,36 @@ export function HealthCheckPage() {
     warningCount: number;
   }>({ status: "good", passCount: 0, failCount: 0, warningCount: 0 });
 
-  const checkFirebaseConnection = useCallback(async (): Promise<HealthCheckResult> => {
-    const start = performance.now();
-    try {
-      const testDoc = { test: true, timestamp: new Date(), _healthCheck: true };
-      const docRef = await addDoc(collection(db, "_health_check"), testDoc);
-      const responseTime = Math.round(performance.now() - start);
+  const checkFirebaseConnection =
+    useCallback(async (): Promise<HealthCheckResult> => {
+      const start = performance.now();
+      try {
+        const testDoc = {
+          test: true,
+          timestamp: new Date(),
+          _healthCheck: true,
+        };
+        const docRef = await addDoc(collection(db, "_health_check"), testDoc);
+        const responseTime = Math.round(performance.now() - start);
 
-      await deleteDoc(doc(db, "_health_check", docRef.id));
+        await deleteDoc(doc(db, "_health_check", docRef.id));
 
-      return {
-        name: "Firebase Connection",
-        status: "pass",
-        message: "Connected and operational",
-        details: `Successfully tested read/write operations`,
-        responseTime,
-      };
-    } catch (error) {
-      return {
-        name: "Firebase Connection",
-        status: "fail",
-        message: "Connection failed",
-        details: error instanceof Error ? error.message : String(error),
-      };
-    }
-  }, []);
+        return {
+          name: "Firebase Connection",
+          status: "pass",
+          message: "Connected and operational",
+          details: `Successfully tested read/write operations`,
+          responseTime,
+        };
+      } catch (error) {
+        return {
+          name: "Firebase Connection",
+          status: "fail",
+          message: "Connection failed",
+          details: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }, []);
 
   const checkOnlineStatus = useCallback((): HealthCheckResult => {
     const online = navigator.onLine;
@@ -348,10 +353,16 @@ export function HealthCheckPage() {
 
     setOverallScore({ status, passCount, failCount, warningCount });
     setLoading(false);
-  }, [checkAuth, checkCollections, checkFirebaseConnection, checkIndexes, checkOnlineStatus, checkStorage]);
+  }, [
+    checkAuth,
+    checkCollections,
+    checkFirebaseConnection,
+    checkIndexes,
+    checkOnlineStatus,
+    checkStorage,
+  ]);
 
   useEffect(() => {
-     
     runHealthCheck();
   }, [runHealthCheck]);
 

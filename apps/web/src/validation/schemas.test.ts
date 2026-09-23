@@ -161,7 +161,10 @@ describe("PayrollEmployeeSchema", () => {
   });
 
   it("accepts negative daysWorked (schema allows any number)", () => {
-    const result = PayrollEmployeeSchema.safeParse({ ...validPE, daysWorked: -1 });
+    const result = PayrollEmployeeSchema.safeParse({
+      ...validPE,
+      daysWorked: -1,
+    });
     expect(result.success).toBe(true);
   });
 

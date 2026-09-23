@@ -28,23 +28,23 @@ The application exposes a health check endpoint at `/api/health` that returns JS
 1. Create account at https://uptimerobot.com
 2. Add a new monitor with these settings:
 
-| Setting | Value |
-|---------|-------|
-| **Monitor Type** | HTTP(s) |
-| **Friendly Name** | PayrollPH Production |
-| **URL** | `https://{production-project}.firebaseapp.com/api/health` |
-| **Monitoring Interval** | 5 minutes |
-| **Timeout** | 30 seconds |
-| **HTTP Method** | GET |
-| **Alert Contacts** | {Slack webhook, email} |
+| Setting                 | Value                                                     |
+| ----------------------- | --------------------------------------------------------- |
+| **Monitor Type**        | HTTP(s)                                                   |
+| **Friendly Name**       | PayrollPH Production                                      |
+| **URL**                 | `https://{production-project}.firebaseapp.com/api/health` |
+| **Monitoring Interval** | 5 minutes                                                 |
+| **Timeout**             | 30 seconds                                                |
+| **HTTP Method**         | GET                                                       |
+| **Alert Contacts**      | {Slack webhook, email}                                    |
 
 ### Alert Triggers
 
-| Condition | Action |
-|-----------|--------|
-| Down (3 consecutive failures) | Slack #incidents channel + PagerDuty |
-| SSL certificate expires < 30 days | Email to dev team |
-| Response time > 5s | Slack #incidents |
+| Condition                         | Action                               |
+| --------------------------------- | ------------------------------------ |
+| Down (3 consecutive failures)     | Slack #incidents channel + PagerDuty |
+| SSL certificate expires < 30 days | Email to dev team                    |
+| Response time > 5s                | Slack #incidents                     |
 
 ## Google Cloud Monitoring (Alternative)
 
@@ -74,7 +74,7 @@ alert_policy:
         threshold_value: 1
         duration: 300s
   notification_channels:
-    - {slack_channel_id}
+    - { slack_channel_id }
 ```
 
 ## Better Uptime / Checkly (Synthetic Monitoring)
@@ -83,22 +83,24 @@ For synthetic monitoring that checks full page loads:
 
 ```javascript
 // checkly.check.js
-const { chromium } = require('playwright');
+const { chromium } = require("playwright");
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
 
 // Check health endpoint
-const response = await page.goto('https://{project}.firebaseapp.com/api/health');
+const response = await page.goto(
+  "https://{project}.firebaseapp.com/api/health",
+);
 const data = JSON.parse(await response.text());
 
-if (data.status !== 'healthy') {
+if (data.status !== "healthy") {
   throw new Error(`Health check failed: ${data.status}`);
 }
 
 // Verify key services
-if (data.checks.firestore.status !== 'ok') {
-  throw new Error('Firestore is unreachable');
+if (data.checks.firestore.status !== "ok") {
+  throw new Error("Firestore is unreachable");
 }
 
 await browser.close();
@@ -107,6 +109,7 @@ await browser.close();
 ## Multi-Region Monitoring
 
 Configure monitors from at least two geographic regions:
+
 - **US West** (Oregon)
 - **Asia Pacific** (Singapore) — primary user base
 - **Europe West** (Ireland)

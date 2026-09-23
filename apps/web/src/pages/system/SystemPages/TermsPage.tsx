@@ -10,9 +10,10 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Sheet } from "@/components/ui/Sheet";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
@@ -62,9 +63,7 @@ export function TermsPage() {
   };
 
   useEffect(() => {
-     
     fetchTerms();
-     
   }, []);
 
   const validateForm = useCallback(() => {
@@ -127,9 +126,7 @@ export function TermsPage() {
   }, [formData, terms, editingId]);
 
   useEffect(() => {
-     
     if (showForm) validateForm();
-     
   }, [formData, showForm, validateForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -226,286 +223,284 @@ export function TermsPage() {
           </Button>
         )}
       </div>
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit" : "Add"} Term</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {warnings.length > 0 && (
-              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                {warnings.map((w, i) => (
-                  <p key={i} className="text-sm text-yellow-800">
-                    {w}
-                  </p>
-                ))}
-              </div>
+      <Sheet
+        isOpen={showForm}
+        onClose={() => {
+          setShowForm(false);
+          setEditingId(null);
+          setErrors({});
+          setWarnings([]);
+        }}
+        title={editingId ? "Edit Term" : "Add Term"}
+        footer={
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              form="term-form"
+              disabled={Object.keys(errors).length > 0}
+            >
+              {editingId ? "Update" : "Create"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowForm(false);
+                setEditingId(null);
+                setErrors({});
+                setWarnings([]);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        }
+      >
+        {warnings.length > 0 && (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            {warnings.map((w, i) => (
+              <p key={i} className="text-sm text-yellow-800">
+                {w}
+              </p>
+            ))}
+          </div>
+        )}
+        <form id="term-form" onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Input
+              id="name"
+              label="Name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+            {errors.name && (
+              <p className="text-sm text-red-600 mt-1">{errors.name}</p>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Input
-                    id="name"
-                    label="Name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Type
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        type: e.target.value as Term["type"],
-                      })
-                    }
-                  >
-                    <option value="semi-monthly">Semi-monthly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="bi-weekly">Bi-weekly</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
-                </div>
-                <div>
-                  <Input
-                    id="frequency"
-                    label="Frequency"
-                    value={formData.frequency}
-                    onChange={(e) =>
-                      setFormData({ ...formData, frequency: e.target.value })
-                    }
-                  />
-                  {errors.frequency && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {errors.frequency}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Input
-                    id="daysPerPeriod"
-                    label="Days per Period"
-                    type="number"
-                    value={String(formData.daysPerPeriod)}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        daysPerPeriod: Number(e.target.value),
-                      })
-                    }
-                  />
-                  {errors.daysPerPeriod && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {errors.daysPerPeriod}
-                    </p>
-                  )}
-                </div>
-                {formData.type === "semi-monthly" && (
-                  <>
-                    <div>
-                      <Input
-                        id="cutOff1"
-                        label="First Cutoff Day"
-                        type="number"
-                        value={String(formData.cutOff1)}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            cutOff1: Number(e.target.value),
-                          })
-                        }
-                      />
-                      {errors.cutOff1 && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {errors.cutOff1}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <Input
-                        id="cutOff2"
-                        label="Second Cutoff Day"
-                        type="number"
-                        value={String(formData.cutOff2)}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            cutOff2: Number(e.target.value),
-                          })
-                        }
-                      />
-                      {errors.cutOff2 && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {errors.cutOff2}
-                        </p>
-                      )}
-                    </div>
-                  </>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type
+            </label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  type: e.target.value as Term["type"],
+                })
+              }
+            >
+              <option value="semi-monthly">Semi-monthly</option>
+              <option value="monthly">Monthly</option>
+              <option value="bi-weekly">Bi-weekly</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+          <div>
+            <Input
+              id="frequency"
+              label="Frequency"
+              value={formData.frequency}
+              onChange={(e) =>
+                setFormData({ ...formData, frequency: e.target.value })
+              }
+            />
+            {errors.frequency && (
+              <p className="text-sm text-red-600 mt-1">{errors.frequency}</p>
+            )}
+          </div>
+          <div>
+            <Input
+              id="daysPerPeriod"
+              label="Days per Period"
+              type="number"
+              value={String(formData.daysPerPeriod)}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  daysPerPeriod: Number(e.target.value),
+                })
+              }
+            />
+            {errors.daysPerPeriod && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.daysPerPeriod}
+              </p>
+            )}
+          </div>
+          {formData.type === "semi-monthly" && (
+            <>
+              <div>
+                <Input
+                  id="cutOff1"
+                  label="First Cutoff Day"
+                  type="number"
+                  value={String(formData.cutOff1)}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      cutOff1: Number(e.target.value),
+                    })
+                  }
+                />
+                {errors.cutOff1 && (
+                  <p className="text-sm text-red-600 mt-1">{errors.cutOff1}</p>
                 )}
-                <div className="col-span-2">
-                  <Input
-                    id="description"
-                    label="Description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                  />
-                </div>
               </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={Object.keys(errors).length > 0}>
-                  {editingId ? "Update" : "Create"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
-                    setErrors({});
-                    setWarnings([]);
-                  }}
-                >
-                  Cancel
-                </Button>
+              <div>
+                <Input
+                  id="cutOff2"
+                  label="Second Cutoff Day"
+                  type="number"
+                  value={String(formData.cutOff2)}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      cutOff2: Number(e.target.value),
+                    })
+                  }
+                />
+                {errors.cutOff2 && (
+                  <p className="text-sm text-red-600 mt-1">{errors.cutOff2}</p>
+                )}
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            </>
+          )}
+          <Input
+            id="description"
+            label="Description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+        </form>
+      </Sheet>
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig?.key === "name" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("name")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Name
+                      {sortConfig?.key === "name" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
                       ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Type
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Frequency
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Days/Period
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Type
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Frequency
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Days/Period
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : sortedTerms.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No terms found
-                  </td>
-                </tr>
-              ) : (
-                sortedTerms.map((term) => (
-                  <tr key={term.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {term.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {typeLabels[term.type] || term.type}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {term.frequency || "-"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {term.daysPerPeriod || "-"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(term)}
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${term.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                      >
-                        {term.isActive ? "Active" : "Inactive"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canEdit("system", "terms") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingId(term.id);
-                              setFormData({
-                                name: term.name,
-                                description: term.description || "",
-                                type: term.type,
-                                frequency: term.frequency,
-                                daysPerPeriod: term.daysPerPeriod,
-                                cutOff1: term.cutOff1 || 0,
-                                cutOff2: term.cutOff2 || 0,
-                              });
-                              setShowForm(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("system", "terms") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setConfirmDelete(term.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : sortedTerms.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No terms found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedTerms.map((term) => (
+                    <tr key={term.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {term.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {typeLabels[term.type] || term.type}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {term.frequency || "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {term.daysPerPeriod || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleToggleStatus(term)}
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${term.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                        >
+                          {term.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {canEdit("system", "terms") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingId(term.id);
+                                setFormData({
+                                  name: term.name,
+                                  description: term.description || "",
+                                  type: term.type,
+                                  frequency: term.frequency,
+                                  daysPerPeriod: term.daysPerPeriod,
+                                  cutOff1: term.cutOff1 || 0,
+                                  cutOff2: term.cutOff2 || 0,
+                                });
+                                setShowForm(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canDelete("system", "terms") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setConfirmDelete(term.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

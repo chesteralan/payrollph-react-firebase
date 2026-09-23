@@ -28,7 +28,12 @@ import {
   X,
 } from "lucide-react";
 import type { PrintFormat } from "./PrintFormatsPage.types";
-import { DEFAULT_COLUMNS, DEFAULT_SIGNATURE_LABELS, OUTPUT_TYPES, WIZARD_STEPS } from "./PrintFormatsPage.constants";
+import {
+  DEFAULT_COLUMNS,
+  DEFAULT_SIGNATURE_LABELS,
+  OUTPUT_TYPES,
+  WIZARD_STEPS,
+} from "./PrintFormatsPage.constants";
 import {
   WizardBasicInfoStep,
   WizardColumnsStep,
@@ -83,10 +88,18 @@ export function PrintFormatsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [wizardStep, setWizardStep] = useState(0);
 
-  const [basicForm, setBasicForm] = useState<BasicFormState>({ ...INITIAL_BASIC });
-  const [layoutForm, setLayoutForm] = useState<LayoutFormState>({ ...INITIAL_LAYOUT });
-  const [headerForm, setHeaderForm] = useState<HeaderFormState>({ ...INITIAL_HEADER });
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([...INITIAL_COLUMNS]);
+  const [basicForm, setBasicForm] = useState<BasicFormState>({
+    ...INITIAL_BASIC,
+  });
+  const [layoutForm, setLayoutForm] = useState<LayoutFormState>({
+    ...INITIAL_LAYOUT,
+  });
+  const [headerForm, setHeaderForm] = useState<HeaderFormState>({
+    ...INITIAL_HEADER,
+  });
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([
+    ...INITIAL_COLUMNS,
+  ]);
   const [includeTotals, setIncludeTotals] = useState(true);
 
   const fetchFormats = useCallback(async () => {
@@ -112,7 +125,10 @@ export function PrintFormatsPage() {
     setWizardStep(0);
     setBasicForm({ ...INITIAL_BASIC });
     setLayoutForm({ ...INITIAL_LAYOUT });
-    setHeaderForm({ ...INITIAL_HEADER, signatureLabels: [...DEFAULT_SIGNATURE_LABELS] });
+    setHeaderForm({
+      ...INITIAL_HEADER,
+      signatureLabels: [...DEFAULT_SIGNATURE_LABELS],
+    });
     setSelectedColumns([...INITIAL_COLUMNS]);
     setIncludeTotals(true);
   };
@@ -143,7 +159,9 @@ export function PrintFormatsPage() {
         showTitle: format.showTitle,
         showPeriod: format.showPeriod,
         showSignatureLines: format.showSignatureLines,
-        signatureLabels: format.signatureLabels || [...DEFAULT_SIGNATURE_LABELS],
+        signatureLabels: format.signatureLabels || [
+          ...DEFAULT_SIGNATURE_LABELS,
+        ],
       });
       setSelectedColumns(format.columnOrder || [...INITIAL_COLUMNS]);
       setIncludeTotals(format.includeTotals);
@@ -378,110 +396,114 @@ export function PrintFormatsPage() {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Name
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Output Type
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Paper
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Columns
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Name
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Output Type
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Paper
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Columns
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : formats.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No print formats found
-                  </td>
-                </tr>
-              ) : (
-                formats.map((f) => (
-                  <tr key={f.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {f.name}
-                      </div>
-                      {f.description && (
-                        <div className="text-xs text-gray-500">
-                          {f.description}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm capitalize text-gray-500">
-                      {OUTPUT_TYPES.find((t) => t.value === f.outputType)
-                        ?.label || f.outputType}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {f.paperSize} {f.orientation}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {f.columnOrder?.length || 0} columns
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canAdd("payroll", "templates") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleClone(f)}
-                            title="Clone"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canEdit("payroll", "templates") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openWizard(f)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("payroll", "templates") && (
-                          <ConfirmDialog
-                            title="Delete Print Format"
-                            message={`Delete "${f.name}"?`}
-                            confirmText="Delete"
-                            onConfirm={() => handleDelete(f.id)}
-                          >
-                            {(open: () => void) => (
-                              <Button variant="ghost" size="sm" onClick={open}>
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : formats.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No print formats found
+                    </td>
+                  </tr>
+                ) : (
+                  formats.map((f) => (
+                    <tr key={f.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {f.name}
+                        </div>
+                        {f.description && (
+                          <div className="text-xs text-gray-500">
+                            {f.description}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm capitalize text-gray-500">
+                        {OUTPUT_TYPES.find((t) => t.value === f.outputType)
+                          ?.label || f.outputType}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {f.paperSize} {f.orientation}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {f.columnOrder?.length || 0} columns
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {canAdd("payroll", "templates") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleClone(f)}
+                              title="Clone"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canEdit("payroll", "templates") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openWizard(f)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canDelete("payroll", "templates") && (
+                            <ConfirmDialog
+                              title="Delete Print Format"
+                              message={`Delete "${f.name}"?`}
+                              confirmText="Delete"
+                              onConfirm={() => handleDelete(f.id)}
+                            >
+                              {(open: () => void) => (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={open}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </ConfirmDialog>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

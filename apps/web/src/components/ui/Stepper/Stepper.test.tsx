@@ -59,16 +59,12 @@ describe("Stepper", () => {
       { label: "Pending", completed: false, active: true },
     ];
     render(<Stepper steps={steps} onStepClick={handleClick} />);
-    fireEvent.click(
-      screen.getByRole("button", { name: /Step 2: Pending/i }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: /Step 2: Pending/i }));
     expect(handleClick).not.toHaveBeenCalled();
   });
 
   it("disables step buttons when onStepClick is not provided", () => {
-    const steps: Step[] = [
-      { label: "Done", completed: true, active: false },
-    ];
+    const steps: Step[] = [{ label: "Done", completed: true, active: false }];
     render(<Stepper steps={steps} />);
     const button = screen.getByRole("button", { name: /Step 1: Done/i });
     expect(button).toBeDisabled();
@@ -76,7 +72,9 @@ describe("Stepper", () => {
 
   it("has accessible list and listitem roles", () => {
     render(<Stepper steps={makeSteps()} />);
-    expect(screen.getByRole("list", { name: "Progress steps" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("list", { name: "Progress steps" }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
   });
 

@@ -42,7 +42,12 @@ describe("NameForm", () => {
       <NameForm
         {...defaultProps}
         editingId="abc123"
-        formData={{ firstName: "John", middleName: "M", lastName: "Doe", suffix: "Jr." }}
+        formData={{
+          firstName: "John",
+          middleName: "M",
+          lastName: "Doe",
+          suffix: "Jr.",
+        }}
       />,
     );
     expect(

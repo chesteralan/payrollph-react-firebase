@@ -28,6 +28,7 @@ export function CompaniesPage() {
     setColumnGroup,
     handleSubmit,
     handleEdit,
+    resetForm,
     addPayrollPeriod,
     removePayrollPeriod,
     updatePayrollPeriod,
@@ -53,7 +54,12 @@ export function CompaniesPage() {
             {showDeleted ? "Show Active" : "Show Archived"}
           </Button>
           {canAdd("system", "companies") && (
-            <Button onClick={() => setShowForm(!showForm)}>
+            <Button
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Company
             </Button>
@@ -61,23 +67,22 @@ export function CompaniesPage() {
         </div>
       </div>
 
-      {showForm && (
-        <CompanyForm
-          formData={formData}
-          columnGroup={columnGroup}
-          editingId={editingId}
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingId(null);
-          }}
-          onFormDataChange={setFormData}
-          onColumnGroupChange={setColumnGroup}
-          onAddPayrollPeriod={addPayrollPeriod}
-          onRemovePayrollPeriod={removePayrollPeriod}
-          onUpdatePayrollPeriod={updatePayrollPeriod}
-        />
-      )}
+      <CompanyForm
+        isOpen={showForm}
+        formData={formData}
+        columnGroup={columnGroup}
+        editingId={editingId}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+        onFormDataChange={setFormData}
+        onColumnGroupChange={setColumnGroup}
+        onAddPayrollPeriod={addPayrollPeriod}
+        onRemovePayrollPeriod={removePayrollPeriod}
+        onUpdatePayrollPeriod={updatePayrollPeriod}
+      />
 
       <CompanyTable
         companies={sortedCompanies}

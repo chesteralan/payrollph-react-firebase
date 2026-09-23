@@ -8,28 +8,29 @@ describe("reportGenerator", () => {
   });
 
   it("should return an empty array with filters", async () => {
-    const result = await generateReportData(
-      "attendance",
-      { companyId: "comp1", from: "2024-01-01", to: "2024-01-31" },
-    );
+    const result = await generateReportData("attendance", {
+      companyId: "comp1",
+      from: "2024-01-01",
+      to: "2024-01-31",
+    });
     expect(result).toEqual([]);
   });
 
   it("should return an empty array with fields specified", async () => {
-    const result = await generateReportData(
-      "employee-list",
-      undefined,
-      ["name", "department", "position"],
-    );
+    const result = await generateReportData("employee-list", undefined, [
+      "name",
+      "department",
+      "position",
+    ]);
     expect(result).toEqual([]);
   });
 
   it("should return an empty array with all parameters", async () => {
-    const result = await generateReportData(
-      "13th-month",
-      { year: 2024 },
-      ["employee", "grossPay", "monthsPay"],
-    );
+    const result = await generateReportData("13th-month", { year: 2024 }, [
+      "employee",
+      "grossPay",
+      "monthsPay",
+    ]);
     expect(result).toEqual([]);
   });
 

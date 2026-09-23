@@ -3,10 +3,7 @@ export interface BenefitItem {
   name: string;
   description?: string;
   allocationType:
-    | "fixed"
-    | "percentage_of_salary"
-    | "percentage_of_basic"
-    | "tiered";
+    "fixed" | "percentage_of_salary" | "percentage_of_basic" | "tiered";
   allocationValue?: number;
   employeeShareType: "fixed" | "percentage";
   employeeShareValue?: number;

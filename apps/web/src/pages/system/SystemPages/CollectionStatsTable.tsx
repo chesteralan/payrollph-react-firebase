@@ -23,55 +23,55 @@ export function CollectionStatsTable({
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                Collection
-              </th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                Documents
-              </th>
-              <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {loading ? (
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-4 text-center text-gray-500"
-                >
-                  Loading...
-                </td>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                  Collection
+                </th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                  Documents
+                </th>
+                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                  Actions
+                </th>
               </tr>
-            ) : (
-              COLLECTIONS.map((col) => (
-                <tr key={col} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {col}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                    {stats[col] || 0}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={!!exportLoading}
-                      onClick={() => exportCollection(col)}
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      {exportLoading === col ? "Exporting..." : "Export"}
-                    </Button>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    Loading...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                COLLECTIONS.map((col) => (
+                  <tr key={col} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      {col}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                      {stats[col] || 0}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={!!exportLoading}
+                        onClick={() => exportCollection(col)}
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        {exportLoading === col ? "Exporting..." : "Export"}
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </CardContent>
     </Card>

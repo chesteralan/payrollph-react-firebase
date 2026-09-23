@@ -59,10 +59,7 @@ export function SalaryCard({
                 onChange={(e) =>
                   update({
                     frequency: e.target.value as
-                      | "monthly"
-                      | "semi-monthly"
-                      | "weekly"
-                      | "daily",
+                      "monthly" | "semi-monthly" | "weekly" | "daily",
                   })
                 }
               >

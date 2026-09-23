@@ -4,12 +4,12 @@
 
 This project uses **Vitest** for unit/integration tests and **Playwright** for end-to-end (E2E) tests.
 
-| Layer | Tool | Location |
-|-------|------|----------|
-| Unit tests | Vitest + Testing Library | `src/**/*.test.{ts,tsx}` |
-| Integration tests | Vitest + @firebase/rules-unit-testing | `src/test/*.test.ts` |
-| E2E tests | Playwright | `e2e/*.spec.ts` |
-| Visual regression | Playwright Snapshots | `e2e/*.spec.ts` + `e2e/snapshots/` |
+| Layer             | Tool                                  | Location                           |
+| ----------------- | ------------------------------------- | ---------------------------------- |
+| Unit tests        | Vitest + Testing Library              | `src/**/*.test.{ts,tsx}`           |
+| Integration tests | Vitest + @firebase/rules-unit-testing | `src/test/*.test.ts`               |
+| E2E tests         | Playwright                            | `e2e/*.spec.ts`                    |
+| Visual regression | Playwright Snapshots                  | `e2e/*.spec.ts` + `e2e/snapshots/` |
 
 ## Running Tests
 
@@ -96,6 +96,7 @@ src/
 ### Unit Test Patterns
 
 **Utility function test:**
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { formatCurrency } from "./format";
@@ -112,6 +113,7 @@ describe("formatCurrency", () => {
 ```
 
 **React component test:**
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -126,6 +128,7 @@ describe("Button", () => {
 ```
 
 **Hook test:**
+
 ```typescript
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
@@ -182,18 +185,19 @@ describe("LoginForm", () => {
 
 The project enforces **80% coverage** minimum across all metrics:
 
-| Metric | Threshold |
-|--------|-----------|
-| Lines | 80% |
-| Branches | 80% |
-| Functions | 80% |
-| Statements | 80% |
+| Metric     | Threshold |
+| ---------- | --------- |
+| Lines      | 80%       |
+| Branches   | 80%       |
+| Functions  | 80%       |
+| Statements | 80%       |
 
 Coverage is configured in `vite.config.ts` under `test.coverage`.
 
 ### Excluded from Coverage
 
 These files are intentionally excluded from coverage requirements:
+
 - `src/test/**` — Test utilities and setup
 - `src/types/**` — TypeScript type definitions
 - `src/config/**` — Firebase/Sentry configuration
@@ -260,6 +264,7 @@ Tests run automatically in CI via GitHub Actions (`.github/workflows/ci-cd.yml`)
 ### Vitest Hangs During Setup
 
 If Vitest hangs during test discovery, check:
+
 1. The `pool` setting in `vite.config.ts` — remove `pool: "forks"` if jsdom is slow to initialize
 2. jsdom environment setup can take 10-20s per test file — this is expected
 3. Run a single file to isolate the issue: `vitest run path/to/test.test.ts`
@@ -267,6 +272,7 @@ If Vitest hangs during test discovery, check:
 ### Playwright Fails to Connect
 
 If Playwright can't connect to the dev server:
+
 1. Ensure the dev server is running: `yarn dev`
 2. Check `playwright.config.ts` for the correct `baseURL` (default: `http://localhost:5173`)
 3. The `webServer` config in `playwright.config.ts` auto-starts the dev server in CI
@@ -274,6 +280,7 @@ If Playwright can't connect to the dev server:
 ### Firestore Emulator Not Running
 
 The security rules tests require the Firestore emulator:
+
 ```bash
 firebase emulators:start --only firestore
 # In another terminal:

@@ -1,11 +1,7 @@
 import { useCallback, useState } from "react";
 
 export type DateFormat =
-  | "MM/DD/YYYY"
-  | "DD/MM/YYYY"
-  | "YYYY-MM-DD"
-  | "DD-MMM-YYYY"
-  | "MMM DD, YYYY";
+  "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD" | "DD-MMM-YYYY" | "MMM DD, YYYY";
 export type TimeFormat = "12h" | "24h";
 
 interface DateTimeFormatConfig {

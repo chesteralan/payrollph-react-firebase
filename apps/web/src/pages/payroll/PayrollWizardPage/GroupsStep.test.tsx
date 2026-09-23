@@ -39,9 +39,7 @@ describe("GroupsStep", () => {
 
   it("renders empty state message when no groups", () => {
     render(<GroupsStep {...defaultProps} />);
-    expect(
-      screen.getByText(/No groups added\. Add filters/),
-    ).toBeTruthy();
+    expect(screen.getByText(/No groups added\. Add filters/)).toBeTruthy();
   });
 
   it("renders existing groups", () => {

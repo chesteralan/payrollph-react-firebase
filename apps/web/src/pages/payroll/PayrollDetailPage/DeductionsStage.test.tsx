@@ -107,9 +107,7 @@ describe("DeductionsStage", () => {
   });
 
   it("renders deduction values from data", () => {
-    const deductionData = new Map([
-      ["emp-1", new Map([["d1", 1500]])],
-    ]);
+    const deductionData = new Map([["emp-1", new Map([["d1", 1500]])]]);
     render(
       <DeductionsStage
         rows={[mockRow]}

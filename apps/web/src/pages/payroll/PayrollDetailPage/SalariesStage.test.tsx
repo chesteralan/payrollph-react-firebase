@@ -64,7 +64,9 @@ describe("SalariesStage", () => {
         updateRow={vi.fn()}
       />,
     );
-    expect(screen.getByText(/20 actual workdays \(calendar-adjusted\)/)).toBeTruthy();
+    expect(
+      screen.getByText(/20 actual workdays \(calendar-adjusted\)/),
+    ).toBeTruthy();
   });
 
   it("renders empty state when no rows", () => {

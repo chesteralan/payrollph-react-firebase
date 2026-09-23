@@ -210,11 +210,7 @@ describe("encryption utils", () => {
 
     it("should handle empty string field values", async () => {
       const obj = { sss: "", name: "Test" };
-      const result = await encryptSensitiveFields(
-        obj,
-        ["sss"],
-        testPassphrase,
-      );
+      const result = await encryptSensitiveFields(obj, ["sss"], testPassphrase);
       // Empty string is skipped (falsy check), so remains unchanged
       expect(result.sss).toBe("");
     });

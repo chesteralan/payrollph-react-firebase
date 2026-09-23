@@ -76,9 +76,7 @@ describe("ComputationSummary", () => {
   });
 
   it("computes earnings from earningData", () => {
-    const earningData = new Map([
-      ["emp-1", new Map([["e1", 5000]])],
-    ]);
+    const earningData = new Map([["emp-1", new Map([["e1", 5000]])]]);
     render(
       <ComputationSummary
         rows={[mockRow]}
@@ -93,9 +91,7 @@ describe("ComputationSummary", () => {
   });
 
   it("computes deductions from deductionData", () => {
-    const deductionData = new Map([
-      ["emp-1", new Map([["d1", 2000]])],
-    ]);
+    const deductionData = new Map([["emp-1", new Map([["d1", 2000]])]]);
     render(
       <ComputationSummary
         rows={[mockRow]}

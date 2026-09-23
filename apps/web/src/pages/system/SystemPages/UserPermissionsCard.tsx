@@ -60,17 +60,14 @@ export function UserPermissionsCard({
               {DEPARTMENTS.flatMap((dept) =>
                 dept.sections.map((section) => {
                   const restriction = restrictions.find(
-                    (r) =>
-                      r.department === dept.key && r.section === section,
+                    (r) => r.department === dept.key && r.section === section,
                   );
                   return (
                     <tr
                       key={`${dept.key}-${section}`}
                       className="hover:bg-gray-50"
                     >
-                      <td className="px-3 py-2 pl-6 capitalize">
-                        {section}
-                      </td>
+                      <td className="px-3 py-2 pl-6 capitalize">{section}</td>
                       {["view", "add", "edit", "delete"].map((action) => {
                         const actionKey =
                           action === "view"
@@ -81,15 +78,10 @@ export function UserPermissionsCard({
                                 ? "canEdit"
                                 : "canDelete";
                         const isChecked = restriction
-                          ? !!restriction[
-                              actionKey as keyof UserRestriction
-                            ]
+                          ? !!restriction[actionKey as keyof UserRestriction]
                           : false;
                         return (
-                          <td
-                            key={action}
-                            className="px-3 py-2 text-center"
-                          >
+                          <td key={action} className="px-3 py-2 text-center">
                             <button
                               onClick={() =>
                                 onToggleRestriction(

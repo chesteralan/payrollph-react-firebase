@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { AVAILABLE_FIELDS, CATEGORIES } from "./CustomReportBuilderPage.constants";
+import {
+  AVAILABLE_FIELDS,
+  CATEGORIES,
+} from "./CustomReportBuilderPage.constants";
 
 describe("CustomReportBuilderPage constants", () => {
   it("AVAILABLE_FIELDS is a non-empty array", () => {

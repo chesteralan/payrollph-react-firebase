@@ -113,11 +113,17 @@ describe("WizardHeaderFooterStep", () => {
   it("renders signature labels input when showSignatureLines is true", () => {
     render(
       <WizardHeaderFooterStep
-        headerForm={{ ...defaultHeaderForm, showSignatureLines: true, signatureLabels: ["Prepared by"] }}
+        headerForm={{
+          ...defaultHeaderForm,
+          showSignatureLines: true,
+          signatureLabels: ["Prepared by"],
+        }}
         setHeaderForm={vi.fn()}
       />,
     );
-    expect(screen.getByText("Signature Labels (comma-separated)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Signature Labels (comma-separated)"),
+    ).toBeInTheDocument();
   });
 
   it("renders header HTML textarea when showHeader is true", () => {
@@ -127,7 +133,9 @@ describe("WizardHeaderFooterStep", () => {
         setHeaderForm={vi.fn()}
       />,
     );
-    expect(screen.getByText("Custom Header HTML (optional)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Custom Header HTML (optional)"),
+    ).toBeInTheDocument();
   });
 
   it("renders footer HTML textarea when showFooter is true", () => {
@@ -137,7 +145,9 @@ describe("WizardHeaderFooterStep", () => {
         setHeaderForm={vi.fn()}
       />,
     );
-    expect(screen.getByText("Custom Footer HTML (optional)")).toBeInTheDocument();
+    expect(
+      screen.getByText("Custom Footer HTML (optional)"),
+    ).toBeInTheDocument();
   });
 });
 

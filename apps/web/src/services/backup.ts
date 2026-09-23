@@ -2,7 +2,13 @@
 // Note: Actual backups should be automated via Firebase CLI or Cloud Functions
 // This provides client-side backup metadata tracking
 
-import { collection, doc, getDocs, updateDoc, writeBatch } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import type { UserAccount } from "../types";
 

@@ -32,27 +32,73 @@ const SEED_CONFIG = {
 // ============================================================
 
 const FIRST_NAMES = [
-  "Juan", "Maria", "Jose", "Ana", "Pedro", "Rosa", "Carlos", "Elena",
-  "Miguel", "Luisa", "Antonio", "Isabel", "Manuel", "Carmen", "Francisco",
-  "Angela", "Ramon", "Teresa", "Fernando", "Gloria",
+  "Juan",
+  "Maria",
+  "Jose",
+  "Ana",
+  "Pedro",
+  "Rosa",
+  "Carlos",
+  "Elena",
+  "Miguel",
+  "Luisa",
+  "Antonio",
+  "Isabel",
+  "Manuel",
+  "Carmen",
+  "Francisco",
+  "Angela",
+  "Ramon",
+  "Teresa",
+  "Fernando",
+  "Gloria",
 ];
 
 const LAST_NAMES = [
-  "Santos", "Reyes", "Cruz", "Bautista", "Gonzales", "Mendoza", "Garcia",
-  "Flores", "Rivera", "Lopez", "Martinez", "Dela Cruz", "Villanueva",
-  "Fernandez", "Torres", "Castillo", "Domingo", "Ramos", "Aguilar",
+  "Santos",
+  "Reyes",
+  "Cruz",
+  "Bautista",
+  "Gonzales",
+  "Mendoza",
+  "Garcia",
+  "Flores",
+  "Rivera",
+  "Lopez",
+  "Martinez",
+  "Dela Cruz",
+  "Villanueva",
+  "Fernandez",
+  "Torres",
+  "Castillo",
+  "Domingo",
+  "Ramos",
+  "Aguilar",
   "Navarro",
 ];
 
 const POSITIONS = [
-  "Software Engineer", "HR Manager", "Accountant", "Office Clerk",
-  "Sales Representative", "Marketing Specialist", "Operations Manager",
-  "Customer Support", "IT Administrator", "Finance Analyst",
+  "Software Engineer",
+  "HR Manager",
+  "Accountant",
+  "Office Clerk",
+  "Sales Representative",
+  "Marketing Specialist",
+  "Operations Manager",
+  "Customer Support",
+  "IT Administrator",
+  "Finance Analyst",
 ];
 
 const DEPARTMENTS = [
-  "Engineering", "Human Resources", "Finance", "Operations",
-  "Sales", "Marketing", "IT Support", "Administration",
+  "Engineering",
+  "Human Resources",
+  "Finance",
+  "Operations",
+  "Sales",
+  "Marketing",
+  "IT Support",
+  "Administration",
 ];
 
 function randomElement<T>(arr: T[]): T {
@@ -68,7 +114,9 @@ function generateEmployeeCode(index: number, companyCode: string): string {
 }
 
 function randomDate(start: Date, end: Date): Date {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+  );
 }
 
 // ============================================================
@@ -78,7 +126,10 @@ function randomDate(start: Date, end: Date): Date {
 async function seedDatabase() {
   // Initialize Firebase Admin
   const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-    ? (JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as Record<string, unknown>)
+    ? (JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as Record<
+        string,
+        unknown
+      >)
     : undefined;
 
   const app = initializeApp(
@@ -132,7 +183,10 @@ async function seedDatabase() {
       const employeeRef = db.collection("employees").doc();
       await employeeRef.set({
         companyId,
-        employeeCode: generateEmployeeCode(i + 1, companyCodes[companyIds.indexOf(companyId)]!),
+        employeeCode: generateEmployeeCode(
+          i + 1,
+          companyCodes[companyIds.indexOf(companyId)]!,
+        ),
         firstName,
         lastName,
         fullName: `${firstName} ${lastName}`,
@@ -161,10 +215,14 @@ async function seedDatabase() {
       });
 
       if ((i + 1) % 10 === 0) {
-        console.log(`  ✓ ${i + 1}/${SEED_CONFIG.employeesPerCompany} employees created for company ${companyCodes[companyIds.indexOf(companyId)]}`);
+        console.log(
+          `  ✓ ${i + 1}/${SEED_CONFIG.employeesPerCompany} employees created for company ${companyCodes[companyIds.indexOf(companyId)]}`,
+        );
       }
     }
-    console.log(`  ✓ All ${SEED_CONFIG.employeesPerCompany} employees created for company ${companyCodes[companyIds.indexOf(companyId)]}`);
+    console.log(
+      `  ✓ All ${SEED_CONFIG.employeesPerCompany} employees created for company ${companyCodes[companyIds.indexOf(companyId)]}`,
+    );
   }
 
   // Create users
@@ -180,8 +238,18 @@ async function seedDatabase() {
         companyIds: [companyId],
         isActive: true,
         permissions: {
-          employees: { view: true, create: role !== "user", edit: role !== "user", delete: role === "admin" },
-          payroll: { view: true, create: role !== "user", process: role === "admin", lock: role === "admin" },
+          employees: {
+            view: true,
+            create: role !== "user",
+            edit: role !== "user",
+            delete: role === "admin",
+          },
+          payroll: {
+            view: true,
+            create: role !== "user",
+            process: role === "admin",
+            lock: role === "admin",
+          },
           reports: { view: true, export: true },
           settings: { view: role === "admin", edit: role === "admin" },
         },
@@ -189,7 +257,9 @@ async function seedDatabase() {
         updatedAt: new Date(),
       });
     }
-    console.log(`  ✓ Users created for company ${companyCodes[companyIds.indexOf(companyId)]}`);
+    console.log(
+      `  ✓ Users created for company ${companyCodes[companyIds.indexOf(companyId)]}`,
+    );
   }
 
   // Create sample payroll runs
@@ -202,7 +272,11 @@ async function seedDatabase() {
         companyId,
         period: {
           start: new Date(payrollDate.getFullYear(), payrollDate.getMonth(), 1),
-          end: new Date(payrollDate.getFullYear(), payrollDate.getMonth() + 1, 0),
+          end: new Date(
+            payrollDate.getFullYear(),
+            payrollDate.getMonth() + 1,
+            0,
+          ),
         },
         status: m === 0 ? "draft" : "published",
         totalEmployees: SEED_CONFIG.employeesPerCompany,
@@ -215,18 +289,34 @@ async function seedDatabase() {
         updatedAt: new Date(),
       });
     }
-    console.log(`  ✓ ${SEED_CONFIG.payrollRuns} payroll runs created for company ${companyCodes[companyIds.indexOf(companyId)]}`);
+    console.log(
+      `  ✓ ${SEED_CONFIG.payrollRuns} payroll runs created for company ${companyCodes[companyIds.indexOf(companyId)]}`,
+    );
   }
 
   // Create audit logs
-  const AUDIT_ACTIONS = ["login", "logout", "create_employee", "update_employee", "process_payroll", "lock_payroll", "export_report"];
+  const AUDIT_ACTIONS = [
+    "login",
+    "logout",
+    "create_employee",
+    "update_employee",
+    "process_payroll",
+    "lock_payroll",
+    "export_report",
+  ];
   for (let i = 0; i < SEED_CONFIG.auditLogs; i++) {
     const auditRef = db.collection("system_audit").doc();
     await auditRef.set({
       userId: "seed-user",
       userName: "Seed Script",
       action: randomElement(AUDIT_ACTIONS),
-      module: randomElement(["auth", "employees", "payroll", "reports", "settings"]),
+      module: randomElement([
+        "auth",
+        "employees",
+        "payroll",
+        "reports",
+        "settings",
+      ]),
       description: `Seed action: ${randomElement(["created", "updated", "processed", "viewed", "exported"])}`,
       companyId: randomElement(companyIds),
       ipAddress: `192.168.${randomInt(0, 255)}.${randomInt(1, 254)}`,
@@ -239,9 +329,15 @@ async function seedDatabase() {
 
   console.log("\n✅ Database seeding complete!");
   console.log(`   Companies: ${SEED_CONFIG.companies}`);
-  console.log(`   Employees: ${SEED_CONFIG.companies * SEED_CONFIG.employeesPerCompany}`);
-  console.log(`   Users: ${SEED_CONFIG.companies * SEED_CONFIG.usersPerCompany}`);
-  console.log(`   Payroll runs: ${SEED_CONFIG.companies * SEED_CONFIG.payrollRuns}`);
+  console.log(
+    `   Employees: ${SEED_CONFIG.companies * SEED_CONFIG.employeesPerCompany}`,
+  );
+  console.log(
+    `   Users: ${SEED_CONFIG.companies * SEED_CONFIG.usersPerCompany}`,
+  );
+  console.log(
+    `   Payroll runs: ${SEED_CONFIG.companies * SEED_CONFIG.payrollRuns}`,
+  );
   console.log(`   Audit logs: ${SEED_CONFIG.auditLogs}`);
 }
 

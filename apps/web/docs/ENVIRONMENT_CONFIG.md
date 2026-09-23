@@ -6,35 +6,35 @@ PayrollPH uses environment variables for configuration. Variables are loaded at 
 
 ## Environment Files
 
-| File | Purpose | Git |
-|------|---------|-----|
-| `.env` | Development defaults | ❌ (never commit) |
-| `.env.example` | Template with all variables | ✅ |
-| `.env.local` | Local overrides (gitignored) | ❌ |
-| `.env.production` | Production build values | ❌ (CI secrets) |
+| File              | Purpose                      | Git               |
+| ----------------- | ---------------------------- | ----------------- |
+| `.env`            | Development defaults         | ❌ (never commit) |
+| `.env.example`    | Template with all variables  | ✅                |
+| `.env.local`      | Local overrides (gitignored) | ❌                |
+| `.env.production` | Production build values      | ❌ (CI secrets)   |
 
 ## Variable Reference
 
 ### Required Variables
 
-| Variable | Description | Example | Used In |
-|----------|-------------|---------|---------|
-| `VITE_FIREBASE_API_KEY` | Firebase Web API Key | `AIzaSy...` | All environments |
-| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase Auth domain | `project.firebaseapp.com` | All environments |
-| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID | `payrollph-prod` | All environments |
-| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase Storage bucket | `project.appspot.com` | All environments |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase sender ID | `123456789` | All environments |
-| `VITE_FIREBASE_APP_ID` | Firebase app ID | `1:123:web:abc` | All environments |
+| Variable                            | Description             | Example                   | Used In          |
+| ----------------------------------- | ----------------------- | ------------------------- | ---------------- |
+| `VITE_FIREBASE_API_KEY`             | Firebase Web API Key    | `AIzaSy...`               | All environments |
+| `VITE_FIREBASE_AUTH_DOMAIN`         | Firebase Auth domain    | `project.firebaseapp.com` | All environments |
+| `VITE_FIREBASE_PROJECT_ID`          | Firebase project ID     | `payrollph-prod`          | All environments |
+| `VITE_FIREBASE_STORAGE_BUCKET`      | Firebase Storage bucket | `project.appspot.com`     | All environments |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase sender ID      | `123456789`               | All environments |
+| `VITE_FIREBASE_APP_ID`              | Firebase app ID         | `1:123:web:abc`           | All environments |
 
 ### Optional Variables
 
-| Variable | Description | Default | Used In |
-|----------|-------------|---------|---------|
-| `VITE_FIREBASE_MEASUREMENT_ID` | Google Analytics ID | `G-XXXXX` | Analytics |
-| `VITE_RECAPTCHA_SITE_KEY` | reCAPTCHA v3 site key | — | Auth security |
-| `VITE_SENTRY_DSN` | Sentry DSN for error tracking | — | Error monitoring |
-| `VITE_APP_VERSION` | App version for release tracking | `0.0.0` | Sentry releases |
-| `VITE_API_BASE_URL` | API base URL (if using Cloud Functions) | — | API calls |
+| Variable                       | Description                             | Default   | Used In          |
+| ------------------------------ | --------------------------------------- | --------- | ---------------- |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Google Analytics ID                     | `G-XXXXX` | Analytics        |
+| `VITE_RECAPTCHA_SITE_KEY`      | reCAPTCHA v3 site key                   | —         | Auth security    |
+| `VITE_SENTRY_DSN`              | Sentry DSN for error tracking           | —         | Error monitoring |
+| `VITE_APP_VERSION`             | App version for release tracking        | `0.0.0`   | Sentry releases  |
+| `VITE_API_BASE_URL`            | API base URL (if using Cloud Functions) | —         | API calls        |
 
 ## Environments
 
@@ -101,18 +101,18 @@ VITE_APP_VERSION=1.0.0
 
 The following secrets must be configured in GitHub repository settings:
 
-| Secret | Description |
-|--------|-------------|
-| `FIREBASE_TOKEN` | Firebase CI token (`firebase login:ci`) |
-| `FIREBASE_API_KEY` | Production API key |
-| `FIREBASE_AUTH_DOMAIN` | Production auth domain |
-| `FIREBASE_PROJECT_ID` | Production project ID |
-| `FIREBASE_STORAGE_BUCKET` | Production storage bucket |
-| `FIREBASE_MESSAGING_SENDER_ID` | Production sender ID |
-| `FIREBASE_APP_ID` | Production app ID |
-| `RECAPTCHA_SITE_KEY` | reCAPTCHA site key |
-| `FIREBASE_STAGING_PROJECT` | Staging Firebase project ID |
-| `VITE_SENTRY_DSN` | Sentry DSN |
+| Secret                         | Description                             |
+| ------------------------------ | --------------------------------------- |
+| `FIREBASE_TOKEN`               | Firebase CI token (`firebase login:ci`) |
+| `FIREBASE_API_KEY`             | Production API key                      |
+| `FIREBASE_AUTH_DOMAIN`         | Production auth domain                  |
+| `FIREBASE_PROJECT_ID`          | Production project ID                   |
+| `FIREBASE_STORAGE_BUCKET`      | Production storage bucket               |
+| `FIREBASE_MESSAGING_SENDER_ID` | Production sender ID                    |
+| `FIREBASE_APP_ID`              | Production app ID                       |
+| `RECAPTCHA_SITE_KEY`           | reCAPTCHA site key                      |
+| `FIREBASE_STAGING_PROJECT`     | Staging Firebase project ID             |
+| `VITE_SENTRY_DSN`              | Sentry DSN                              |
 
 ## Firebase Project Setup
 

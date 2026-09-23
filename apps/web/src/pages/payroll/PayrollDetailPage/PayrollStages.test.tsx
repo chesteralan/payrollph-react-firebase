@@ -4,7 +4,13 @@ import { StageSelector, DTRStage } from "./PayrollStages";
 import type { ProcessingRow } from "../PayrollDetailPage.types";
 
 vi.mock("@/components/ui/EditableCell", () => ({
-  EditableCell: ({ value, onChange }: { value: number; onChange?: (v: string) => void }) => (
+  EditableCell: ({
+    value,
+    onChange,
+  }: {
+    value: number;
+    onChange?: (v: string) => void;
+  }) => (
     <input
       data-testid="editable-cell"
       value={value}

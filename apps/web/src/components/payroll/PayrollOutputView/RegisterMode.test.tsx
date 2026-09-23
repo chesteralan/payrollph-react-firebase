@@ -9,22 +9,41 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("@/components/ui/Button", () => ({
-  Button: ({ children, onClick, variant, size, className }: {
+  Button: ({
+    children,
+    onClick,
+    variant,
+    size,
+    className,
+  }: {
     children: React.ReactNode;
     onClick?: () => void;
     variant?: string;
     size?: string;
     className?: string;
   }) => (
-    <button onClick={onClick} data-variant={variant} data-size={size} className={className}>
+    <button
+      onClick={onClick}
+      data-variant={variant}
+      data-size={size}
+      className={className}
+    >
       {children}
     </button>
   ),
 }));
 
 vi.mock("@/components/ui/Card", () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card" className={className}>{children}</div>
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card" className={className}>
+      {children}
+    </div>
   ),
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
@@ -32,8 +51,16 @@ vi.mock("@/components/ui/Card", () => ({
   CardTitle: ({ children }: { children: React.ReactNode }) => (
     <h3 data-testid="card-title">{children}</h3>
   ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-content" className={className}>{children}</div>
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card-content" className={className}>
+      {children}
+    </div>
   ),
 }));
 
@@ -121,7 +148,9 @@ describe("PayrollRegisterMode", () => {
 
   it("shows 'No employees match' when filteredRows is empty", () => {
     render(<PayrollRegisterMode {...defaultProps} filteredRows={[]} />);
-    expect(screen.getByText("No employees match the selected filters.")).toBeTruthy();
+    expect(
+      screen.getByText("No employees match the selected filters."),
+    ).toBeTruthy();
   });
 
   it("renders filter button", () => {

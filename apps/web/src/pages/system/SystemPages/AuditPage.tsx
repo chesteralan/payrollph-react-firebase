@@ -59,9 +59,7 @@ export function AuditPage() {
   }, [filterModule, filterUser]);
 
   useEffect(() => {
-     
     fetchLogs();
-     
   }, [fetchLogs, filterModule, filterUser]);
 
   const {
@@ -194,130 +192,130 @@ export function AuditPage() {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("timestamp")}
-                >
-                  <div className="flex items-center gap-1">
-                    Timestamp
-                    {sortConfig?.key === "timestamp" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("userName")}
-                >
-                  <div className="flex items-center gap-1">
-                    User
-                    {sortConfig?.key === "userName" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("action")}
-                >
-                  <div className="flex items-center gap-1">
-                    Action
-                    {sortConfig?.key === "action" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("module")}
-                >
-                  <div className="flex items-center gap-1">
-                    Module
-                    {sortConfig?.key === "module" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Description
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("timestamp")}
                   >
-                    Loading...
-                  </td>
-                </tr>
-              ) : sortedLogs.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
+                    <div className="flex items-center gap-1">
+                      Timestamp
+                      {sortConfig?.key === "timestamp" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("userName")}
                   >
-                    No audit logs found
-                  </td>
+                    <div className="flex items-center gap-1">
+                      User
+                      {sortConfig?.key === "userName" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("action")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Action
+                      {sortConfig?.key === "action" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("module")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Module
+                      {sortConfig?.key === "module" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Description
+                  </th>
                 </tr>
-              ) : (
-                sortedLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {log.timestamp
-                        ? new Date(log.timestamp).toLocaleString()
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {log.userName || log.userId}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${actionColors[log.action] || "bg-gray-100 text-gray-800"}`}
-                      >
-                        {log.action}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm capitalize text-gray-900">
-                      {log.module}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-md truncate">
-                      {log.description}
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : sortedLogs.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No audit logs found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {log.timestamp
+                          ? new Date(log.timestamp).toLocaleString()
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {log.userName || log.userId}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${actionColors[log.action] || "bg-gray-100 text-gray-800"}`}
+                        >
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm capitalize text-gray-900">
+                        {log.module}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-md truncate">
+                        {log.description}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

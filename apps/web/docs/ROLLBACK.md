@@ -22,12 +22,14 @@ curl https://{project}.firebaseapp.com/api/health
 ## Firestore Rollback
 
 ### Via Firebase Console
+
 1. Go to Firebase Console → Firestore → Backups
 2. Select the backup before the problematic change
 3. Click "Restore" → Choose target database
 4. Update app configuration to point to restored database
 
 ### Via gcloud CLI
+
 ```bash
 # List available backups
 gcloud firestore backups list --project={project-id}
@@ -83,7 +85,7 @@ on:
   workflow_dispatch:
     inputs:
       commit:
-        description: 'Commit to rollback to'
+        description: "Commit to rollback to"
         required: true
 
 jobs:
@@ -97,7 +99,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Build
         run: |

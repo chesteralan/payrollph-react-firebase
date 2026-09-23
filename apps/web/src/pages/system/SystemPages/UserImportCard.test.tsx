@@ -24,9 +24,7 @@ describe("UserImportCard", () => {
 
   it("shows upload prompt when no CSV loaded", () => {
     renderWithProviders(<UserImportCard {...defaultProps} />);
-    expect(
-      screen.getByText(/upload a csv file/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/upload a csv file/i)).toBeInTheDocument();
   });
 
   it("shows select file button when no CSV loaded", () => {
@@ -43,11 +41,7 @@ describe("UserImportCard", () => {
         importStats={{ success: 5, failed: 1, duplicates: 0 }}
       />,
     );
-    expect(
-      screen.getByText(/import complete/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/successfully imported/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/import complete/i)).toBeInTheDocument();
+    expect(screen.getByText(/successfully imported/i)).toBeInTheDocument();
   });
 });

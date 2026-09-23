@@ -26,9 +26,7 @@ export function CalendarEventCard({
             {new Date(event.date).getDate()}
           </span>
           <span className="text-sm">{event.name}</span>
-          {event.recurring && (
-            <Repeat className="w-3 h-3 text-blue-500" />
-          )}
+          {event.recurring && <Repeat className="w-3 h-3 text-blue-500" />}
         </div>
         <div className="flex items-center gap-2 mt-1">
           <span
@@ -36,9 +34,7 @@ export function CalendarEventCard({
           >
             {event.type}
           </span>
-          {event.isPaid && (
-            <span className="text-xs text-gray-500">Paid</span>
-          )}
+          {event.isPaid && <span className="text-xs text-gray-500">Paid</span>}
         </div>
       </div>
       <div className="flex items-center gap-1">

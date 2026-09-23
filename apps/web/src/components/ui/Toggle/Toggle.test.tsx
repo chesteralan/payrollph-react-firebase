@@ -22,7 +22,9 @@ describe("Toggle", () => {
   });
 
   it("should display label when provided", () => {
-    render(<Toggle checked={false} onChange={vi.fn()} label="Enable feature" />);
+    render(
+      <Toggle checked={false} onChange={vi.fn()} label="Enable feature" />,
+    );
     expect(screen.getByText("Enable feature")).toBeInTheDocument();
   });
 
@@ -69,7 +71,9 @@ describe("Toggle", () => {
   });
 
   it("should apply custom className", () => {
-    render(<Toggle checked={false} onChange={vi.fn()} className="custom-class" />);
+    render(
+      <Toggle checked={false} onChange={vi.fn()} className="custom-class" />,
+    );
     const toggle = screen.getByRole("switch");
     expect(toggle).toHaveClass("custom-class");
   });

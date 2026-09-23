@@ -43,8 +43,8 @@ export function classifyError(
     msg.includes("unauthenticated") ||
     msg.includes("permission denied") ||
     msg.includes("token") ||
-    name === "firebaseerror" &&
-      (msg.includes("auth/") || msg.includes("permission-denied"))
+    (name === "firebaseerror" &&
+      (msg.includes("auth/") || msg.includes("permission-denied")))
   ) {
     return ERROR_GROUPS.AUTH;
   }
@@ -125,7 +125,10 @@ export const initSentry = () => {
       if (event.exception?.values?.[0]) {
         const exc = event.exception.values[0];
         const error = new Error(exc.value ?? "Unknown");
-        const group = classifyError(error, event.extra as Record<string, unknown> | undefined);
+        const group = classifyError(
+          error,
+          event.extra as Record<string, unknown> | undefined,
+        );
 
         // Apply fingerprint for grouping
         event.fingerprint = [group, exc.type ?? "Error"].filter(Boolean);

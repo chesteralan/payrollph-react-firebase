@@ -1,9 +1,9 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
-import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
+import { Building2, ChevronDown, ChevronRight } from "lucide-react";
 import { clsx } from "clsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { navigation } from "./navConfig";
 import type { NavItem, SidebarProps } from "./Sidebar.types";
@@ -101,12 +101,17 @@ function NavItemComponent({
 }
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { userCompanies, currentCompanyId, setCurrentCompanyId } = useAuth();
+  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+  const currentCompany = userCompanies.find(
+    (c) => c.companyId === currentCompanyId,
+  );
+
+  const handleCompanyChange = (companyId: string) => {
+    setCurrentCompanyId(companyId);
+    setShowCompanyDropdown(false);
   };
 
   const handleNavClick = () => {
@@ -161,22 +166,56 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="px-3 py-4 border-t border-gray-700">
-          <div className="px-3 py-2">
-            <p className="text-sm text-white font-medium">
-              {user?.displayName}
-            </p>
-            <p className="text-xs text-gray-400">{user?.email}</p>
+        {userCompanies.length > 1 && (
+          <div className="px-3 py-4 border-t border-gray-700" ref={dropdownRef}>
+            <div className="relative mb-2">
+              <button
+                onClick={() => setShowCompanyDropdown(!showCompanyDropdown)}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-sidebar-hover hover:text-white rounded-md transition-colors"
+                aria-label="Change company"
+                aria-expanded={showCompanyDropdown}
+                aria-haspopup="listbox"
+              >
+                <Building2 className="w-4 h-4" aria-hidden="true" />
+                <span className="flex-1 text-left truncate">
+                  {currentCompany?.companyId || "Select Company"}
+                </span>
+                <ChevronDown
+                  className={clsx(
+                    "w-4 h-4 transition-transform",
+                    showCompanyDropdown && "rotate-180",
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+              {showCompanyDropdown && (
+                <div
+                  className="absolute bottom-full left-0 right-0 mb-1 bg-sidebar-hover rounded-md shadow-lg py-1 z-10"
+                  role="listbox"
+                  aria-label="Select company"
+                >
+                  {userCompanies.map((company) => (
+                    <button
+                      key={company.companyId}
+                      onClick={() => handleCompanyChange(company.companyId)}
+                      className={clsx(
+                        "w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded-md transition-colors",
+                        company.companyId === currentCompanyId
+                          ? "bg-sidebar-active text-white"
+                          : "text-gray-300 hover:bg-sidebar-hover hover:text-white",
+                      )}
+                      role="option"
+                      aria-selected={company.companyId === currentCompanyId}
+                    >
+                      <Building2 className="w-4 h-4" aria-hidden="true" />
+                      <span className="truncate">{company.companyId}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-sidebar-hover hover:text-white rounded-md transition-colors"
-            aria-label="Logout"
-          >
-            <LogOut className="w-4 h-4" aria-hidden="true" />
-            <span>Logout</span>
-          </button>
-        </div>
+        )}
       </div>
     </>
   );

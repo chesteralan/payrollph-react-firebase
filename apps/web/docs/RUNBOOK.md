@@ -18,12 +18,12 @@ User → Firebase Hosting (CDN) → React SPA
 
 ## Monitoring Stack
 
-| Service | Purpose | Dashboard URL |
-|---------|---------|---------------|
-| **Sentry** | Error tracking, performance monitoring, release health | https://sentry.io/organizations/{org}/projects/payroll-web/ |
-| **Firebase Console** | Firestore metrics, Auth usage, Hosting status | https://console.firebase.google.com/project/{project-id}/ |
-| **Google Cloud Monitoring** | Uptime checks, infrastructure metrics | https://console.cloud.google.com/monitoring |
-| **UptimeRobot** | External uptime monitoring | https://uptimerobot.com/dashboard |
+| Service                     | Purpose                                                | Dashboard URL                                               |
+| --------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
+| **Sentry**                  | Error tracking, performance monitoring, release health | https://sentry.io/organizations/{org}/projects/payroll-web/ |
+| **Firebase Console**        | Firestore metrics, Auth usage, Hosting status          | https://console.firebase.google.com/project/{project-id}/   |
+| **Google Cloud Monitoring** | Uptime checks, infrastructure metrics                  | https://console.cloud.google.com/monitoring                 |
+| **UptimeRobot**             | External uptime monitoring                             | https://uptimerobot.com/dashboard                           |
 
 ## Health Check Endpoint
 
@@ -32,6 +32,7 @@ GET /api/health
 ```
 
 Returns:
+
 ```json
 {
   "status": "healthy",
@@ -53,12 +54,12 @@ Uptime monitors should check this endpoint every 5 minutes. Expected response: `
 
 ### Severity Levels
 
-| Level | Definition | Response Time | Examples |
-|-------|------------|---------------|----------|
-| **P0** | Critical — complete system outage | 15 min | Site down, cannot process payroll |
-| **P1** | High — major feature broken | 30 min | Payroll calculation errors, login broken |
-| **P2** | Medium — non-critical feature degraded | 2 hours | Export not working, UI issues |
-| **P3** | Low — cosmetic / minor bugs | Next business day | Typo in UI, styling issues |
+| Level  | Definition                             | Response Time     | Examples                                 |
+| ------ | -------------------------------------- | ----------------- | ---------------------------------------- |
+| **P0** | Critical — complete system outage      | 15 min            | Site down, cannot process payroll        |
+| **P1** | High — major feature broken            | 30 min            | Payroll calculation errors, login broken |
+| **P2** | Medium — non-critical feature degraded | 2 hours           | Export not working, UI issues            |
+| **P3** | Low — cosmetic / minor bugs            | Next business day | Typo in UI, styling issues               |
 
 ### Incident Response Steps
 
@@ -112,21 +113,21 @@ Uptime monitors should check this endpoint every 5 minutes. Expected response: `
 
 ### Sentry Alert Rules
 
-| Rule | Condition | Action | Severity |
-|------|-----------|--------|----------|
-| Crash spike | > 10 errors in 5 minutes | Slack notification | P0 |
-| New error type | First occurrence of an error | Slack notification | P1 |
-| Slow transaction | > 5s average duration on key transactions | Slack notification | P1 |
-| Error threshold | > 1% error rate over 1 hour | Email + Slack | P1 |
-| 404 spike | > 20 404s in 10 minutes | Slack notification | P2 |
+| Rule             | Condition                                 | Action             | Severity |
+| ---------------- | ----------------------------------------- | ------------------ | -------- |
+| Crash spike      | > 10 errors in 5 minutes                  | Slack notification | P0       |
+| New error type   | First occurrence of an error              | Slack notification | P1       |
+| Slow transaction | > 5s average duration on key transactions | Slack notification | P1       |
+| Error threshold  | > 1% error rate over 1 hour               | Email + Slack      | P1       |
+| 404 spike        | > 20 404s in 10 minutes                   | Slack notification | P2       |
 
 ### Uptime Monitoring Alerts
 
-| Check | Interval | Threshold | Action |
-|-------|----------|-----------|--------|
-| Health endpoint | 5 min | 3 consecutive failures | Slack + PagerDuty |
-| SSL certificate | 24 hours | Expiring in < 30 days | Email notification |
-| Response time | 5 min | > 5s average over 10 min | Slack notification |
+| Check           | Interval | Threshold                | Action             |
+| --------------- | -------- | ------------------------ | ------------------ |
+| Health endpoint | 5 min    | 3 consecutive failures   | Slack + PagerDuty  |
+| SSL certificate | 24 hours | Expiring in < 30 days    | Email notification |
+| Response time   | 5 min    | > 5s average over 10 min | Slack notification |
 
 ## Backup and Recovery
 
@@ -183,11 +184,11 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 ## Key Contacts
 
-| Role | Contact | Escalation |
-|------|---------|------------|
-| Developer On-Call | Slack: @dev-oncall | P0 immediate |
-| Database Admin | Slack: @dba | Data recovery |
-| Security | Slack: @security | Security incidents |
+| Role              | Contact            | Escalation         |
+| ----------------- | ------------------ | ------------------ |
+| Developer On-Call | Slack: @dev-oncall | P0 immediate       |
+| Database Admin    | Slack: @dba        | Data recovery      |
+| Security          | Slack: @security   | Security incidents |
 
 ## Maintenance Windows
 
@@ -202,6 +203,7 @@ firebase deploy --only firestore:rules,firestore:indexes
 Access at: `https://sentry.io/organizations/{org}/dashboards/payroll/`
 
 Key widgets:
+
 - **Error rate** — Errors per minute, colored by severity
 - **Transaction duration** — P50/P95/P99 for key transactions (payroll, DTR, reports)
 - **Release health** — Crash-free rate per version
@@ -213,6 +215,7 @@ Key widgets:
 Access at: `https://console.firebase.google.com/project/{project-id}/`
 
 Key metrics to monitor:
+
 - **Firestore reads/writes** — Ensure under free tier or budget limits
 - **Auth active users** — Track usage growth
 - **Hosting bandwidth** — Monitor for traffic spikes
@@ -227,13 +230,13 @@ Key metrics to monitor:
 
 ### Log Levels
 
-| Level | Usage | Example |
-|-------|-------|---------|
-| `fatal` | Unrecoverable errors | App crash |
-| `error` | Failed operations | Payroll save failed |
-| `warning` | Degraded functionality | Slow query > 1s |
-| `info` | Business metrics | Payroll created |
-| `debug` | Development only | Component render |
+| Level     | Usage                  | Example             |
+| --------- | ---------------------- | ------------------- |
+| `fatal`   | Unrecoverable errors   | App crash           |
+| `error`   | Failed operations      | Payroll save failed |
+| `warning` | Degraded functionality | Slow query > 1s     |
+| `info`    | Business metrics       | Payroll created     |
+| `debug`   | Development only       | Component render    |
 
 ## On-Call Checklist
 
