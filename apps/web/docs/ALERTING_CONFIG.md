@@ -33,50 +33,50 @@ beforeSend(event) {
 
 ### Grouping Rules (Sentry Console)
 
-| Rule | Description |
-|------|-------------|
-| **Merge by fingerprint** | Errors with same fingerprint → same issue |
-| **Stack trace grouping** | Group by top 3 frames of stack trace |
-| **Message grouping** | Group by error message pattern (with ID normalization) |
+| Rule                     | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| **Merge by fingerprint** | Errors with same fingerprint → same issue              |
+| **Stack trace grouping** | Group by top 3 frames of stack trace                   |
+| **Message grouping**     | Group by error message pattern (with ID normalization) |
 
 ## Alert Rules
 
 ### Critical Alerts (P0 — Slack + PagerDuty)
 
-| Rule | Condition | Threshold | Window |
-|------|-----------|-----------|--------|
-| **Crash Spike** | Unique errors > 10 | 10+ events | 5 minutes |
-| **New Critical Error** | New error type with `level=error` or `level=fatal` | 1+ events | 1 hour |
-| **Complete Outage** | Health check returns `unhealthy` | 3 consecutive failures | 15 minutes |
-| **Auth Failure Spike** | Firebase Auth errors | 50+ events | 5 minutes |
+| Rule                   | Condition                                          | Threshold              | Window     |
+| ---------------------- | -------------------------------------------------- | ---------------------- | ---------- |
+| **Crash Spike**        | Unique errors > 10                                 | 10+ events             | 5 minutes  |
+| **New Critical Error** | New error type with `level=error` or `level=fatal` | 1+ events              | 1 hour     |
+| **Complete Outage**    | Health check returns `unhealthy`                   | 3 consecutive failures | 15 minutes |
+| **Auth Failure Spike** | Firebase Auth errors                               | 50+ events             | 5 minutes  |
 
 ### High Priority Alerts (P1 — Slack notification)
 
-| Rule | Condition | Threshold | Window |
-|------|-----------|-----------|--------|
-| **Error Rate Spike** | Error rate > 1% of all events | 1%+ | 1 hour |
-| **Slow Transactions** | Transaction duration > 5s | 5+ transactions | 5 minutes |
-| **Firestore Errors** | Firestore permission denied / not found | 10+ events | 15 minutes |
-| **Payroll Errors** | Payroll calculation/processing errors | 5+ events | 15 minutes |
-| **Replay Errors** | Session replay captures crash | 3+ replays | 1 hour |
+| Rule                  | Condition                               | Threshold       | Window     |
+| --------------------- | --------------------------------------- | --------------- | ---------- |
+| **Error Rate Spike**  | Error rate > 1% of all events           | 1%+             | 1 hour     |
+| **Slow Transactions** | Transaction duration > 5s               | 5+ transactions | 5 minutes  |
+| **Firestore Errors**  | Firestore permission denied / not found | 10+ events      | 15 minutes |
+| **Payroll Errors**    | Payroll calculation/processing errors   | 5+ events       | 15 minutes |
+| **Replay Errors**     | Session replay captures crash           | 3+ replays      | 1 hour     |
 
 ### Warning Alerts (P2 — Email/Slack digest)
 
-| Rule | Condition | Threshold | Window |
-|------|-----------|-----------|--------|
-| **Deprecation Warnings** | API deprecation notices | 5+ events | 24 hours |
-| **Slow Queries** | Firestore queries > 1s | 20+ events | 1 hour |
-| **404 Not Found** | 404 responses on valid routes | 20+ events | 10 minutes |
-| **Rate Limit Hits** | Rate limited requests | 10+ events | 1 hour |
+| Rule                     | Condition                     | Threshold  | Window     |
+| ------------------------ | ----------------------------- | ---------- | ---------- |
+| **Deprecation Warnings** | API deprecation notices       | 5+ events  | 24 hours   |
+| **Slow Queries**         | Firestore queries > 1s        | 20+ events | 1 hour     |
+| **404 Not Found**        | 404 responses on valid routes | 20+ events | 10 minutes |
+| **Rate Limit Hits**      | Rate limited requests         | 10+ events | 1 hour     |
 
 ## Notification Channels
 
-| Channel | Purpose | P0 | P1 | P2 | P3 |
-|---------|---------|----|----|----|----|
-| **Slack #incidents** | Real-time critical alerts | ✅ | ✅ | ❌ | ❌ |
-| **Slack #engineering** | High priority team notifications | ❌ | ✅ | ✅ | ❌ |
-| **Email (dev team)** | Daily/Weekly digest | ❌ | ❌ | ✅ | ✅ |
-| **PagerDuty** | On-call escalation | ✅ | ❌ | ❌ | ❌ |
+| Channel                | Purpose                          | P0  | P1  | P2  | P3  |
+| ---------------------- | -------------------------------- | --- | --- | --- | --- |
+| **Slack #incidents**   | Real-time critical alerts        | ✅  | ✅  | ❌  | ❌  |
+| **Slack #engineering** | High priority team notifications | ❌  | ✅  | ✅  | ❌  |
+| **Email (dev team)**   | Daily/Weekly digest              | ❌  | ❌  | ✅  | ✅  |
+| **PagerDuty**          | On-call escalation               | ✅  | ❌  | ❌  | ❌  |
 
 ## Sentry Config
 
@@ -87,9 +87,9 @@ Sentry.init({
   dsn: VITE_SENTRY_DSN,
   environment: import.meta.env.MODE,
   release: import.meta.env.VITE_APP_VERSION,
-  tracesSampleRate: 0.1,           // 10% of transactions in production
-  replaysSessionSampleRate: 0.1,   // 10% of sessions recorded
-  replaysOnErrorSampleRate: 1.0,   // 100% of errors get replay
+  tracesSampleRate: 0.1, // 10% of transactions in production
+  replaysSessionSampleRate: 0.1, // 10% of sessions recorded
+  replaysOnErrorSampleRate: 1.0, // 100% of errors get replay
   beforeSend(event) {
     // Error grouping logic
   },
@@ -100,13 +100,13 @@ Sentry.init({
 
 ### Key Performance Indicators (KPIs)
 
-| Metric | Source | Alert Threshold |
-|--------|--------|-----------------|
-| Page load time | Sentry Browser | > 3s P75 |
-| Payroll process time | Sentry Custom Transaction | > 10s P95 |
-| Firestore read count | Sentry Breadcrumbs | > 100/action |
-| Error-free rate | Sentry Release Health | < 99% |
-| API error rate | Sentry Events | > 2% |
+| Metric               | Source                    | Alert Threshold |
+| -------------------- | ------------------------- | --------------- |
+| Page load time       | Sentry Browser            | > 3s P75        |
+| Payroll process time | Sentry Custom Transaction | > 10s P95       |
+| Firestore read count | Sentry Breadcrumbs        | > 100/action    |
+| Error-free rate      | Sentry Release Health     | < 99%           |
+| API error rate       | Sentry Events             | > 2%            |
 
 ### Dashboard Widgets (Sentry Dashboard)
 

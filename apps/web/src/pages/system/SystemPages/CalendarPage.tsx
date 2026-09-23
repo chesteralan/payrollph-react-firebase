@@ -78,27 +78,25 @@ export function CalendarPage() {
         </div>
       </div>
 
-      {showForm && (
-        <CalendarEventForm
-          formData={formData}
-          editingId={editingId}
-          onFormDataChange={setFormData}
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingId(null);
-          }}
-        />
-      )}
+      <CalendarEventForm
+        isOpen={showForm}
+        formData={formData}
+        editingId={editingId}
+        onFormDataChange={setFormData}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+      />
 
-      {showRecurringForm && (
-        <RecurringHolidayForm
-          formData={recurringFormData}
-          onFormDataChange={setRecurringFormData}
-          onSubmit={handleCreateRecurringHoliday}
-          onCancel={() => setShowRecurringForm(false)}
-        />
-      )}
+      <RecurringHolidayForm
+        isOpen={showRecurringForm}
+        formData={recurringFormData}
+        onFormDataChange={setRecurringFormData}
+        onSubmit={handleCreateRecurringHoliday}
+        onCancel={() => setShowRecurringForm(false)}
+      />
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading...</div>

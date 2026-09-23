@@ -7,7 +7,12 @@ const formatCurrency = (v: number) => `₱${v.toFixed(2)}`;
 
 const mockData: DeductionTypeSummary[] = [
   { deductionId: "1", name: "SSS Loan", totalAmount: 3000, employeeCount: 5 },
-  { deductionId: "2", name: "Pag-IBIG Loan", totalAmount: 1500, employeeCount: 3 },
+  {
+    deductionId: "2",
+    name: "Pag-IBIG Loan",
+    totalAmount: 1500,
+    employeeCount: 3,
+  },
 ];
 
 describe("DeductionsByTypeTable", () => {

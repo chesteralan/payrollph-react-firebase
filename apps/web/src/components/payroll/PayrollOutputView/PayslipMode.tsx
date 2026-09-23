@@ -71,28 +71,28 @@ export function PayslipMode({
                     const gross = row.salaryAmount + totalEarnings;
                     const net = gross - totalDeductions - totalBenefitsEE;
                     return `
-                  <div class="payslip" style="page-break-after:always;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-bottom:16px;font-family:system-ui;">
-                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:12px;margin-bottom:16px;">
-                      <div><h2 style="margin:0;">Payslip</h2><p style="margin:4px 0 0;color:#6b7280;font-size:14px;">${monthName} ${payroll.year}</p></div>
-                      <div style="text-align:right;font-size:14px;"><div style="font-weight:500;">${row.employeeCode}</div><div>${row.lastName}${row.firstName ? ", " + row.firstName : ""}</div></div>
+                  <div class="payslip border border-gray-200 rounded-lg p-6 mb-4 font-system-ui" style="page-break-after:always;">
+                    <div class="flex justify-between border-b border-gray-200 pb-3 mb-4">
+                      <div><h2 class="m-0">Payslip</h2><p class="mt-1 text-sm text-gray-500">${monthName} ${payroll.year}</p></div>
+                      <div class="text-right text-sm"><div class="font-medium">${row.employeeCode}</div><div>${row.lastName}${row.firstName ? ", " + row.firstName : ""}</div></div>
                     </div>
-                    <div style="margin-bottom:16px;">
-                      <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Earnings</h3>
-                      <div style="font-size:14px;">
-                        <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Basic Salary</span><span style="font-weight:500;">${formatCurrency(row.salaryAmount)}</span></div>
-                        ${earnings.map((e) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${e.name}</span><span>${formatCurrency(e.amount)}</span></div>`).join("")}
-                        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Earnings</span><span>${formatCurrency(row.salaryAmount + totalEarnings)}</span></div>
+                    <div class="mb-4">
+                      <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Earnings</h3>
+                      <div class="text-sm">
+                        <div class="flex justify-between py-1"><span>Basic Salary</span><span class="font-medium">${formatCurrency(row.salaryAmount)}</span></div>
+                        ${earnings.map((e) => `<div class="flex justify-between py-1"><span>${e.name}</span><span>${formatCurrency(e.amount)}</span></div>`).join("")}
+                        <div class="flex justify-between py-2 mt-1 border-t border-gray-200 font-semibold"><span>Total Earnings</span><span>${formatCurrency(row.salaryAmount + totalEarnings)}</span></div>
                       </div>
                     </div>
-                    <div style="margin-bottom:16px;">
-                      <h3 style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px;">Deductions</h3>
-                      <div style="font-size:14px;">
-                        ${deductions.map((d) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${d.name}</span><span>${formatCurrency(d.amount)}</span></div>`).join("")}
-                        ${benefits.map((b) => `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${b.name} (EE)</span><span>${formatCurrency(b.employeeShare)}</span></div>`).join("")}
-                        <div style="display:flex;justify-content:space-between;padding:8px 0 4px;border-top:1px solid #e5e7eb;font-weight:600;"><span>Total Deductions</span><span>${formatCurrency(totalDeductions + totalBenefitsEE)}</span></div>
+                    <div class="mb-4">
+                      <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Deductions</h3>
+                      <div class="text-sm">
+                        ${deductions.map((d) => `<div class="flex justify-between py-1"><span>${d.name}</span><span>${formatCurrency(d.amount)}</span></div>`).join("")}
+                        ${benefits.map((b) => `<div class="flex justify-between py-1"><span>${b.name} (EE)</span><span>${formatCurrency(b.employeeShare)}</span></div>`).join("")}
+                        <div class="flex justify-between py-2 mt-1 border-t border-gray-200 font-semibold"><span>Total Deductions</span><span>${formatCurrency(totalDeductions + totalBenefitsEE)}</span></div>
                       </div>
                     </div>
-                    <div style="background:#f9fafb;padding:16px;border-radius:8px;display:flex;justify-content:space-between;font-size:18px;font-weight:bold;"><span>Net Pay</span><span>${formatCurrency(net)}</span></div>
+                    <div class="bg-gray-50 p-4 rounded-lg flex justify-between text-lg font-bold"><span>Net Pay</span><span>${formatCurrency(net)}</span></div>
                   </div>`;
                   })
                   .join("");

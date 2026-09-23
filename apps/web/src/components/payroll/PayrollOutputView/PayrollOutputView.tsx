@@ -1,11 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import ExcelJS from "exceljs";
 import { Button } from "@/components/ui/Button";
-import {
-  Download,
-  FileSpreadsheet,
-  Printer,
-} from "lucide-react";
+import { Download, FileSpreadsheet, Printer } from "lucide-react";
 
 import type {
   OutputMode,
@@ -36,18 +32,20 @@ export function PayrollOutputView({
   const [filterGroup, setFilterGroup] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
   const [filterArea, setFilterArea] = useState("");
-  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
-    basic: true,
-    earnings: true,
-    gross: true,
-    deductions: true,
-    benefits: true,
-    net: true,
-    daysWorked: false,
-    absences: false,
-    late: false,
-    overtime: false,
-  });
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
+    {
+      basic: true,
+      earnings: true,
+      gross: true,
+      deductions: true,
+      benefits: true,
+      net: true,
+      daysWorked: false,
+      absences: false,
+      late: false,
+      overtime: false,
+    },
+  );
 
   const groups = useMemo(
     () => [...new Set(rows.map((r) => r.groupId).filter(Boolean))],
@@ -260,7 +258,12 @@ export function PayrollOutputView({
       bottom: borderStyle,
       left: borderStyle,
       right: borderStyle,
-      diagonal: { style: "thin", color: { argb: "FF000000" }, up: false, down: false },
+      diagonal: {
+        style: "thin",
+        color: { argb: "FF000000" },
+        up: false,
+        down: false,
+      },
     };
 
     ws.getRow(1).eachCell((cell) => {

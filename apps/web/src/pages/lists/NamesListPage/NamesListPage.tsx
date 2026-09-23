@@ -431,7 +431,18 @@ export function NamesListPage() {
             Import CSV
           </Button>
           {canAdd("lists", "names") && (
-            <Button onClick={() => setShowForm(!showForm)}>
+            <Button
+              onClick={() => {
+                setEditingId(null);
+                setFormData({
+                  firstName: "",
+                  middleName: "",
+                  lastName: "",
+                  suffix: "",
+                });
+                setShowForm(true);
+              }}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Name
             </Button>
@@ -446,47 +457,44 @@ export function NamesListPage() {
         onClear={clearSelection}
       />
 
-      {showImport && (
-        <CsvImportCard
-          csvPreview={csvPreview}
-          csvFileName={csvFileName}
-          importStats={importStats}
-          importing={importing}
-          onFileSelect={handleFileSelect}
-          onImport={handleImport}
-          onReset={resetImport}
-        />
-      )}
+      <CsvImportCard
+        isOpen={showImport}
+        csvPreview={csvPreview}
+        csvFileName={csvFileName}
+        importStats={importStats}
+        importing={importing}
+        onFileSelect={handleFileSelect}
+        onImport={handleImport}
+        onReset={resetImport}
+      />
 
-      {showForm && (
-        <NameForm
-          editingId={editingId}
-          formData={formData}
-          onUpdate={setFormData}
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingId(null);
-          }}
-        />
-      )}
+      <NameForm
+        isOpen={showForm}
+        editingId={editingId}
+        formData={formData}
+        onUpdate={setFormData}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+      />
 
-      {showBulkEdit && (
-        <BulkEditCard
-          selectedCount={selectedCount}
-          groups={groups}
-          positions={positions}
-          areas={areas}
-          statuses={statuses}
-          bulkEditData={bulkEditData}
-          bulkLoading={bulkLoading}
-          onUpdate={(field, value) =>
-            setBulkEditData((prev) => ({ ...prev, [field]: value }))
-          }
-          onApply={handleBulkEdit}
-          onCancel={() => setShowBulkEdit(false)}
-        />
-      )}
+      <BulkEditCard
+        isOpen={showBulkEdit}
+        selectedCount={selectedCount}
+        groups={groups}
+        positions={positions}
+        areas={areas}
+        statuses={statuses}
+        bulkEditData={bulkEditData}
+        bulkLoading={bulkLoading}
+        onUpdate={(field, value) =>
+          setBulkEditData((prev) => ({ ...prev, [field]: value }))
+        }
+        onApply={handleBulkEdit}
+        onCancel={() => setShowBulkEdit(false)}
+      />
 
       <div>
         <NamesTable
@@ -498,7 +506,9 @@ export function NamesListPage() {
           sortConfig={sortConfig}
           onToggleSelect={toggleSelect}
           onToggleSelectAll={toggleSelectAll}
-          onSort={(key: string) => handleSort(key as keyof (NameRecord & { fullName: string }))}
+          onSort={(key: string) =>
+            handleSort(key as keyof (NameRecord & { fullName: string }))
+          }
           onEdit={handleEdit}
           onDelete={handleDelete}
         />

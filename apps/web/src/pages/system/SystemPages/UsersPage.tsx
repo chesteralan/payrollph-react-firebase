@@ -16,7 +16,12 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useToast } from "@/hooks/useToast";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Plus, Upload } from "lucide-react";
-import type { Department, Section, UserAccount, UserRestriction } from "@/types";
+import type {
+  Department,
+  Section,
+  UserAccount,
+  UserRestriction,
+} from "@/types";
 import { BulkActionBar } from "./BulkActionBar";
 import { UserForm } from "./UserForm";
 import { UserImportCard } from "./UserImportCard";
@@ -83,9 +88,7 @@ export function UsersPage() {
   };
 
   useEffect(() => {
-     
     fetchUsers();
-     
   }, []);
 
   const filteredUsers = useMemo(() => {
@@ -458,18 +461,17 @@ export function UsersPage() {
         onClearSelection={clearSelection}
       />
 
-      {showForm && (
-        <UserForm
-          editingId={editingId}
-          formData={formData}
-          onChange={setFormData}
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingId(null);
-          }}
-        />
-      )}
+      <UserForm
+        isOpen={showForm}
+        editingId={editingId}
+        formData={formData}
+        onChange={setFormData}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+      />
 
       {showImport && (
         <UserImportCard

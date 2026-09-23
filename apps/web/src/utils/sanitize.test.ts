@@ -19,7 +19,7 @@ describe("sanitize utils", () => {
   describe("sanitizeString", () => {
     it("should escape HTML special characters", () => {
       expect(sanitizeString('<script>alert("xss")</script>')).toBe(
-        "&lt;script&gt;alert(&quot;xss&quot;)&lt;&#x2F;script&gt;"
+        "&lt;script&gt;alert(&quot;xss&quot;)&lt;&#x2F;script&gt;",
       );
     });
 
@@ -46,9 +46,7 @@ describe("sanitize utils", () => {
     });
 
     it("should handle string with only special characters", () => {
-      expect(sanitizeString("<>&\"'/")).toBe(
-        "&lt;&gt;&amp;&quot;&#x27;&#x2F;"
-      );
+      expect(sanitizeString("<>&\"'/")).toBe("&lt;&gt;&amp;&quot;&#x27;&#x2F;");
     });
   });
 
@@ -84,13 +82,13 @@ describe("sanitize utils", () => {
 
     it("should accept email with subdomains", () => {
       expect(sanitizeEmail("user@sub.example.com")).toBe(
-        "user@sub.example.com"
+        "user@sub.example.com",
       );
     });
 
     it("should accept email with plus addressing", () => {
       expect(sanitizeEmail("user+tag@example.com")).toBe(
-        "user+tag@example.com"
+        "user+tag@example.com",
       );
     });
   });
@@ -257,9 +255,7 @@ describe("sanitize utils", () => {
     });
 
     it("should remove script tags", () => {
-      expect(stripHtml('<script>alert("xss")</script>')).toBe(
-        'alert("xss")'
-      );
+      expect(stripHtml('<script>alert("xss")</script>')).toBe('alert("xss")');
     });
 
     it("should return empty string for non-string input", () => {
@@ -407,7 +403,7 @@ describe("sanitize utils", () => {
     });
 
     it("should detect javascript: URIs", () => {
-      expect(containsXss('javascript:alert(1)')).toBe(true);
+      expect(containsXss("javascript:alert(1)")).toBe(true);
     });
 
     it("should detect iframe tags", () => {
@@ -449,17 +445,13 @@ describe("sanitize utils", () => {
       const result = validateInput("hello world", { maxLength: 5 });
       expect(result.isValid).toBe(false);
       expect(result.sanitized).toBe("hello");
-      expect(result.errors).toContain(
-        "Input exceeds maximum length of 5"
-      );
+      expect(result.errors).toContain("Input exceeds maximum length of 5");
     });
 
     it("should enforce minLength", () => {
       const result = validateInput("hi", { minLength: 5 });
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Input must be at least 5 characters"
-      );
+      expect(result.errors).toContain("Input must be at least 5 characters");
     });
 
     it("should validate pattern", () => {
@@ -475,13 +467,13 @@ describe("sanitize utils", () => {
     });
 
     it("should detect XSS when not allowing HTML", () => {
-      const result = validateInput('<script>alert(1)</script>');
+      const result = validateInput("<script>alert(1)</script>");
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Input contains invalid characters");
     });
 
     it("should not flag XSS when allowHtml is true", () => {
-      const result = validateInput('<script>alert(1)</script>', {
+      const result = validateInput("<script>alert(1)</script>", {
         allowHtml: true,
       });
       expect(result.errors).not.toContain("Input contains invalid characters");

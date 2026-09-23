@@ -47,7 +47,9 @@ export async function performHealthCheck(): Promise<HealthStatus> {
   };
 
   const statuses = Object.values(checks).map((c) => c.status);
-  const overallStatus: HealthStatus["status"] = statuses.every((s) => s === "ok")
+  const overallStatus: HealthStatus["status"] = statuses.every(
+    (s) => s === "ok",
+  )
     ? "healthy"
     : statuses.some((s) => s === "error")
       ? "unhealthy"
@@ -80,7 +82,8 @@ async function checkFirestore(): Promise<ServiceCheck> {
   } catch (error) {
     return {
       status: "error",
-      message: error instanceof Error ? error.message : "Firestore check failed",
+      message:
+        error instanceof Error ? error.message : "Firestore check failed",
     };
   }
 }

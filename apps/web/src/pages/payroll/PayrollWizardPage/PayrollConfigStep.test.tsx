@@ -36,7 +36,9 @@ describe("PayrollConfigStep", () => {
 
   it("renders the name input", () => {
     render(<PayrollConfigStep {...defaultProps} />);
-    expect(screen.getByPlaceholderText("e.g., January 2026 Payroll")).toBeTruthy();
+    expect(
+      screen.getByPlaceholderText("e.g., January 2026 Payroll"),
+    ).toBeTruthy();
   });
 
   it("renders month select with month options", () => {
@@ -74,10 +76,7 @@ describe("PayrollConfigStep", () => {
 
   it("displays error for year when errors.year is set", () => {
     render(
-      <PayrollConfigStep
-        {...defaultProps}
-        errors={{ year: "Invalid year" }}
-      />,
+      <PayrollConfigStep {...defaultProps} errors={{ year: "Invalid year" }} />,
     );
     expect(screen.getByText("Invalid year")).toBeTruthy();
   });
@@ -123,9 +122,7 @@ describe("PayrollConfigStep", () => {
 
   it("calls onTermChange when term select changes", () => {
     const onTermChange = vi.fn();
-    render(
-      <PayrollConfigStep {...defaultProps} onTermChange={onTermChange} />,
-    );
+    render(<PayrollConfigStep {...defaultProps} onTermChange={onTermChange} />);
     fireEvent.change(screen.getByDisplayValue("No term"), {
       target: { value: "term1" },
     });
@@ -133,13 +130,7 @@ describe("PayrollConfigStep", () => {
   });
 
   it("hides template and term selects when arrays are empty", () => {
-    render(
-      <PayrollConfigStep
-        {...defaultProps}
-        templates={[]}
-        terms={[]}
-      />,
-    );
+    render(<PayrollConfigStep {...defaultProps} templates={[]} terms={[]} />);
     expect(screen.queryByText("Template (Optional)")).toBeNull();
     expect(screen.queryByText("Term (Optional)")).toBeNull();
   });

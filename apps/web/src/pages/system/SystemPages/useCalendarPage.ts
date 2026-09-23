@@ -54,9 +54,11 @@ export function useCalendarPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formData, setFormData] = useState<CalendarFormData>({ ...EMPTY_FORM });
-  const [recurringFormData, setRecurringFormData] = useState<RecurringFormData>({
-    ...EMPTY_RECURRING,
-  });
+  const [recurringFormData, setRecurringFormData] = useState<RecurringFormData>(
+    {
+      ...EMPTY_RECURRING,
+    },
+  );
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);

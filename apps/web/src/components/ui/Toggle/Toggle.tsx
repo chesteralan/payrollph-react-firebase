@@ -1,7 +1,9 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
-export interface ToggleProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
+export interface ToggleProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "onChange"
+> {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label?: string;

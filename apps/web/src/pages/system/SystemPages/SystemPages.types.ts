@@ -6,9 +6,5 @@ export interface CalendarEvent extends CalendarEntry {
 }
 
 export type Department =
-  | "payroll"
-  | "employees"
-  | "lists"
-  | "reports"
-  | "system";
+  "payroll" | "employees" | "lists" | "reports" | "system";
 export type Section = string;

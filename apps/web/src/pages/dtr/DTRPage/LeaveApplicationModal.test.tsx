@@ -63,7 +63,12 @@ describe("LeaveApplicationModal", () => {
 
   it("displays total days when both dates are provided", () => {
     setup({
-      leaveForm: { benefitId: "vacation", startDate: "2025-01-15", endDate: "2025-01-17", reason: "" },
+      leaveForm: {
+        benefitId: "vacation",
+        startDate: "2025-01-15",
+        endDate: "2025-01-17",
+        reason: "",
+      },
     });
     expect(screen.getByText("Total Days:")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();

@@ -44,8 +44,4 @@ export interface PayrollOutputViewProps {
 }
 
 export type OutputMode =
-  | "register"
-  | "payslip"
-  | "transmittal"
-  | "journal"
-  | "denomination";
+  "register" | "payslip" | "transmittal" | "journal" | "denomination";

@@ -33,11 +33,7 @@ export function BulkActionBar({
       <div className="flex gap-2">
         {canEdit("system", "users") && (
           <>
-            <Button
-              size="sm"
-              onClick={onActivate}
-              disabled={bulkLoading}
-            >
+            <Button size="sm" onClick={onActivate} disabled={bulkLoading}>
               Activate
             </Button>
             <Button

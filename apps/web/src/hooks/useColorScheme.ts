@@ -17,7 +17,9 @@ export function useColorScheme() {
     } else if (newMode === "light") {
       root.classList.remove("dark");
     } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
       root.classList.toggle("dark", prefersDark);
     }
   }, []);

@@ -5,8 +5,22 @@ import { DTRImportModal } from "./DTRImportModal";
 const defaultProps = {
   show: true,
   importPreview: [
-    { date: "2025-01-15", timeIn: "08:00", timeOut: "17:00", hoursWorked: 8, overtimeHours: 0, lateHours: 0 },
-    { date: "2025-01-16", timeIn: "09:00", timeOut: "18:00", hoursWorked: 8, overtimeHours: 1, lateHours: 0 },
+    {
+      date: "2025-01-15",
+      timeIn: "08:00",
+      timeOut: "17:00",
+      hoursWorked: 8,
+      overtimeHours: 0,
+      lateHours: 0,
+    },
+    {
+      date: "2025-01-16",
+      timeIn: "09:00",
+      timeOut: "18:00",
+      hoursWorked: 8,
+      overtimeHours: 1,
+      lateHours: 0,
+    },
   ],
   importErrors: [],
   onClose: vi.fn(),

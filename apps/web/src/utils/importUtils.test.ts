@@ -244,12 +244,7 @@ describe("findDuplicates", () => {
   });
 
   it("should handle multiple distinct duplicate groups", () => {
-    const data = [
-      { code: "X" },
-      { code: "Y" },
-      { code: "X" },
-      { code: "Y" },
-    ];
+    const data = [{ code: "X" }, { code: "Y" }, { code: "X" }, { code: "Y" }];
     const result = findDuplicates(data, "code");
     expect(result.count).toBe(4);
   });

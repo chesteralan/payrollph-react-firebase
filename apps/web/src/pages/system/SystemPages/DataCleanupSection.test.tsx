@@ -26,15 +26,9 @@ describe("DataCleanupSection", () => {
 
   it("shows cleanup operation buttons", () => {
     renderWithProviders(<DataCleanupSection {...defaultProps} />);
-    expect(
-      screen.getByText(/remove orphaned records/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/remove duplicate names/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/clear old dtr entries/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/remove orphaned records/i)).toBeInTheDocument();
+    expect(screen.getByText(/remove duplicate names/i)).toBeInTheDocument();
+    expect(screen.getByText(/clear old dtr entries/i)).toBeInTheDocument();
   });
 
   it("shows cleanup history when results exist", () => {

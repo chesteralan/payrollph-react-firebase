@@ -56,7 +56,9 @@ describe("ToastProvider & useToast", () => {
   it("renders message when provided", () => {
     renderWithProvider();
     fireEvent.click(screen.getByText("Add error with message"));
-    expect(screen.getAllByText("Details here").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Details here").length).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it("removes a toast via dismiss button", () => {

@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { collection, doc, getDoc, getDocs, query, type Query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  type Query,
+  where,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import type { CollectionName } from "../services/firestore";
 import { COLLECTION_SCHEMAS, type ValidationFailure } from "./schemas";

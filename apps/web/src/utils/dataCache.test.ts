@@ -368,11 +368,11 @@ describe("useMultiCache hook", () => {
   });
 
   it("should fetch all keys", async () => {
-    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-value`);
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(async (key: string) => `${key}-value`);
 
-    const { result } = renderHook(() =>
-      useMultiCache(["a", "b"], fetchFn),
-    );
+    const { result } = renderHook(() => useMultiCache(["a", "b"], fetchFn));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.results).toEqual({ a: "a-value", b: "b-value" });
@@ -380,11 +380,11 @@ describe("useMultiCache hook", () => {
 
   it("should use cached values when available", async () => {
     cache.set("a", "cached-a");
-    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-fetched`);
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(async (key: string) => `${key}-fetched`);
 
-    const { result } = renderHook(() =>
-      useMultiCache(["a", "b"], fetchFn),
-    );
+    const { result } = renderHook(() => useMultiCache(["a", "b"], fetchFn));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.results.a).toBe("cached-a");
@@ -398,9 +398,7 @@ describe("useMultiCache hook", () => {
       .mockRejectedValueOnce(new Error("Fail"))
       .mockResolvedValueOnce("ok");
 
-    const { result } = renderHook(() =>
-      useMultiCache(["a", "b"], fetchFn),
-    );
+    const { result } = renderHook(() => useMultiCache(["a", "b"], fetchFn));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.results.a).toBeNull();
@@ -418,11 +416,11 @@ describe("useMultiCache hook", () => {
   });
 
   it("should cache fetched results", async () => {
-    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-val`);
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(async (key: string) => `${key}-val`);
 
-    const { result } = renderHook(() =>
-      useMultiCache(["x", "y"], fetchFn),
-    );
+    const { result } = renderHook(() => useMultiCache(["x", "y"], fetchFn));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(cache.get("x")).toBe("x-val");
@@ -430,7 +428,9 @@ describe("useMultiCache hook", () => {
   });
 
   it("should pass ttl option to cache.set", async () => {
-    const fetchFn = vi.fn().mockImplementation(async (key: string) => `${key}-ttl`);
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(async (key: string) => `${key}-ttl`);
 
     const { result } = renderHook(() =>
       useMultiCache(["m"], fetchFn, { ttl: 3000 }),
@@ -445,9 +445,7 @@ describe("useMultiCache hook", () => {
     cache.set("b", "cached-b");
     const fetchFn = vi.fn();
 
-    const { result } = renderHook(() =>
-      useMultiCache(["a", "b"], fetchFn),
-    );
+    const { result } = renderHook(() => useMultiCache(["a", "b"], fetchFn));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.results).toEqual({ a: "cached-a", b: "cached-b" });

@@ -78,6 +78,8 @@ export function useActivityMonitor(maxActivities = 100): ActivityMonitor {
     clearActivities,
     activityCount: activities.length,
     lastActivity:
-      activities.length > 0 ? (activities[activities.length - 1] ?? null) : null,
+      activities.length > 0
+        ? (activities[activities.length - 1] ?? null)
+        : null,
   };
 }

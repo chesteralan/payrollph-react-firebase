@@ -11,8 +11,9 @@ import { db } from "@/config/firebase";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Sheet } from "@/components/ui/Sheet";
 import {
   ChevronDown,
   ChevronsUpDown,
@@ -51,12 +52,9 @@ export function DeductionsPage() {
     setLoading(false);
   };
 
-   
   useEffect(() => {
     fetchItems();
-     
   }, []);
-   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,214 +141,225 @@ export function DeductionsPage() {
             XLS
           </Button>
           {canAdd("lists", "deductions") && (
-            <Button onClick={() => setShowForm(!showForm)}>
+            <Button
+              onClick={() => {
+                setEditingId(null);
+                setFormData({
+                  name: "",
+                  description: "",
+                  type: "fixed",
+                  ruleValue: 0,
+                });
+                setShowForm(true);
+              }}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Deduction
             </Button>
           )}
         </div>
       </div>
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit" : "Add"} Deduction</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  id="name"
-                  label="Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Type
-                  </label>
-                  <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        type: e.target.value as "fixed" | "percentage",
-                      })
-                    }
-                  >
-                    <option value="fixed">Fixed Amount</option>
-                    <option value="percentage">Percentage</option>
-                  </select>
-                </div>
-                <Input
-                  id="description"
-                  label="Description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                />
-                {formData.type === "percentage" && (
-                  <Input
-                    id="ruleValue"
-                    label="Percentage (%)"
-                    type="number"
-                    value={String(formData.ruleValue)}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        ruleValue: Number(e.target.value),
-                      })
-                    }
-                  />
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit">{editingId ? "Update" : "Create"}</Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+      <Sheet
+        isOpen={showForm}
+        onClose={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+        title={editingId ? "Edit Deduction" : "Add Deduction"}
+        footer={
+          <div className="flex gap-2">
+            <Button type="submit" form="deduction-form">
+              {editingId ? "Update" : "Create"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowForm(false);
+                setEditingId(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        }
+      >
+        <form id="deduction-form" onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            id="name"
+            label="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type
+            </label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  type: e.target.value as "fixed" | "percentage",
+                })
+              }
+            >
+              <option value="fixed">Fixed Amount</option>
+              <option value="percentage">Percentage</option>
+            </select>
+          </div>
+          <Input
+            id="description"
+            label="Description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+          {formData.type === "percentage" && (
+            <Input
+              id="ruleValue"
+              label="Percentage (%)"
+              type="number"
+              value={String(formData.ruleValue)}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  ruleValue: Number(e.target.value),
+                })
+              }
+            />
+          )}
+        </form>
+      </Sheet>
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig?.key === "name" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("name")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Name
+                      {sortConfig?.key === "name" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
                       ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Description
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Type
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Description
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Type
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : sortedItems.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No deductions found
-                  </td>
-                </tr>
-              ) : (
-                sortedItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {item.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {item.description || "-"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                          item.type === "percentage"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {item.type === "percentage"
-                          ? `${item.ruleValue}%`
-                          : "Fixed"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(item)}
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${
-                          item.isActive
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {item.isActive ? "Active" : "Inactive"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canEdit("lists", "deductions") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingId(item.id);
-                              setFormData({
-                                name: item.name,
-                                description: item.description || "",
-                                type: item.type,
-                                ruleValue: item.ruleValue || 0,
-                              });
-                              setShowForm(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("lists", "deductions") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : sortedItems.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No deductions found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {item.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {item.description || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                            item.type === "percentage"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {item.type === "percentage"
+                            ? `${item.ruleValue}%`
+                            : "Fixed"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleToggleStatus(item)}
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                            item.isActive
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {canEdit("lists", "deductions") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingId(item.id);
+                                setFormData({
+                                  name: item.name,
+                                  description: item.description || "",
+                                  type: item.type,
+                                  ruleValue: item.ruleValue || 0,
+                                });
+                                setShowForm(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canDelete("lists", "deductions") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

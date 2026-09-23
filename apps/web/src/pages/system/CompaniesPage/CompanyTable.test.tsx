@@ -12,7 +12,13 @@ const mockCompany: Company = {
   defaultWorkdays: 22,
   isActive: true,
   isDeleted: false,
-  columnGroup: { dtr: true, salaries: true, earnings: false, benefits: false, deductions: false },
+  columnGroup: {
+    dtr: true,
+    salaries: true,
+    earnings: false,
+    benefits: false,
+    deductions: false,
+  },
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -52,7 +58,9 @@ describe("CompanyTable", () => {
   });
 
   it("shows loading state", () => {
-    renderWithProviders(<CompanyTable {...defaultProps} companies={[]} loading={true} />);
+    renderWithProviders(
+      <CompanyTable {...defaultProps} companies={[]} loading={true} />,
+    );
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
@@ -63,12 +71,16 @@ describe("CompanyTable", () => {
 
   it("renders search input", () => {
     renderWithProviders(<CompanyTable {...defaultProps} />);
-    expect(screen.getByPlaceholderText(/search companies/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/search companies/i),
+    ).toBeInTheDocument();
   });
 
   it("displays Archived status for deleted companies", () => {
     const deletedCompany = { ...mockCompany, isDeleted: true };
-    renderWithProviders(<CompanyTable {...defaultProps} companies={[deletedCompany]} />);
+    renderWithProviders(
+      <CompanyTable {...defaultProps} companies={[deletedCompany]} />,
+    );
     expect(screen.getByText("Archived")).toBeInTheDocument();
   });
 });
