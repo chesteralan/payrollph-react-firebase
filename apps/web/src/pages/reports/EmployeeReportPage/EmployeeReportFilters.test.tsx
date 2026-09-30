@@ -12,13 +12,28 @@ const filters: FilterType = {
 };
 
 const groups: EmployeeGroup[] = [
-  { id: "g1", name: "Engineering", companyId: "c1", isActive: true } as EmployeeGroup,
+  {
+    id: "g1",
+    name: "Engineering",
+    companyId: "c1",
+    isActive: true,
+  } as EmployeeGroup,
 ];
 const positions: EmployeePosition[] = [
-  { id: "p1", name: "Developer", companyId: "c1", isActive: true } as EmployeePosition,
+  {
+    id: "p1",
+    name: "Developer",
+    companyId: "c1",
+    isActive: true,
+  } as EmployeePosition,
 ];
 const areas: EmployeeArea[] = [
-  { id: "a1", name: "Main Office", companyId: "c1", isActive: true } as EmployeeArea,
+  {
+    id: "a1",
+    name: "Main Office",
+    companyId: "c1",
+    isActive: true,
+  } as EmployeeArea,
 ];
 
 describe("EmployeeReportFilters", () => {

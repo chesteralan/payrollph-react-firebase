@@ -272,7 +272,10 @@ export const processDueReports = async (): Promise<void> => {
   }
 };
 
-const exportToXlsx = async (data: unknown[], _name: string): Promise<string> => {
+const exportToXlsx = async (
+  data: unknown[],
+  _name: string,
+): Promise<string> => {
   const ExcelJS = (await import("exceljs")).default;
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Report");

@@ -101,7 +101,6 @@ export function CompanySettingsPage() {
 
   useEffect(() => {
     if (selectedCompanyId) {
-       
       fetchSettings(selectedCompanyId);
     }
   }, [selectedCompanyId]);

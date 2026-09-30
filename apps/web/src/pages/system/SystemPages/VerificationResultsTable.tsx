@@ -32,61 +32,61 @@ export function VerificationResultsTable({
           </div>
         ) : (
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Check Name
-                </th>
-                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Details
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Issues
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {results.map((result, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {result.name}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        result.status === "Pass"
-                          ? "bg-green-100 text-green-800"
-                          : result.status === "Fail"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {result.status === "Pass" && (
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                      )}
-                      {result.status === "Fail" && (
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                      )}
-                      {result.status === "Warning" && (
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                      )}
-                      {result.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {result.details}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                    {result.issueCount}
-                  </td>
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Check Name
+                  </th>
+                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Details
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Issues
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {results.map((result, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      {result.name}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          result.status === "Pass"
+                            ? "bg-green-100 text-green-800"
+                            : result.status === "Fail"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {result.status === "Pass" && (
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                        )}
+                        {result.status === "Fail" && (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
+                        {result.status === "Warning" && (
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                        )}
+                        {result.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {result.details}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
+                      {result.issueCount}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </CardContent>

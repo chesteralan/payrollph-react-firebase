@@ -26,9 +26,7 @@ describe("VerificationResultsTable", () => {
 
   it("shows prompt when no results", () => {
     renderWithProviders(<VerificationResultsTable {...defaultProps} />);
-    expect(
-      screen.getByText(/click "run verification"/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/click "run verification"/i)).toBeInTheDocument();
   });
 
   it("displays results when provided", () => {
@@ -52,8 +50,6 @@ describe("VerificationResultsTable", () => {
     renderWithProviders(
       <VerificationResultsTable {...defaultProps} verifying={true} />,
     );
-    expect(
-      screen.getByRole("button", { name: /verifying/i }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: /verifying/i })).toBeDisabled();
   });
 });

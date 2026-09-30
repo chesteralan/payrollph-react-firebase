@@ -93,9 +93,7 @@ export function DataCleanupSection({
               max={365}
             />
             <span className="text-sm text-gray-500">days</span>
-            <span className="text-sm text-gray-500 ml-4">
-              Archive cutoff:
-            </span>
+            <span className="text-sm text-gray-500 ml-4">Archive cutoff:</span>
             <input
               type="number"
               value={archiveYears}
@@ -150,50 +148,48 @@ export function DataCleanupSection({
 
         {cleanupResults.length > 0 && (
           <div className="mt-6">
-            <h4 className="font-medium text-gray-900 mb-3">
-              Cleanup History
-            </h4>
+            <h4 className="font-medium text-gray-900 mb-3">Cleanup History</h4>
             <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Operation
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Records
-                  </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Time (ms)
-                  </th>
-                  <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {cleanupResults.map((result, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {result.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 text-right">
-                      {result.count}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 text-right">
-                      {result.time}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${result.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                      >
-                        {result.success ? "Success" : "Failed"}
-                      </span>
-                    </td>
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      Operation
+                    </th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      Records
+                    </th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      Time (ms)
+                    </th>
+                    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {cleanupResults.map((result, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {result.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-right">
+                        {result.count}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 text-right">
+                        {result.time}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${result.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                        >
+                          {result.success ? "Success" : "Failed"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

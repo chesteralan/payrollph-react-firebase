@@ -25,9 +25,7 @@ describe("CalendarEventForm", () => {
     expect(
       screen.getByRole("heading", { name: /add calendar entry/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /create/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
   });
 
   it("renders Edit form when editingId is set", () => {
@@ -37,9 +35,7 @@ describe("CalendarEventForm", () => {
     expect(
       screen.getByRole("heading", { name: /edit calendar entry/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /update/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /update/i })).toBeInTheDocument();
   });
 
   it("displays form field values", () => {

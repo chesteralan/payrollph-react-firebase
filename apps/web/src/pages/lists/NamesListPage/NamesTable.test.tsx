@@ -13,8 +13,20 @@ vi.mock("@/hooks/usePermissions", () => ({
 }));
 
 const mockNames: (NameRecord & { fullName: string })[] = [
-  { id: "1", firstName: "Juan", lastName: "Dela Cruz", fullName: "Juan Dela Cruz" },
-  { id: "2", firstName: "Maria", middleName: "Santos", lastName: "Reyes", suffix: "Jr.", fullName: "Maria Santos Reyes Jr." },
+  {
+    id: "1",
+    firstName: "Juan",
+    lastName: "Dela Cruz",
+    fullName: "Juan Dela Cruz",
+  },
+  {
+    id: "2",
+    firstName: "Maria",
+    middleName: "Santos",
+    lastName: "Reyes",
+    suffix: "Jr.",
+    fullName: "Maria Santos Reyes Jr.",
+  },
 ];
 
 const defaultProps = {

@@ -24,14 +24,12 @@ export function YearEndReportPage() {
   const [loading, setLoading] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
 
-   
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false);
       setSummaries([]);
     }
   }, [currentCompanyId]);
-   
 
   const generateReport = async () => {
     if (!currentCompanyId) return;
@@ -378,81 +376,81 @@ export function YearEndReportPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Employee
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Runs
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Basic Salary
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Earnings
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Benefits
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Gross Pay
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Net Pay
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {summaries.map((s, i) => (
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                            {s.employeeName}
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Employee
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Runs
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Basic Salary
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Earnings
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Benefits
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Gross Pay
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Net Pay
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {summaries.map((s, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                              {s.employeeName}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {s.payrollRuns}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {formatCurrency(s.totalBasicSalary)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {formatCurrency(s.totalEarnings)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {formatCurrency(s.totalBenefits)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right font-medium">
+                              {formatCurrency(s.totalGrossPay)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right font-semibold">
+                              {formatCurrency(s.totalNetPay)}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                          <td className="px-6 py-4">Total</td>
+                          <td className="px-6 py-4 text-right">
+                            {totals.totalPayrollRuns}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {s.payrollRuns}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totals.totalBasicSalary)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {formatCurrency(s.totalBasicSalary)}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totals.totalEarnings)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {formatCurrency(s.totalEarnings)}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totals.totalBenefits)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {formatCurrency(s.totalBenefits)}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totals.totalGrossPay)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-right font-medium">
-                            {formatCurrency(s.totalGrossPay)}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-right font-semibold">
-                            {formatCurrency(s.totalNetPay)}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totals.totalNetPay)}
                           </td>
                         </tr>
-                      ))}
-                      <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                        <td className="px-6 py-4">Total</td>
-                        <td className="px-6 py-4 text-right">
-                          {totals.totalPayrollRuns}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totals.totalBasicSalary)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totals.totalEarnings)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totals.totalBenefits)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totals.totalGrossPay)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totals.totalNetPay)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

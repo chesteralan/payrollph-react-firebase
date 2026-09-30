@@ -40,9 +40,7 @@ const defaultProps = {
 describe("UsersTable", () => {
   it("renders the search bar", () => {
     renderWithProviders(<UsersTable {...defaultProps} />);
-    expect(
-      screen.getByPlaceholderText(/search users/i),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/search users/i)).toBeInTheDocument();
   });
 
   it("displays user count", () => {

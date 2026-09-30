@@ -6,21 +6,23 @@ import { type Page } from "@playwright/test";
  */
 export async function mockFirebaseAuth(page: Page) {
   // Mock the identitytoolkit verifyPassword response
-  await page.route("**/identitytoolkit/v1/accounts:signInWithPassword**", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        kind: "identitytoolkit#VerifyPasswordResponse",
-        localId: "test-user-uid",
-        email: "test@example.com",
-        displayName: "Test User",
-        idToken: "mock-id-token",
-        registered: true,
-        refreshToken: "mock-refresh-token",
-        expiresIn: "3600",
+  await page.route(
+    "**/identitytoolkit/v1/accounts:signInWithPassword**",
+    (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          kind: "identitytoolkit#VerifyPasswordResponse",
+          localId: "test-user-uid",
+          email: "test@example.com",
+          displayName: "Test User",
+          idToken: "mock-id-token",
+          registered: true,
+          refreshToken: "mock-refresh-token",
+          expiresIn: "3600",
+        }),
       }),
-    }),
   );
 
   // Mock the SecureToken API refresh

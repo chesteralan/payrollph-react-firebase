@@ -72,7 +72,9 @@ export const CalendarEventSchema = z.object({
   companyId: z.string(),
   title: z.string().min(1, "Event title is required"),
   date: z.coerce.date(),
-  type: z.enum(["regular_holiday", "special_holiday", "event", "deadline"]).optional(),
+  type: z
+    .enum(["regular_holiday", "special_holiday", "event", "deadline"])
+    .optional(),
   description: z.string().optional(),
   recurring: z.boolean().optional(),
   createdBy: z.string().optional(),

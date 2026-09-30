@@ -74,12 +74,7 @@ export interface EmployeeProfile {
 }
 
 export type DocumentCategory =
-  | "ID"
-  | "Contract"
-  | "Tax Form"
-  | "Medical"
-  | "Certificate"
-  | "Other";
+  "ID" | "Contract" | "Tax Form" | "Medical" | "Certificate" | "Other";
 
 export interface EmployeeDocument {
   id: string;

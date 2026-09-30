@@ -45,8 +45,20 @@ export function DashboardPage() {
     publishedPayrolls: 0,
     totalCompanies: 0,
     recentActivities: 0,
-    upcomingPayrolls: [] as Array<{id: string; name: string; status: string; month: number; year: number}>,
-    recentPayrolls: [] as Array<{id: string; name: string; status: string; month: number; year: number}>,
+    upcomingPayrolls: [] as Array<{
+      id: string;
+      name: string;
+      status: string;
+      month: number;
+      year: number;
+    }>,
+    recentPayrolls: [] as Array<{
+      id: string;
+      name: string;
+      status: string;
+      month: number;
+      year: number;
+    }>,
   });
   const [loading, setLoading] = useState(true);
 
@@ -145,7 +157,6 @@ export function DashboardPage() {
 
   useEffect(() => {
     if (currentCompanyId) {
-       
       loadDashboard();
     }
   }, [currentCompanyId, loadDashboard]);

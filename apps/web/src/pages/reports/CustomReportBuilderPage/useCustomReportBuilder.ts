@@ -4,7 +4,10 @@ import { db } from "@/config/firebase";
 import { useCompany } from "@/hooks/useCompany";
 import type { Employee, Payroll, PayrollEmployee } from "@/types";
 import { exportToXLS } from "@/utils/exportUtils";
-import type { ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
+import type {
+  ReportFilter,
+  SavedReport,
+} from "./CustomReportBuilderPage.types";
 import { AVAILABLE_FIELDS } from "./CustomReportBuilderPage.constants";
 
 export function useCustomReportBuilder() {
@@ -153,13 +156,9 @@ export function useCustomReportBuilder() {
 
       // Apply grouping
       if (groupBy) {
-        const grouped = data.reduce<
-          Record<string, Record<string, unknown>[]>
-        >(
+        const grouped = data.reduce<Record<string, Record<string, unknown>[]>>(
           (acc, row) => {
-            const key = String(
-              row[groupBy as keyof typeof row] || "Unknown",
-            );
+            const key = String(row[groupBy as keyof typeof row] || "Unknown");
             if (!acc[key]) acc[key] = [];
             acc[key]?.push(row);
             return acc;
@@ -197,9 +196,7 @@ export function useCustomReportBuilder() {
     exportToXLS(
       previewData.filter((row) => !row.__isGroupHeader),
       {
-        filename: `custom_report_${
-          new Date().toISOString().split("T")[0]
-        }`,
+        filename: `custom_report_${new Date().toISOString().split("T")[0]}`,
         columns,
         sheetName: "Custom Report",
       },

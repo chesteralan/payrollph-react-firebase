@@ -19,10 +19,10 @@ describe("EmptyState", () => {
   });
 
   it("renders action when provided", () => {
-    render(
-      <EmptyState title="Empty" action={<button>Add item</button>} />,
-    );
-    expect(screen.getByRole("button", { name: /add item/i })).toBeInTheDocument();
+    render(<EmptyState title="Empty" action={<button>Add item</button>} />);
+    expect(
+      screen.getByRole("button", { name: /add item/i }),
+    ).toBeInTheDocument();
   });
 
   it("has status role", () => {

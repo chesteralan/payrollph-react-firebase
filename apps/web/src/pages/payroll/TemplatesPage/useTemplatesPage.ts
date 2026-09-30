@@ -156,16 +156,13 @@ export function useTemplatesPage() {
     );
   };
 
-   
   useEffect(() => {
     fetchTemplates();
   }, []);
-   
-   
+
   useEffect(() => {
     fetchLookups();
   }, []);
-   
 
   const toggleItem = (
     list: string[],

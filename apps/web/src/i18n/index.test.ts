@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  loadMessages,
-  interpolate,
-  t,
-  setHtmlLang,
-} from "./index";
+import { loadMessages, interpolate, t, setHtmlLang } from "./index";
 import type { LocaleMessages } from "./index";
 
 describe("i18n", () => {

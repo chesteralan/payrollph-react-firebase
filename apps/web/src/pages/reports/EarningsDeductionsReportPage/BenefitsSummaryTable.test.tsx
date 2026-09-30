@@ -6,8 +6,20 @@ import type { BenefitSummary } from "./EarningsDeductionsReportPage.types";
 const formatCurrency = (v: number) => `₱${v.toFixed(2)}`;
 
 const mockData: BenefitSummary[] = [
-  { benefitId: "1", name: "SSS", totalEE: 1000, totalER: 2000, employeeCount: 10 },
-  { benefitId: "2", name: "PhilHealth", totalEE: 500, totalER: 500, employeeCount: 8 },
+  {
+    benefitId: "1",
+    name: "SSS",
+    totalEE: 1000,
+    totalER: 2000,
+    employeeCount: 10,
+  },
+  {
+    benefitId: "2",
+    name: "PhilHealth",
+    totalEE: 500,
+    totalER: 500,
+    employeeCount: 8,
+  },
 ];
 
 describe("BenefitsSummaryTable", () => {

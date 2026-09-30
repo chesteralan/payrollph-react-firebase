@@ -22,10 +22,8 @@ const mockOnAuthStateChanged = vi.fn();
 vi.mock("@/config/firebase", () => ({
   auth: {
     currentUser: null,
-    onAuthStateChanged: (
-      _auth: unknown,
-      cb: (user: unknown) => void,
-    ) => mockOnAuthStateChanged(_auth, cb),
+    onAuthStateChanged: (_auth: unknown, cb: (user: unknown) => void) =>
+      mockOnAuthStateChanged(_auth, cb),
     signOut: vi.fn().mockResolvedValue(undefined),
   },
   db: {},
@@ -41,18 +39,10 @@ function TestConsumer() {
     <div>
       <div data-testid="loading">{String(ctx.loading)}</div>
       <div data-testid="user-name">{ctx.user?.displayName ?? "none"}</div>
-      <div data-testid="company-id">
-        {ctx.currentCompanyId ?? "none"}
-      </div>
-      <div data-testid="session-expiring">
-        {String(ctx.sessionExpiring)}
-      </div>
-      <div data-testid="restrictions-count">
-        {ctx.restrictions.length}
-      </div>
-      <div data-testid="has-user">
-        {String(ctx.firebaseUser !== null)}
-      </div>
+      <div data-testid="company-id">{ctx.currentCompanyId ?? "none"}</div>
+      <div data-testid="session-expiring">{String(ctx.sessionExpiring)}</div>
+      <div data-testid="restrictions-count">{ctx.restrictions.length}</div>
+      <div data-testid="has-user">{String(ctx.firebaseUser !== null)}</div>
     </div>
   );
 }
@@ -113,10 +103,12 @@ describe("AuthProvider", () => {
   });
 
   it("should call signOut on logout", async () => {
-    const mockAuthOnAuthChanged = vi.fn((_auth: unknown, cb: (user: unknown) => void) => {
-      setTimeout(() => cb(null), 10);
-      return vi.fn();
-    });
+    const mockAuthOnAuthChanged = vi.fn(
+      (_auth: unknown, cb: (user: unknown) => void) => {
+        setTimeout(() => cb(null), 10);
+        return vi.fn();
+      },
+    );
 
     mockOnAuthStateChanged.mockImplementation(mockAuthOnAuthChanged);
 

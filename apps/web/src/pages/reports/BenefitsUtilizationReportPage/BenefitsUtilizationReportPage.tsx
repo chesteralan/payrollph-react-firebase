@@ -33,14 +33,12 @@ export function BenefitsUtilizationReportPage() {
     null,
   );
 
-   
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false);
       setBenefits([]);
     }
   }, [currentCompanyId]);
-   
 
   const generateReport = async () => {
     if (!currentCompanyId) return;
@@ -417,131 +415,134 @@ export function BenefitsUtilizationReportPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Benefit
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Employees
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          EE Share
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          ER Share
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Total Cost
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {benefits.map((b) => (
-                        <>
-                          <tr
-                            key={b.benefitId}
-                            className="hover:bg-gray-50 cursor-pointer"
-                            onClick={() => toggleExpand(b.benefitId)}
-                          >
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                              {b.benefitName}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right">
-                              {b.employeeCount}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right">
-                              {formatCurrency(b.totalEmployeeShare)}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right">
-                              {formatCurrency(b.totalEmployerShare)}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right font-semibold">
-                              {formatCurrency(b.totalCost)}
-                            </td>
-                          </tr>
-                          {expandedBenefitId === b.benefitId && (
-                            <tr>
-                              <td colSpan={5} className="px-6 py-4 bg-gray-50">
-                                <div className="ml-4">
-                                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                                    Employee Breakdown
-                                  </h4>
-                                  <table className="w-full">
-                                    <thead>
-                                      <tr className="text-xs text-gray-500 border-b">
-                                        <th className="text-left pb-2">
-                                          Employee
-                                        </th>
-                                        <th className="text-left pb-2">
-                                          Group
-                                        </th>
-                                        <th className="text-left pb-2">
-                                          Payroll
-                                        </th>
-                                        <th className="text-left pb-2">
-                                          Period
-                                        </th>
-                                        <th className="text-right pb-2">
-                                          EE Share
-                                        </th>
-                                        <th className="text-right pb-2">
-                                          ER Share
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {b.employees.map((e, i) => (
-                                        <tr
-                                          key={i}
-                                          className="border-b border-gray-100"
-                                        >
-                                          <td className="py-2 text-sm text-gray-700">
-                                            {e.employeeName}
-                                          </td>
-                                          <td className="py-2 text-sm text-gray-500">
-                                            {e.groupName}
-                                          </td>
-                                          <td className="py-2 text-sm text-gray-500">
-                                            {e.payrollName}
-                                          </td>
-                                          <td className="py-2 text-sm text-gray-500">
-                                            {e.period}
-                                          </td>
-                                          <td className="py-2 text-sm text-right">
-                                            {formatCurrency(e.employeeShare)}
-                                          </td>
-                                          <td className="py-2 text-sm text-right">
-                                            {formatCurrency(e.employerShare)}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Benefit
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Employees
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            EE Share
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            ER Share
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Total Cost
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {benefits.map((b) => (
+                          <>
+                            <tr
+                              key={b.benefitId}
+                              className="hover:bg-gray-50 cursor-pointer"
+                              onClick={() => toggleExpand(b.benefitId)}
+                            >
+                              <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                {b.benefitName}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right">
+                                {b.employeeCount}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right">
+                                {formatCurrency(b.totalEmployeeShare)}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right">
+                                {formatCurrency(b.totalEmployerShare)}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right font-semibold">
+                                {formatCurrency(b.totalCost)}
                               </td>
                             </tr>
-                          )}
-                        </>
-                      ))}
-                      <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                        <td className="px-6 py-4">Total</td>
-                        <td className="px-6 py-4 text-right">
-                          {totalEmployees}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totalEE)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totalER)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totalCost)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                            {expandedBenefitId === b.benefitId && (
+                              <tr>
+                                <td
+                                  colSpan={5}
+                                  className="px-6 py-4 bg-gray-50"
+                                >
+                                  <div className="ml-4">
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                                      Employee Breakdown
+                                    </h4>
+                                    <table className="w-full">
+                                      <thead>
+                                        <tr className="text-xs text-gray-500 border-b">
+                                          <th className="text-left pb-2">
+                                            Employee
+                                          </th>
+                                          <th className="text-left pb-2">
+                                            Group
+                                          </th>
+                                          <th className="text-left pb-2">
+                                            Payroll
+                                          </th>
+                                          <th className="text-left pb-2">
+                                            Period
+                                          </th>
+                                          <th className="text-right pb-2">
+                                            EE Share
+                                          </th>
+                                          <th className="text-right pb-2">
+                                            ER Share
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {b.employees.map((e, i) => (
+                                          <tr
+                                            key={i}
+                                            className="border-b border-gray-100"
+                                          >
+                                            <td className="py-2 text-sm text-gray-700">
+                                              {e.employeeName}
+                                            </td>
+                                            <td className="py-2 text-sm text-gray-500">
+                                              {e.groupName}
+                                            </td>
+                                            <td className="py-2 text-sm text-gray-500">
+                                              {e.payrollName}
+                                            </td>
+                                            <td className="py-2 text-sm text-gray-500">
+                                              {e.period}
+                                            </td>
+                                            <td className="py-2 text-sm text-right">
+                                              {formatCurrency(e.employeeShare)}
+                                            </td>
+                                            <td className="py-2 text-sm text-right">
+                                              {formatCurrency(e.employerShare)}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </>
+                        ))}
+                        <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                          <td className="px-6 py-4">Total</td>
+                          <td className="px-6 py-4 text-right">
+                            {totalEmployees}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totalEE)}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totalER)}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totalCost)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

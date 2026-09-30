@@ -50,12 +50,16 @@ describe("UserForm", () => {
 
   it("hides password field when editing", () => {
     renderWithProviders(
-      <UserForm {...defaultProps} editingId="abc123" formData={{
-        username: "jdoe",
-        email: "jdoe@test.com",
-        displayName: "John Doe",
-        password: "",
-      }} />,
+      <UserForm
+        {...defaultProps}
+        editingId="abc123"
+        formData={{
+          username: "jdoe",
+          email: "jdoe@test.com",
+          displayName: "John Doe",
+          password: "",
+        }}
+      />,
     );
     expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
   });

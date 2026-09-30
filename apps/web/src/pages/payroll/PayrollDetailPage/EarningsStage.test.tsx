@@ -107,9 +107,7 @@ describe("EarningsStage", () => {
   });
 
   it("renders earning values from data", () => {
-    const earningData = new Map([
-      ["emp-1", new Map([["e1", 5000]])],
-    ]);
+    const earningData = new Map([["emp-1", new Map([["e1", 5000]])]]);
     render(
       <EarningsStage
         rows={[mockRow]}

@@ -4,12 +4,7 @@ export interface DTRPageDayForm {
   overtimeHours: number;
   lateHours: number;
   absenceType:
-    | "absent"
-    | "late"
-    | "undertime"
-    | "sick"
-    | "vacation"
-    | undefined;
+    "absent" | "late" | "undertime" | "sick" | "vacation" | undefined;
   absenceReason: string;
   notes: string;
 }

@@ -120,7 +120,9 @@ describe("DTRSummaryTable", () => {
   it("renders employee data in table rows", () => {
     render(
       <DTRSummaryTable
-        entries={makeEntries([{ employeeName: "Jane Smith", employeeCode: "EMP002" }])}
+        entries={makeEntries([
+          { employeeName: "Jane Smith", employeeCode: "EMP002" },
+        ])}
         searchQuery=""
         onSearchChange={vi.fn()}
         selectedMonth={0}
@@ -173,7 +175,9 @@ describe("DTRSummaryTable", () => {
   it("displays hours worked, overtime, and late values", () => {
     render(
       <DTRSummaryTable
-        entries={makeEntries([{ hoursWorked: 8, overtimeHours: 2, lateHours: 0.5 }])}
+        entries={makeEntries([
+          { hoursWorked: 8, overtimeHours: 2, lateHours: 0.5 },
+        ])}
         searchQuery=""
         onSearchChange={vi.fn()}
         selectedMonth={0}

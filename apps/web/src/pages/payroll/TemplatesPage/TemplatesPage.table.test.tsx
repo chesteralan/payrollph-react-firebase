@@ -34,8 +34,22 @@ const mockTemplates: PayrollTemplate[] = [
 ];
 
 const mockPrintFormats: PrintFormat[] = [
-  { id: "register", name: "Payroll Register", outputType: "register", paperSize: "A4", orientation: "portrait", isActive: true },
-  { id: "payslip", name: "Payslip", outputType: "payslip", paperSize: "A4", orientation: "portrait", isActive: true },
+  {
+    id: "register",
+    name: "Payroll Register",
+    outputType: "register",
+    paperSize: "A4",
+    orientation: "portrait",
+    isActive: true,
+  },
+  {
+    id: "payslip",
+    name: "Payslip",
+    outputType: "payslip",
+    paperSize: "A4",
+    orientation: "portrait",
+    isActive: true,
+  },
 ];
 
 const defaultProps = {

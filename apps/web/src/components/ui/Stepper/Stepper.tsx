@@ -51,7 +51,9 @@ export function Stepper({ steps, onStepClick }: StepperProps) {
                     !step.active &&
                       !step.completed &&
                       "border-gray-300 text-gray-400 bg-white",
-                    step.completed && onStepClick && "cursor-pointer hover:shadow-md",
+                    step.completed &&
+                      onStepClick &&
+                      "cursor-pointer hover:shadow-md",
                     step.completed && !onStepClick && "cursor-default",
                     !step.completed && "cursor-default",
                   )}
@@ -81,9 +83,7 @@ export function Stepper({ steps, onStepClick }: StepperProps) {
                     <span
                       className={clsx(
                         "block text-xs mt-0.5",
-                        step.active
-                          ? "text-gray-500"
-                          : "text-gray-400",
+                        step.active ? "text-gray-500" : "text-gray-400",
                       )}
                     >
                       {step.description}

@@ -56,9 +56,7 @@ describe("WizardContent", () => {
   });
 
   it("renders Edit Template heading when editing", () => {
-    renderWithProviders(
-      <WizardContent {...defaultProps} editingId="t1" />,
-    );
+    renderWithProviders(<WizardContent {...defaultProps} editingId="t1" />);
     expect(screen.getByText("Edit Template")).toBeInTheDocument();
   });
 
@@ -89,9 +87,9 @@ describe("WizardContent", () => {
   });
 
   it("renders Create Template button on last step", () => {
-    renderWithProviders(
-      <WizardContent {...defaultProps} wizardStep={4} />,
-    );
-    expect(screen.getAllByText("Create Template").length).toBeGreaterThanOrEqual(2);
+    renderWithProviders(<WizardContent {...defaultProps} wizardStep={4} />);
+    expect(
+      screen.getAllByText("Create Template").length,
+    ).toBeGreaterThanOrEqual(2);
   });
 });

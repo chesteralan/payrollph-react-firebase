@@ -118,7 +118,10 @@ export function Report13thMonthPage() {
         Name: "TOTAL",
         "Hire Date": "",
         "Months Worked": 0,
-        "Total Basic Salary": results.reduce((s, r) => s + r.totalBasicSalary, 0),
+        "Total Basic Salary": results.reduce(
+          (s, r) => s + r.totalBasicSalary,
+          0,
+        ),
         "13th Month Pay": results.reduce((s, r) => s + r.thirteenthMonth, 0),
       },
     ];
@@ -242,72 +245,78 @@ export function Report13thMonthPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Employee Code
-                        </th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Name
-                        </th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Hire Date
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Months Worked
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Total Basic
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          13th Month Pay
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {results.map((r, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                            {r.employeeCode}
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Employee Code
+                          </th>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Name
+                          </th>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Hire Date
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Months Worked
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Total Basic
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            13th Month Pay
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {results.map((r, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                              {r.employeeCode}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              {r.firstName} {r.lastName}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {r.hireDate
+                                ? new Date(r.hireDate).toLocaleDateString()
+                                : "N/A"}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {r.monthsWorked}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right">
+                              {formatCurrency(r.totalBasicSalary)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-right font-semibold">
+                              {formatCurrency(r.thirteenthMonth)}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                          <td className="px-6 py-4" colSpan={3}>
+                            Total
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            {r.firstName} {r.lastName}
+                          <td className="px-6 py-4 text-right"></td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(
+                              results.reduce(
+                                (s, r) => s + r.totalBasicSalary,
+                                0,
+                              ),
+                            )}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            {r.hireDate
-                              ? new Date(r.hireDate).toLocaleDateString()
-                              : "N/A"}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {r.monthsWorked}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-right">
-                            {formatCurrency(r.totalBasicSalary)}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-right font-semibold">
-                            {formatCurrency(r.thirteenthMonth)}
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(
+                              results.reduce(
+                                (s, r) => s + r.thirteenthMonth,
+                                0,
+                              ),
+                            )}
                           </td>
                         </tr>
-                      ))}
-                      <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                        <td className="px-6 py-4" colSpan={3}>
-                          Total
-                        </td>
-                        <td className="px-6 py-4 text-right"></td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(
-                            results.reduce((s, r) => s + r.totalBasicSalary, 0),
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(
-                            results.reduce((s, r) => s + r.thirteenthMonth, 0),
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

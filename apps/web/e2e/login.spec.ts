@@ -30,7 +30,9 @@ test.describe("Login flow", () => {
     await expect(password).toHaveValue("password123");
   });
 
-  test("forgot password link navigates to forgot-password page", async ({ page }) => {
+  test("forgot password link navigates to forgot-password page", async ({
+    page,
+  }) => {
     const link = page.locator("a[href='/forgot-password']");
     if (await link.isVisible()) {
       await link.click();
@@ -41,14 +43,16 @@ test.describe("Login flow", () => {
 
   test("shows loading state during submission", async ({ page }) => {
     // Mock the auth response to delay
-    await page.route("**/identitytoolkit/v1/accounts:signInWithPassword**", (route) =>
-      route.fulfill({
-        status: 400,
-        contentType: "application/json",
-        body: JSON.stringify({
-          error: { message: "INVALID_PASSWORD" },
+    await page.route(
+      "**/identitytoolkit/v1/accounts:signInWithPassword**",
+      (route) =>
+        route.fulfill({
+          status: 400,
+          contentType: "application/json",
+          body: JSON.stringify({
+            error: { message: "INVALID_PASSWORD" },
+          }),
         }),
-      }),
     );
 
     await page.locator("#email").fill("user@example.com");
@@ -61,21 +65,23 @@ test.describe("Login flow", () => {
 
   test("successful login redirects to dashboard", async ({ page }) => {
     // Mock successful auth
-    await page.route("**/identitytoolkit/v1/accounts:signInWithPassword**", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          kind: "identitytoolkit#VerifyPasswordResponse",
-          localId: "test-user-uid",
-          email: "test@example.com",
-          displayName: "Test User",
-          idToken: "mock-id-token",
-          registered: true,
-          refreshToken: "mock-refresh-token",
-          expiresIn: "3600",
+    await page.route(
+      "**/identitytoolkit/v1/accounts:signInWithPassword**",
+      (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            kind: "identitytoolkit#VerifyPasswordResponse",
+            localId: "test-user-uid",
+            email: "test@example.com",
+            displayName: "Test User",
+            idToken: "mock-id-token",
+            registered: true,
+            refreshToken: "mock-refresh-token",
+            expiresIn: "3600",
+          }),
         }),
-      }),
     );
 
     // Mock Firestore calls
@@ -92,7 +98,9 @@ test.describe("Login flow", () => {
     await page.locator("button[type='submit']").click();
 
     // Should redirect away from login
-    await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), {
+      timeout: 10000,
+    });
     await expect(page).not.toHaveURL(/\/login/);
   });
 });

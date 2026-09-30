@@ -40,12 +40,16 @@ const defaultProps = {
 describe("CompanyForm", () => {
   it("renders Add Company title when not editing", () => {
     render(<CompanyForm {...defaultProps} />);
-    expect(screen.getByRole("heading", { name: /add company/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /add company/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders Edit Company title when editing", () => {
     render(<CompanyForm {...defaultProps} editingId="some-id" />);
-    expect(screen.getByRole("heading", { name: /edit company/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /edit company/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders form fields with initial values", () => {
@@ -58,12 +62,16 @@ describe("CompanyForm", () => {
   it("renders payroll periods section", () => {
     render(<CompanyForm {...defaultProps} />);
     expect(screen.getAllByText(/payroll periods/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: /add period/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /add period/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows empty state when no payroll periods", () => {
     render(<CompanyForm {...defaultProps} />);
-    expect(screen.getByText(/no payroll periods configured/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/no payroll periods configured/i),
+    ).toBeInTheDocument();
   });
 
   it("renders column groups checkboxes", () => {

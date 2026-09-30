@@ -23,7 +23,13 @@ function PayrollHeader({
   onToggleLock,
   onPublish,
 }: {
-  payroll: { name: string; month: number; year: number; isPublished?: boolean; isLocked?: boolean };
+  payroll: {
+    name: string;
+    month: number;
+    year: number;
+    isPublished?: boolean;
+    isLocked?: boolean;
+  };
   term: { name: string } | null;
   activeStage: string;
   saving: boolean;

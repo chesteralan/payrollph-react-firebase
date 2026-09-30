@@ -1,10 +1,11 @@
 import { useRef } from "react";
-import { AlertCircle, Check, Upload, X } from "lucide-react";
+import { AlertCircle, Check, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Sheet } from "@/components/ui/Sheet";
 import type { CsvPreviewRow } from "./NamesListPage.types";
 
 interface CsvImportCardProps {
+  isOpen: boolean;
   csvPreview: CsvPreviewRow[];
   csvFileName: string;
   importStats: { success: number; failed: number; duplicates: number } | null;
@@ -15,6 +16,7 @@ interface CsvImportCardProps {
 }
 
 export function CsvImportCard({
+  isOpen,
   csvPreview,
   csvFileName,
   importStats,
@@ -26,16 +28,35 @@ export function CsvImportCard({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Import Names from CSV</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onReset}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Sheet
+      isOpen={isOpen}
+      onClose={onReset}
+      title="Import Names from CSV"
+      footer={
+        csvPreview.length > 0 && !importStats ? (
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={onReset}>
+              Cancel
+            </Button>
+            <Button
+              onClick={onImport}
+              disabled={
+                importing || csvPreview.filter((r) => r.isValid).length === 0
+              }
+            >
+              {importing
+                ? "Importing..."
+                : `Import ${csvPreview.filter((r) => r.isValid).length} Names`}
+            </Button>
+          </div>
+        ) : importStats ? (
+          <div className="flex justify-end">
+            <Button onClick={onReset}>Done</Button>
+          </div>
+        ) : null
+      }
+    >
+      <div className="space-y-4">
         {!csvPreview.length && !importStats && (
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
@@ -67,9 +88,7 @@ export function CsvImportCard({
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-gray-600">
                 File: <span className="font-medium">{csvFileName}</span>
-                <span className="ml-2">
-                  ({csvPreview.length} rows found)
-                </span>
+                <span className="ml-2">({csvPreview.length} rows found)</span>
               </div>
               <div className="flex gap-2">
                 <span className="text-sm text-green-600">
@@ -81,7 +100,7 @@ export function CsvImportCard({
               </div>
             </div>
 
-            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
@@ -95,13 +114,8 @@ export function CsvImportCard({
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {csvPreview.map((row, index) => (
-                    <tr
-                      key={index}
-                      className={row.isValid ? "" : "bg-red-50"}
-                    >
-                      <td className="px-3 py-2 text-gray-500">
-                        {index + 1}
-                      </td>
+                    <tr key={index} className={row.isValid ? "" : "bg-red-50"}>
+                      <td className="px-3 py-2 text-gray-500">{index + 1}</td>
                       <td className="px-3 py-2">{row.firstName}</td>
                       <td className="px-3 py-2">{row.middleName}</td>
                       <td className="px-3 py-2">{row.lastName}</td>
@@ -120,23 +134,6 @@ export function CsvImportCard({
                   ))}
                 </tbody>
               </table>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="ghost" onClick={onReset}>
-                Cancel
-              </Button>
-              <Button
-                onClick={onImport}
-                disabled={
-                  importing ||
-                  csvPreview.filter((r) => r.isValid).length === 0
-                }
-              >
-                {importing
-                  ? "Importing..."
-                  : `Import ${csvPreview.filter((r) => r.isValid).length} Names`}
-              </Button>
             </div>
           </div>
         )}
@@ -170,10 +167,9 @@ export function CsvImportCard({
                 </span>
               )}
             </p>
-            <Button onClick={onReset}>Done</Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Sheet>
   );
 }

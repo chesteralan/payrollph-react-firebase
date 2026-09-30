@@ -1,9 +1,4 @@
-import {
-  Calendar as CalendarIcon,
-  Check,
-  Plus,
-  X,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Check, Plus, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CalendarGrid } from "@/components/ui/CalendarGrid";
@@ -169,9 +164,7 @@ export function DTRCalendar({
 
           {leaveApplications.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium mb-2">
-                Leave Applications
-              </h4>
+              <h4 className="text-sm font-medium mb-2">Leave Applications</h4>
               <div className="space-y-2">
                 {leaveApplications.map((app) => {
                   const benefitName =

@@ -106,10 +106,7 @@ export function PersonalInfoSection({
               onChange={(e) =>
                 update({
                   civilStatus: e.target.value as
-                    | "single"
-                    | "married"
-                    | "widowed"
-                    | "separated",
+                    "single" | "married" | "widowed" | "separated",
                 })
               }
             >

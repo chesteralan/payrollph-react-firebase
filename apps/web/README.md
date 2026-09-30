@@ -5,6 +5,7 @@ A full-featured payroll management application built with **React + Vite** (fron
 ## Features
 
 ### Core Payroll
+
 - Payroll wizard with 5-step creation (config → dates → groups → employees → review)
 - Payroll processing stages: DTR → Salaries → Earnings → Benefits → Deductions → Summary
 - Inline editing with batch save and auto-calculations
@@ -13,18 +14,21 @@ A full-featured payroll management application built with **React + Vite** (fron
 - Payroll output views: Register, Payslip, Bank Transmittal, Journal Entry, Cash Denomination
 
 ### Employee Management
+
 - Full employee CRUD with profile tabs (personal info, contacts, compensation, DTR history)
 - Employee groups, positions, and areas management
 - Employee status tracking (active/inactive/terminated)
 - Document upload and employee search/filtering
 
 ### Daily Time Record (DTR)
+
 - Calendar view with month navigation
 - Per-employee attendance, absence, overtime, and leave management
 - Leave balance tracking with validation
 - DTR linked to payroll processing
 
 ### Reports
+
 - 13th Month Report with XLS export
 - Payroll Summary, Earnings/Deductions Breakdown
 - Attendance/DTR reports, Benefits Utilization
@@ -32,6 +36,7 @@ A full-featured payroll management application built with **React + Vite** (fron
 - Report scheduling with email delivery
 
 ### System Administration
+
 - User accounts with full RBAC permissions matrix
 - Multi-company support with per-company settings
 - Company configuration (periods, print settings, workdays)
@@ -39,6 +44,7 @@ A full-featured payroll management application built with **React + Vite** (fron
 - Calendar management (holidays, special workdays)
 
 ### Security
+
 - Firebase Authentication with email/password
 - Role-based access control (department/section/action matrix)
 - IP-based access restrictions, two-factor authentication (TOTP)
@@ -47,6 +53,7 @@ A full-featured payroll management application built with **React + Vite** (fron
 - Data encryption for sensitive fields
 
 ### Other
+
 - Offline mode with IndexedDB queue and sync
 - CSV/XLS import for employees, names, users
 - Print-optimized views, batch printing
@@ -54,16 +61,16 @@ A full-featured payroll management application built with **React + Vite** (fron
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | React 19, TypeScript 6, Vite 8 |
-| **Styling** | Tailwind CSS v4 |
-| **Backend** | Firebase (Auth, Firestore, Storage) |
-| **State** | React Context + custom hooks |
-| **Testing** | Vitest, Testing Library, Playwright |
-| **Package Manager** | yarn |
-| **Error Tracking** | Sentry |
-| **Monitoring** | Firebase App Check, reCAPTCHA v3 |
+| Layer               | Technology                          |
+| ------------------- | ----------------------------------- |
+| **Frontend**        | React 19, TypeScript 6, Vite 8      |
+| **Styling**         | Tailwind CSS v4                     |
+| **Backend**         | Firebase (Auth, Firestore, Storage) |
+| **State**           | React Context + custom hooks        |
+| **Testing**         | Vitest, Testing Library, Playwright |
+| **Package Manager** | yarn                                |
+| **Error Tracking**  | Sentry                              |
+| **Monitoring**      | Firebase App Check, reCAPTCHA v3    |
 
 ## Getting Started
 
@@ -160,21 +167,21 @@ payroll-web/
 
 ## Scripts
 
-| Script | Description |
-|---|---|
-| `yarn dev` | Start development server |
-| `yarn build` | Type-check + production build |
-| `yarn lint` | Run ESLint |
-| `yarn format` | Format with Prettier |
-| `yarn test` | Run tests (watch mode) |
-| `yarn test:run` | Run tests once |
-| `yarn test:coverage` | Run tests with coverage |
-| `yarn type-check` | Run TypeScript type checking |
-| `yarn preview` | Preview production build |
-| `yarn deploy` | Build + deploy hosting |
-| `yarn deploy:all` | Build + deploy everything |
-| `yarn backup:create` | Create Firestore backup |
-| `yarn backup:list` | List Firestore backups |
+| Script               | Description                   |
+| -------------------- | ----------------------------- |
+| `yarn dev`           | Start development server      |
+| `yarn build`         | Type-check + production build |
+| `yarn lint`          | Run ESLint                    |
+| `yarn format`        | Format with Prettier          |
+| `yarn test`          | Run tests (watch mode)        |
+| `yarn test:run`      | Run tests once                |
+| `yarn test:coverage` | Run tests with coverage       |
+| `yarn type-check`    | Run TypeScript type checking  |
+| `yarn preview`       | Preview production build      |
+| `yarn deploy`        | Build + deploy hosting        |
+| `yarn deploy:all`    | Build + deploy everything     |
+| `yarn backup:create` | Create Firestore backup       |
+| `yarn backup:list`   | List Firestore backups        |
 
 ## Documentation
 

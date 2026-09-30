@@ -50,7 +50,12 @@ describe("useTemplatesPage", () => {
     expect(result.current.selectedDeductions).toEqual([]);
     expect(result.current.selectedBenefits).toEqual([]);
     expect(result.current.selectedPrintColumns).toEqual([
-      "basic", "earnings", "gross", "deductions", "benefits", "net",
+      "basic",
+      "earnings",
+      "gross",
+      "deductions",
+      "benefits",
+      "net",
     ]);
   });
 

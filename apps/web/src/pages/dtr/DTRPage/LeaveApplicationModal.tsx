@@ -16,7 +16,9 @@ function calcLeaveDays(startDate: string, endDate: string): number {
   if (!startDate || !endDate) return 0;
   const start = new Date(startDate);
   const end = new Date(endDate);
-  return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return (
+    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+  );
 }
 
 export function LeaveApplicationModal({
@@ -83,17 +85,14 @@ export function LeaveApplicationModal({
           </div>
           {leaveForm.startDate && leaveForm.endDate && (
             <p className="text-sm text-gray-600">
-              Total Days:{" "}
-              <span className="font-medium">{totalDays}</span>
+              Total Days: <span className="font-medium">{totalDays}</span>
             </p>
           )}
           <Input
             id="reason"
             label="Reason"
             value={leaveForm.reason}
-            onChange={(e) =>
-              onChange({ ...leaveForm, reason: e.target.value })
-            }
+            onChange={(e) => onChange({ ...leaveForm, reason: e.target.value })}
           />
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="ghost" onClick={onClose}>

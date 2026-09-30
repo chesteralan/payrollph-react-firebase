@@ -134,7 +134,11 @@ describe("SalaryCard", () => {
       <SalaryCard
         {...setup({
           salary: semiMonthlySalary,
-          salaryForm: { amount: "25000", frequency: "semi-monthly", effectiveDate: "2024-01-01" },
+          salaryForm: {
+            amount: "25000",
+            frequency: "semi-monthly",
+            effectiveDate: "2024-01-01",
+          },
         })}
       />,
     );
@@ -151,7 +155,11 @@ describe("SalaryCard", () => {
       <SalaryCard
         {...setup({
           salary: weeklySalary,
-          salaryForm: { amount: "12000", frequency: "weekly", effectiveDate: "2024-01-01" },
+          salaryForm: {
+            amount: "12000",
+            frequency: "weekly",
+            effectiveDate: "2024-01-01",
+          },
         })}
       />,
     );

@@ -84,9 +84,7 @@ describe("ReviewStep", () => {
   it("calls onBack when Back is clicked", () => {
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
     const onBack = vi.fn();
-    renderWithRouter(
-      <ReviewStep {...defaultProps} onBack={onBack} />,
-    );
+    renderWithRouter(<ReviewStep {...defaultProps} onBack={onBack} />);
     fireEvent.click(screen.getByText("Back"));
     expect(onBack).toHaveBeenCalled();
   });
@@ -100,12 +98,7 @@ describe("ReviewStep", () => {
 
   it("shows group filter count", () => {
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
-    renderWithRouter(
-      <ReviewStep
-        {...defaultProps}
-        groups={[{}, {}, {}]}
-      />,
-    );
+    renderWithRouter(<ReviewStep {...defaultProps} groups={[{}, {}, {}]} />);
     expect(screen.getByText("3 filters")).toBeTruthy();
   });
 });

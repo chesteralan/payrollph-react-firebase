@@ -15,9 +15,7 @@ vi.mock("@/hooks/usePermissions", () => ({
 describe("TermsPage", () => {
   it("renders the terms page heading", () => {
     renderWithProviders(<TermsPage />);
-    expect(
-      screen.getByRole("heading", { name: /terms/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /terms/i })).toBeInTheDocument();
   });
 
   it("renders the add term button", () => {
@@ -29,8 +27,6 @@ describe("TermsPage", () => {
 
   it("shows empty state when no terms", async () => {
     renderWithProviders(<TermsPage />);
-    expect(
-      await screen.findByText(/no terms found/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/no terms found/i)).toBeInTheDocument();
   });
 });

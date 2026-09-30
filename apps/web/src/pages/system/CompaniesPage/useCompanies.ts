@@ -61,13 +61,19 @@ export function useCompanies() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showDeleted, setShowDeleted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [formData, setFormData] = useState<CompanyFormData>({ ...DEFAULT_FORM_DATA });
-  const [columnGroup, setColumnGroup] = useState<CompanyColumnGroup>({ ...DEFAULT_COLUMN_GROUP });
+  const [formData, setFormData] = useState<CompanyFormData>({
+    ...DEFAULT_FORM_DATA,
+  });
+  const [columnGroup, setColumnGroup] = useState<CompanyColumnGroup>({
+    ...DEFAULT_COLUMN_GROUP,
+  });
 
   const fetchCompanies = async () => {
     setLoading(true);
     const snap = await getDocs(collection(db, "companies"));
-    setCompanies(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[]);
+    setCompanies(
+      snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Company[],
+    );
     setLoading(false);
   };
 
@@ -162,7 +168,8 @@ export function useCompanies() {
       payDay?: number;
       frequency?: string;
     }[];
-    (updated[index] as Record<string, string | number | undefined>)[field] = value;
+    (updated[index] as Record<string, string | number | undefined>)[field] =
+      value;
     setFormData({ ...formData, payrollPeriods: updated });
   };
 
@@ -255,6 +262,7 @@ export function useCompanies() {
     handleSort,
     handleSubmit,
     handleEdit,
+    resetForm,
     addPayrollPeriod,
     removePayrollPeriod,
     updatePayrollPeriod,

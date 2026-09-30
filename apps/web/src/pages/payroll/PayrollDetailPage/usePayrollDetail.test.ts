@@ -46,7 +46,13 @@ describe("usePayrollDetail", () => {
     const { result } = renderHook(() => usePayrollDetail());
 
     expect(result.current.STAGES).toEqual([
-      "dtr", "salaries", "earnings", "benefits", "deductions", "summary", "output",
+      "dtr",
+      "salaries",
+      "earnings",
+      "benefits",
+      "deductions",
+      "summary",
+      "output",
     ]);
   });
 

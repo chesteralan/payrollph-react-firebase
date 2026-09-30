@@ -8,12 +8,7 @@
  * (`getAll`, `getById`, `create`, `update`, `remove`) rather than importing
  * Firebase SDK primitives directly.
  */
-import {
-  create,
-  getAll,
-  getById,
-  update,
-} from "@/services/firestore";
+import { create, getAll, getById, update } from "@/services/firestore";
 import type {
   Employee,
   EmployeeArea,
@@ -24,11 +19,7 @@ import type {
   EmployeeStatus,
 } from "@/types/employee";
 import type { Company, CompanyOptions } from "@/types/company";
-import type {
-  UserAccount,
-  UserCompany,
-  UserSettings,
-} from "@/types/user";
+import type { UserAccount, UserCompany, UserSettings } from "@/types/user";
 import type {
   Payroll,
   PayrollEmployee,

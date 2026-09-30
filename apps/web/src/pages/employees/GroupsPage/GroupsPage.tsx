@@ -12,8 +12,9 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Sheet } from "@/components/ui/Sheet";
 import {
   ChevronDown,
   ChevronsUpDown,
@@ -120,54 +121,62 @@ export function EmployeeGroupsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Employee Groups</h1>
         {canAdd("employees", "groups") && (
-          <Button onClick={() => setShowForm(!showForm)}>
+          <Button
+            onClick={() => {
+              setEditingId(null);
+              setFormData({ name: "", description: "" });
+              setShowForm(true);
+            }}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Group
           </Button>
         )}
       </div>
 
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit Group" : "Add Group"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                id="name"
-                label="Name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-              />
-              <Input
-                id="description"
-                label="Description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-              />
-              <div className="flex gap-2">
-                <Button type="submit">{editingId ? "Update" : "Create"}</Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+      <Sheet
+        isOpen={showForm}
+        onClose={() => {
+          setShowForm(false);
+          setEditingId(null);
+        }}
+        title={editingId ? "Edit Group" : "Add Group"}
+        footer={
+          <div className="flex gap-2">
+            <Button type="submit" form="group-form">
+              {editingId ? "Update" : "Create"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowForm(false);
+                setEditingId(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        }
+      >
+        <form id="group-form" onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            id="name"
+            label="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          <Input
+            id="description"
+            label="Description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+        </form>
+      </Sheet>
 
       <Card>
         <CardContent className="pt-4">
@@ -184,126 +193,130 @@ export function EmployeeGroupsPage() {
         </CardContent>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig?.key === "name" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Description
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("isActive")}
-                >
-                  <div className="flex items-center gap-1">
-                    Status
-                    {sortConfig?.key === "isActive" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("name")}
                   >
-                    Loading...
-                  </td>
-                </tr>
-              ) : sortedGroups.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
+                    <div className="flex items-center gap-1">
+                      Name
+                      {sortConfig?.key === "name" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Description
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("isActive")}
                   >
-                    No groups found
-                  </td>
+                    <div className="flex items-center gap-1">
+                      Status
+                      {sortConfig?.key === "isActive" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : (
-                sortedGroups.map((g) => (
-                  <tr key={g.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {g.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {g.description || "-"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(g)}
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${g.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                      >
-                        {g.isActive ? "Active" : "Inactive"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canEdit("employees", "groups") && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingId(g.id);
-                              setFormData({
-                                name: g.name,
-                                description: g.description || "",
-                              });
-                              setShowForm(true);
-                            }}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {canDelete("employees", "groups") && (
-                          <ConfirmDialog
-                            title="Delete Group"
-                            message={`Delete "${g.name}"? This cannot be undone.`}
-                            confirmText="Delete"
-                            onConfirm={() => handleDelete(g.id)}
-                          >
-                            {(open) => (
-                              <Button variant="ghost" size="sm" onClick={open}>
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : sortedGroups.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No groups found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedGroups.map((g) => (
+                    <tr key={g.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {g.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {g.description || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleToggleStatus(g)}
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-colors ${g.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                        >
+                          {g.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {canEdit("employees", "groups") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingId(g.id);
+                                setFormData({
+                                  name: g.name,
+                                  description: g.description || "",
+                                });
+                                setShowForm(true);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canDelete("employees", "groups") && (
+                            <ConfirmDialog
+                              title="Delete Group"
+                              message={`Delete "${g.name}"? This cannot be undone.`}
+                              confirmText="Delete"
+                              onConfirm={() => handleDelete(g.id)}
+                            >
+                              {(open) => (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={open}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </ConfirmDialog>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

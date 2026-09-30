@@ -108,11 +108,7 @@ export function EmployeeReportFilters({
             </select>
           </div>
           <div className="flex items-end">
-            <Button
-              onClick={onGenerate}
-              disabled={loading}
-              className="w-full"
-            >
+            <Button onClick={onGenerate} disabled={loading} className="w-full">
               {loading ? "Generating..." : "Generate Report"}
             </Button>
           </div>

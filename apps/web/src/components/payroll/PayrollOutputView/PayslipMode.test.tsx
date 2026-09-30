@@ -8,7 +8,12 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("@/components/ui/Button", () => ({
-  Button: ({ children, onClick, variant, className }: {
+  Button: ({
+    children,
+    onClick,
+    variant,
+    className,
+  }: {
     children: React.ReactNode;
     onClick?: () => void;
     variant?: string;
@@ -21,17 +26,41 @@ vi.mock("@/components/ui/Button", () => ({
 }));
 
 vi.mock("@/components/ui/Card", () => ({
-  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card" className={className}>{children}</div>
+  Card: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card" className={className}>
+      {children}
+    </div>
   ),
-  CardHeader: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-header" className={className}>{children}</div>
+  CardHeader: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card-header" className={className}>
+      {children}
+    </div>
   ),
   CardTitle: ({ children }: { children: React.ReactNode }) => (
     <h3 data-testid="card-title">{children}</h3>
   ),
-  CardContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="card-content" className={className}>{children}</div>
+  CardContent: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div data-testid="card-content" className={className}>
+      {children}
+    </div>
   ),
 }));
 

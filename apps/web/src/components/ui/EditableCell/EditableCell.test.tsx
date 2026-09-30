@@ -70,9 +70,7 @@ describe("EditableCell", () => {
     const { rerender } = render(
       <EditableCell value="a" originalValue="a" onChange={vi.fn()} />,
     );
-    rerender(
-      <EditableCell value="b" originalValue="a" onChange={vi.fn()} />,
-    );
+    rerender(<EditableCell value="b" originalValue="a" onChange={vi.fn()} />);
     const cell = screen.getByText("b");
     expect(cell.className).toContain("bg-yellow-100");
     vi.useRealTimers();

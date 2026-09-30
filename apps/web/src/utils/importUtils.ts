@@ -105,7 +105,8 @@ export function csvToObjects<T extends Record<string, string>>(
 
   for (let i = dataStart; i < rows.length; i++) {
     const row = rows[i];
-    if (!row || row.length === 0 || (row.length === 1 && row[0] === "")) continue;
+    if (!row || row.length === 0 || (row.length === 1 && row[0] === ""))
+      continue;
 
     const obj: Record<string, string> = {};
     for (let j = 0; j < fileHeaders.length; j++) {

@@ -469,5 +469,3 @@ describe("setupOfflineListeners", () => {
     expect(removeSpy2).toHaveBeenCalledWith("online", expect.any(Function));
   });
 });
-
-

@@ -70,7 +70,9 @@ describe("DocumentsCard", () => {
 
   it("shows default prompt when no file is selected", () => {
     render(<DocumentsCard {...setup({ selectedFile: null })} />);
-    expect(screen.getByText("Click to select a file or drag and drop")).toBeInTheDocument();
+    expect(
+      screen.getByText("Click to select a file or drag and drop"),
+    ).toBeInTheDocument();
   });
 
   it("renders document table with file names", () => {
@@ -102,7 +104,9 @@ describe("DocumentsCard", () => {
   });
 
   it("shows upload progress when uploading", () => {
-    render(<DocumentsCard {...setup({ uploading: true, uploadProgress: 50 })} />);
+    render(
+      <DocumentsCard {...setup({ uploading: true, uploadProgress: 50 })} />,
+    );
     expect(screen.getByText("Uploading...")).toBeInTheDocument();
     expect(screen.getByText("50%")).toBeInTheDocument();
   });
@@ -130,7 +134,9 @@ describe("DocumentsCard", () => {
 
   it("disables upload button when uploading", () => {
     const file = new File(["test"], "test.pdf", { type: "application/pdf" });
-    render(<DocumentsCard {...setup({ selectedFile: file, uploading: true })} />);
+    render(
+      <DocumentsCard {...setup({ selectedFile: file, uploading: true })} />,
+    );
     const buttons = screen.getAllByText("Uploading...");
     const uploadButton = buttons.find((el) => el.tagName === "BUTTON");
     expect(uploadButton).toBeDisabled();
@@ -144,9 +150,12 @@ describe("DocumentsCard", () => {
         {...setup({ selectedFile: file, onDocNotesChange: onChange })}
       />,
     );
-    fireEvent.change(screen.getByPlaceholderText("Add notes about this document"), {
-      target: { value: "new note" },
-    });
+    fireEvent.change(
+      screen.getByPlaceholderText("Add notes about this document"),
+      {
+        target: { value: "new note" },
+      },
+    );
     expect(onChange).toHaveBeenCalledWith("new note");
   });
 

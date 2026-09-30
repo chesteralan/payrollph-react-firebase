@@ -36,19 +36,23 @@ export function usePermissions() {
   );
 
   const canView = useCallback(
-    (department: Department, section: Section) => can(department, section, "view"),
+    (department: Department, section: Section) =>
+      can(department, section, "view"),
     [can],
   );
   const canAdd = useCallback(
-    (department: Department, section: Section) => can(department, section, "add"),
+    (department: Department, section: Section) =>
+      can(department, section, "add"),
     [can],
   );
   const canEdit = useCallback(
-    (department: Department, section: Section) => can(department, section, "edit"),
+    (department: Department, section: Section) =>
+      can(department, section, "edit"),
     [can],
   );
   const canDelete = useCallback(
-    (department: Department, section: Section) => can(department, section, "delete"),
+    (department: Department, section: Section) =>
+      can(department, section, "delete"),
     [can],
   );
 

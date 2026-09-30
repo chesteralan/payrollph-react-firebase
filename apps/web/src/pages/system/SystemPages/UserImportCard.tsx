@@ -81,9 +81,7 @@ export function UserImportCard({
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-gray-600">
                 File: <span className="font-medium">{csvFileName}</span>
-                <span className="ml-2">
-                  ({csvPreview.length} rows found)
-                </span>
+                <span className="ml-2">({csvPreview.length} rows found)</span>
               </div>
               <div className="flex gap-2">
                 <span className="text-sm text-green-600">
@@ -111,13 +109,8 @@ export function UserImportCard({
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {csvPreview.map((row, index) => (
-                    <tr
-                      key={index}
-                      className={row.isValid ? "" : "bg-red-50"}
-                    >
-                      <td className="px-3 py-2 text-gray-500">
-                        {index + 1}
-                      </td>
+                    <tr key={index} className={row.isValid ? "" : "bg-red-50"}>
+                      <td className="px-3 py-2 text-gray-500">{index + 1}</td>
                       <td className="px-3 py-2">{row.email}</td>
                       <td className="px-3 py-2">{row.firstName}</td>
                       <td className="px-3 py-2">{row.lastName}</td>
@@ -147,8 +140,7 @@ export function UserImportCard({
               <Button
                 onClick={onImport}
                 disabled={
-                  importing ||
-                  csvPreview.filter((r) => r.isValid).length === 0
+                  importing || csvPreview.filter((r) => r.isValid).length === 0
                 }
               >
                 {importing

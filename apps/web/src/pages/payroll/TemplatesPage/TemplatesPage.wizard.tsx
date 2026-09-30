@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { SelectionPanel } from "@/components/ui/SelectionPanel";
-import type { EmployeeArea, EmployeeGroup, EmployeePosition, EmployeeStatus, PrintFormat } from "./TemplatesPage.types";
+import type {
+  EmployeeArea,
+  EmployeeGroup,
+  EmployeePosition,
+  EmployeeStatus,
+  PrintFormat,
+} from "./TemplatesPage.types";
 
 const WIZARD_STEPS = [
   "Basic Info",
@@ -233,8 +234,8 @@ export function WizardContent({
         {wizardStep === 1 && (
           <div className="space-y-6">
             <p className="text-sm text-gray-600">
-              Select which groups, positions, areas, and statuses to
-              include. Leave all unchecked to include all employees.
+              Select which groups, positions, areas, and statuses to include.
+              Leave all unchecked to include all employees.
             </p>
             <SelectionPanel
               title="Employee Groups"

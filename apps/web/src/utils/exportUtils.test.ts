@@ -574,9 +574,15 @@ describe("exportToXLS", () => {
       capturedBlob = blob as Blob;
       return "blob:mock";
     });
-    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
-    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    const revoke = vi
+      .spyOn(URL, "revokeObjectURL")
+      .mockImplementation(() => {});
+    const append = vi
+      .spyOn(document.body, "appendChild")
+      .mockImplementation(() => undefined as unknown as Node);
+    const remove = vi
+      .spyOn(document.body, "removeChild")
+      .mockImplementation(() => undefined as unknown as Node);
     // Prevent actual click from navigating
     const origCreateElement = HTMLAnchorElement.prototype.click;
     HTMLAnchorElement.prototype.click = vi.fn();
@@ -597,9 +603,15 @@ describe("exportToXLS", () => {
 
   it("should handle empty data array", async () => {
     const spy = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
-    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
-    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    const revoke = vi
+      .spyOn(URL, "revokeObjectURL")
+      .mockImplementation(() => {});
+    const append = vi
+      .spyOn(document.body, "appendChild")
+      .mockImplementation(() => undefined as unknown as Node);
+    const remove = vi
+      .spyOn(document.body, "removeChild")
+      .mockImplementation(() => undefined as unknown as Node);
     const origClick = HTMLAnchorElement.prototype.click;
     HTMLAnchorElement.prototype.click = vi.fn();
 
@@ -616,9 +628,15 @@ describe("exportToXLS", () => {
 
   it("should handle single column export", async () => {
     const spy = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock");
-    const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
-    const append = vi.spyOn(document.body, "appendChild").mockImplementation(() => undefined as unknown as Node);
-    const remove = vi.spyOn(document.body, "removeChild").mockImplementation(() => undefined as unknown as Node);
+    const revoke = vi
+      .spyOn(URL, "revokeObjectURL")
+      .mockImplementation(() => {});
+    const append = vi
+      .spyOn(document.body, "appendChild")
+      .mockImplementation(() => undefined as unknown as Node);
+    const remove = vi
+      .spyOn(document.body, "removeChild")
+      .mockImplementation(() => undefined as unknown as Node);
     const origClick = HTMLAnchorElement.prototype.click;
     HTMLAnchorElement.prototype.click = vi.fn();
 

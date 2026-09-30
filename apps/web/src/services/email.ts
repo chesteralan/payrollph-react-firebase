@@ -13,8 +13,7 @@ export function setEmailApiUrl(url: string | undefined): void {
 
 function getEmailApiUrl(): string | undefined {
   return (
-    _emailApiUrl ??
-    (import.meta.env.VITE_EMAIL_API_URL as string | undefined)
+    _emailApiUrl ?? (import.meta.env.VITE_EMAIL_API_URL as string | undefined)
   );
 }
 

@@ -32,9 +32,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("calls action when matching key is pressed", () => {
     const action = vi.fn();
-    renderHook(() =>
-      useKeyboardShortcuts([{ key: "k", action }]),
-    );
+    renderHook(() => useKeyboardShortcuts([{ key: "k", action }]));
 
     act(() => fireKeyDown("k"));
 
@@ -43,9 +41,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("prevents default when preventDefault is not false", () => {
     const action = vi.fn();
-    renderHook(() =>
-      useKeyboardShortcuts([{ key: "s", action }]),
-    );
+    renderHook(() => useKeyboardShortcuts([{ key: "s", action }]));
 
     act(() => {
       const event = new KeyboardEvent("keydown", {
@@ -61,9 +57,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("does not call action for non-matching key", () => {
     const action = vi.fn();
-    renderHook(() =>
-      useKeyboardShortcuts([{ key: "a", action }]),
-    );
+    renderHook(() => useKeyboardShortcuts([{ key: "a", action }]));
 
     act(() => fireKeyDown("b"));
 
@@ -111,9 +105,7 @@ describe("useKeyboardShortcuts", () => {
 
   it("ignores keydown inside input elements", () => {
     const action = vi.fn();
-    renderHook(() =>
-      useKeyboardShortcuts([{ key: "a", action }]),
-    );
+    renderHook(() => useKeyboardShortcuts([{ key: "a", action }]));
 
     const input = document.createElement("input");
     document.body.appendChild(input);
@@ -129,16 +121,10 @@ describe("useKeyboardShortcuts", () => {
       useKeyboardShortcuts([{ key: "a", action: vi.fn() }]),
     );
 
-    expect(addSpy).toHaveBeenCalledWith(
-      "keydown",
-      expect.any(Function),
-    );
+    expect(addSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
 
     unmount();
 
-    expect(removeSpy).toHaveBeenCalledWith(
-      "keydown",
-      expect.any(Function),
-    );
+    expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
   });
 });

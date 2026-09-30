@@ -39,9 +39,7 @@ export function EmployeeReportSummaryCards({
         <CardContent className="pt-6">
           <div className="text-sm text-gray-500">Total Salary</div>
           <div className="text-2xl font-bold">
-            {formatCurrency(
-              employees.reduce((s, e) => s + (e.salary || 0), 0),
-            )}
+            {formatCurrency(employees.reduce((s, e) => s + (e.salary || 0), 0))}
           </div>
         </CardContent>
       </Card>

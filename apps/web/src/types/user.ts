@@ -37,11 +37,7 @@ export interface UserSettings {
 }
 
 export type Department =
-  | "payroll"
-  | "employees"
-  | "lists"
-  | "reports"
-  | "system";
+  "payroll" | "employees" | "lists" | "reports" | "system";
 
 export type Section =
   | "payroll"

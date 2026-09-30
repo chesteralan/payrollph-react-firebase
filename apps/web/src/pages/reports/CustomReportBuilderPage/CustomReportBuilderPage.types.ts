@@ -9,7 +9,13 @@ export interface ReportField {
 
 export interface ReportFilter {
   field: string;
-  operator: "equals" | "not_equals" | "contains" | "greater_than" | "less_than" | "between";
+  operator:
+    | "equals"
+    | "not_equals"
+    | "contains"
+    | "greater_than"
+    | "less_than"
+    | "between";
   value: unknown;
 }
 
@@ -20,7 +26,7 @@ export interface SavedReport {
   filters: ReportFilter[];
   groupBy?: string;
   sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
+  sortDirection?: "asc" | "desc";
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { Download, Upload } from "lucide-react";
+import { Calendar as CalendarIcon, Download, Upload } from "lucide-react";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { DTRCalendar } from "./DTRCalendar";
 import { DayEntryModal } from "./DayEntryModal";
@@ -103,6 +103,18 @@ export function DTRPage() {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
+
+      {viewMode === "calendar" && !selectedEmployeeId && (
+        <div className="text-center py-12 text-gray-500">
+          <CalendarIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium">
+            Select an employee to view their DTR
+          </p>
+          <p className="text-sm">
+            Choose an employee from the dropdown above to get started
+          </p>
+        </div>
+      )}
 
       {viewMode === "calendar" && selectedEmployeeId && (
         <DTRCalendar

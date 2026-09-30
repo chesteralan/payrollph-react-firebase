@@ -26,14 +26,12 @@ export function PayrollSummaryPage() {
     null,
   );
 
-   
   useEffect(() => {
     if (currentCompanyId) {
       setHasGenerated(false);
       setPayrolls([]);
     }
   }, [currentCompanyId]);
-   
 
   const fetchPayrollDetails = async (
     payroll: Payroll,
@@ -133,7 +131,10 @@ export function PayrollSummaryPage() {
           groups,
           periodStart: "",
           periodEnd: "",
-          totalGrossPay: employees.reduce((sum, e) => sum + (e.grossPay || 0), 0),
+          totalGrossPay: employees.reduce(
+            (sum, e) => sum + (e.grossPay || 0),
+            0,
+          ),
           totalDeductions: 0,
           totalNetPay: employees.reduce((sum, e) => sum + (e.netPay || 0), 0),
         });
@@ -403,132 +404,135 @@ export function PayrollSummaryPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Payroll
-                        </th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Period
-                        </th>
-                        <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Status
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Employees
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Gross Pay
-                        </th>
-                        <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                          Net Pay
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {payrolls.map((p) => (
-                        <>
-                          <tr
-                            key={p.id}
-                            className="hover:bg-gray-50 cursor-pointer"
-                            onClick={() => toggleExpand(p.id)}
-                          >
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                              {p.name}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {new Date(0, p.month - 1).toLocaleString(
-                                "default",
-                                { month: "long" },
-                              )}{" "}
-                              {p.year}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span
-                                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[p.status || "draft"]}`}
-                              >
-                                {p.status || "draft"}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right">
-                              {p.employeeCount}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right">
-                              {formatCurrency(p.grossPay)}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-right font-semibold">
-                              {formatCurrency(p.netPay)}
-                            </td>
-                          </tr>
-                          {expandedPayrollId === p.id && (
-                            <tr>
-                              <td colSpan={6} className="px-6 py-4 bg-gray-50">
-                                <div className="ml-4">
-                                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                                    Group Breakdown
-                                  </h4>
-                                  <table className="w-full">
-                                    <thead>
-                                      <tr className="text-xs text-gray-500 border-b">
-                                        <th className="text-left pb-2">
-                                          Group
-                                        </th>
-                                        <th className="text-right pb-2">
-                                          Employees
-                                        </th>
-                                        <th className="text-right pb-2">
-                                          Gross Pay
-                                        </th>
-                                        <th className="text-right pb-2">
-                                          Net Pay
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {p.groups.map((g, i) => (
-                                        <tr
-                                          key={i}
-                                          className="border-b border-gray-100"
-                                        >
-                                          <td className="py-2 text-sm text-gray-700">
-                                            {g.groupName}
-                                          </td>
-                                          <td className="py-2 text-sm text-right">
-                                            {g.employeeCount}
-                                          </td>
-                                          <td className="py-2 text-sm text-right">
-                                            {formatCurrency(g.totalGrossPay)}
-                                          </td>
-                                          <td className="py-2 text-sm text-right">
-                                            {formatCurrency(g.totalNetPay)}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Payroll
+                          </th>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Period
+                          </th>
+                          <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Status
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Employees
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Gross Pay
+                          </th>
+                          <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                            Net Pay
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {payrolls.map((p) => (
+                          <>
+                            <tr
+                              key={p.id}
+                              className="hover:bg-gray-50 cursor-pointer"
+                              onClick={() => toggleExpand(p.id)}
+                            >
+                              <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                {p.name}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {new Date(0, p.month - 1).toLocaleString(
+                                  "default",
+                                  { month: "long" },
+                                )}{" "}
+                                {p.year}
+                              </td>
+                              <td className="px-6 py-4">
+                                <span
+                                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[p.status || "draft"]}`}
+                                >
+                                  {p.status || "draft"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right">
+                                {p.employeeCount}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right">
+                                {formatCurrency(p.grossPay)}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-right font-semibold">
+                                {formatCurrency(p.netPay)}
                               </td>
                             </tr>
-                          )}
-                        </>
-                      ))}
-                      <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
-                        <td className="px-6 py-4" colSpan={3}>
-                          Total
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {totalEmployees}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totalGross)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {formatCurrency(totalNet)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                            {expandedPayrollId === p.id && (
+                              <tr>
+                                <td
+                                  colSpan={6}
+                                  className="px-6 py-4 bg-gray-50"
+                                >
+                                  <div className="ml-4">
+                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                                      Group Breakdown
+                                    </h4>
+                                    <table className="w-full">
+                                      <thead>
+                                        <tr className="text-xs text-gray-500 border-b">
+                                          <th className="text-left pb-2">
+                                            Group
+                                          </th>
+                                          <th className="text-right pb-2">
+                                            Employees
+                                          </th>
+                                          <th className="text-right pb-2">
+                                            Gross Pay
+                                          </th>
+                                          <th className="text-right pb-2">
+                                            Net Pay
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {p.groups.map((g, i) => (
+                                          <tr
+                                            key={i}
+                                            className="border-b border-gray-100"
+                                          >
+                                            <td className="py-2 text-sm text-gray-700">
+                                              {g.groupName}
+                                            </td>
+                                            <td className="py-2 text-sm text-right">
+                                              {g.employeeCount}
+                                            </td>
+                                            <td className="py-2 text-sm text-right">
+                                              {formatCurrency(g.totalGrossPay)}
+                                            </td>
+                                            <td className="py-2 text-sm text-right">
+                                              {formatCurrency(g.totalNetPay)}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </>
+                        ))}
+                        <tr className="bg-gray-50 font-bold border-t-2 border-gray-300">
+                          <td className="px-6 py-4" colSpan={3}>
+                            Total
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {totalEmployees}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totalGross)}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {formatCurrency(totalNet)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

@@ -28,9 +28,7 @@ describe("BulkActionBar", () => {
   });
 
   it("shows singular when one selected", () => {
-    renderWithProviders(
-      <BulkActionBar {...defaultProps} selectedCount={1} />,
-    );
+    renderWithProviders(<BulkActionBar {...defaultProps} selectedCount={1} />);
     expect(screen.getByText(/1 user selected/i)).toBeInTheDocument();
   });
 });

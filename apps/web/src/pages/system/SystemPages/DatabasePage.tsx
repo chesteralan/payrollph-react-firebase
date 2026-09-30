@@ -20,7 +20,11 @@ import { CollectionStatsTable } from "./CollectionStatsTable";
 import { BackupHistoryTable } from "./BackupHistoryTable";
 import { VerificationResultsTable } from "./VerificationResultsTable";
 import { DataCleanupSection } from "./DataCleanupSection";
-import type { Backup, CleanupResult, VerificationResult } from "./DatabasePage.types";
+import type {
+  Backup,
+  CleanupResult,
+  VerificationResult,
+} from "./DatabasePage.types";
 
 export function DatabasePage() {
   const { canView, canAdd } = usePermissions();
@@ -31,7 +35,9 @@ export function DatabasePage() {
   const [backupLoading, setBackupLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState("");
   const [selectedCollection, setSelectedCollection] = useState("");
-  const [verificationResults, setVerificationResults] = useState<VerificationResult[]>([]);
+  const [verificationResults, setVerificationResults] = useState<
+    VerificationResult[]
+  >([]);
   const [verifying, setVerifying] = useState(false);
   const [cleanupLoading, setCleanupLoading] = useState("");
   const [cleanupResults, setCleanupResults] = useState<CleanupResult[]>([]);
@@ -74,10 +80,8 @@ export function DatabasePage() {
   }, []);
 
   useEffect(() => {
-     
     fetchStats();
     fetchBackups();
-     
   }, [fetchStats, fetchBackups]);
 
   const exportCollection = async (collectionName: string) => {

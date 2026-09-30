@@ -73,7 +73,8 @@ const PayrollRow = React.memo(function PayrollRow({
         <span
           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[p.status || "draft"]}`}
         >
-          {p.status || "draft"}
+          {(p.status || "draft").charAt(0).toUpperCase() +
+            (p.status || "draft").slice(1)}
         </span>
       </td>
       <td className="px-6 py-4 text-right">
@@ -82,6 +83,8 @@ const PayrollRow = React.memo(function PayrollRow({
             variant="ghost"
             size="sm"
             onClick={() => onView(p.id)}
+            aria-label={`View ${p.name}`}
+            title={`View ${p.name}`}
           >
             <Eye className="w-4 h-4" />
           </Button>
@@ -91,7 +94,8 @@ const PayrollRow = React.memo(function PayrollRow({
                 variant="ghost"
                 size="sm"
                 onClick={() => onClone(p)}
-                title="Clone payroll"
+                aria-label={`Clone ${p.name}`}
+                title={`Clone ${p.name}`}
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -99,6 +103,8 @@ const PayrollRow = React.memo(function PayrollRow({
                 variant="ghost"
                 size="sm"
                 onClick={() => onToggleLock(p)}
+                aria-label={p.isLocked ? `Unlock ${p.name}` : `Lock ${p.name}`}
+                title={p.isLocked ? `Unlock ${p.name}` : `Lock ${p.name}`}
               >
                 {p.isLocked ? (
                   <Unlock className="w-4 h-4" />
@@ -111,7 +117,8 @@ const PayrollRow = React.memo(function PayrollRow({
                   variant="ghost"
                   size="sm"
                   onClick={() => onPublish(p)}
-                  title="Publish payroll"
+                  aria-label={`Publish ${p.name}`}
+                  title={`Publish ${p.name}`}
                 >
                   <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -123,6 +130,8 @@ const PayrollRow = React.memo(function PayrollRow({
               variant="ghost"
               size="sm"
               onClick={() => onDelete(p.id)}
+              aria-label={`Delete ${p.name}`}
+              title={`Delete ${p.name}`}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -259,7 +268,6 @@ export function PayrollRunsPage() {
   );
 
   useEffect(() => {
-     
     setCurrentPage(1);
   }, [searchQuery, statusFilter]);
 
@@ -313,58 +321,58 @@ export function PayrollRunsPage() {
         </CardContent>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Name
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Period
-                </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Name
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Period
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : paginatedPayrolls.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No payroll runs found
-                  </td>
-                </tr>
-              ) : (
-                paginatedPayrolls.map((p) => (
-                  <PayrollRow
-                    key={p.id}
-                    payroll={p}
-                    onView={(id) => navigate(`/payroll/${id}`)}
-                    onClone={handleClone}
-                    onToggleLock={toggleLock}
-                    onPublish={handlePublish}
-                    onDelete={handleDelete}
-                    canDeletePayroll={canDelete("payroll", "payroll")}
-                  />
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
+                    </td>
+                  </tr>
+                ) : paginatedPayrolls.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No payroll runs found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedPayrolls.map((p) => (
+                    <PayrollRow
+                      key={p.id}
+                      payroll={p}
+                      onView={(id) => navigate(`/payroll/${id}`)}
+                      onClone={handleClone}
+                      onToggleLock={toggleLock}
+                      onPublish={handlePublish}
+                      onDelete={handleDelete}
+                      canDeletePayroll={canDelete("payroll", "payroll")}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
           {totalPages > 1 && (
             <Pagination

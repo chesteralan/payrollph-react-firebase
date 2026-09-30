@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 
-export type EmptyStateType = 
-  | "data" 
-  | "employees" 
-  | "payroll" 
-  | "calendar" 
-  | "reports" 
-  | "settings" 
-  | "files" 
+export type EmptyStateType =
+  | "data"
+  | "employees"
+  | "payroll"
+  | "calendar"
+  | "reports"
+  | "settings"
+  | "files"
   | "error";
 
 export interface EmptyStateProps {

@@ -1,6 +1,12 @@
 import { useCustomReportBuilder } from "./useCustomReportBuilder";
-import { AVAILABLE_FIELDS, CATEGORIES } from "./CustomReportBuilderPage.constants";
-import type { ReportFilter, SavedReport } from "./CustomReportBuilderPage.types";
+import {
+  AVAILABLE_FIELDS,
+  CATEGORIES,
+} from "./CustomReportBuilderPage.constants";
+import type {
+  ReportFilter,
+  SavedReport,
+} from "./CustomReportBuilderPage.types";
 
 function FieldSelector({
   selectedFields,
@@ -88,9 +94,7 @@ function ReportConfiguration({
           <label className="block text-sm font-medium mb-1">Direction</label>
           <select
             value={sortDirection}
-            onChange={(e) =>
-              setSortDirection(e.target.value as "asc" | "desc")
-            }
+            onChange={(e) => setSortDirection(e.target.value as "asc" | "desc")}
             className="w-full px-3 py-2 border rounded-md"
           >
             <option value="asc">Ascending</option>
@@ -142,17 +146,12 @@ function FilterEditor({
         </button>
       </div>
       {filters.map((filter, index) => (
-        <div
-          key={index}
-          className="grid grid-cols-12 gap-2 mb-3 items-end"
-        >
+        <div key={index} className="grid grid-cols-12 gap-2 mb-3 items-end">
           <div className="col-span-4">
             <label className="block text-xs text-gray-600 mb-1">Field</label>
             <select
               value={filter.field}
-              onChange={(e) =>
-                onUpdate(index, { field: e.target.value })
-              }
+              onChange={(e) => onUpdate(index, { field: e.target.value })}
               className="w-full px-2 py-1 border rounded text-sm"
             >
               {AVAILABLE_FIELDS.map((f) => (
@@ -163,9 +162,7 @@ function FilterEditor({
             </select>
           </div>
           <div className="col-span-3">
-            <label className="block text-xs text-gray-600 mb-1">
-              Operator
-            </label>
+            <label className="block text-xs text-gray-600 mb-1">Operator</label>
             <select
               value={filter.operator}
               onChange={(e) =>
@@ -187,9 +184,7 @@ function FilterEditor({
             <input
               type="text"
               value={String(filter.value)}
-              onChange={(e) =>
-                onUpdate(index, { value: e.target.value })
-              }
+              onChange={(e) => onUpdate(index, { value: e.target.value })}
               className="w-full px-2 py-1 border rounded text-sm"
               placeholder="Enter value"
             />
@@ -299,9 +294,7 @@ function ReportPreview({
           <thead className="bg-gray-50 border-b">
             <tr>
               {selectedFields.map((fieldId) => {
-                const field = AVAILABLE_FIELDS.find(
-                  (f) => f.id === fieldId,
-                );
+                const field = AVAILABLE_FIELDS.find((f) => f.id === fieldId);
                 return (
                   <th
                     key={fieldId}
@@ -334,10 +327,7 @@ function ReportPreview({
                   }`}
                 >
                   {row.__isGroupHeader ? (
-                    <td
-                      colSpan={selectedFields.length}
-                      className="px-4 py-2"
-                    >
+                    <td colSpan={selectedFields.length} className="px-4 py-2">
                       {String(row.__groupKey)}
                     </td>
                   ) : (
@@ -462,10 +452,7 @@ export default function CustomReportBuilderPage() {
 
       {/* Saved Reports Tab */}
       {activeTab === "saved" && (
-        <SavedReportsTable
-          savedReports={savedReports}
-          onLoad={loadReport}
-        />
+        <SavedReportsTable savedReports={savedReports} onLoad={loadReport} />
       )}
 
       {/* Preview Tab */}

@@ -201,150 +201,150 @@ export function TrashPage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("collectionLabel")}
-                >
-                  <div className="flex items-center gap-1">
-                    Type
-                    {sortConfig?.key === "collectionLabel" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("sortName")}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig?.key === "sortName" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
-                  onClick={() => handleSort("sortDate")}
-                >
-                  <div className="flex items-center gap-1">
-                    Deleted
-                    {sortConfig?.key === "sortDate" ? (
-                      sortConfig.direction === "asc" ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )
-                    ) : (
-                      <ChevronsUpDown className="w-3 h-3 opacity-30" />
-                    )}
-                  </div>
-                </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {loading ? (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("collectionLabel")}
                   >
-                    Loading...
-                  </td>
+                    <div className="flex items-center gap-1">
+                      Type
+                      {sortConfig?.key === "collectionLabel" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("sortName")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Name
+                      {sortConfig?.key === "sortName" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700 select-none"
+                    onClick={() => handleSort("sortDate")}
+                  >
+                    <div className="flex items-center gap-1">
+                      Deleted
+                      {sortConfig?.key === "sortDate" ? (
+                        sortConfig.direction === "asc" ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )
+                      ) : (
+                        <ChevronsUpDown className="w-3 h-3 opacity-30" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
                 </tr>
-              ) : sortedItems.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Trash is empty
-                  </td>
-                </tr>
-              ) : (
-                sortedItems.map((item) => (
-                  <tr
-                    key={`${item.collection}-${item.id}`}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {item.collectionLabel}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {item.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {item.deletedAt
-                        ? item.deletedAt.toLocaleDateString()
-                        : "Unknown"}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canEdit("system", "companies") && (
-                          <ConfirmDialog
-                            title="Restore Item"
-                            message={`Restore ${item.name} from ${item.collectionLabel}?`}
-                            confirmText="Restore"
-                            variant="info"
-                            onConfirm={() => handleRestore(item)}
-                          >
-                            {(open) => (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={open}
-                                title="Restore"
-                              >
-                                <RotateCcw className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                        {canDelete("system", "companies") && (
-                          <ConfirmDialog
-                            title="Permanently Delete"
-                            message={`Permanently delete ${item.name}? This cannot be undone.`}
-                            confirmText="Delete Permanently"
-                            variant="danger"
-                            onConfirm={() => handlePermanentDelete(item)}
-                          >
-                            {(open) => (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={open}
-                                title="Delete permanently"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                              </Button>
-                            )}
-                          </ConfirmDialog>
-                        )}
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : sortedItems.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      Trash is empty
+                    </td>
+                  </tr>
+                ) : (
+                  sortedItems.map((item) => (
+                    <tr
+                      key={`${item.collection}-${item.id}`}
+                      className="hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {item.collectionLabel}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {item.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {item.deletedAt
+                          ? item.deletedAt.toLocaleDateString()
+                          : "Unknown"}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {canEdit("system", "companies") && (
+                            <ConfirmDialog
+                              title="Restore Item"
+                              message={`Restore ${item.name} from ${item.collectionLabel}?`}
+                              confirmText="Restore"
+                              variant="info"
+                              onConfirm={() => handleRestore(item)}
+                            >
+                              {(open) => (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={open}
+                                  title="Restore"
+                                >
+                                  <RotateCcw className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </ConfirmDialog>
+                          )}
+                          {canDelete("system", "companies") && (
+                            <ConfirmDialog
+                              title="Permanently Delete"
+                              message={`Permanently delete ${item.name}? This cannot be undone.`}
+                              confirmText="Delete Permanently"
+                              variant="danger"
+                              onConfirm={() => handlePermanentDelete(item)}
+                            >
+                              {(open) => (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={open}
+                                  title="Delete permanently"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-500" />
+                                </Button>
+                              )}
+                            </ConfirmDialog>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>

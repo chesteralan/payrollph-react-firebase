@@ -17,7 +17,13 @@ vi.mock("./useCalendarPage", () => ({
     showRecurringForm: false,
     selectedYear: 2025,
     formData: { date: "", name: "", type: "holiday", isPaid: true },
-    recurringFormData: { month: 0, day: 1, name: "", type: "holiday", isPaid: true },
+    recurringFormData: {
+      month: 0,
+      day: 1,
+      name: "",
+      type: "holiday",
+      isPaid: true,
+    },
     groupedByMonth: {},
     setShowForm: vi.fn(),
     setShowRecurringForm: vi.fn(),
@@ -36,8 +42,18 @@ vi.mock("./useCalendarPage", () => ({
 
 vi.mock("@/utils/calendarUtils", () => ({
   MONTH_NAMES: [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ],
 }));
 
@@ -73,7 +89,9 @@ describe("CalendarPage", () => {
 
   it("shows empty state when no entries", () => {
     renderWithProviders(<CalendarPage />);
-    expect(screen.getByText("No calendar entries for 2025")).toBeInTheDocument();
+    expect(
+      screen.getByText("No calendar entries for 2025"),
+    ).toBeInTheDocument();
   });
 
   it("renders year selector", () => {

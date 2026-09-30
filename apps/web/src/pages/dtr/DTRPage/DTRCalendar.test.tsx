@@ -18,7 +18,8 @@ vi.mock("lucide-react", () => ({
 }));
 
 vi.mock("./DTRComputation", () => ({
-  dateStr: (y: number, m: number, d: number) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
+  dateStr: (y: number, m: number, d: number) =>
+    `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
   dayStatus: () => "none",
 }));
 
@@ -30,14 +31,29 @@ vi.mock("./DTRStatsCards", () => ({
 
 vi.mock("@/components/ui/Card", () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  CardTitle: ({ children }: { children: React.ReactNode }) => <h4>{children}</h4>,
+  CardContent: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardHeader: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <h4>{children}</h4>
+  ),
 }));
 
 vi.mock("@/components/ui/Button", () => ({
-  Button: ({ children, onClick, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }) => (
-    <button onClick={onClick} {...rest}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    ...rest
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    variant?: string;
+    size?: string;
+  }) => (
+    <button onClick={onClick} {...rest}>
+      {children}
+    </button>
   ),
 }));
 
@@ -46,7 +62,13 @@ vi.mock("@/components/ui/CalendarGrid", () => ({
 }));
 
 const defaultProps = {
-  stats: { daysWorked: 22, totalHours: 176, totalOvertime: 12, totalLate: 2.5, totalAbsences: 3 },
+  stats: {
+    daysWorked: 22,
+    totalHours: 176,
+    totalOvertime: 12,
+    totalLate: 2.5,
+    totalAbsences: 3,
+  },
   selectedYear: 2026,
   selectedMonth: 0,
   daysInMonth: 31,
@@ -101,9 +123,7 @@ describe("DTRCalendar", () => {
 
   it("renders leave balances when provided", () => {
     setup({
-      leaveBalances: [
-        { id: "b1", benefitId: "ben1", remaining: 5 } as never,
-      ],
+      leaveBalances: [{ id: "b1", benefitId: "ben1", remaining: 5 } as never],
       benefits: [{ id: "ben1", name: "Vacation Leave" }],
     });
     expect(screen.getByText("Leave Balances")).toBeInTheDocument();

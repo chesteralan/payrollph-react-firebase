@@ -144,9 +144,9 @@ describe("useUserPermissions", () => {
     const wrapper = createWrapper(stores);
     const { result } = renderHook(() => useUserPermissions(), { wrapper });
 
-    expect(
-      result.current.hasPermission("payroll", "payroll", "view"),
-    ).toBe(false);
+    expect(result.current.hasPermission("payroll", "payroll", "view")).toBe(
+      false,
+    );
   });
 
   it("hasPermission returns correct values based on restrictions", () => {
@@ -169,18 +169,18 @@ describe("useUserPermissions", () => {
     const wrapper = createWrapper(stores);
     const { result } = renderHook(() => useUserPermissions(), { wrapper });
 
-    expect(
-      result.current.hasPermission("payroll", "payroll", "view"),
-    ).toBe(true);
-    expect(
-      result.current.hasPermission("payroll", "payroll", "add"),
-    ).toBe(true);
-    expect(
-      result.current.hasPermission("payroll", "payroll", "edit"),
-    ).toBe(false);
-    expect(
-      result.current.hasPermission("payroll", "payroll", "delete"),
-    ).toBe(false);
+    expect(result.current.hasPermission("payroll", "payroll", "view")).toBe(
+      true,
+    );
+    expect(result.current.hasPermission("payroll", "payroll", "add")).toBe(
+      true,
+    );
+    expect(result.current.hasPermission("payroll", "payroll", "edit")).toBe(
+      false,
+    );
+    expect(result.current.hasPermission("payroll", "payroll", "delete")).toBe(
+      false,
+    );
   });
 
   it("hasPermission returns false for unmatched department/section", () => {
@@ -203,8 +203,8 @@ describe("useUserPermissions", () => {
     const wrapper = createWrapper(stores);
     const { result } = renderHook(() => useUserPermissions(), { wrapper });
 
-    expect(
-      result.current.hasPermission("employees", "employees", "view"),
-    ).toBe(false);
+    expect(result.current.hasPermission("employees", "employees", "view")).toBe(
+      false,
+    );
   });
 });

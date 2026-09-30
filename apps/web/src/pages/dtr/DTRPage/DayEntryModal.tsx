@@ -56,9 +56,7 @@ export function DayEntryModal({
               label="Time In"
               type="time"
               value={dayForm.timeIn}
-              onChange={(e) =>
-                onChange({ ...dayForm, timeIn: e.target.value })
-              }
+              onChange={(e) => onChange({ ...dayForm, timeIn: e.target.value })}
             />
             <Input
               id="timeOut"
@@ -72,8 +70,7 @@ export function DayEntryModal({
           </div>
           {dayForm.timeIn && dayForm.timeOut && (
             <p className="text-sm text-gray-600">
-              Hours Worked:{" "}
-              <span className="font-medium">{hoursWorked}</span>
+              Hours Worked: <span className="font-medium">{hoursWorked}</span>
             </p>
           )}
           <div className="grid grid-cols-2 gap-4">
@@ -142,9 +139,7 @@ export function DayEntryModal({
             id="notes"
             label="Notes"
             value={dayForm.notes}
-            onChange={(e) =>
-              onChange({ ...dayForm, notes: e.target.value })
-            }
+            onChange={(e) => onChange({ ...dayForm, notes: e.target.value })}
           />
           <div className="flex items-center justify-between pt-2">
             {canDelete && hasExistingEntry && (

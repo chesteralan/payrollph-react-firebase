@@ -1,13 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { z } from "zod";
 import { addMockDocs, clearMockDocs, getMockDocs } from "../__mocks__/firebase";
-import {
-  getDoc,
-  getDocs,
-  collection,
-  query,
-  where,
-} from "firebase/firestore";
+import { getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import {
   hasSchema,
   getByIdValidated,
@@ -146,13 +140,12 @@ describe("getByIdValidated", () => {
   });
 
   it("throws ValidationFailure when document fails schema validation", async () => {
-    addMockDocs("payroll/bad-doc", [
-      { id: "bad-doc", name: "", month: 13 },
-    ]);
+    addMockDocs("payroll/bad-doc", [{ id: "bad-doc", name: "", month: 13 }]);
 
-    await expect(
-      getByIdValidated("payroll", "bad-doc"),
-    ).rejects.toHaveProperty("collection", "payroll");
+    await expect(getByIdValidated("payroll", "bad-doc")).rejects.toHaveProperty(
+      "collection",
+      "payroll",
+    );
   });
 
   it("passes through data for collections without a schema", async () => {
@@ -206,10 +199,7 @@ describe("getAllValidated", () => {
   });
 
   it("skips invalid documents and returns only valid ones", async () => {
-    addMockDocs("payroll", [
-      validPayroll,
-      { id: "bad-doc", name: "" },
-    ]);
+    addMockDocs("payroll", [validPayroll, { id: "bad-doc", name: "" }]);
 
     const result = await getAllValidated("payroll");
 

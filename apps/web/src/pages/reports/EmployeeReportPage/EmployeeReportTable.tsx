@@ -15,37 +15,57 @@ function ExpandedDetail({ emp }: { emp: EmployeeReportData }) {
       <td colSpan={10} className="px-4 py-3">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">SSS</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              SSS
+            </div>
             <div className="text-gray-900">{emp.profile?.sss || "-"}</div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">TIN</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              TIN
+            </div>
             <div className="text-gray-900">{emp.profile?.tin || "-"}</div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">PhilHealth</div>
-            <div className="text-gray-900">{emp.profile?.philhealth || "-"}</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              PhilHealth
+            </div>
+            <div className="text-gray-900">
+              {emp.profile?.philhealth || "-"}
+            </div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">HDMF/Pag-IBIG</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              HDMF/Pag-IBIG
+            </div>
             <div className="text-gray-900">{emp.profile?.hdmf || "-"}</div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">Bank</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              Bank
+            </div>
             <div className="text-gray-900">{emp.profile?.bankName || "-"}</div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">Bank Account</div>
-            <div className="text-gray-900">{emp.profile?.bankAccount || "-"}</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              Bank Account
+            </div>
+            <div className="text-gray-900">
+              {emp.profile?.bankAccount || "-"}
+            </div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">Email</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              Email
+            </div>
             <div className="text-gray-900">
               {getPrimaryContact(emp.contacts, "email") || "-"}
             </div>
           </div>
           <div>
-            <div className="text-xs font-medium text-gray-500 uppercase">Address</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">
+              Address
+            </div>
             <div className="text-gray-900">
               {getPrimaryContact(emp.contacts, "address") || "-"}
             </div>

@@ -48,13 +48,17 @@ describe("PersonalInfoSection", () => {
 
   it("renders HDMF input with correct value", () => {
     render(<PersonalInfoSection {...setup()} />);
-    expect(screen.getByLabelText("HDMF (Pag-IBIG)")).toHaveValue("1234-5678-9012");
+    expect(screen.getByLabelText("HDMF (Pag-IBIG)")).toHaveValue(
+      "1234-5678-9012",
+    );
   });
 
   it("renders bank name and account inputs", () => {
     render(<PersonalInfoSection {...setup()} />);
     expect(screen.getByLabelText("Bank Name")).toHaveValue("BDO");
-    expect(screen.getByLabelText("Bank Account Number")).toHaveValue("1234567890");
+    expect(screen.getByLabelText("Bank Account Number")).toHaveValue(
+      "1234567890",
+    );
   });
 
   it("renders date of birth input", () => {
@@ -74,7 +78,9 @@ describe("PersonalInfoSection", () => {
 
   it("calls onProfileFormChange when SSS input changes", () => {
     const onChange = vi.fn();
-    render(<PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />);
+    render(
+      <PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />,
+    );
     fireEvent.change(screen.getByLabelText("SSS Number"), {
       target: { value: "00-0000000-0" },
     });
@@ -100,7 +106,9 @@ describe("PersonalInfoSection", () => {
 
   it("calls onProfileFormChange when gender select changes", () => {
     const onChange = vi.fn();
-    render(<PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />);
+    render(
+      <PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />,
+    );
     fireEvent.change(screen.getByDisplayValue("Male"), {
       target: { value: "female" },
     });
@@ -109,7 +117,9 @@ describe("PersonalInfoSection", () => {
 
   it("calls onProfileFormChange when civil status select changes", () => {
     const onChange = vi.fn();
-    render(<PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />);
+    render(
+      <PersonalInfoSection {...setup({ onProfileFormChange: onChange })} />,
+    );
     fireEvent.change(screen.getByDisplayValue("Single"), {
       target: { value: "married" },
     });

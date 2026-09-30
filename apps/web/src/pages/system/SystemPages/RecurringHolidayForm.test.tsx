@@ -28,9 +28,7 @@ describe("RecurringHolidayForm", () => {
     expect(
       screen.getByRole("button", { name: /create recurring holiday/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /cancel/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
   it("displays the provided form values", () => {

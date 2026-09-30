@@ -22,8 +22,6 @@ describe("RestrictionsPage", () => {
 
   it("displays instructions about permissions", () => {
     renderWithProviders(<RestrictionsPage />);
-    expect(
-      screen.getByText(/manage permissions/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/manage permissions/i)).toBeInTheDocument();
   });
 });

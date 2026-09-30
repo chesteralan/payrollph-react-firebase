@@ -363,9 +363,7 @@ describe("exportToCsv", () => {
     ];
     const url = await exportToCsv(data, "test");
     // If URL.createObjectURL was called with a Blob, the export succeeded
-    expect(URL.createObjectURL).toHaveBeenCalledWith(
-      expect.any(Blob),
-    );
+    expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
     const blob = (URL.createObjectURL as ReturnType<typeof vi.fn>).mock
       .calls[0][0];
     expect(blob.type).toBe("text/csv");
