@@ -12,6 +12,7 @@ const defaultFormData: CalendarFormData = {
 };
 
 const defaultProps = {
+  isOpen: true,
   formData: defaultFormData,
   editingId: null,
   onFormDataChange: vi.fn(),

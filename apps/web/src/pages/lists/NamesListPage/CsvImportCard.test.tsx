@@ -13,6 +13,7 @@ vi.mock("@/hooks/usePermissions", () => ({
 }));
 
 const defaultProps = {
+  isOpen: true,
   csvPreview: [],
   csvFileName: "",
   importStats: null,
