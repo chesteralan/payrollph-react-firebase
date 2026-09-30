@@ -77,15 +77,15 @@ describe("Sidebar", () => {
       expect(screen.getByLabelText("Main navigation")).toBeInTheDocument();
     });
 
-    it("renders the user display name and email", () => {
+    it("does not render user display name or email (moved to Header)", () => {
       renderSidebar();
-      expect(screen.getByText("Admin User")).toBeInTheDocument();
-      expect(screen.getByText("admin@test.com")).toBeInTheDocument();
+      expect(screen.queryByText("Admin User")).not.toBeInTheDocument();
+      expect(screen.queryByText("admin@test.com")).not.toBeInTheDocument();
     });
 
-    it("renders the logout button", () => {
+    it("does not render a logout button (moved to Header)", () => {
       renderSidebar();
-      expect(screen.getByLabelText("Logout")).toBeInTheDocument();
+      expect(screen.queryByLabelText("Logout")).not.toBeInTheDocument();
     });
   });
 
@@ -251,17 +251,9 @@ describe("Sidebar", () => {
   });
 
   describe("Logout", () => {
-    it("calls logout function when logout button is clicked", async () => {
-      const logout = vi.fn(async () => {});
-      vi.spyOn(useAuthModule, "useAuth").mockReturnValue(
-        createMockAuth({ logout }),
-      );
-
+    it("does not handle logout (logout lives in Header)", () => {
       renderSidebar();
-      const logoutBtn = screen.getByLabelText("Logout");
-      await userEvent.click(logoutBtn);
-
-      expect(logout).toHaveBeenCalledTimes(1);
+      expect(screen.queryByLabelText("Logout")).not.toBeInTheDocument();
     });
   });
 

@@ -194,10 +194,12 @@ describe("checkSetupNeeded", () => {
     );
   });
 
-  it("should handle Firestore errors gracefully", async () => {
+  it("should return false when Firestore errors (fail open)", async () => {
     vi.mocked(getDocs).mockRejectedValueOnce(new Error("Permission denied"));
 
-    // The function does not catch errors, so it will throw
-    await expect(checkSetupNeeded()).rejects.toThrow("Permission denied");
+    // Fail open: assume setup is not needed so login remains usable
+    const needed = await checkSetupNeeded();
+
+    expect(needed).toBe(false);
   });
 });

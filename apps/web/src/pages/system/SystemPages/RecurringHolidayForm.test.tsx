@@ -5,6 +5,7 @@ import { renderWithProviders } from "@/test/page-test-utils";
 import type { RecurringFormData } from "./useCalendarPage";
 
 const defaultProps = {
+  isOpen: true,
   formData: {
     month: 1,
     day: 1,
