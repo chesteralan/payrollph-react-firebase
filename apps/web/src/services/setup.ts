@@ -95,6 +95,16 @@ export async function setupAdminUser({
 }
 
 export async function checkSetupNeeded(): Promise<boolean> {
-  const snap = await getDocs(collection(db, "user_accounts"));
-  return snap.empty;
+  try {
+    const snap = await Promise.race([
+      getDocs(collection(db, "user_accounts")),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Setup check timeout")), 2000),
+      ),
+    ]);
+    return snap.empty;
+  } catch (error) {
+    console.warn("Setup check failed, assuming setup not needed:", error);
+    return false;
+  }
 }

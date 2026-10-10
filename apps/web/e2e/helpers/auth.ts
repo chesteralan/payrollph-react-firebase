@@ -43,6 +43,28 @@ export async function mockFirebaseAuth(page: Page) {
   await page.route("**/firestore.googleapis.com/**", (route) => {
     const url = route.request().url();
 
+    // Prevent LoginPage from redirecting to /setup:
+    // checkSetupNeeded() treats a non-empty user_accounts collection as "already set up".
+    if (url.includes("user_accounts")) {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          documents: [
+            {
+              name: "projects/dummy-project/databases/(default)/documents/user_accounts/test-user-uid",
+              fields: {
+                username: { stringValue: "testuser" },
+                email: { stringValue: "test@example.com" },
+                displayName: { stringValue: "Test User" },
+                isActive: { booleanValue: true },
+              },
+            },
+          ],
+        }),
+      });
+    }
+
     // Mock companies query
     if (url.includes("/documents/companies")) {
       return route.fulfill({

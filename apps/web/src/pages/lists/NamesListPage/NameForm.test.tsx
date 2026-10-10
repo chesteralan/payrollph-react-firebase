@@ -13,6 +13,7 @@ vi.mock("@/hooks/usePermissions", () => ({
 }));
 
 const defaultProps = {
+  isOpen: true,
   editingId: null,
   formData: {
     firstName: "",

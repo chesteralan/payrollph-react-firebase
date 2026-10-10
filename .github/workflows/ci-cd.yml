@@ -262,6 +262,18 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Create e2e Firebase env file
+        working-directory: apps/web
+        run: |
+          cat > .env << 'EOF'
+          VITE_FIREBASE_API_KEY=AIzaSyDummyKeyForE2ETests1234567890
+          VITE_FIREBASE_AUTH_DOMAIN=dummy-project.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID=dummy-project
+          VITE_FIREBASE_STORAGE_BUCKET=dummy-project.appspot.com
+          VITE_FIREBASE_MESSAGING_SENDER_ID=1234567890
+          VITE_FIREBASE_APP_ID=1:1234567890:web:abcdef123456
+          EOF
+
       - name: Install Playwright browsers
         working-directory: apps/web
         run: yarn playwright install --with-deps chromium firefox

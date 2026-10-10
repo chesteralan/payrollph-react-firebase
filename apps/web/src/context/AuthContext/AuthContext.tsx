@@ -138,89 +138,98 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      setFirebaseUser(fbUser);
+      try {
+        setFirebaseUser(fbUser);
 
-      if (fbUser) {
-        const userDoc = await getDoc(doc(db, "user_accounts", fbUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUser({
-            id: fbUser.uid,
-            email: fbUser.email || "",
-            username: userData.username,
-            displayName: userData.displayName,
-            avatarUrl: userData.avatarUrl,
-            isActive: userData.isActive ?? true,
-            createdAt: userData.createdAt?.toDate(),
-            updatedAt: userData.updatedAt?.toDate(),
-          });
+        if (fbUser) {
+          const userDoc = await getDoc(doc(db, "user_accounts", fbUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({
+              id: fbUser.uid,
+              email: fbUser.email || "",
+              username: userData.username,
+              displayName: userData.displayName,
+              avatarUrl: userData.avatarUrl,
+              isActive: userData.isActive ?? true,
+              createdAt: userData.createdAt?.toDate(),
+              updatedAt: userData.updatedAt?.toDate(),
+            });
 
-          const [restrictionsSnap, companiesSnap, settingsSnap] =
-            await Promise.all([
-              getDocs(
-                query(
-                  collection(db, "user_restrictions"),
-                  where("userId", "==", fbUser.uid),
+            const [restrictionsSnap, companiesSnap, settingsSnap] =
+              await Promise.all([
+                getDocs(
+                  query(
+                    collection(db, "user_restrictions"),
+                    where("userId", "==", fbUser.uid),
+                  ),
                 ),
-              ),
-              getDocs(
-                query(
-                  collection(db, "user_companies"),
-                  where("userId", "==", fbUser.uid),
+                getDocs(
+                  query(
+                    collection(db, "user_companies"),
+                    where("userId", "==", fbUser.uid),
+                  ),
                 ),
-              ),
-              getDocs(
-                query(
-                  collection(db, "user_settings"),
-                  where("userId", "==", fbUser.uid),
+                getDocs(
+                  query(
+                    collection(db, "user_settings"),
+                    where("userId", "==", fbUser.uid),
+                  ),
                 ),
-              ),
-            ]);
+              ]);
 
-          const restrictionsData = restrictionsSnap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          })) as UserRestriction[];
-          const companiesData = companiesSnap.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          })) as UserCompany[];
-          const settingsDoc = settingsSnap.docs[0];
-          const settingsData = settingsDoc
-            ? ({ id: settingsDoc.id, ...settingsDoc.data() } as UserSettings)
-            : null;
+            const restrictionsData = restrictionsSnap.docs.map((d) => ({
+              id: d.id,
+              ...d.data(),
+            })) as UserRestriction[];
+            const companiesData = companiesSnap.docs.map((d) => ({
+              id: d.id,
+              ...d.data(),
+            })) as UserCompany[];
+            const settingsDoc = settingsSnap.docs[0];
+            const settingsData = settingsDoc
+              ? ({ id: settingsDoc.id, ...settingsDoc.data() } as UserSettings)
+              : null;
 
-          setRestrictions(restrictionsData);
-          setUserCompanies(companiesData);
-          setSettings(settingsData);
+            setRestrictions(restrictionsData);
+            setUserCompanies(companiesData);
+            setSettings(settingsData);
 
-          if (settingsData?.locale) {
-            setHtmlLang(settingsData.locale as Locale);
+            if (settingsData?.locale) {
+              setHtmlLang(settingsData.locale as Locale);
+            }
+
+            if (companiesData.length > 0) {
+              const primary = companiesData.find((c) => c.isPrimary);
+              setCurrentCompanyIdState(
+                settingsData?.defaultCompanyId ||
+                  primary?.companyId ||
+                  companiesData[0]?.companyId ||
+                  null,
+              );
+            }
+
+            resetIdleTimer();
           }
-
-          if (companiesData.length > 0) {
-            const primary = companiesData.find((c) => c.isPrimary);
-            setCurrentCompanyIdState(
-              settingsData?.defaultCompanyId ||
-                primary?.companyId ||
-                companiesData[0]?.companyId ||
-                null,
-            );
-          }
-
-          resetIdleTimer();
+        } else {
+          setUser(null);
+          setRestrictions([]);
+          setUserCompanies([]);
+          setSettings(null);
+          setCurrentCompanyIdState(null);
+          setSessionExpiring(false);
+          clearSessionTimers();
         }
-      } else {
+      } catch (error) {
+        console.error("Auth state change failed:", error);
         setUser(null);
         setRestrictions([]);
         setUserCompanies([]);
         setSettings(null);
         setCurrentCompanyIdState(null);
-        setSessionExpiring(false);
-        clearSessionTimers();
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {

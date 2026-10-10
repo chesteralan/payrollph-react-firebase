@@ -16,13 +16,22 @@ export function LoginPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     checkSetupNeeded()
       .then((needed: boolean) => {
-        if (needed) {
+        if (!cancelled && needed) {
           navigate("/setup", { replace: true });
         }
       })
-      .finally(() => setChecking(false));
+      .catch(() => {
+        // Fail open: show the login form even if the setup check fails.
+      })
+      .finally(() => {
+        if (!cancelled) setChecking(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

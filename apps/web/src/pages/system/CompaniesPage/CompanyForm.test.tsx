@@ -25,6 +25,7 @@ const mockColumnGroup: CompanyColumnGroup = {
 };
 
 const defaultProps = {
+  isOpen: true,
   formData: mockFormData,
   columnGroup: mockColumnGroup,
   editingId: null,

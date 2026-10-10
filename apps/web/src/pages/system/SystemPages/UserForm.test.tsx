@@ -4,6 +4,7 @@ import { UserForm } from "./UserForm";
 import { renderWithProviders } from "@/test/page-test-utils";
 
 const defaultProps = {
+  isOpen: true,
   editingId: null as string | null,
   formData: {
     username: "",

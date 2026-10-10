@@ -85,9 +85,9 @@ describe("AppLayout", () => {
 
     it("renders the header bar with user name", () => {
       renderAppLayout();
-      // "Admin User" appears twice: in sidebar footer and header
+      // "Admin User" appears once: in the header (sidebar no longer shows it)
       const userElements = screen.getAllByText("Admin User");
-      expect(userElements.length).toBeGreaterThanOrEqual(2);
+      expect(userElements.length).toBe(1);
     });
 
     it("renders the breadcrumb navigation", () => {

@@ -13,6 +13,7 @@ vi.mock("@/hooks/usePermissions", () => ({
 }));
 
 const defaultProps = {
+  isOpen: true,
   selectedCount: 3,
   groups: [{ id: "g1", name: "Group A", isActive: true }],
   positions: [{ id: "p1", name: "Position A", isActive: true }],
